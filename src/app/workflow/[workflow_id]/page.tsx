@@ -2,12 +2,12 @@
 
 import { backendService } from '@/app/services/backend'
 import SideBar from './SideBar'
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange } from '@xyflow/react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange, Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { WorkFlow, WorkflowNode } from '@/types/backendService';
-import { cvtWorkflowNodeToReactFlowNode } from '@/lib/utils';
+import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/utils';
 import { Node } from "@xyflow/react"
 import { customNodeTypes } from '@/NodeType/constants';
 
@@ -16,7 +16,7 @@ const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }
     const [workflow, setWorkflow] = useState<WorkFlow | null>(null);
     const [workflowId, setWorkflowId] = useState<string | null>(null);
     const [nodes, setNodes] = useState<Node[]>([]);
-    const [connections, setConnections] = useState<string | null>(null);
+    const [connections, setConnections] = useState<Edge[]>([]);
 
     useEffect(() => {
         const initializeParams = async () => {
@@ -32,15 +32,15 @@ const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }
         const fetchWorkflow = async () => {
             const workflowInfo = await backendService.getWorkFlow(workflowId);
             const workflowNodes = await backendService.getWorkFlowNodes(workflowId);
-            const workflowConnections = await backendService.getWorkFlowNodes(workflowId);
+            const workflowConnections = await backendService.getWorkFlowConnections(workflowId);
             setWorkflow(workflowInfo)
             setNodes(workflowNodes.map(node => cvtWorkflowNodeToReactFlowNode(node)))
-            // setNodes(workflowConnections)
-            console.log(workflowConnections)
+            setConnections(workflowConnections.map(edge=>cvtWorkFlowEdgeToReactFlowEdge(edge)))
         };
 
         fetchWorkflow();
     }, [workflowId]);
+    console.log(connections)
 
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -58,9 +58,13 @@ const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }
                 <SideBar />
                 <div className="border rounded m-2 p-2">
                     <ReactFlow
+                        nodeTypes={customNodeTypes}
+                        
                         onNodesChange={onNodesChange}
                         nodes={nodes}
-                        nodeTypes={customNodeTypes}
+
+                        edges={connections}
+                        
                         fitView
                     >
                         <Background />

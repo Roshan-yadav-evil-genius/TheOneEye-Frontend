@@ -1,4 +1,5 @@
-import { NodeType, WorkFlow, WorkflowNode } from '@/types/backendService';
+import { NodeType, WorkFlow, WorkflowEdge, WorkflowNode } from '@/types/backendService';
+import { Edge } from '@xyflow/react';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8001/api';
@@ -17,7 +18,7 @@ export const backendService={
       const response = await backend.get(`/workflow/${workflow_id}/`);
       return response.data;
     },
-    getWorkFlowNodeTypes:async(workflow_id:string):Promise<NodeType[]>=>{
+    getWorkFlowNodeTypes:async():Promise<NodeType[]>=>{
       const response = await backend.get(`/node-types/`);
       return response.data;
     },
@@ -25,7 +26,7 @@ export const backendService={
       const response = await backend.get(`/workflow/${workflow_id}/nodes/`);
       return response.data;
     },
-    getWorkFlowConnections:async(workflow_id:string):Promise<WorkFlow>=>{
+    getWorkFlowConnections:async(workflow_id:string):Promise<WorkflowEdge[]>=>{
       const response = await backend.get(`/workflow/${workflow_id}/connections/`);
       return response.data;
     }

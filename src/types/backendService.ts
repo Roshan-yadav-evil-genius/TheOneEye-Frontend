@@ -24,3 +24,10 @@ export type WorkflowNode = {
     position_y: number;
     data: Record<string, string>;
 };
+
+
+export type WorkflowEdge = {
+    id: string;
+    source_node: string;
+    target_node: string;
+  };
