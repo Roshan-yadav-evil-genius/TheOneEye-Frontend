@@ -1,13 +1,11 @@
-import { WorkFlow } from '@/types/backendService';
+import { NodeType, WorkFlow, WorkflowNode } from '@/types/backendService';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:8001/api';
 
 const backend = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+
 });
 
 export const backendService={
@@ -19,7 +17,11 @@ export const backendService={
       const response = await backend.get(`/workflow/${workflow_id}/`);
       return response.data;
     },
-    getWorkFlowNodes:async(workflow_id:string):Promise<WorkFlow>=>{
+    getWorkFlowNodeTypes:async(workflow_id:string):Promise<NodeType[]>=>{
+      const response = await backend.get(`/node-types/`);
+      return response.data;
+    },
+    getWorkFlowNodes:async(workflow_id:string):Promise<WorkflowNode[]>=>{
       const response = await backend.get(`/workflow/${workflow_id}/nodes/`);
       return response.data;
     },

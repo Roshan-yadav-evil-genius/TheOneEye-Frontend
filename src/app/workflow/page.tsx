@@ -1,14 +1,27 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import { backendService } from '../services/backend'
 import Link from 'next/link';
+import { WorkFlow } from '@/types/backendService';
 
-const WorkFlow = async () => {
-  const workflows = await backendService.getWorkFlows();
+const WorkFlowPage = () => {
+  const [workFlows, setWorkFlows] = useState<WorkFlow[]>([])
+
+
+  useEffect(()=>{
+    const loadWorkFlows = async () =>{
+      const data = await backendService.getWorkFlows();
+      setWorkFlows(data)
+    }
+    loadWorkFlows()
+  },[])
+  
+
   return (
     <div className='m-5'>
       <h1>WorkFlows</h1>
       <ul>
-        {workflows.map((workflow, index) => {
+        {workFlows.map((workflow, index) => {
           return (
             <li key={index}>
               <Link href={`/workflow/${workflow.id}`} className='border rounded m-5 p-5 flex flex-col'>
@@ -23,4 +36,4 @@ const WorkFlow = async () => {
   )
 }
 
-export default WorkFlow
+export default WorkFlowPage
