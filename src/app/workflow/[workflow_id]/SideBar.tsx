@@ -3,6 +3,8 @@ import { backendService } from '@/app/services/backend'
 import { TNodeType } from '@/types/backendService'
 import { ENodeTypes } from '@/constants/NodeTypes'
 import { cvtnodeTypesValueToEnum } from '@/lib/converter'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getNodeAvatar } from '@/NodeType/Mappings'
 
 type SideBarProps = {
   addNode: (nodeType:ENodeTypes) => void
@@ -29,7 +31,11 @@ const SideBar = (props: SideBarProps) => {
               onClick={()=>props.addNode(cvtnodeTypesValueToEnum(nodeType.id))}
               className="border rounded m-2 p-2 active:bg-gray-400 hover:bg-gray-200"
             >
-              <div>
+              <div className='flex items-center gap-2'>
+              <Avatar className='size-5'>
+                    <AvatarImage src={getNodeAvatar(cvtnodeTypesValueToEnum(nodeType.id))} />
+                    <AvatarFallback className='bg-red-400 '>{nodeType.name.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
+                  </Avatar>
                 {nodeType.name}
               </div>
               <p className='text-xs text-gray-400'>{nodeType.description}</p>

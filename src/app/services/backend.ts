@@ -60,6 +60,11 @@ export const backendService = {
     const newNodePosition = cvtXYPositionToWorkFlowPosition(position);
     const response = await backend.patch(`/workflow/${workflow_id}/nodes/${node_id}/`, newNodePosition);
     return response.data;
-  }
+  },
+  patchWorkFlowNodeData: async (workflow_id: string, node_id: string, data: Record<string, any>): Promise<TWorkflowNode> => {
+    const newNodeData = {data:data};
+    const response = await backend.patch(`/workflow/${workflow_id}/nodes/${node_id}/`, newNodeData);
+    return response.data;
+  },
 
 }
