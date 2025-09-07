@@ -4,6 +4,8 @@ import { EllipsisVertical, GripVertical, Trash } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useReactFlow } from '@xyflow/react'
 import { backendService } from '@/app/services/backend'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
 
 type BaseNodeProps = React.HTMLAttributes<HTMLElement> & {
     node_id: string
@@ -14,15 +16,14 @@ type BaseNodeProps = React.HTMLAttributes<HTMLElement> & {
 }
 
 const BaseNode = ({ node_id, title, avatar, children, selected = false, className = '', ...rest }: BaseNodeProps) => {
-    const {setNodes}=useReactFlow();
-
-    const onDelete = async (node_id: string) => {
-
-        // if (!workflowId) return;
-        // const isDeleted = await backendService.deleteWorkFlowNode(workflowId, node_id);
-        // if (isDeleted) {
+    const { setNodes } = useReactFlow();
+    const workFlow_id = useSelector((state: RootState) => state.WorkFlow.id);
+    
+    const onDelete = async (workflow_id: string, node_id: string) => {
+        const isDeleted = await backendService.deleteWorkFlowNode(workflow_id, node_id);
+        if (isDeleted) {
             setNodes((nodesSnapshot) => nodesSnapshot.filter(node => node.id !== node_id))
-        // }
+        }
     }
 
     return (
@@ -48,7 +49,7 @@ const BaseNode = ({ node_id, title, avatar, children, selected = false, classNam
                     </div>
                 </div>
                 <div>
-                    <Trash className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' onClick={() =>onDelete(node_id)} />
+                    <Trash onClick={() => onDelete(workFlow_id, node_id)} className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' />
                 </div>
             </header>
             <main className='border rounded p-2'>

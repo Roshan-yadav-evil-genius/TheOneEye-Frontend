@@ -38,7 +38,7 @@ export const backendService = {
     return response.data;
   },
   deleteWorkFlowNode: async (workflow_id: string, node_id: string): Promise<boolean> => {
-    const response = await backend.delete(`/workflow/${workflow_id}/nodes/${node_id}`);
+    const response = await backend.delete(`/workflow/${workflow_id}/nodes/${node_id}/`);
     if(response.status===204){
       return true
     }
