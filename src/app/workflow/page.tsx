@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import { backendService } from '../services/backend'
 import Link from 'next/link';
-import { WorkFlow } from '@/types/backendService';
+import { TWorkFlow } from '@/types/backendService';
 
 const WorkFlowPage = () => {
-  const [workFlows, setWorkFlows] = useState<WorkFlow[]>([])
+  const [workFlows, setWorkFlows] = useState<TWorkFlow[]>([])
 
 
   useEffect(()=>{
@@ -15,7 +15,7 @@ const WorkFlowPage = () => {
     }
     loadWorkFlows()
   },[])
-  
+
 
   return (
     <div className='m-5'>

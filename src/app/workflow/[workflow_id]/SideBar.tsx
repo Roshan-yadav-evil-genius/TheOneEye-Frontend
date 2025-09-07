@@ -2,25 +2,35 @@ import { Input } from '@/components/ui/input'
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { backendService } from '@/app/services/backend'
-import { NodeType } from '@/types/backendService'
+import { TNodeType } from '@/types/backendService'
+import { nodeTypesValueToEnum } from '@/NodeType/constants'
+import { ENodeTypes } from '@/types/nodeConnection'
 
-const SideBar = () => {
-  const [nodes, setNodes] = useState<NodeType[]>([])
+type SideBarProps = {
+  addNode: (nodeType:ENodeTypes) => void
+}
 
-  useEffect(()=>{
-    const loadNodeTypes=async ()=>{
+const SideBar = (props: SideBarProps) => {
+  const [nodeTypes, setNodes] = useState<TNodeType[]>([])
+
+  useEffect(() => {
+    const loadNodeTypes = async () => {
       const _nodes = await backendService.getWorkFlowNodeTypes()
       setNodes(_nodes)
     }
     loadNodeTypes()
-  },[])
+  }, [])
   return (
     <div className="border rounded m-2 p-2 gap-2 flex flex-col">
       <h1 className='text-xl font-bold text-gray-700'>Nodes</h1>
       <ul className='border rounded'>
-      {
-          nodes.map((node) => {
-            return <li key={node.id} className="border rounded m-2 p-2 active:bg-gray-400 hover:bg-gray-200">{node.name}</li>
+        {
+          nodeTypes.map((nodeType) => {
+            return <li
+              key={nodeType.id}
+              onClick={()=>props.addNode(nodeTypesValueToEnum(nodeType.id))}
+              className="border rounded m-2 p-2 active:bg-gray-400 hover:bg-gray-200"
+            >{nodeType.name}</li>
           })
         }
       </ul>

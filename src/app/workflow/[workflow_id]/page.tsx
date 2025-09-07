@@ -2,29 +2,24 @@
 
 import { backendService } from '@/app/services/backend'
 import SideBar from './SideBar'
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange, Edge } from '@xyflow/react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange, Edge, NodePositionChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { WorkFlow, WorkflowNode } from '@/types/backendService';
-import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/utils';
+import { use, useCallback, useEffect, useState } from 'react';
+import { TWorkFlow } from '@/types/backendService';
+import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/typeConverter';
 import { Node } from "@xyflow/react"
 import { customNodeTypes } from '@/NodeType/constants';
+import { ENodeTypes } from '@/types/nodeConnection';
 
 
 const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }) => {
-    const [workflow, setWorkflow] = useState<WorkFlow | null>(null);
-    const [workflowId, setWorkflowId] = useState<string | null>(null);
+    const { workflow_id } = use(params);
+    const [workflow, setWorkflow] = useState<TWorkFlow | null>(null);
+    const [workflowId, setWorkflowId] = useState<string | null>(workflow_id);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [connections, setConnections] = useState<Edge[]>([]);
 
-    useEffect(() => {
-        const initializeParams = async () => {
-            const resolvedParams = await params;
-            setWorkflowId(resolvedParams.workflow_id);
-        };
-        initializeParams();
-    }, [params]);
 
     useEffect(() => {
         if (!workflowId) return;
@@ -35,16 +30,35 @@ const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }
             const workflowConnections = await backendService.getWorkFlowConnections(workflowId);
             setWorkflow(workflowInfo)
             setNodes(workflowNodes.map(node => cvtWorkflowNodeToReactFlowNode(node)))
-            setConnections(workflowConnections.map(edge=>cvtWorkFlowEdgeToReactFlowEdge(edge)))
+            setConnections(workflowConnections.map(edge => cvtWorkFlowEdgeToReactFlowEdge(edge)))
         };
 
         fetchWorkflow();
     }, [workflowId]);
-    console.log(connections)
 
     const onNodesChange = useCallback(
-        (changes: NodeChange[]) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+        (changes: NodeChange[]) => {
+
+            // Node Position Manipulation Occured
+            const positionChanged = changes.filter((change): change is NodePositionChange => change.type === 'position' && change.dragging === false)
+            if (positionChanged.length > 0 && workflowId) {
+                positionChanged.forEach(async (nodeChange) => {
+                    if (!nodeChange.position) return;
+                    await backendService.patchWorkFlowNodePosition(workflowId, nodeChange.id, nodeChange.position)
+                })
+            }
+
+
+            setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot))
+        },
         []);
+
+    const addNode = async (nodeType: ENodeTypes) => {
+        if (!workflowId) return;
+        const WorkFlowNewNode = await backendService.postWorkFlowNode(workflowId, nodeType)
+        const ReactFlowNewNode = cvtWorkflowNodeToReactFlowNode(WorkFlowNewNode)
+        setNodes((nodesSnapshot) => [...nodesSnapshot, ReactFlowNewNode])
+    }
 
 
 
@@ -55,16 +69,16 @@ const WorkFlowEditor = ({ params }: { params: Promise<{ workflow_id: string }> }
                 <button >WorkFlows</button>
             </nav>
             <main className="grid grid-cols-[300px_1fr] gap-2 border rounded not-first-of-type: p-2 min-h-0 h-full">
-                <SideBar />
+                <SideBar addNode={addNode} />
                 <div className="border rounded m-2 p-2">
                     <ReactFlow
                         nodeTypes={customNodeTypes}
-                        
+
                         onNodesChange={onNodesChange}
                         nodes={nodes}
 
                         edges={connections}
-                        
+
                         fitView
                     >
                         <Background />

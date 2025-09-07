@@ -1,5 +1,7 @@
-import { NodeType, WorkFlow, WorkflowEdge, WorkflowNode } from '@/types/backendService';
-import { Edge } from '@xyflow/react';
+import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
+import { TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
+import { ENodeTypes } from '@/types/nodeConnection';
+import { Edge, XYPosition } from '@xyflow/react';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8001/api';
@@ -9,26 +11,43 @@ const backend = axios.create({
 
 });
 
-export const backendService={
-    getWorkFlows:async ():Promise<WorkFlow[]>=>{
-        const response = await backend.get("/workflow/");
-        return response.data;
-    },
-    getWorkFlow:async(workflow_id:string):Promise<WorkFlow>=>{
-      const response = await backend.get(`/workflow/${workflow_id}/`);
-      return response.data;
-    },
-    getWorkFlowNodeTypes:async():Promise<NodeType[]>=>{
-      const response = await backend.get(`/node-types/`);
-      return response.data;
-    },
-    getWorkFlowNodes:async(workflow_id:string):Promise<WorkflowNode[]>=>{
-      const response = await backend.get(`/workflow/${workflow_id}/nodes/`);
-      return response.data;
-    },
-    getWorkFlowConnections:async(workflow_id:string):Promise<WorkflowEdge[]>=>{
-      const response = await backend.get(`/workflow/${workflow_id}/connections/`);
-      return response.data;
+export const backendService = {
+  getWorkFlows: async (): Promise<TWorkFlow[]> => {
+    const response = await backend.get("/workflow/");
+    return response.data;
+  },
+  getWorkFlow: async (workflow_id: string): Promise<TWorkFlow> => {
+    const response = await backend.get(`/workflow/${workflow_id}/`);
+    return response.data;
+  },
+  getWorkFlowNodeTypes: async (): Promise<TNodeType[]> => {
+    const response = await backend.get(`/node-types/`);
+    return response.data;
+  },
+  getWorkFlowNodes: async (workflow_id: string): Promise<TWorkflowNode[]> => {
+    const response = await backend.get(`/workflow/${workflow_id}/nodes/`);
+    return response.data;
+  },
+  getWorkFlowConnections: async (workflow_id: string): Promise<TWorkflowEdge[]> => {
+    const response = await backend.get(`/workflow/${workflow_id}/connections/`);
+    return response.data;
+  },
+  postWorkFlowNode: async (workflow_id: string, node_type: ENodeTypes): Promise<TWorkflowNode> => {
+    const data =  { node_type: node_type, data: {} }
+    const response = await backend.post(`/workflow/${workflow_id}/nodes/`,data);
+    return response.data;
+  },
+  deleteWorkFlowNode: async (workflow_id: string, node_id: string): Promise<boolean> => {
+    const response = await backend.delete(`/workflow/${workflow_id}/nodes/${node_id}`);
+    if(response.status===204){
+      return true
     }
+    return false
+  },
+  patchWorkFlowNodePosition: async (workflow_id: string, node_id: string, position: XYPosition): Promise<TWorkflowNode> => {
+    const newNodePosition = cvtXYPositionToWorkFlowPosition(position);
+    const response = await backend.patch(`/workflow/${workflow_id}/nodes/${node_id}/`, newNodePosition);
+    return response.data;
+  }
 
 }

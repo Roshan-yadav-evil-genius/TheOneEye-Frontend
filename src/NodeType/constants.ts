@@ -1,14 +1,23 @@
 import React from "react";
 import WatcherNode from "./WatcherNode";
 import CosineSimilarityNode from "./CosineSimilarityNode";
-import { NodeTypes, TNodeComponentMapping } from "@/types/nodeConnection";
+import { ENodeTypes,TNodeTypeComponentMap } from "@/types/nodeConnection";
 
 
-const NodeTypeComponentMapping:TNodeComponentMapping[] = [
-    { type: NodeTypes.Watcher, component: WatcherNode },
-    { type: NodeTypes.CosineSimilarity, component: CosineSimilarityNode }
+const NodeTypeComponentMap: TNodeTypeComponentMap[] = [
+    { type: ENodeTypes.Watcher, component: WatcherNode },
+    { type: ENodeTypes.CosineSimilarity, component: CosineSimilarityNode }
 ]
 
-export const customNodeTypes=Object.fromEntries(
-    NodeTypeComponentMapping.map((node)=>[node.type,node.component])
+const NodeTypesValueMap: Record<string, ENodeTypes> = {
+    [ENodeTypes.Watcher]: ENodeTypes.Watcher,
+    [ENodeTypes.CosineSimilarity]: ENodeTypes.CosineSimilarity,
+};
+
+export function nodeTypesValueToEnum(value: string): ENodeTypes {
+    return NodeTypesValueMap[value];
+}
+
+export const customNodeTypes = Object.fromEntries(
+    NodeTypeComponentMap.map((node) => [node.type, node.component])
 )

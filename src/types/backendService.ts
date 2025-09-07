@@ -1,5 +1,5 @@
 
-export type WorkFlow = {
+export type TWorkFlow = {
     id: string,
     name: string,
     description: string,
@@ -8,26 +8,29 @@ export type WorkFlow = {
     updated_at: string
 }
 
-export type NodeType = {
+export type TNodeType = {
     id: string;
     name: string;
     description: string;
     initiator: boolean;
 };
 
-export type WorkflowNode = {
-    id: string;
-    node_type: NodeType;
-    created_at: string;
-    updated_at: string;
+export type TWorkFlowNodePosition = {
     position_x: number;
     position_y: number;
-    data: Record<string, string>;
 };
 
+export type TWorkflowNode = {
+    id: string;
+    node_type: TNodeType;
+    created_at: string;
+    updated_at: string;
+    data: Record<string, string>;
+} & TWorkFlowNodePosition;
 
-export type WorkflowEdge = {
+
+export type TWorkflowEdge = {
     id: string;
     source_node: string;
     target_node: string;
-  };
+};
