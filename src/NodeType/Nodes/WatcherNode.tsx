@@ -1,6 +1,6 @@
 import { Handle, NodeProps, Position } from '@xyflow/react'
 import React from 'react'
-import BaseNode from './BaseNode'
+import BaseNode from '../BaseNode'
 
 const WatcherNode = (props: NodeProps) => {
 
@@ -8,6 +8,7 @@ const WatcherNode = (props: NodeProps) => {
         <BaseNode node_id={props.id} title='Freelance Watcher' selected={props.selected}>
             WatcherNode
             <Handle type="source" position={Position.Right} style={{ width: 10, height: 10 }} />
+            <Handle type="target" position={Position.Left} style={{ width: 10, height: 10 }} />
         </BaseNode>
     )
 }

@@ -1,6 +1,6 @@
+import { ENodeTypes } from '@/constants/NodeTypes';
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
 import { TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
-import { ENodeTypes } from '@/types/nodeConnection';
 import { Connection, Edge, XYPosition } from '@xyflow/react';
 import axios from 'axios';
 
@@ -33,7 +33,7 @@ export const backendService = {
     return response.data;
   },
   postWorkFlowNode: async (workflow_id: string, node_type: ENodeTypes): Promise<TWorkflowNode> => {
-    const data = { source_node: node_type, data: {} }
+    const data = { node_type: node_type, data: {} }
     const response = await backend.post(`/workflow/${workflow_id}/nodes/`, data);
     return response.data;
   },
@@ -41,7 +41,6 @@ export const backendService = {
     const data = { source_node: connection.source, target_node: connection.target }
     const response = await backend.post(`/workflow/${workflow_id}/connections/`, data);
     return response.data;
-
   },
   deleteWorkFlowNode: async (workflow_id: string, node_id: string): Promise<boolean> => {
     const response = await backend.delete(`/workflow/${workflow_id}/nodes/${node_id}/`);

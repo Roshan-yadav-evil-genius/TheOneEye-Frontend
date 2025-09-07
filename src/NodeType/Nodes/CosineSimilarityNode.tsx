@@ -1,6 +1,6 @@
 import { Handle, NodeProps, Position } from '@xyflow/react'
 import React from 'react'
-import BaseNode from './BaseNode'
+import BaseNode from '../BaseNode'
 
 const CosineSimilarityNode = (props: NodeProps) => {
     return (

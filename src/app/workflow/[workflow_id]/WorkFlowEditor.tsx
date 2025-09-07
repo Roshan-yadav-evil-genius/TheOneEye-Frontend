@@ -6,14 +6,13 @@ import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Con
 import '@xyflow/react/dist/style.css';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
-import { TWorkFlow } from '@/types/backendService';
 import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/typeConverter';
 import { Node } from "@xyflow/react"
-import { customEdgeTypes, customNodeTypes } from '@/NodeType/constants';
-import { ENodeTypes } from '@/types/nodeConnection';
+import { customEdgeTypes, customNodeTypes } from '@/NodeType/Mappings';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
-import { setWorkFlowId, setWorkFlowInfo } from '@/store/Slices/WorkFlow';
+import { setWorkFlowInfo } from '@/store/Slices/WorkFlow';
+import { ENodeTypes } from '@/constants/NodeTypes';
 
 
 const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {

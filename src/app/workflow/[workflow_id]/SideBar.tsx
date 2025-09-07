@@ -1,10 +1,8 @@
-import { Input } from '@/components/ui/input'
 import React, { useEffect, useState } from 'react'
-import { Button } from "@/components/ui/button"
 import { backendService } from '@/app/services/backend'
 import { TNodeType } from '@/types/backendService'
-import { nodeTypesValueToEnum } from '@/NodeType/constants'
-import { ENodeTypes } from '@/types/nodeConnection'
+import { ENodeTypes } from '@/constants/NodeTypes'
+import { cvtnodeTypesValueToEnum } from '@/lib/converter'
 
 type SideBarProps = {
   addNode: (nodeType:ENodeTypes) => void
@@ -28,9 +26,15 @@ const SideBar = (props: SideBarProps) => {
           nodeTypes.map((nodeType) => {
             return <li
               key={nodeType.id}
-              onClick={()=>props.addNode(nodeTypesValueToEnum(nodeType.id))}
+              onClick={()=>props.addNode(cvtnodeTypesValueToEnum(nodeType.id))}
               className="border rounded m-2 p-2 active:bg-gray-400 hover:bg-gray-200"
-            >{nodeType.name}</li>
+            >
+              <div>
+                {nodeType.name}
+              </div>
+              <p className='text-xs text-gray-400'>{nodeType.description}</p>
+              <p className='text-xs text-gray-200'>{nodeType.id}</p>
+            </li>
           })
         }
       </ul>
