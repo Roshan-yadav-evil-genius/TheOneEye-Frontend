@@ -14,6 +14,7 @@ export function cvtWorkflowNodeToReactFlowNode(workflownode: TWorkflowNode): Nod
   export function cvtWorkFlowEdgeToReactFlowEdge(workflowedge:TWorkflowEdge):Edge{
     return{
       id:workflowedge.id,
+      type:"BaseEdge",
       source:workflowedge.source_node,
       target:workflowedge.target_node
     }

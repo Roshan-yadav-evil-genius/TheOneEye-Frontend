@@ -18,7 +18,7 @@ type BaseNodeProps = React.HTMLAttributes<HTMLElement> & {
 const BaseNode = ({ node_id, title, avatar, children, selected = false, className = '', ...rest }: BaseNodeProps) => {
     const { setNodes } = useReactFlow();
     const workFlow_id = useSelector((state: RootState) => state.WorkFlow.id);
-    
+
     const onDelete = async (workflow_id: string, node_id: string) => {
         const isDeleted = await backendService.deleteWorkFlowNode(workflow_id, node_id);
         if (isDeleted) {
@@ -35,21 +35,22 @@ const BaseNode = ({ node_id, title, avatar, children, selected = false, classNam
             {...rest}
         >
             <header className='flex justify-between items-center'>
-                <div className='flex items-center'>
-
-                    <div className='dragByVerticalGrip'>
-                        <GripVertical />
-                    </div>
                     <div className='flex items-center gap-2'>
                         <Avatar>
-                            <AvatarImage width={50} src={avatar} />
-                            <AvatarFallback>CN</AvatarFallback>
+                            <AvatarImage  src={avatar} />
+                            <AvatarFallback className='bg-red-400 '>{title.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <h1 className='font-bold text-gray-800'>{title}</h1>
                     </div>
-                </div>
-                <div>
-                    <Trash onClick={() => onDelete(workFlow_id, node_id)} className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' />
+                <div className='flex items-center'>
+                    <Trash 
+                    onClick={() => onDelete(workFlow_id, node_id)} 
+                    className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' />
+                    <div className='dragByVerticalGrip'>
+                        <GripVertical />
+                    </div>
+
+
                 </div>
             </header>
             <main className='border rounded p-2'>

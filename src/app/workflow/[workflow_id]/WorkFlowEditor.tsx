@@ -2,45 +2,43 @@
 
 import { backendService } from '@/app/services/backend'
 import SideBar from './SideBar'
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange, Edge, NodePositionChange } from '@xyflow/react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background, Controls, NodeChange, Edge, NodePositionChange, EdgeChange, Connection } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { TWorkFlow } from '@/types/backendService';
 import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/typeConverter';
 import { Node } from "@xyflow/react"
-import { customNodeTypes } from '@/NodeType/constants';
+import { customEdgeTypes, customNodeTypes } from '@/NodeType/constants';
 import { ENodeTypes } from '@/types/nodeConnection';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setWorkFlowId } from '@/store/Slices/WorkFlow';
+import { AppDispatch, RootState } from '@/store/store';
+import { setWorkFlowId, setWorkFlowInfo } from '@/store/Slices/WorkFlow';
 
 
-const WorkFlowEditor = ({WorkFlow_id}:{WorkFlow_id:string}) => {
-    const dispatch = useDispatch()
+const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
+    const workflow = useSelector((state: RootState) => state.WorkFlow)
+    const dispatch = useDispatch<AppDispatch>()
 
-    const [workflow, setWorkflow] = useState<TWorkFlow | null>(null);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [connections, setConnections] = useState<Edge[]>([]);
 
-    useEffect(()=>{
-        dispatch(setWorkFlowId({id:WorkFlow_id}))
-    },[])
+    useEffect(() => {
+        dispatch(setWorkFlowInfo(WorkFlow_id))
+    }, [])
 
     useEffect(() => {
-        if (!WorkFlow_id) return;
-
+        if (!workflow.id) return;
         const fetchWorkflow = async () => {
-            const workflowInfo = await backendService.getWorkFlow(WorkFlow_id);
-            const workflowNodes = await backendService.getWorkFlowNodes(WorkFlow_id);
-            const workflowConnections = await backendService.getWorkFlowConnections(WorkFlow_id);
-            setWorkflow(workflowInfo)
+            const workflowNodes = await backendService.getWorkFlowNodes(workflow.id);
             setNodes(workflowNodes.map(node => cvtWorkflowNodeToReactFlowNode(node)))
+
+            const workflowConnections = await backendService.getWorkFlowConnections(workflow.id);
             setConnections(workflowConnections.map(edge => cvtWorkFlowEdgeToReactFlowEdge(edge)))
         };
 
         fetchWorkflow();
-    }, [WorkFlow_id]);
+    }, [workflow]);
 
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
@@ -55,9 +53,18 @@ const WorkFlowEditor = ({WorkFlow_id}:{WorkFlow_id:string}) => {
             }
 
 
-            setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot))
+            setNodes((nds) => applyNodeChanges(changes, nds))
         },
         []);
+
+    const onConnect = useCallback(async (connection: Connection) => {
+        const newConnection = await backendService.postWorkFlowConnection(workflow.id, connection)
+        setConnections((eds) => [...eds, cvtWorkFlowEdgeToReactFlowEdge(newConnection)]);
+    }, [workflow]);
+
+    const onEdgesChange = useCallback((changes: EdgeChange[]) => {
+        setConnections((eds) => applyEdgeChanges(changes, eds))
+    }, [workflow])
 
     const addNode = async (nodeType: ENodeTypes) => {
         if (!WorkFlow_id) return;
@@ -78,12 +85,16 @@ const WorkFlowEditor = ({WorkFlow_id}:{WorkFlow_id:string}) => {
                 <SideBar addNode={addNode} />
                 <div className="border rounded m-2 p-2">
                     <ReactFlow
+
                         nodeTypes={customNodeTypes}
+                        edgeTypes={customEdgeTypes}
 
-                        onNodesChange={onNodesChange}
                         nodes={nodes}
+                        onNodesChange={onNodesChange}
 
+                        onConnect={onConnect}
                         edges={connections}
+                        onEdgesChange={onEdgesChange}
 
                         fitView
                     >

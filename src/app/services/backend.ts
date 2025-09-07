@@ -1,7 +1,7 @@
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
 import { TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
 import { ENodeTypes } from '@/types/nodeConnection';
-import { Edge, XYPosition } from '@xyflow/react';
+import { Connection, Edge, XYPosition } from '@xyflow/react';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8001/api';
@@ -33,13 +33,26 @@ export const backendService = {
     return response.data;
   },
   postWorkFlowNode: async (workflow_id: string, node_type: ENodeTypes): Promise<TWorkflowNode> => {
-    const data =  { node_type: node_type, data: {} }
-    const response = await backend.post(`/workflow/${workflow_id}/nodes/`,data);
+    const data = { source_node: node_type, data: {} }
+    const response = await backend.post(`/workflow/${workflow_id}/nodes/`, data);
     return response.data;
+  },
+  postWorkFlowConnection: async (workflow_id: string, connection: Connection): Promise<TWorkflowEdge> => {
+    const data = { source_node: connection.source, target_node: connection.target }
+    const response = await backend.post(`/workflow/${workflow_id}/connections/`, data);
+    return response.data;
+
   },
   deleteWorkFlowNode: async (workflow_id: string, node_id: string): Promise<boolean> => {
     const response = await backend.delete(`/workflow/${workflow_id}/nodes/${node_id}/`);
-    if(response.status===204){
+    if (response.status === 204) {
+      return true
+    }
+    return false
+  },
+  deleteWorkFlowConnection: async (workflow_id: string, edge_id: string): Promise<boolean> => {
+    const response = await backend.delete(`/workflow/${workflow_id}/connections/${edge_id}/`);
+    if (response.status === 204) {
       return true
     }
     return false

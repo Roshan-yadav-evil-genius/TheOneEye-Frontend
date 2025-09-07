@@ -2,6 +2,8 @@ import React from "react";
 import WatcherNode from "./WatcherNode";
 import CosineSimilarityNode from "./CosineSimilarityNode";
 import { ENodeTypes,TNodeTypeComponentMap } from "@/types/nodeConnection";
+import BaseEdge from "./BaseEdge";
+
 
 
 const NodeTypeComponentMap: TNodeTypeComponentMap[] = [
@@ -21,3 +23,7 @@ export function nodeTypesValueToEnum(value: string): ENodeTypes {
 export const customNodeTypes = Object.fromEntries(
     NodeTypeComponentMap.map((node) => [node.type, node.component])
 )
+
+export const customEdgeTypes={
+    BaseEdge:BaseEdge
+}
