@@ -1,6 +1,6 @@
 import { ENodeTypes } from '@/constants/NodeTypes';
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
-import { TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
+import { TExecutionResponse, TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
 import { Connection, Edge, XYPosition } from '@xyflow/react';
 import axios from 'axios';
 
@@ -66,5 +66,13 @@ export const backendService = {
     const response = await backend.patch(`/workflow/${workflow_id}/nodes/${node_id}/`, newNodeData);
     return response.data;
   },
+  startWorkFlowExecution:async(workflow_id:string):Promise<TExecutionResponse>=>{
+    const response = await backend.get(`/workflow/${workflow_id}/start_execution`);
+    return response.data;
+  },
+  stopWorkFlowExecution:async(workflow_id:string):Promise<TExecutionResponse>=>{
+    const response = await backend.get(`/workflow/${workflow_id}/stop_execution`);
+    return response.data;
+  }
 
 }

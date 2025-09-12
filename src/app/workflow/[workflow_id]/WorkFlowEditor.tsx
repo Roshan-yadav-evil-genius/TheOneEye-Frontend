@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { setWorkFlowInfo } from '@/store/Slices/WorkFlow';
 import { ENodeTypes } from '@/constants/NodeTypes';
+import { Button } from '@/components/ui/button';
+import { FileClock, Pause, Play } from 'lucide-react';
 
 
 const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
@@ -73,13 +75,55 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
     }
 
 
+    const start_execution = async () => {
+        if (!WorkFlow_id) return;
+        const response = await backendService.startWorkFlowExecution(WorkFlow_id)
+        console.log(response)
+        if (response.task_id){
+            dispatch(setWorkFlowInfo(WorkFlow_id))
+        }
+    }
+    const stop_execution = async () => {
+        if (!WorkFlow_id) return;
+        const response = await backendService.stopWorkFlowExecution(WorkFlow_id)
+        console.log(response)
+        if (response.status === "SUCCESS"){
+            dispatch(setWorkFlowInfo(WorkFlow_id))
+        }
+    }
+
+
 
     return (
         <section className="p-2 min-h-screen grid gap-2 grid-rows-[min-content_1fr_min-content]">
-            <nav className="border rounded p-2 flex gap-2">
-                <Link href="/workflow/34/45" className='underline text-blue-700'>NotFound</Link>
-                <button >WorkFlows</button>
-            </nav>
+            <header className="border rounded p-2 flex gap-2 justify-between items-center">
+                <nav>
+
+                    <Link href="/workflow/" className='underline text-blue-700'>WorkFlow</Link>
+                </nav>
+                <p className='font-bold'>{workflow?.name} ({workflow?.id})</p>
+
+                <div className='flex gap-2 items-center'>
+                    {workflow.task_id ? (
+                        <Button
+                            className="bg-red-400 hover:bg-red-700"
+                            onClick={stop_execution}
+                        >
+                            <Pause /> Stop
+                        </Button>
+                    ) : (
+                        <Button
+                            className="bg-green-400 hover:bg-green-700"
+                            onClick={start_execution}
+                        >
+                            <Play /> Execute
+                        </Button>
+                    )}
+
+
+                    <Button><FileClock />Schedule</Button>
+                </div>
+            </header>
             <main className="grid grid-cols-[300px_1fr] gap-2 border rounded not-first-of-type: p-2 min-h-0 h-full">
                 <SideBar addNode={addNode} />
                 <div className="border rounded m-2 p-2">
@@ -103,9 +147,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
                 </div>
             </main>
             <footer className='border rounded p-2'>Footer</footer>
-            <header className='border rounded p-2'>
-                Workflow: {workflow?.name} ({workflow?.id})
-            </header>
+
         </section>
     )
 }

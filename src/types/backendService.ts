@@ -34,3 +34,8 @@ export type TWorkflowEdge = {
     source_node: string;
     target_node: string;
 };
+
+export type TExecutionResponse = {
+    task_id:string,
+    status:string
+}
