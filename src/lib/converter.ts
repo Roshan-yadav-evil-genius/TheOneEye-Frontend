@@ -3,7 +3,7 @@ import { ENodeTypes } from "@/constants/NodeTypes";
 const NodeTypesValueMap: Record<string, ENodeTypes> = {
     [ENodeTypes.FreelanceJobs]: ENodeTypes.FreelanceJobs,
     [ENodeTypes.CosineSimilarity]: ENodeTypes.CosineSimilarity,
-    [ENodeTypes.CookieStore]: ENodeTypes.CookieStore
+    [ENodeTypes.Deduplicator]: ENodeTypes.Deduplicator
 };
 
 export function cvtnodeTypesValueToEnum(value: string): ENodeTypes {

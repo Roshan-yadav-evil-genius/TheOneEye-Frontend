@@ -8,10 +8,10 @@ export type TNodeTypeComponentMap<T = NodeProps> = {
     component: (props: T) => React.JSX.Element
 }
 
-export type TCookieStoreProps = Omit<NodeProps, "data"> & {
+export type TDeduplicatorProps = Omit<NodeProps, "data"> & {
     data: { cookies: string }
 }
-export type TCookieStoreNodeMap = TNodeTypeComponentMap<TCookieStoreProps>
+export type TDeduplicatorMap = TNodeTypeComponentMap<TDeduplicatorProps>
 
 export type TFreelanceJobsProps = Omit<NodeProps, "data"> & {
     data: {

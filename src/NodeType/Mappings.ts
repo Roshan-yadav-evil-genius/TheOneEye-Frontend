@@ -1,16 +1,16 @@
 import React from "react";
 import CosineSimilarity from "./Nodes/CosineSimilarity";
-import { TCookieStoreNodeMap, TCosineSimilarityNodeMap, TFreelanceJobsNodeMap, TNodeTypeComponentMap } from "@/types/nodeConnection";
+import { TDeduplicatorMap, TCosineSimilarityNodeMap, TFreelanceJobsNodeMap, TNodeTypeComponentMap } from "@/types/nodeConnection";
 import BaseEdge from "./BaseEdge";
 import AnimatedEdge from "./AnimatedEdge";
 import { ENodeTypes } from "@/constants/NodeTypes";
 import FreelanceJobs from "./Nodes/FreelanceJobs";
-import CookieStore from "./Nodes/CookieStore";
+import Deduplicator from "./Nodes/Deduplicator";
 
 
 // INFO: we did this way because we are going to store additional metdata fo reach node
 export const NodeTypeMetaData: (
-    TNodeTypeComponentMap | TCookieStoreNodeMap | TFreelanceJobsNodeMap | TCosineSimilarityNodeMap)[] = [
+    TNodeTypeComponentMap | TDeduplicatorMap | TFreelanceJobsNodeMap | TCosineSimilarityNodeMap)[] = [
         {
             type: ENodeTypes.FreelanceJobs,
             icon: "https://www.f-cdn.com/assets/main/en/assets/favicon.ico",
@@ -22,9 +22,9 @@ export const NodeTypeMetaData: (
             component: CosineSimilarity
         },
         {
-            type: ENodeTypes.CookieStore,
-            icon: "https://cookie-editor.com/favicon.ico",
-            component: CookieStore
+            type: ENodeTypes.Deduplicator,
+            icon: "https://tse2.mm.bing.net/th/id/OIP.mpkFR44j2xuj9psay9FvxwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+            component: Deduplicator
         }
     ]
 
