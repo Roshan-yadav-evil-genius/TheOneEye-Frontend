@@ -9,7 +9,7 @@ import { TCosineSimilarityProps } from '@/types/nodeConnection'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { getNodeAvatar } from '../Mappings'
-import { ENodeTypes } from '@/constants/NodeTypes'
+import { ENodeTypes } from '@/NodeType/NodeTypes'
 
 const CosineSimilarity = (props: TCosineSimilarityProps) => {
     const workflow_id = useSelector((store: RootState) => store.WorkFlow.id)

@@ -12,10 +12,10 @@ import { customEdgeTypes, customNodeTypes } from '@/NodeType/Mappings';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { setWorkFlowInfo } from '@/store/Slices/WorkFlow';
-import { ENodeTypes } from '@/constants/NodeTypes';
+import { ENodeTypes } from '@/NodeType/NodeTypes';
 import { Button } from '@/components/ui/button';
 import { FileClock, Pause, Play } from 'lucide-react';
-
+import Image from "next/image";
 
 const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
     const workflow = useSelector((state: RootState) => state.WorkFlow)
@@ -70,6 +70,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
 
     const addNode = async (nodeType: ENodeTypes) => {
         if (!WorkFlow_id) return;
+        console.log(nodeType)
         const WorkFlowNewNode = await backendService.postWorkFlowNode(WorkFlow_id, nodeType)
         const ReactFlowNewNode = cvtWorkflowNodeToReactFlowNode(WorkFlowNewNode)
         setNodes((nodesSnapshot) => [...nodesSnapshot, ReactFlowNewNode])
@@ -80,7 +81,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
         if (!WorkFlow_id) return;
         const response = await backendService.startWorkFlowExecution(WorkFlow_id)
         console.log(response)
-        if (response.task_id){
+        if (response.task_id) {
             dispatch(setWorkFlowInfo(WorkFlow_id))
         }
     }
@@ -88,7 +89,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
         if (!WorkFlow_id) return;
         const response = await backendService.stopWorkFlowExecution(WorkFlow_id)
         console.log(response)
-        if (response.status === "SUCCESS"){
+        if (response.status === "SUCCESS") {
             dispatch(setWorkFlowInfo(WorkFlow_id))
         }
     }
@@ -98,11 +99,26 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
     return (
         <section className="p-2 min-h-screen grid gap-2 grid-rows-[min-content_1fr_min-content]">
             <header className="border rounded p-2 flex gap-2 justify-between items-center">
-                <nav>
+                <div className='flex flex-col justify-center items-center'>
 
-                    <Link href="/workflow/" className='underline text-blue-700'>WorkFlow</Link>
-                </nav>
-                <p className='font-bold'>{workflow?.name} ({workflow?.id})</p>
+                    <Image
+                        src="/TheOneEyeLogo.png" // public/images/sample.jpg
+                        alt="Sample"
+                        width={100}
+                        height={76.35}
+                    />
+                    <h1 className='text-2xl font-bold'>TheOneEye</h1>
+                </div>
+
+                <div className='flex flex-col items-center'>
+                    <p className='font-bold'>
+
+                        {workflow?.name} ({workflow?.id})
+                    </p>
+                    <nav className='flex items-center gap-5'>
+                        <Link href="/workflow/" className='underline text-blue-700'>WorkFlow</Link>
+                    </nav>
+                </div>
 
                 <div className='flex gap-2 items-center'>
                     {isExecuting ? (

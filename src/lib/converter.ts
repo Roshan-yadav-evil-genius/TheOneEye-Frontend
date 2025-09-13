@@ -1,11 +1,7 @@
-import { ENodeTypes } from "@/constants/NodeTypes";
+import { ENodeTypes, NodeTypesValueToEnum } from "@/NodeType/NodeTypes";
 
-const NodeTypesValueMap: Record<string, ENodeTypes> = {
-    [ENodeTypes.FreelanceJobs]: ENodeTypes.FreelanceJobs,
-    [ENodeTypes.CosineSimilarity]: ENodeTypes.CosineSimilarity,
-    [ENodeTypes.Deduplicator]: ENodeTypes.Deduplicator
-};
+
 
 export function cvtnodeTypesValueToEnum(value: string): ENodeTypes {
-    return NodeTypesValueMap[value];
+    return NodeTypesValueToEnum[value];
 }

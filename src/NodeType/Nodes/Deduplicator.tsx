@@ -7,7 +7,7 @@ import { backendService } from '@/app/services/backend'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 import { TDeduplicatorProps as TDeduplicatorProps } from '@/types/nodeConnection'
-import { ENodeTypes } from '@/constants/NodeTypes'
+import { ENodeTypes } from '@/NodeType/NodeTypes'
 import { getNodeAvatar } from '../Mappings'
 
 const Deduplicator = (props: TDeduplicatorProps) => {

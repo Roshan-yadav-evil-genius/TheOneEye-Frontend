@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { backendService } from '@/app/services/backend'
 import { TNodeType } from '@/types/backendService'
-import { ENodeTypes } from '@/constants/NodeTypes'
+import { ENodeTypes } from '@/NodeType/NodeTypes'
 import { cvtnodeTypesValueToEnum } from '@/lib/converter'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getNodeAvatar } from '@/NodeType/Mappings'

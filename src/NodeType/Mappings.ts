@@ -1,20 +1,22 @@
 import React from "react";
 import CosineSimilarity from "./Nodes/CosineSimilarity";
-import { TDeduplicatorMap, TCosineSimilarityNodeMap, TFreelanceJobsNodeMap, TNodeTypeComponentMap } from "@/types/nodeConnection";
+import { TDeduplicatorMap, TCosineSimilarityNodeMap, TInFiniteBrowserOperationNodeMap, TNodeTypeComponentMap, TAiAgentNodeMap } from "@/types/nodeConnection";
 import BaseEdge from "./BaseEdge";
 import AnimatedEdge from "./AnimatedEdge";
-import { ENodeTypes } from "@/constants/NodeTypes";
-import FreelanceJobs from "./Nodes/FreelanceJobs";
+import { ENodeTypes } from "@/NodeType/NodeTypes";
+import InFiniteBrowserOperation from "./Nodes/InFiniteBrowserOperation";
 import Deduplicator from "./Nodes/Deduplicator";
+import AiAgent from "./Nodes/AiAgent";
+import FiniteBrowserOperation from "./Nodes/FiniteBrowserOperation";
 
 
 // INFO: we did this way because we are going to store additional metdata fo reach node
 export const NodeTypeMetaData: (
-    TNodeTypeComponentMap | TDeduplicatorMap | TFreelanceJobsNodeMap | TCosineSimilarityNodeMap)[] = [
+    TNodeTypeComponentMap | TAiAgentNodeMap | TDeduplicatorMap | TInFiniteBrowserOperationNodeMap | TCosineSimilarityNodeMap)[] = [
         {
-            type: ENodeTypes.FreelanceJobs,
-            icon: "https://www.f-cdn.com/assets/main/en/assets/favicon.ico",
-            component: FreelanceJobs
+            type: ENodeTypes.InFiniteBrowserOperation,
+            icon: "https://edgestatic.azureedge.net/welcome/static/favicon.png",
+            component: InFiniteBrowserOperation
         },
         {
             type: ENodeTypes.CosineSimilarity,
@@ -25,7 +27,17 @@ export const NodeTypeMetaData: (
             type: ENodeTypes.Deduplicator,
             icon: "https://tse2.mm.bing.net/th/id/OIP.mpkFR44j2xuj9psay9FvxwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
             component: Deduplicator
-        }
+        },
+        {
+            type: ENodeTypes.AiAgent,
+            icon: "https://tse4.mm.bing.net/th/id/OIP.5V5bspqYOeNUnV7hj7ck4gHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+            component: AiAgent
+        },
+        {
+            type: ENodeTypes.FiniteBrowserOperation,
+            icon: "https://edgestatic.azureedge.net/welcome/static/favicon.png",
+            component: FiniteBrowserOperation
+        },
     ]
 
 export const getNodeAvatar = (type: ENodeTypes) => {

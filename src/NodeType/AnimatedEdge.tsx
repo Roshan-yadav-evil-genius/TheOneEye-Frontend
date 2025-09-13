@@ -50,7 +50,7 @@ const AnimatedEdge = (props: EdgeProps) => {
                     }}
                 />
                 {/* Animated dots flowing along the path */}
-                <circle r="3" fill="#3b82f6">
+                <circle r="5" fill="#DA4646">
                     <animateMotion dur="3s" repeatCount="indefinite">
                         <mpath href={`#path-${props.id}`} />
                     </animateMotion>

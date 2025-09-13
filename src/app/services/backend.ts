@@ -1,4 +1,4 @@
-import { ENodeTypes } from '@/constants/NodeTypes';
+import { ENodeTypes } from '@/NodeType/NodeTypes';
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
 import { TExecutionResponse, TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
 import { Connection, Edge, XYPosition } from '@xyflow/react';

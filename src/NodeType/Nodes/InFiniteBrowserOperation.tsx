@@ -7,11 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { backendService } from '@/app/services/backend'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
-import { TFreelanceJobsProps } from '@/types/nodeConnection'
+import { TInFiniteBrowserOperationProps } from '@/types/nodeConnection'
 import { getNodeAvatar } from '../Mappings'
-import { ENodeTypes } from '@/constants/NodeTypes'
+import { ENodeTypes } from '@/NodeType/NodeTypes'
 
-const FreelanceJobs = (props: TFreelanceJobsProps) => {
+const InFiniteBrowserOperation = (props: TInFiniteBrowserOperationProps) => {
     const workflow_id = useSelector((store: RootState) => store.WorkFlow.id)
     console.log(props.data)
     const [projectPageUrl, setProjectPageUrl] = useState(props.data.projectPageUrl ?? "")
@@ -40,7 +40,7 @@ const FreelanceJobs = (props: TFreelanceJobsProps) => {
 
 
     return (
-        <BaseNode node_id={props.id} title='Freelance Jobs' avatar={getNodeAvatar(ENodeTypes.FreelanceJobs)} selected={props.selected}>
+        <BaseNode node_id={props.id} title='Infinite Browser Operation' avatar={getNodeAvatar(ENodeTypes.InFiniteBrowserOperation)} selected={props.selected}>
             <div className='grid w-full max-w-sm items-center gap-5'>
 
                 <div className="grid w-full max-w-sm items-center gap-3">
@@ -69,9 +69,8 @@ const FreelanceJobs = (props: TFreelanceJobsProps) => {
             </div>
 
             <Handle type="source" position={Position.Right} style={{ width: 10, height: 10 }} />
-            <Handle type="target" position={Position.Left} style={{ width: 10, height: 10 }} />
         </BaseNode>
     )
 }
 
-export default FreelanceJobs
+export default InFiniteBrowserOperation
