@@ -4,21 +4,28 @@ import { BezierEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, useReactFlow }
 import { X } from 'lucide-react'
 import React from 'react'
 import { useSelector } from 'react-redux';
+import AnimatedEdge from './AnimatedEdge';
 
 const BaseEdge = (props: EdgeProps) => {
-    // Delete Icon Placemnt Logic
+    // Delete Icon Placement Logic
     const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
     const [edgePath, labelX, labelY] = getBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition })
 
     // Delete Functionality
     const { setEdges } = useReactFlow();
     const workFlow_id = useSelector((state: RootState) => state.WorkFlow.id);
+    const isExecuting = useSelector((state: RootState) => !!state.WorkFlow.task_id);
 
     const onDelete = async (edge_id: string) => {
         const isDeleted = await backendService.deleteWorkFlowConnection(workFlow_id, edge_id);
         if (isDeleted) {
             setEdges((eds) => eds.filter(eds => eds.id !== edge_id))
         }
+    }
+
+    // If workflow is executing, use animated edge, otherwise use regular edge
+    if (isExecuting) {
+        return <AnimatedEdge {...props} />;
     }
 
     return (

@@ -15,6 +15,7 @@ export function cvtWorkflowNodeToReactFlowNode(workflownode: TWorkflowNode): Nod
     return{
       id:workflowedge.id,
       type:"BaseEdge",
+      animated:false,
       source:workflowedge.source_node,
       target:workflowedge.target_node
     }

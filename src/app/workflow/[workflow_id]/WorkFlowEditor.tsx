@@ -19,6 +19,7 @@ import { FileClock, Pause, Play } from 'lucide-react';
 
 const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
     const workflow = useSelector((state: RootState) => state.WorkFlow)
+    const isExecuting = useSelector((state: RootState) => !!state.WorkFlow.task_id);
     const dispatch = useDispatch<AppDispatch>()
 
     const [nodes, setNodes] = useState<Node[]>([]);
@@ -34,7 +35,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
             const workflowNodes = await backendService.getWorkFlowNodes(workflow.id);
             setNodes(workflowNodes.map(node => cvtWorkflowNodeToReactFlowNode(node)))
 
-            const workflowConnections = await backendService.getWorkFlowConnections(workflow.id);
+            let workflowConnections = await backendService.getWorkFlowConnections(workflow.id);
             setConnections(workflowConnections.map(edge => cvtWorkFlowEdgeToReactFlowEdge(edge)))
         };
 
@@ -104,7 +105,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
                 <p className='font-bold'>{workflow?.name} ({workflow?.id})</p>
 
                 <div className='flex gap-2 items-center'>
-                    {workflow.task_id ? (
+                    {isExecuting ? (
                         <Button
                             className="bg-red-400 hover:bg-red-700"
                             onClick={stop_execution}

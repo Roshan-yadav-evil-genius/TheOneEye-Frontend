@@ -2,6 +2,7 @@ import React from "react";
 import CosineSimilarity from "./Nodes/CosineSimilarity";
 import { TCookieStoreNodeMap, TCosineSimilarityNodeMap, TFreelanceJobsNodeMap, TNodeTypeComponentMap } from "@/types/nodeConnection";
 import BaseEdge from "./BaseEdge";
+import AnimatedEdge from "./AnimatedEdge";
 import { ENodeTypes } from "@/constants/NodeTypes";
 import FreelanceJobs from "./Nodes/FreelanceJobs";
 import CookieStore from "./Nodes/CookieStore";
@@ -37,5 +38,6 @@ export const customNodeTypes = Object.fromEntries(
 )
 
 export const customEdgeTypes = {
-    BaseEdge: BaseEdge
+    BaseEdge: BaseEdge,
+    AnimatedEdge: AnimatedEdge
 }
