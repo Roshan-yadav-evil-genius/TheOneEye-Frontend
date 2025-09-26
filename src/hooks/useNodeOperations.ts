@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import { backendService } from '@/app/services/backend'
 import { FieldValues } from 'react-hook-form'
-import { showErrorToast, showSuccessToast, withErrorHandling } from '@/lib/errorHandler'
+import { showToast, withErrorHandling } from '@/lib/errorHandler'
 
 interface NodeConfig {
   [key: string]: any
@@ -32,67 +32,60 @@ export const useNodeOperations = ({
   const [isClearing, setIsClearing] = useState(false)
 
   const deleteNode = async () => {
-    try {
-      const isDeleted = await backendService.deleteWorkFlowNode(workflowId, nodeId)
-      if (isDeleted) {
-        setNodes((nodesSnapshot) => nodesSnapshot.filter(node => node.id !== nodeId))
-        showSuccessToast('Node deleted successfully')
-      } else {
-        showErrorToast({ message: 'Failed to delete node' } as any, 'Delete Failed')
-      }
-    } catch (error) {
-      showErrorToast(error as any, 'Delete Failed')
+    const isDeleted = await backendService.deleteWorkFlowNode(workflowId, nodeId)
+    if (isDeleted === true) {
+      setNodes((nodesSnapshot) => nodesSnapshot.filter(node => node.id !== nodeId))
+      showToast('Node deleted successfully')
     }
+    // Error handling is now done in the backend service
   }
 
   const submitNodeData = async (values: FieldValues) => {
-    try {
-      console.log('Form submitted for node:', nodeId, 'with values:', values)
-      
-      // Separate file fields from regular fields
-      const fileFields: { [key: string]: File } = {}
-      const regularFields: { [key: string]: any } = {}
-      
-      // Process each field based on its type
-      nodeTypeConfig.forEach(field => {
-        const value = values[field.key]
-        if (field.type === 'file') {
-          if (value && value instanceof FileList && value.length > 0) {
-            // New file selected - upload it
-            fileFields[field.key] = value[0] // Take the first file
-          } else if (nodeConfig[field.key]) {
-            // No new file selected but existing file exists - keep the existing ID
-            regularFields[field.key] = nodeConfig[field.key]
-          }
-        } else {
-          regularFields[field.key] = value
+    console.log('Form submitted for node:', nodeId, 'with values:', values)
+    
+    // Separate file fields from regular fields
+    const fileFields: { [key: string]: File } = {}
+    const regularFields: { [key: string]: any } = {}
+    
+    // Process each field based on its type
+    nodeTypeConfig.forEach(field => {
+      const value = values[field.key]
+      if (field.type === 'file') {
+        if (value && value instanceof FileList && value.length > 0) {
+          // New file selected - upload it
+          fileFields[field.key] = value[0] // Take the first file
+        } else if (nodeConfig[field.key]) {
+          // No new file selected but existing file exists - keep the existing ID
+          regularFields[field.key] = nodeConfig[field.key]
         }
+      } else {
+        regularFields[field.key] = value
+      }
+    })
+    
+    // Upload files first and collect their IDs
+    if (Object.keys(fileFields).length > 0) {
+      const fileUploadPromises = Object.entries(fileFields).map(async ([key, file]) => {
+        const uploadResponse = await backendService.uploadWorkFlowNodeFile(workflowId, nodeId, key, file)
+        if (uploadResponse) {
+          return { key, id: uploadResponse.id }
+        }
+        throw new Error(`File upload failed for ${key}`)
       })
       
-      // Upload files first and collect their IDs
-      if (Object.keys(fileFields).length > 0) {
-        const fileUploadPromises = Object.entries(fileFields).map(async ([key, file]) => {
-          try {
-            const uploadResponse = await backendService.uploadWorkFlowNodeFile(workflowId, nodeId, key, file)
-            return { key, id: uploadResponse.id }
-          } catch (error) {
-            showErrorToast(error as any, `File Upload Failed: ${key}`)
-            throw error
-          }
-        })
-        
-        // Wait for all file uploads to complete
-        const fileUploadResults = await Promise.all(fileUploadPromises)
-        
-        // Replace file field keys with their uploaded IDs in the regular fields
-        fileUploadResults.forEach(({ key, id }) => {
-          regularFields[key] = id
-        })
-      }
+      // Wait for all file uploads to complete
+      const fileUploadResults = await Promise.all(fileUploadPromises)
       
-      // Submit the final data (regular fields + file IDs)
-      await backendService.patchWorkFlowNodeData(workflowId, nodeId, regularFields)
-      
+      // Replace file field keys with their uploaded IDs in the regular fields
+      fileUploadResults.forEach(({ key, id }) => {
+        regularFields[key] = id
+      })
+    }
+    
+    // Submit the final data (regular fields + file IDs)
+    const result = await backendService.patchWorkFlowNodeData(workflowId, nodeId, regularFields)
+    
+    if (result) {
       // Update the node data in React Flow state to reflect the new file IDs
       setNodes((nodesSnapshot) => 
         nodesSnapshot.map(node => 
@@ -111,11 +104,9 @@ export const useNodeOperations = ({
         )
       )
       
-      showSuccessToast('Node data saved successfully')
-    } catch (error) {
-      showErrorToast(error as any, 'Save Failed')
-      throw error // Re-throw to let the form handle it
+      showToast('Node data saved successfully')
     }
+    // Error handling is now done in the backend service
   }
 
   const clearNodeData = async () => {
@@ -127,13 +118,8 @@ export const useNodeOperations = ({
       
       if (fileFields.length > 0) {
         const fileDeletePromises = fileFields.map(async (field) => {
-          try {
-            const fileId = nodeConfig[field.key]
-            return await backendService.deleteWorkFlowNodeFile(workflowId, nodeId, fileId)
-          } catch (error) {
-            showErrorToast(error as any, `File Delete Failed: ${field.key}`)
-            throw error
-          }
+          const fileId = nodeConfig[field.key]
+          return await backendService.deleteWorkFlowNodeFile(workflowId, nodeId, fileId)
         })
         
         // Wait for all file deletions to complete
@@ -151,21 +137,24 @@ export const useNodeOperations = ({
       }, {} as Record<string, any>)
       
       // Update backend with empty data
-      await backendService.patchWorkFlowNodeData(workflowId, nodeId, emptyData)
+      const result = await backendService.patchWorkFlowNodeData(workflowId, nodeId, emptyData)
       
-      // Update the node data in React Flow state
-      setNodes((nodesSnapshot) => 
-        nodesSnapshot.map(node => 
-          node.id === nodeId 
-            ? { ...node, data: { ...node.data, config: emptyData } }
-            : node
+      if (result) {
+        // Update the node data in React Flow state
+        setNodes((nodesSnapshot) => 
+          nodesSnapshot.map(node => 
+            node.id === nodeId 
+              ? { ...node, data: { ...node.data, config: emptyData } }
+              : node
+          )
         )
-      )
-      
-      showSuccessToast('Node data cleared successfully')
-      return emptyData
+        
+        showToast('Node data cleared successfully')
+        return emptyData
+      }
     } catch (error) {
-      showErrorToast(error as any, 'Clear Failed')
+      // This catch block is for any non-API errors
+      showToast('Clear operation failed')
       throw error
     } finally {
       setIsClearing(false)

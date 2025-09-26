@@ -13,6 +13,7 @@ interface AxiosDRFError {
     data: DRFErrorResponse | string
   }
   message: string
+  code?: string
 }
 
 /**
@@ -21,6 +22,10 @@ interface AxiosDRFError {
 export const extractErrorMessage = (error: AxiosDRFError): string => {
   // If it's a network error or no response
   if (!error.response) {
+    // Check for specific Axios timeout error
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      return 'Request timed out. Please try again.'
+    }
     return 'Network error. Please check your connection and try again.'
   }
 
@@ -74,52 +79,10 @@ export const extractErrorMessage = (error: AxiosDRFError): string => {
 }
 
 /**
- * Shows error toast with extracted message
+ * Shows a basic toast message - no colors, no styling, just the message
  */
-export const showErrorToast = (error: AxiosDRFError, title: string = 'Error') => {
-  const message = extractErrorMessage(error)
-  toast.error(title, {
-    description: message,
-    duration: 5000,
-    style: {
-      backgroundColor: '#fef2f2',
-      border: '1px solid #fecaca',
-      color: '#dc2626',
-    },
-    descriptionClassName: 'text-red-700',
-  })
-}
-
-/**
- * Shows success toast
- */
-export const showSuccessToast = (message: string, title: string = 'Success') => {
-  toast.success(title, {
-    description: message,
-    duration: 3000,
-    style: {
-      backgroundColor: '#f0fdf4',
-      border: '1px solid #bbf7d0',
-      color: '#16a34a',
-    },
-    descriptionClassName: 'text-green-700',
-  })
-}
-
-/**
- * Shows info toast
- */
-export const showInfoToast = (message: string, title: string = 'Info') => {
-  toast.info(title, {
-    description: message,
-    duration: 3000,
-    style: {
-      backgroundColor: '#eff6ff',
-      border: '1px solid #bfdbfe',
-      color: '#2563eb',
-    },
-    descriptionClassName: 'text-blue-700',
-  })
+export const showToast = (message: string) => {
+  toast(message)
 }
 
 /**
@@ -127,12 +90,14 @@ export const showInfoToast = (message: string, title: string = 'Info') => {
  */
 export const withErrorHandling = async <T>(
   asyncFn: () => Promise<T>,
-  errorTitle: string = 'Operation Failed'
-): Promise<T | null> => {
+  errorTitle: string = 'Operation Failed',
+  defaultValue?: T
+): Promise<T | undefined> => {
   try {
     return await asyncFn()
   } catch (error) {
-    showErrorToast(error as AxiosDRFError, errorTitle)
-    return null
+    const message = extractErrorMessage(error as AxiosDRFError)
+    showToast(message)
+    return defaultValue
   }
 }

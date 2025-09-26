@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import { showErrorToast, showSuccessToast, showInfoToast } from '@/lib/errorHandler'
+import { showToast } from '@/lib/errorHandler'
 
 /**
  * Demo component to test error handling with Sonner toasts
@@ -8,43 +8,23 @@ import { showErrorToast, showSuccessToast, showInfoToast } from '@/lib/errorHand
  */
 export const ErrorHandlingDemo: React.FC = () => {
   const simulateNetworkError = () => {
-    const error = {
-      message: 'Network Error',
-      response: undefined
-    }
-    showErrorToast(error as any, 'Network Error')
+    showToast('Network error. Please check your connection and try again.')
   }
 
   const simulateDRFValidationError = () => {
-    const error = {
-      response: {
-        status: 400,
-        data: {
-          username: ['This field is required.'],
-          email: ['Enter a valid email address.'],
-          non_field_errors: ['Invalid credentials provided.']
-        }
-      }
-    }
-    showErrorToast(error as any, 'Validation Error')
+    showToast('username: This field is required.; email: Enter a valid email address.')
   }
 
   const simulateServerError = () => {
-    const error = {
-      response: {
-        status: 500,
-        data: 'Internal server error occurred'
-      }
-    }
-    showErrorToast(error as any, 'Server Error')
+    showToast('Internal server error. Please try again later.')
   }
 
   const simulateSuccess = () => {
-    showSuccessToast('Operation completed successfully!')
+    showToast('Operation completed successfully!')
   }
 
   const simulateInfo = () => {
-    showInfoToast('This is an informational message')
+    showToast('This is an informational message')
   }
 
   return (
