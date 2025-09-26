@@ -18,9 +18,14 @@ This directory contains reusable components for building workflow nodes. The com
 - **Purpose**: Renders form fields based on configuration, with support for different field types
 - **Props**: `field`, `control`, `name`, `existingValue`, `className`
 - **Supported Field Types**: 
-  - `text`, `email`, `password`, `number` - Standard input fields
+  - `text`, `email`, `password`, `number`, `tel`, `url`, `search` - Standard input fields
+  - `date`, `time`, `datetime-local`, `month`, `week`, `color` - Specialized input fields
   - `textarea` - Multi-line text input
   - `select` - Dropdown selection with options
+  - `radio` - Radio button group with options
+  - `checkbox` - Single checkbox input
+  - `range` - Slider input with min/max/step
+  - `hidden` - Hidden input field
   - `file` - File upload with status display
 - **Reusable**: Yes - can render any form field type based on configuration
 
@@ -121,6 +126,49 @@ const MyNode = (props) => {
   "max": 2,
   "step": 0.1,
   "required": true
+}
+```
+
+### Radio Button Field
+```json
+{
+  "key": "gender",
+  "label": "Gender",
+  "type": "radio",
+  "options": [
+    { "label": "Male", "value": "male" },
+    { "label": "Female", "value": "female" }
+  ]
+}
+```
+
+### Checkbox Field
+```json
+{
+  "key": "subscribe",
+  "label": "Subscribe to Newsletter",
+  "type": "checkbox"
+}
+```
+
+### Range/Slider Field
+```json
+{
+  "key": "satisfaction",
+  "label": "Satisfaction Level",
+  "type": "range",
+  "min": 0,
+  "max": 10,
+  "step": 1
+}
+```
+
+### Hidden Field
+```json
+{
+  "key": "hidden_token",
+  "type": "hidden",
+  "value": "abc123xyz"
 }
 ```
 
