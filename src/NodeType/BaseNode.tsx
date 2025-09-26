@@ -78,6 +78,24 @@ const BaseNode = (props: TBaseNodeProps) => {
     
     // Submit the final data (regular fields + file IDs)
     await backendService.patchWorkFlowNodeData(workFlow_id, props.id, regularFields);
+    
+    // Update the node data in React Flow state to reflect the new file IDs
+    setNodes((nodesSnapshot) => 
+      nodesSnapshot.map(node => 
+        node.id === props.id 
+          ? { 
+              ...node, 
+              data: { 
+                ...node.data, 
+                config: { 
+                  ...(node.data.config || {}), 
+                  ...regularFields 
+                } 
+              } 
+            }
+          : node
+      )
+    );
   }
   
   return (
