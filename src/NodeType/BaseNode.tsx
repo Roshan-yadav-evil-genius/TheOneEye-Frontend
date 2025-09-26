@@ -25,6 +25,8 @@ const BaseNode = (props: TBaseNodeProps) => {
     }
   }
 
+  const [isClearing, setIsClearing] = React.useState(false);
+
   const form = useForm({
     defaultValues: props.data.node_type.config.reduce((acc, field) => {
       if (field.type === 'file') {
@@ -154,7 +156,60 @@ const BaseNode = (props: TBaseNodeProps) => {
               })
             }
             {props.data.node_type.config.length > 0 && (
-              <div className='flex justify-end'>
+              <div className='flex justify-end gap-5'>
+                <Button 
+                  size="sm" 
+                  className='hover:bg-red-600'
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      setIsClearing(true);
+                      
+                      // First, delete existing files from backend
+                      const fileDeletePromises = props.data.node_type.config
+                        .filter(field => field.type === 'file' && props.data.config[field.key])
+                        .map(async (field) => {
+                          const fileId = props.data.config[field.key];
+                          return backendService.deleteWorkFlowNodeFile(workFlow_id, props.id, fileId);
+                        });
+                      
+                      // Wait for all file deletions to complete
+                      await Promise.all(fileDeletePromises);
+                      
+                      // Clear all data in backend
+                      const emptyData = props.data.node_type.config.reduce((acc, field) => {
+                        if (field.type === 'file') {
+                          acc[field.key] = null;
+                        } else {
+                          acc[field.key] = "";
+                        }
+                        return acc;
+                      }, {} as Record<string, any>);
+                      
+                      // Update backend with empty data
+                      await backendService.patchWorkFlowNodeData(workFlow_id, props.id, emptyData);
+                      
+                      // Update the node data in React Flow state
+                      setNodes((nodesSnapshot) => 
+                        nodesSnapshot.map(node => 
+                          node.id === props.id 
+                            ? { ...node, data: { ...node.data, config: emptyData } }
+                            : node
+                        )
+                      );
+                      
+                      // Reset form to empty values
+                      form.reset(emptyData);
+                    } catch (error) {
+                      console.error('Error clearing node data:', error);
+                    } finally {
+                      setIsClearing(false);
+                    }
+                  }}
+                >
+                  {(form.formState.isSubmitting || isClearing) && <Loader2Icon className="animate-spin" />}
+                  Clear
+                </Button>
                 <Button size="sm" type="submit">
                   {form.formState.isSubmitting && <Loader2Icon className="animate-spin" />}
                   Save
