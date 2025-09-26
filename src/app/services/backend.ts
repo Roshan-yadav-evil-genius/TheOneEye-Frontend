@@ -1,5 +1,5 @@
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
-import { TExecutionResponse, TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
+import { TExecutionResponse, TFileUploadResponse, TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
 import { Connection, Edge, XYPosition } from '@xyflow/react';
 import axios from 'axios';
 
@@ -71,6 +71,18 @@ export const backendService = {
   },
   stopWorkFlowExecution:async(workflow_id:string):Promise<TExecutionResponse>=>{
     const response = await backend.get(`/workflow/${workflow_id}/stop_execution`);
+    return response.data;
+  },
+  uploadWorkFlowNodeFile: async (workflow_id: string, node_id: string, key: string, file: File): Promise<TFileUploadResponse> => {
+    const formData = new FormData();
+    formData.append('key', key);
+    formData.append('file', file);
+    
+    const response = await backend.post(`/workflow/${workflow_id}/nodes/${node_id}/files/upload/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   }
 

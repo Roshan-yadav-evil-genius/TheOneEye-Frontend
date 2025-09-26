@@ -34,7 +34,37 @@ const BaseNode = (props: TBaseNodeProps) => {
 
   const onSubmit = async (values: FieldValues) => {
     console.log('Form submitted for node:', props.id, 'with values:', values)
-    await backendService.patchWorkFlowNodeData(workFlow_id,props.id,values)
+    
+    // Separate file fields from regular fields
+    const fileFields: { [key: string]: File } = {};
+    const regularFields: { [key: string]: any } = {};
+    
+    // Process each field based on its type
+    props.data.node_type.config.forEach(field => {
+      const value = values[field.key];
+      if (field.type === 'file' && value && value instanceof FileList && value.length > 0) {
+        fileFields[field.key] = value[0]; // Take the first file
+      } else if (field.type !== 'file') {
+        regularFields[field.key] = value;
+      }
+    });
+    
+    // Upload files first and collect their IDs
+    const fileUploadPromises = Object.entries(fileFields).map(async ([key, file]) => {
+      const uploadResponse = await backendService.uploadWorkFlowNodeFile(workFlow_id, props.id, key, file);
+      return { key, id: uploadResponse.id };
+    });
+    
+    // Wait for all file uploads to complete
+    const fileUploadResults = await Promise.all(fileUploadPromises);
+    
+    // Replace file field keys with their uploaded IDs in the regular fields
+    fileUploadResults.forEach(({ key, id }) => {
+      regularFields[key] = id;
+    });
+    
+    // Submit the final data (regular fields + file IDs)
+    await backendService.patchWorkFlowNodeData(workFlow_id, props.id, regularFields);
   }
   
   return (
@@ -74,11 +104,22 @@ const BaseNode = (props: TBaseNodeProps) => {
                       <FormItem className='mb-2'>
                         <FormLabel>{node_field.label}</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type={node_field.type}
-                            required={node_field.required}
-                          />
+                          {node_field.type === 'file' ? (
+                            <Input
+                              type="file"
+                              onChange={(e) => {
+                                const fileList = e.target.files;
+                                field.onChange(fileList);
+                              }}
+                              required={node_field.required}
+                            />
+                          ) : (
+                            <Input
+                              {...field}
+                              type={node_field.type}
+                              required={node_field.required}
+                            />
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -50,3 +50,12 @@ export type TExecutionResponse = {
     task_id:string,
     status:string
 }
+
+export type TFileUploadResponse = {
+    id: string;
+    node: string;
+    key: string;
+    file: string;
+    created_at: string;
+    updated_at: string;
+}
