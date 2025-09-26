@@ -27,13 +27,16 @@ const BaseNode = (props: TBaseNodeProps) => {
 
   const form = useForm({
     defaultValues: props.data.node_type.config.reduce((acc, field) => {
-      acc[field.key] =  ""; // fallback to empty string
+      acc[field.key] = props.data.config[field.key] || ""; // Use existing data or fallback to empty string
       return acc;
     }, {} as Record<string, any>)
   })
-  const onSubmit = (values: FieldValues) => {
-    console.log(values)
+
+  const onSubmit = async (values: FieldValues) => {
+    console.log('Form submitted for node:', props.id, 'with values:', values)
+    await backendService.patchWorkFlowNodeData(workFlow_id,props.id,values)
   }
+  
   return (
     <section
       className={
@@ -44,7 +47,7 @@ const BaseNode = (props: TBaseNodeProps) => {
         <div className='flex items-center gap-2'>
           <Avatar>
             <AvatarImage src={props.data?.node_type?.logo} />
-            <AvatarFallback className='bg-red-400 '>{props.data.node_type.name.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
+            <AvatarFallback className='bg-red-400'>{props.data.node_type.name.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
           </Avatar>
           <h1 className='font-bold text-gray-800'>{props.data.node_type.name}</h1>
         </div>
@@ -62,7 +65,6 @@ const BaseNode = (props: TBaseNodeProps) => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {
               props.data.node_type.config.map((node_field) => {
-                console.log(node_field)
                 return (
                   <FormField
                     key={node_field.key}
@@ -85,18 +87,16 @@ const BaseNode = (props: TBaseNodeProps) => {
                 )
               })
             }
+            {props.data.node_type.config.length > 0 && (
+              <div className='flex justify-end'>
+                <Button size="sm" type="submit">
+                  {form.formState.isSubmitting && <Loader2Icon className="animate-spin" />}
+                  Save
+                </Button>
+              </div>
+            )}
           </form>
         </Form>
-        <div className='flex justify-end'>
-
-          {props.data.node_type.config.length > 0 && (
-            <Button size="sm" type="submit"
-            >
-              {form.formState.isSubmitting && <Loader2Icon className="animate-spin" />}
-              Save
-            </Button>
-          )}
-        </div>
       </main>
       <footer className='text-xs text-gray-500'>Id: {props.id}</footer>
       {
