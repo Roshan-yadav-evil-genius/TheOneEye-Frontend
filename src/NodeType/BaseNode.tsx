@@ -119,17 +119,6 @@ const BaseNode = (props: TBaseNodeProps) => {
                         <FormControl>
                           {node_field.type === 'file' ? (
                             <div className="space-y-2">
-                              {/* Show existing file if present */}
-                              {props.data.config[node_field.key] && (
-                                <div className="p-2 bg-green-50 border border-green-200 rounded text-sm">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-green-700">
-                                      📁 (File: {props.data.config[node_field.key]})
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                              
                               {/* File input */}
                               <Input
                                 type="file"
@@ -139,6 +128,15 @@ const BaseNode = (props: TBaseNodeProps) => {
                                 }}
                                 required={node_field.required && !props.data.config[node_field.key]}
                               />
+                              <FormDescription>
+                                {props.data.config[node_field.key] && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium">
+                                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                      File: <span className="font-mono">{props.data.config[node_field.key]}</span>
+                                    </span>
+                                  )
+                                }
+                              </FormDescription>
                             </div>
                           ) : (
                             <Input
