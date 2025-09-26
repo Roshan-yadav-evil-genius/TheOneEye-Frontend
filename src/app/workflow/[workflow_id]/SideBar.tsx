@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { backendService } from '@/app/services/backend'
 import { TNodeType } from '@/types/backendService'
-import { cvtnodeTypesValueToEnum } from '@/lib/converter'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type SideBarProps = {

@@ -1,5 +1,4 @@
 import { NodeProps } from "@xyflow/react"
-import React from "react"
 import { TNodeType } from "./backendService"
 
 

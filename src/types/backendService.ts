@@ -8,13 +8,22 @@ export type TWorkFlow = {
     updated_at: string
 }
 
+export type Field = {
+    key: string;
+    type: string;
+    label: string;
+    placeholder: string;
+    required: boolean;
+};
+
 export type TNodeType = {
     id: string;
     name: string;
     description: string;
     logo: string;
     input:boolean;
-    output:boolean
+    output:boolean;
+    config:Field[];
 };
 
 export type TWorkFlowNodePosition = {

@@ -1,0 +1,8 @@
+[
+    {
+        "key": "iteratorfile",
+        "type": "file",
+        "label": "Csv File",
+        "required": true
+    }
+]
