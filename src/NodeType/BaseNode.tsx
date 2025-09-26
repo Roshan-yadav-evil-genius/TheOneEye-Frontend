@@ -58,7 +58,7 @@ const BaseNode = (props: TBaseNodeProps) => {
             {
                 props.data.node_type.output &&
                 <Handle
-                    type="target"
+                    type="source"
                     position={Position.Right}
                     style={{ background: 'orange', width: 12, height: 12 }}
                 />

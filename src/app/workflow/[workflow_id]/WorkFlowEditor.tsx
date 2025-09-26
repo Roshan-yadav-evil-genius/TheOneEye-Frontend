@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { cvtWorkFlowEdgeToReactFlowEdge, cvtWorkflowNodeToReactFlowNode } from '@/lib/typeConverter';
 import { Node } from "@xyflow/react"
-import { customEdgeTypes, customNodeTypes } from '@/NodeType/Mappings';
+import { customNodeTypes } from '@/NodeType/Mappings';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { setWorkFlowInfo } from '@/store/Slices/WorkFlow';
@@ -146,7 +146,7 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
                     <ReactFlow
 
                         nodeTypes={customNodeTypes}
-                        edgeTypes={customEdgeTypes}
+                        // edgeTypes={customEdgeTypes}
 
                         nodes={nodes}
                         onNodesChange={onNodesChange}
