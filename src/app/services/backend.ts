@@ -1,4 +1,3 @@
-import { ENodeTypes } from '@/NodeType/NodeTypes';
 import { cvtXYPositionToWorkFlowPosition } from '@/lib/typeConverter';
 import { TExecutionResponse, TNodeType, TWorkFlow, TWorkflowEdge, TWorkflowNode, TWorkFlowNodePosition } from '@/types/backendService';
 import { Connection, Edge, XYPosition } from '@xyflow/react';
@@ -32,8 +31,8 @@ export const backendService = {
     const response = await backend.get(`/workflow/${workflow_id}/connections/`);
     return response.data;
   },
-  postWorkFlowNode: async (workflow_id: string, node_type: ENodeTypes): Promise<TWorkflowNode> => {
-    const data = { node_type: node_type, data: {} }
+  postWorkFlowNode: async (workflow_id: string, node_type_id: string): Promise<TWorkflowNode> => {
+    const data = { node_type: node_type_id, data: {} }
     const response = await backend.post(`/workflow/${workflow_id}/nodes/`, data);
     return response.data;
   },

@@ -1,21 +1,15 @@
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { EllipsisVertical, GripVertical, Trash } from 'lucide-react'
+import { GripVertical, Trash } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useReactFlow } from '@xyflow/react'
+import { Handle, NodeProps, Position, useReactFlow } from '@xyflow/react'
 import { backendService } from '@/app/services/backend'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
+import { TBaseNodeProps } from '@/types/nodeConnection'
 
-type BaseNodeProps = React.HTMLAttributes<HTMLElement> & {
-    node_id: string
-    title: string,
-    avatar?: string,
-    selected?: boolean,
-    children: React.ReactNode
-}
 
-const BaseNode = ({ node_id, title, avatar, children, selected = false, className = '', ...rest }: BaseNodeProps) => {
+const BaseNode = (props: TBaseNodeProps) => {
     const { setNodes } = useReactFlow();
     const workFlow_id = useSelector((state: RootState) => state.WorkFlow.id);
 
@@ -30,33 +24,46 @@ const BaseNode = ({ node_id, title, avatar, children, selected = false, classNam
         <section
             className={
                 cn("border rounded p-1 bg-white flex flex-col gap-2 min-w-[300px]",
-                    selected && "border-gray-900",
-                    className)}
-            {...rest}
+                    props.selected && "border-gray-900")}
         >
             <header className='flex justify-between items-center'>
-                    <div className='flex items-center gap-2'>
-                        <Avatar>
-                            <AvatarImage  src={avatar} />
-                            <AvatarFallback className='bg-red-400 '>{title.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <h1 className='font-bold text-gray-800'>{title}</h1>
-                    </div>
+                <div className='flex items-center gap-2'>
+                    <Avatar>
+                        <AvatarImage src={props.data?.node_type?.logo} />
+                        <AvatarFallback className='bg-red-400 '>{props.data.node_type.name.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <h1 className='font-bold text-gray-800'>{props.data.node_type.name}</h1>
+                </div>
                 <div className='flex items-center'>
-                    <Trash 
-                    onClick={() => onDelete(workFlow_id, node_id)} 
-                    className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' />
+                    <Trash
+                        onClick={() => onDelete(workFlow_id, props.id)}
+                        className='text-red-200 hover:text-red-600 hover:cursor-pointer w-5' />
                     <div className='dragByVerticalGrip'>
                         <GripVertical />
                     </div>
-
-
                 </div>
             </header>
             <main className='border rounded p-2'>
-                {children}
+                Body Of Node
             </main>
-            <footer className='text-xs text-gray-500'>Id: {node_id}</footer>
+            <footer className='text-xs text-gray-500'>Id: {props.id}</footer>
+            {
+                props.data.node_type.input &&
+                <Handle
+                    type="target"
+                    position={Position.Left}
+                    style={{ background: 'green', width: 12, height: 12 }}
+                />
+            }
+            {
+                props.data.node_type.output &&
+                <Handle
+                    type="target"
+                    position={Position.Right}
+                    style={{ background: 'orange', width: 12, height: 12 }}
+                />
+            }
+
         </section>
     )
 }

@@ -12,7 +12,6 @@ import { customEdgeTypes, customNodeTypes } from '@/NodeType/Mappings';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { setWorkFlowInfo } from '@/store/Slices/WorkFlow';
-import { ENodeTypes } from '@/NodeType/NodeTypes';
 import { Button } from '@/components/ui/button';
 import { FileClock, Pause, Play } from 'lucide-react';
 import Image from "next/image";
@@ -68,10 +67,10 @@ const WorkFlowEditor = ({ WorkFlow_id }: { WorkFlow_id: string }) => {
         setConnections((eds) => applyEdgeChanges(changes, eds))
     }, [workflow])
 
-    const addNode = async (nodeType: ENodeTypes) => {
+    const addNode = async (nodeType_id: string) => {
         if (!WorkFlow_id) return;
-        console.log(nodeType)
-        const WorkFlowNewNode = await backendService.postWorkFlowNode(WorkFlow_id, nodeType)
+        console.log(nodeType_id)
+        const WorkFlowNewNode = await backendService.postWorkFlowNode(WorkFlow_id, nodeType_id)
         const ReactFlowNewNode = cvtWorkflowNodeToReactFlowNode(WorkFlowNewNode)
         setNodes((nodesSnapshot) => [...nodesSnapshot, ReactFlowNewNode])
     }

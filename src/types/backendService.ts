@@ -12,7 +12,9 @@ export type TNodeType = {
     id: string;
     name: string;
     description: string;
-    initiator: boolean;
+    logo: string;
+    input:boolean;
+    output:boolean
 };
 
 export type TWorkFlowNodePosition = {

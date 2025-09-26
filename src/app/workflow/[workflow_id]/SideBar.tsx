@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { backendService } from '@/app/services/backend'
 import { TNodeType } from '@/types/backendService'
-import { ENodeTypes } from '@/NodeType/NodeTypes'
 import { cvtnodeTypesValueToEnum } from '@/lib/converter'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getNodeAvatar } from '@/NodeType/Mappings'
 
 type SideBarProps = {
-  addNode: (nodeType:ENodeTypes) => void
+  addNode: (nodeType_id:string) => void
 }
 
 const SideBar = (props: SideBarProps) => {
@@ -28,12 +26,12 @@ const SideBar = (props: SideBarProps) => {
           nodeTypes.map((nodeType) => {
             return <li
               key={nodeType.id}
-              onClick={()=>props.addNode(cvtnodeTypesValueToEnum(nodeType.id))}
+              onClick={()=>props.addNode(nodeType.id)}
               className="border rounded m-2 p-2 active:bg-gray-400 hover:bg-gray-200"
             >
               <div className='flex items-center gap-2'>
               <Avatar className='size-5'>
-                    <AvatarImage src={getNodeAvatar(cvtnodeTypesValueToEnum(nodeType.id))} />
+                    <AvatarImage src={nodeType.logo} />
                     <AvatarFallback className='bg-red-400 '>{nodeType.name.split('').slice(0, 2).join('').toUpperCase()}</AvatarFallback>
                   </Avatar>
                 {nodeType.name}
