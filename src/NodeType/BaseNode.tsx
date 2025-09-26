@@ -27,7 +27,12 @@ const BaseNode = (props: TBaseNodeProps) => {
 
   const form = useForm({
     defaultValues: props.data.node_type.config.reduce((acc, field) => {
-      acc[field.key] = props.data.config[field.key] || ""; // Use existing data or fallback to empty string
+      if (field.type === 'file') {
+        // For file fields, don't set a default value - let the UI handle showing existing files
+        acc[field.key] = null;
+      } else {
+        acc[field.key] = props.data.config[field.key] || ""; // Use existing data or fallback to empty string
+      }
       return acc;
     }, {} as Record<string, any>)
   })
@@ -42,9 +47,15 @@ const BaseNode = (props: TBaseNodeProps) => {
     // Process each field based on its type
     props.data.node_type.config.forEach(field => {
       const value = values[field.key];
-      if (field.type === 'file' && value && value instanceof FileList && value.length > 0) {
-        fileFields[field.key] = value[0]; // Take the first file
-      } else if (field.type !== 'file') {
+      if (field.type === 'file') {
+        if (value && value instanceof FileList && value.length > 0) {
+          // New file selected - upload it
+          fileFields[field.key] = value[0]; // Take the first file
+        } else if (props.data.config[field.key]) {
+          // No new file selected but existing file exists - keep the existing ID
+          regularFields[field.key] = props.data.config[field.key];
+        }
+      } else {
         regularFields[field.key] = value;
       }
     });
@@ -105,14 +116,28 @@ const BaseNode = (props: TBaseNodeProps) => {
                         <FormLabel>{node_field.label}</FormLabel>
                         <FormControl>
                           {node_field.type === 'file' ? (
-                            <Input
-                              type="file"
-                              onChange={(e) => {
-                                const fileList = e.target.files;
-                                field.onChange(fileList);
-                              }}
-                              required={node_field.required}
-                            />
+                            <div className="space-y-2">
+                              {/* Show existing file if present */}
+                              {props.data.config[node_field.key] && (
+                                <div className="p-2 bg-green-50 border border-green-200 rounded text-sm">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-green-700">
+                                      📁 (File: {props.data.config[node_field.key]})
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* File input */}
+                              <Input
+                                type="file"
+                                onChange={(e) => {
+                                  const fileList = e.target.files;
+                                  field.onChange(fileList);
+                                }}
+                                required={node_field.required && !props.data.config[node_field.key]}
+                              />
+                            </div>
                           ) : (
                             <Input
                               {...field}
