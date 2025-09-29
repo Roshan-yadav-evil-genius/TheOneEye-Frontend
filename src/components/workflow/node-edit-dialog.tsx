@@ -19,6 +19,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
+import { sampleInputData, sampleOutputData } from "@/data/sample-data";
 
 interface Condition {
   id: string;
@@ -127,7 +128,7 @@ export function NodeEditDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700">
+      <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label}</DialogTitle>
         </VisuallyHidden>
@@ -137,6 +138,7 @@ export function NodeEditDialog({
             <InputSection 
               activeInputTab={activeInputTab}
               onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
+              jsonData={sampleInputData}
             />
 
             {/* Node Editor Column */}
@@ -317,17 +319,8 @@ export function NodeEditDialog({
             <OutputSection 
               activeOutputTab={activeOutputTab}
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
+              jsonData={sampleOutputData}
             />
-          </div>
-
-          {/* Footer inside the dialog - centered buttons */}
-          <div className="border-t border-gray-700 bg-gray-900 p-4 flex justify-center gap-4">
-            <Button variant="outline" onClick={handleCancel} className="border-gray-600 text-white hover:bg-gray-800 px-8">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="bg-orange-600 hover:bg-orange-700 text-white px-8">
-              Save Changes
-            </Button>
           </div>
         </div>
       </DialogContent>
