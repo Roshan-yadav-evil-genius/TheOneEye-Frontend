@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText } from 'lucide-react';
+import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText, GripVertical } from 'lucide-react';
 
 interface SchemaField {
   key: string;
@@ -20,8 +20,6 @@ interface DraggableFieldProps {
 }
 
 function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldProps) {
-  const [isDragEnabled, setIsDragEnabled] = useState(false);
-  
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: field.path,
     data: {
@@ -29,49 +27,14 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
       key: field.key,
       path: field.path,
       fieldType: field.type
-    },
-    disabled: !isDragEnabled
+    }
   });
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined;
 
-  const dragRef = useRef<HTMLDivElement>(null);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const [isLongPressing, setIsLongPressing] = useState(false);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Don't start long press if clicking on expand button
-    if ((e.target as HTMLElement).closest('button')) {
-      return;
-    }
-
-    setIsLongPressing(true);
-    longPressTimer.current = setTimeout(() => {
-      // Enable drag after 500ms
-      setIsDragEnabled(true);
-      setIsLongPressing(false);
-    }, 500);
-  };
-
-  const handleMouseUp = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-    setIsLongPressing(false);
-    setIsDragEnabled(false);
-  };
-
   const handleClick = (e: React.MouseEvent) => {
-    // If we were long pressing or dragging is enabled, don't trigger click
-    if (isLongPressing || isDragEnabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
     // If clicking on expand button, let it handle the click
     if ((e.target as HTMLElement).closest('button')) {
       return;
@@ -81,15 +44,6 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
     if (field.children && field.children.length > 0) {
       onToggle();
     }
-  };
-
-  const handleMouseLeave = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-    setIsLongPressing(false);
-    setIsDragEnabled(false);
   };
 
   const getTypeIcon = (type: string) => {
@@ -131,22 +85,15 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
 
   return (
     <div
-      ref={(node) => {
-        setNodeRef(node);
-        dragRef.current = node;
-      }}
+      ref={setNodeRef}
       style={{ ...style, marginLeft: `${level * 16}px` }}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      {...(isDragEnabled ? listeners : {})}
+      {...listeners}
       {...attributes}
       className={`
-        flex items-center gap-2 py-1 px-2 rounded
+        group flex items-center gap-2 py-1 px-2 rounded
         hover:bg-gray-700/30 transition-colors select-none
-        ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
-        ${isLongPressing ? 'bg-gray-700/50 cursor-grab' : 'cursor-pointer'}
+        ${isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
       `}
     >
       {isExpandable && (
@@ -170,7 +117,6 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
       {!isExpandable && <div className="w-4" />}
       
       {getTypeIcon(field.type)}
-      
       <div className="flex items-center justify-between w-full">
         <span className={`font-mono text-sm ${getTypeColor(field.type)}`}>
           {field.key}

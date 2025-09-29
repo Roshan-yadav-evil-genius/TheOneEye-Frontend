@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DndContext } from "@dnd-kit/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
+import { DroppableInput } from "./droppable-input";
 import { sampleInputData } from "@/data/sample-data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 
@@ -131,13 +133,14 @@ export function NodeEditDialog({
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label}</DialogTitle>
         </VisuallyHidden>
-        <div className="flex flex-col h-full overflow-hidden">
-          <ResizablePanels 
-            defaultSizes={[33.33, 33.33, 33.34]}
-            minSizes={[20, 25, 20]}
-            maxSizes={[60, 60, 60]}
-            className="flex-1 overflow-hidden"
-          >
+        <DndContext>
+          <div className="flex flex-col h-full overflow-hidden">
+            <ResizablePanels 
+              defaultSizes={[33.33, 33.33, 33.34]}
+              minSizes={[20, 25, 20]}
+              maxSizes={[60, 60, 60]}
+              className="flex-1 overflow-hidden"
+            >
             {/* INPUT Column */}
             <InputSection 
               activeInputTab={activeInputTab}
@@ -221,11 +224,11 @@ export function NodeEditDialog({
                             <button className="bg-gray-700 text-gray-300 px-2 py-1 text-xs rounded">
                               fx
                             </button>
-                            <Input
+                            <DroppableInput
                               value={condition.field}
-                              onChange={(e) => updateCondition(condition.id, "field", e.target.value)}
-                              className="bg-gray-800 border-pink-500 text-white placeholder-gray-400"
+                              onChange={(value) => updateCondition(condition.id, "field", value)}
                               placeholder="Field expression"
+                              id={`condition-field-${condition.id}`}
                             />
                             <Select value={condition.operator} onValueChange={(value) => updateCondition(condition.id, "operator", value)}>
                               <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
@@ -238,11 +241,12 @@ export function NodeEditDialog({
                                 <SelectItem value="contains">contains</SelectItem>
                               </SelectContent>
                             </Select>
-                            <Input
+                            <DroppableInput
                               value={condition.value}
-                              onChange={(e) => updateCondition(condition.id, "value", e.target.value)}
-                              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                              onChange={(value) => updateCondition(condition.id, "value", value)}
                               placeholder="Value"
+                              id={`condition-value-${condition.id}`}
+                              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
                             />
                             <button
                               onClick={() => removeCondition(condition.id)}
@@ -327,6 +331,7 @@ export function NodeEditDialog({
             />
           </ResizablePanels>
         </div>
+        </DndContext>
       </DialogContent>
     </Dialog>
   );
