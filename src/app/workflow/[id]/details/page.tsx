@@ -1,10 +1,35 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartConfig,
+} from "@/components/ui/chart";
+import { 
+  Area,
+  AreaChart,
+  Line,
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 import { 
   IconArrowLeft, 
   IconClock, 
@@ -13,12 +38,27 @@ import {
   IconUsers,
   IconSettings,
   IconPlayerPlay,
-  IconSquare
+  IconSquare,
+  IconCpu,
+  IconDeviceDesktop,
+  IconNetwork,
+  IconServer
 } from "@tabler/icons-react";
 
 export default function WorkflowDetailsPage() {
   const params = useParams();
   const workflowId = params.id as string;
+  const [timeRange, setTimeRange] = useState("24h");
+
+  // Current live values (in a real app this would come from real-time monitoring)
+  const currentValues = {
+    cpu: 45,
+    memory: 78,
+    networkIn: 420,
+    networkOut: 280,
+    diskRead: 18,
+    diskWrite: 12
+  };
 
   // Mock data - in a real app this would come from an API
   const workflowData = {
@@ -54,6 +94,71 @@ export default function WorkflowDetailsPage() {
       { id: "5", status: "success", duration: "2.0s", timestamp: "1 day ago" },
     ]
   };
+
+  // Docker resource utilization data
+  const dockerResourceData = [
+    { time: "00:00", cpu: 15, memory: 45, networkIn: 120, networkOut: 80, diskRead: 5, diskWrite: 3 },
+    { time: "01:00", cpu: 12, memory: 42, networkIn: 95, networkOut: 65, diskRead: 4, diskWrite: 2 },
+    { time: "02:00", cpu: 8, memory: 38, networkIn: 70, networkOut: 45, diskRead: 3, diskWrite: 1 },
+    { time: "03:00", cpu: 6, memory: 35, networkIn: 50, networkOut: 30, diskRead: 2, diskWrite: 1 },
+    { time: "04:00", cpu: 10, memory: 40, networkIn: 85, networkOut: 55, diskRead: 4, diskWrite: 2 },
+    { time: "05:00", cpu: 18, memory: 48, networkIn: 150, networkOut: 100, diskRead: 6, diskWrite: 4 },
+    { time: "06:00", cpu: 25, memory: 55, networkIn: 200, networkOut: 130, diskRead: 8, diskWrite: 5 },
+    { time: "07:00", cpu: 35, memory: 65, networkIn: 280, networkOut: 180, diskRead: 12, diskWrite: 8 },
+    { time: "08:00", cpu: 45, memory: 75, networkIn: 350, networkOut: 220, diskRead: 15, diskWrite: 10 },
+    { time: "09:00", cpu: 55, memory: 85, networkIn: 420, networkOut: 280, diskRead: 18, diskWrite: 12 },
+    { time: "10:00", cpu: 60, memory: 90, networkIn: 480, networkOut: 320, diskRead: 20, diskWrite: 15 },
+    { time: "11:00", cpu: 58, memory: 88, networkIn: 460, networkOut: 300, diskRead: 19, diskWrite: 14 },
+    { time: "12:00", cpu: 52, memory: 82, networkIn: 400, networkOut: 260, diskRead: 16, diskWrite: 11 },
+    { time: "13:00", cpu: 48, memory: 78, networkIn: 380, networkOut: 240, diskRead: 14, diskWrite: 9 },
+    { time: "14:00", cpu: 50, memory: 80, networkIn: 390, networkOut: 250, diskRead: 15, diskWrite: 10 },
+    { time: "15:00", cpu: 55, memory: 85, networkIn: 430, networkOut: 290, diskRead: 17, diskWrite: 12 },
+    { time: "16:00", cpu: 62, memory: 92, networkIn: 500, networkOut: 340, diskRead: 21, diskWrite: 16 },
+    { time: "17:00", cpu: 65, memory: 95, networkIn: 520, networkOut: 360, diskRead: 22, diskWrite: 18 },
+    { time: "18:00", cpu: 58, memory: 88, networkIn: 470, networkOut: 310, diskRead: 19, diskWrite: 14 },
+    { time: "19:00", cpu: 45, memory: 75, networkIn: 360, networkOut: 230, diskRead: 14, diskWrite: 9 },
+    { time: "20:00", cpu: 35, memory: 65, networkIn: 280, networkOut: 180, diskRead: 11, diskWrite: 7 },
+    { time: "21:00", cpu: 25, memory: 55, networkIn: 200, networkOut: 130, diskRead: 8, diskWrite: 5 },
+    { time: "22:00", cpu: 18, memory: 48, networkIn: 150, networkOut: 100, diskRead: 6, diskWrite: 4 },
+    { time: "23:00", cpu: 12, memory: 42, networkIn: 100, networkOut: 70, diskRead: 4, diskWrite: 3 },
+  ];
+
+  // Chart configurations with high contrast colors
+  const cpuChartConfig = {
+    cpu: {
+      label: "CPU Usage",
+      color: "#3b82f6", // Bright blue
+    },
+  } satisfies ChartConfig;
+
+  const memoryChartConfig = {
+    memory: {
+      label: "Memory Usage",
+      color: "#10b981", // Bright green
+    },
+  } satisfies ChartConfig;
+
+  const networkChartConfig = {
+    networkIn: {
+      label: "Network In",
+      color: "#f59e0b", // Bright orange
+    },
+    networkOut: {
+      label: "Network Out",
+      color: "#ef4444", // Bright red
+    },
+  } satisfies ChartConfig;
+
+  const diskChartConfig = {
+    diskRead: {
+      label: "Disk Read",
+      color: "#8b5cf6", // Bright purple
+    },
+    diskWrite: {
+      label: "Disk Write",
+      color: "#06b6d4", // Bright cyan
+    },
+  } satisfies ChartConfig;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -108,6 +213,260 @@ export default function WorkflowDetailsPage() {
             Run Now
           </Button>
         </div>
+      </div>
+
+      <Separator />
+
+      {/* Time Range Selector */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Resource Utilization</h2>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Select time range" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1h">Last Hour</SelectItem>
+            <SelectItem value="24h">Last 24 Hours</SelectItem>
+            <SelectItem value="7d">Last 7 Days</SelectItem>
+            <SelectItem value="30d">Last 30 Days</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Docker Resource Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* CPU Usage Chart */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <IconCpu className="h-5 w-5" />
+                  CPU Usage
+                </CardTitle>
+                <CardDescription>CPU utilization over time</CardDescription>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-500">{currentValues.cpu}%</div>
+                <div className="text-xs text-muted-foreground">Current</div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-2">
+            <ChartContainer config={cpuChartConfig} className="h-[200px] w-full">
+              <LineChart data={dockerResourceData}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="time" 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <YAxis 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  domain={[0, 100]}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Line
+                  dataKey="cpu"
+                  type="monotone"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#ffffff' }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Memory Usage Chart */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <IconDeviceDesktop className="h-5 w-5" />
+                  Memory Usage
+                </CardTitle>
+                <CardDescription>Memory consumption over time</CardDescription>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-500">{currentValues.memory}%</div>
+                <div className="text-xs text-muted-foreground">Current</div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-2">
+            <ChartContainer config={memoryChartConfig} className="h-[200px] w-full">
+              <AreaChart data={dockerResourceData}>
+                <defs>
+                  <linearGradient id="fillMemory" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="#10b981"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="#10b981"
+                      stopOpacity={0.2}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="time" 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <YAxis 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  domain={[0, 100]}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Area
+                  dataKey="memory"
+                  type="monotone"
+                  fill="url(#fillMemory)"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Network I/O Chart */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <IconNetwork className="h-5 w-5" />
+                  Network I/O
+                </CardTitle>
+                <CardDescription>Network traffic in/out over time</CardDescription>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-orange-500">{currentValues.networkIn} KB/s</div>
+                <div className="text-sm font-bold text-red-500">{currentValues.networkOut} KB/s</div>
+                <div className="text-xs text-muted-foreground">In / Out</div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-2">
+            <ChartContainer config={networkChartConfig} className="h-[200px] w-full">
+              <LineChart data={dockerResourceData}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="time" 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <YAxis 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Line
+                  dataKey="networkIn"
+                  type="monotone"
+                  stroke="#f59e0b"
+                  strokeWidth={3}
+                  dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                  activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#ffffff' }}
+                />
+                <Line
+                  dataKey="networkOut"
+                  type="monotone"
+                  stroke="#ef4444"
+                  strokeWidth={3}
+                  dot={{ fill: '#ef4444', strokeWidth: 2, r: 3 }}
+                  activeDot={{ r: 5, stroke: '#ef4444', strokeWidth: 2, fill: '#ffffff' }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Disk I/O Chart */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <IconServer className="h-5 w-5" />
+                  Disk I/O
+                </CardTitle>
+                <CardDescription>Disk read/write operations over time</CardDescription>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-purple-500">{currentValues.diskRead} MB/s</div>
+                <div className="text-sm font-bold text-cyan-500">{currentValues.diskWrite} MB/s</div>
+                <div className="text-xs text-muted-foreground">Read / Write</div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-2">
+            <ChartContainer config={diskChartConfig} className="h-[200px] w-full">
+              <LineChart data={dockerResourceData}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="time" 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <YAxis 
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Line
+                  dataKey="diskRead"
+                  type="monotone"
+                  stroke="#8b5cf6"
+                  strokeWidth={3}
+                  dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
+                  activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#ffffff' }}
+                />
+                <Line
+                  dataKey="diskWrite"
+                  type="monotone"
+                  stroke="#06b6d4"
+                  strokeWidth={3}
+                  dot={{ fill: '#06b6d4', strokeWidth: 2, r: 3 }}
+                  activeDot={{ r: 5, stroke: '#06b6d4', strokeWidth: 2, fill: '#ffffff' }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
 
       <Separator />
