@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import ReactFlow, {
   Node,
   Edge,
@@ -135,6 +135,16 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType }:
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // Update existing edges when lineType changes
+  useEffect(() => {
+    setEdges((currentEdges) =>
+      currentEdges.map((edge) => ({
+        ...edge,
+        type: lineType,
+      }))
+    );
+  }, [lineType, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
