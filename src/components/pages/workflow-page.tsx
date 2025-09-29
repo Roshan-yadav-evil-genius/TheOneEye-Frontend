@@ -1,3 +1,6 @@
+import { WorkflowList } from "@/components/workflow-list"
+import { mockWorkflows } from "@/data/mock-workflows"
+
 export function WorkflowPage() {
     return (
         <div className="px-4 lg:px-6">
@@ -9,7 +12,7 @@ export function WorkflowPage() {
                     </p>
                 </div>
                 <main>
-
+                    <WorkflowList workflows={mockWorkflows} />
                 </main>
             </div>
         </div>
