@@ -5,7 +5,7 @@ import { JsonViewer } from "./json-viewer";
 interface OutputSectionProps {
   activeOutputTab: "schema" | "json";
   onOutputTabChange: (value: "schema" | "json") => void;
-  jsonData: string;
+  jsonData: any;
 }
 
 export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: OutputSectionProps) {

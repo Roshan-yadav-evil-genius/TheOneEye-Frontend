@@ -5,7 +5,7 @@ import { JsonViewer } from "./json-viewer";
 interface InputSectionProps {
   activeInputTab: "schema" | "json";
   onInputTabChange: (value: "schema" | "json") => void;
-  jsonData: string;
+  jsonData: any;
 }
 
 export function InputSection({ activeInputTab, onInputTabChange, jsonData }: InputSectionProps) {

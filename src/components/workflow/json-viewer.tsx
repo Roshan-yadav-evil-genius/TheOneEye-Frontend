@@ -9,7 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 interface JsonViewerProps {
   title: string;
   statusColor: string;
-  jsonData: string;
+  jsonData: any;
   activeTab: "schema" | "json";
   onTabChange: (value: "schema" | "json") => void;
   showExecuteButton?: boolean;
@@ -35,7 +35,7 @@ export function JsonViewer({
     if (onCopy) {
       onCopy();
     } else {
-      navigator.clipboard.writeText(jsonData);
+      navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
     }
   };
 
@@ -124,7 +124,7 @@ export function JsonViewer({
               showLineNumbers={true}
               wrapLines={true}
             >
-              {jsonData}
+              {JSON.stringify(jsonData, null, 2)}
             </SyntaxHighlighter>
           </div>
         </TabsContent>

@@ -19,7 +19,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
-import { sampleInputData, sampleOutputData } from "@/data/sample-data";
+import { sampleInputData } from "@/data/sample-data";
 
 interface Condition {
   id: string;
@@ -319,7 +319,7 @@ export function NodeEditDialog({
             <OutputSection 
               activeOutputTab={activeOutputTab}
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
-              jsonData={sampleOutputData}
+              jsonData={sampleInputData}
             />
           </div>
         </div>
