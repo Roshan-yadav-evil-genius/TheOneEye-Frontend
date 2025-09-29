@@ -9,19 +9,19 @@ export const sampleInputData = [
       c1: 1,
       c2: 2,
       nested: {
-        deepkey: "deepValue"
+        deepKey: "deepValue"
       }
     }
   },
   {
     row_number: 3,
     Name: "Jane Doe",
-    Age: 28,
+    Age: 42,
     master: {
       c1: 3,
       c2: 4,
       nested: {
-        deepkey: "anotherValue"
+        deepKey: "anotherValue"
       }
     }
   }

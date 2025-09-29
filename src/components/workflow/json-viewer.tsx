@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+import { DraggableSchema } from './draggable-schema';
+import { ExpressionDropZone } from './expression-drop-zone';
+import { useState } from 'react';
 
 interface JsonViewerProps {
   title: string;
@@ -17,6 +21,8 @@ interface JsonViewerProps {
   onCopy?: () => void;
   onDownload?: () => void;
   onRefresh?: () => void;
+  expressions?: string[];
+  onExpressionsChange?: (expressions: string[]) => void;
 }
 
 export function JsonViewer({
@@ -29,7 +35,9 @@ export function JsonViewer({
   onExecute,
   onCopy,
   onDownload,
-  onRefresh
+  onRefresh,
+  expressions = [],
+  onExpressionsChange
 }: JsonViewerProps) {
   const handleCopy = () => {
     if (onCopy) {
@@ -45,8 +53,36 @@ export function JsonViewer({
     }
   };
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && over.id === 'expression-drop-zone' && active.data.current) {
+      const fieldData = active.data.current;
+      const expression = `{{$json.${fieldData.path}}}`;
+      
+      if (onExpressionsChange) {
+        onExpressionsChange([...expressions, expression]);
+      }
+    }
+  };
+
+  const handleRemoveExpression = (index: number) => {
+    if (onExpressionsChange) {
+      const newExpressions = expressions.filter((_, i) => i !== index);
+      onExpressionsChange(newExpressions);
+    }
+  };
+
   return (
-    <div className="w-1/3 border-r flex flex-col overflow-hidden ">
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="w-1/3 border-r flex flex-col overflow-hidden ">
       <div className="flex items-center justify-between p-1 border-b border-gray-700 bg-gray-800 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 ${statusColor} rounded-full`}></div>
@@ -130,34 +166,20 @@ export function JsonViewer({
         </TabsContent>
         
         <TabsContent value="schema" className="flex-1 m-0 overflow-hidden">
-          <div className="h-full overflow-auto p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                <span className="text-blue-400 font-mono text-sm">array</span>
-              </div>
-              <div className="ml-4 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded"></div>
-                  <span className="text-green-400 font-mono text-sm">object</span>
-                </div>
-                <div className="ml-4 space-y-1">
-                  <div className="text-yellow-400 font-mono text-sm">row_number: number</div>
-                  <div className="text-green-400 font-mono text-sm">Name: string</div>
-                  <div className="text-yellow-400 font-mono text-sm">Age: number</div>
-                  <div className="text-purple-400 font-mono text-sm">master: object</div>
-                  {title === "OUTPUT" && (
-                    <>
-                      <div className="text-purple-400 font-mono text-sm">filtered: boolean</div>
-                      <div className="text-green-400 font-mono text-sm">result: string</div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <DraggableSchema jsonData={jsonData} title={title} />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+      
+      <DragOverlay>
+        {activeId ? (
+          <div className="bg-gray-700 border border-gray-600 rounded px-3 py-2 shadow-lg">
+            <span className="text-white font-mono text-sm">
+              {`{{$json.${activeId}}}`}
+            </span>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

@@ -6,9 +6,17 @@ interface InputSectionProps {
   activeInputTab: "schema" | "json";
   onInputTabChange: (value: "schema" | "json") => void;
   jsonData: any;
+  expressions?: string[];
+  onExpressionsChange?: (expressions: string[]) => void;
 }
 
-export function InputSection({ activeInputTab, onInputTabChange, jsonData }: InputSectionProps) {
+export function InputSection({ 
+  activeInputTab, 
+  onInputTabChange, 
+  jsonData, 
+  expressions, 
+  onExpressionsChange 
+}: InputSectionProps) {
   return (
     <JsonViewer
       title="INPUT"
@@ -16,6 +24,8 @@ export function InputSection({ activeInputTab, onInputTabChange, jsonData }: Inp
       jsonData={jsonData}
       activeTab={activeInputTab}
       onTabChange={onInputTabChange}
+      expressions={expressions}
+      onExpressionsChange={onExpressionsChange}
     />
   );
 }
