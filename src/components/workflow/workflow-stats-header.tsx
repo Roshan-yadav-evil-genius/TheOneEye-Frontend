@@ -20,7 +20,9 @@ import {
   IconRoute,
   IconRoute2,
   IconMinus,
-  IconCircle
+  IconCircle,
+  IconMap,
+  IconMapOff
 } from "@tabler/icons-react";
 
 interface WorkflowStatsHeaderProps {
@@ -30,6 +32,8 @@ interface WorkflowStatsHeaderProps {
   onToggleSidebar: () => void;
   lineType: string;
   onLineTypeChange: (type: string) => void;
+  showMinimap: boolean;
+  onMinimapToggle: () => void;
 }
 
 // Mock stats data - in a real app this would come from props or API
@@ -49,7 +53,7 @@ const lineTypeOptions = [
   { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
 ];
 
-export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange }: WorkflowStatsHeaderProps) {
+export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle }: WorkflowStatsHeaderProps) {
   return (
     <div className="px-3 py-2">
       <div className="flex items-center justify-between">
@@ -164,6 +168,21 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
               })}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Minimap Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs"
+            onClick={onMinimapToggle}
+            title={showMinimap ? "Hide minimap" : "Show minimap"}
+          >
+            {showMinimap ? (
+              <IconMap className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
+            ) : (
+              <IconMapOff className="h-3.5 w-3.5 text-gray-500 hover:text-gray-600" />
+            )}
+          </Button>
 
           {/* Run/Stop Button */}
           <div className="flex items-center gap-1">

@@ -18,6 +18,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [lineType, setLineType] = useState("step");
+  const [showMinimap, setShowMinimap] = useState(true);
 
   // TODO: Load workflow data based on workflowId
   // const { data: workflow } = useWorkflow(workflowId);
@@ -36,6 +37,10 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
 
   const handleLineTypeChange = (type: string) => {
     setLineType(type);
+  };
+
+  const handleMinimapToggle = () => {
+    setShowMinimap(!showMinimap);
   };
 
   return (
@@ -65,6 +70,8 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             lineType={lineType}
             onLineTypeChange={handleLineTypeChange}
+            showMinimap={showMinimap}
+            onMinimapToggle={handleMinimapToggle}
           />
         </div>
 
@@ -75,6 +82,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             searchTerm={searchTerm}
             filters={filters}
             lineType={lineType}
+            showMinimap={showMinimap}
           />
         </div>
       </div>

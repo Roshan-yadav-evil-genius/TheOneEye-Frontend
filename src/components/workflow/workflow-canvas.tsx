@@ -27,6 +27,7 @@ interface WorkflowCanvasProps {
     category: string;
   };
   lineType: string;
+  showMinimap: boolean;
 }
 
 const nodeTypes: NodeTypes = {
@@ -129,7 +130,7 @@ const initialEdges: Edge[] = [
   },
 ];
 
-export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType }: WorkflowCanvasProps) {
+export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, showMinimap }: WorkflowCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -275,19 +276,21 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType }:
         }}
       >
         <Controls />
-        <MiniMap 
-          nodeColor={(node) => {
-            switch (node.data?.type) {
-              case "trigger": return "#3b82f6";
-              case "action": return "#10b981";
-              case "logic": return "#8b5cf6";
-              default: return "#6b7280";
-            }
-          }}
-          nodeStrokeWidth={3}
-          zoomable
-          pannable
-        />
+        {showMinimap && (
+          <MiniMap 
+            nodeColor={(node) => {
+              switch (node.data?.type) {
+                case "trigger": return "#3b82f6";
+                case "action": return "#10b981";
+                case "logic": return "#8b5cf6";
+                default: return "#6b7280";
+              }
+            }}
+            nodeStrokeWidth={3}
+            zoomable
+            pannable
+          />
+        )}
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
       
