@@ -1,16 +1,11 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { WorkflowDetailPage } from "@/components/pages/workflow-detail-page"
+import { WorkflowLayout } from "@/components/workflow/workflow-layout"
 
-interface WorkflowDetailPageProps {
+interface WorkflowPageProps {
   params: {
     id: string
   }
 }
 
-export default function Page({ params }: WorkflowDetailPageProps) {
-  return (
-    <DashboardLayout title="Workflow Details">
-      <WorkflowDetailPage workflowId={params.id} />
-    </DashboardLayout>
-  )
+export default function WorkflowPage({ params }: WorkflowPageProps) {
+  return <WorkflowLayout workflowId={params.id} />
 }
