@@ -130,14 +130,16 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
       <Handle
         type="target"
         position={Position.Left}
-        className="w-3 h-3 bg-primary border-2 border-background"
+        className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
         style={{ left: -6 }}
+        id="target"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="w-3 h-3 bg-primary border-2 border-background"
+        className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
         style={{ right: -6 }}
+        id="source"
       />
 
       {/* Hover Actions */}

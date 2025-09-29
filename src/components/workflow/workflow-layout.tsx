@@ -17,6 +17,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
     category: "all",
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [lineType, setLineType] = useState("step");
 
   // TODO: Load workflow data based on workflowId
   // const { data: workflow } = useWorkflow(workflowId);
@@ -31,6 +32,10 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
         ? prev.filter(id => id !== nodeId)
         : [...prev, nodeId]
     );
+  };
+
+  const handleLineTypeChange = (type: string) => {
+    setLineType(type);
   };
 
   return (
@@ -58,6 +63,8 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onRunStop={handleRunStop}
             isSidebarCollapsed={isSidebarCollapsed}
             onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            lineType={lineType}
+            onLineTypeChange={handleLineTypeChange}
           />
         </div>
 
@@ -67,6 +74,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             selectedNodes={selectedNodes}
             searchTerm={searchTerm}
             filters={filters}
+            lineType={lineType}
           />
         </div>
       </div>

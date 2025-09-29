@@ -1,15 +1,26 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PanelLeftIcon } from "lucide-react";
 import { 
   IconPlayerPlay, 
   IconSquare, 
   IconClock, 
   IconActivity,
-  IconTrendingUp
+  IconTrendingUp,
+  IconRoute,
+  IconRoute2,
+  IconMinus,
+  IconCircle
 } from "@tabler/icons-react";
 
 interface WorkflowStatsHeaderProps {
@@ -17,6 +28,8 @@ interface WorkflowStatsHeaderProps {
   onRunStop: () => void;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  lineType: string;
+  onLineTypeChange: (type: string) => void;
 }
 
 // Mock stats data - in a real app this would come from props or API
@@ -29,7 +42,14 @@ const mockStats = {
   nextScheduled: "in 1 hour",
 };
 
-export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar }: WorkflowStatsHeaderProps) {
+const lineTypeOptions = [
+  { value: 'straight', label: 'Straight', icon: IconMinus, description: 'Direct lines' },
+  { value: 'step', label: 'Step', icon: IconRoute, description: 'Ladder style' },
+  { value: 'smoothstep', label: 'Smooth Step', icon: IconRoute2, description: 'Curved steps' },
+  { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
+];
+
+export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange }: WorkflowStatsHeaderProps) {
   return (
     <div className="px-3 py-2">
       <div className="flex items-center justify-between">
@@ -106,6 +126,44 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
             <IconClock className="h-3 w-3" />
             <span>Last: {mockStats.lastRun}</span>
           </div>
+
+          {/* Line Type Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                title="Change line type"
+              >
+                {lineTypeOptions.find(option => option.value === lineType)?.icon && 
+                  React.createElement(lineTypeOptions.find(option => option.value === lineType)!.icon, {
+                    className: "h-3.5 w-3.5 text-blue-500 hover:text-blue-600"
+                  })
+                }
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {lineTypeOptions.map((option) => {
+                const IconComponent = option.icon;
+                return (
+                  <DropdownMenuItem 
+                    key={option.value}
+                    onClick={() => onLineTypeChange(option.value)}
+                    className={lineType === option.value ? "bg-accent" : ""}
+                  >
+                    <div className="flex items-center gap-2">
+                      <IconComponent className="h-4 w-4" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Run/Stop Button */}
           <div className="flex items-center gap-1">

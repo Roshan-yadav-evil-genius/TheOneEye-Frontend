@@ -14,6 +14,7 @@ import ReactFlow, {
   MiniMap,
   NodeTypes,
   ReactFlowInstance,
+  ConnectionLineType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -25,6 +26,7 @@ interface WorkflowCanvasProps {
   filters: {
     category: string;
   };
+  lineType: string;
 }
 
 const nodeTypes: NodeTypes = {
@@ -100,26 +102,34 @@ const initialEdges: Edge[] = [
     id: "e1-2",
     source: "1",
     target: "2",
+    type: "step",
     animated: true,
+    style: { stroke: '#3b82f6', strokeWidth: 2 },
   },
   {
     id: "e2-3",
     source: "2",
     target: "3",
+    type: "step",
+    style: { stroke: '#3b82f6', strokeWidth: 2 },
   },
   {
     id: "e2-4",
     source: "2",
     target: "4",
+    type: "step",
+    style: { stroke: '#3b82f6', strokeWidth: 2 },
   },
   {
     id: "e4-5",
     source: "4",
     target: "5",
+    type: "step",
+    style: { stroke: '#3b82f6', strokeWidth: 2 },
   },
 ];
 
-export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowCanvasProps) {
+export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType }: WorkflowCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -127,8 +137,33 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowC
   const [isDragOver, setIsDragOver] = useState(false);
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (params: Connection) => {
+      // Prevent self-connections
+      if (params.source === params.target) {
+        return;
+      }
+      
+      // Check if connection already exists
+      const connectionExists = edges.some(
+        edge => edge.source === params.source && edge.target === params.target
+      );
+      
+      if (connectionExists) {
+        console.log('Connection already exists');
+        return;
+      }
+      
+      // Create a new edge with a unique ID
+      const newEdge = {
+        ...params,
+        id: `edge-${params.source}-${params.target}-${Date.now()}`,
+        animated: true,
+        type: lineType,
+        style: { stroke: '#3b82f6', strokeWidth: 2 },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [setEdges, edges, lineType]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -218,6 +253,16 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowC
         nodeTypes={nodeTypes}
         fitView
         className="bg-background"
+        connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
+        connectionLineType={lineType === 'straight' ? ConnectionLineType.Straight : 
+                           lineType === 'step' ? ConnectionLineType.Step :
+                           lineType === 'smoothstep' ? ConnectionLineType.SmoothStep :
+                           ConnectionLineType.Bezier}
+        defaultEdgeOptions={{
+          animated: true,
+          style: { stroke: '#3b82f6', strokeWidth: 2 },
+          type: lineType,
+        }}
       >
         <Controls />
         <MiniMap 
