@@ -40,7 +40,8 @@ const initialNodes: Node[] = [
       label: "Start", 
       type: "trigger",
       status: "active",
-      category: "system"
+      category: "system",
+      description: "Workflow entry point"
     },
   },
   {
@@ -51,7 +52,8 @@ const initialNodes: Node[] = [
       label: "Send Email", 
       type: "action",
       status: "active",
-      category: "communication"
+      category: "communication",
+      description: "Send notification email"
     },
   },
   {
@@ -62,7 +64,8 @@ const initialNodes: Node[] = [
       label: "Database Query", 
       type: "action",
       status: "active",
-      category: "data"
+      category: "data",
+      description: "Fetch user data"
     },
   },
   {
@@ -70,10 +73,11 @@ const initialNodes: Node[] = [
     type: "custom",
     position: { x: 300, y: 250 },
     data: { 
-      label: "Condition", 
+      label: "Switch", 
       type: "logic",
       status: "active",
-      category: "control"
+      category: "control",
+      description: "Route based on condition"
     },
   },
   {
@@ -84,7 +88,8 @@ const initialNodes: Node[] = [
       label: "End", 
       type: "trigger",
       status: "active",
-      category: "system"
+      category: "system",
+      description: "Workflow completion"
     },
   },
 ];
@@ -127,9 +132,8 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowC
     return nodes.filter(node => {
       const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filters.category === "all" || node.data.category === filters.category;
-      const matchesStatus = filters.status === "all" || node.data.status === filters.status;
       
-      return matchesSearch && matchesCategory && matchesStatus;
+      return matchesSearch && matchesCategory;
     });
   }, [nodes, searchTerm, filters]);
 
