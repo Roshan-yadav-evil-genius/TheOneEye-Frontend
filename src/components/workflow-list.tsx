@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { WorkflowCard } from "@/components/workflow-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ interface WorkflowListProps {
 export function WorkflowList({
   workflows,
 }: WorkflowListProps) {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
@@ -67,8 +69,7 @@ export function WorkflowList({
   }
 
   const handleView = (id: string) => {
-    console.log(`Viewing workflow: ${id}`)
-    // Navigation is now handled by the card click
+    router.push(`/workflow/${id}/details`)
   }
 
   const handleCreate = () => {

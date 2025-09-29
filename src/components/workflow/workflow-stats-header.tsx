@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +35,7 @@ interface WorkflowStatsHeaderProps {
   onLineTypeChange: (type: string) => void;
   showMinimap: boolean;
   onMinimapToggle: () => void;
+  workflowId?: string;
 }
 
 // Mock stats data - in a real app this would come from props or API
@@ -53,7 +55,14 @@ const lineTypeOptions = [
   { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
 ];
 
-export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle }: WorkflowStatsHeaderProps) {
+export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflowId }: WorkflowStatsHeaderProps) {
+  const router = useRouter();
+
+  const handleDetailsClick = () => {
+    if (workflowId) {
+      router.push(`/workflow/${workflowId}/details`);
+    }
+  };
   return (
     <div className="px-3 py-2">
       <div className="flex items-center justify-between">
@@ -187,10 +196,12 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
           {/* Run/Stop Button */}
           <div className="flex items-center gap-1">
             <Button
+              onClick={handleDetailsClick}
               variant="ghost"
               size="sm"
               className="h-6 px-2 text-xs"
               title="Details"
+              disabled={!workflowId}
             >
               <IconActivity className="h-3.5 w-3.5 text-blue-500 hover:text-blue-600" />
             </Button>

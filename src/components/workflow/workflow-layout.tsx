@@ -72,6 +72,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onLineTypeChange={handleLineTypeChange}
             showMinimap={showMinimap}
             onMinimapToggle={handleMinimapToggle}
+            workflowId={workflowId}
           />
         </div>
 
