@@ -1,0 +1,102 @@
+"use client";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NodeHeader } from "./node-header";
+import { ParametersTab } from "./parameters-tab";
+import { SettingsTab } from "./settings-tab";
+
+interface Condition {
+  id: string;
+  field: string;
+  operator: string;
+  value: string;
+}
+
+interface NodeEditorProps {
+  nodeType: string;
+  nodeLabel: string;
+  activeTab: "parameters" | "settings";
+  onTabChange: (tab: "parameters" | "settings") => void;
+  // Parameters tab props
+  conditions: Condition[];
+  logicOperator: "AND" | "OR";
+  convertTypes: boolean;
+  onConditionsChange: (conditions: Condition[]) => void;
+  onLogicOperatorChange: (operator: "AND" | "OR") => void;
+  onConvertTypesChange: (value: boolean) => void;
+  // Settings tab props
+  label: string;
+  description: string;
+  onLabelChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  // Header actions
+  onTestStep?: () => void;
+  onViewDocs?: () => void;
+}
+
+export function NodeEditor({
+  nodeType,
+  nodeLabel,
+  activeTab,
+  onTabChange,
+  conditions,
+  logicOperator,
+  convertTypes,
+  onConditionsChange,
+  onLogicOperatorChange,
+  onConvertTypesChange,
+  label,
+  description,
+  onLabelChange,
+  onDescriptionChange,
+  onTestStep,
+  onViewDocs
+}: NodeEditorProps) {
+  return (
+    <div className="border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
+      <NodeHeader
+        nodeType={nodeType}
+        nodeLabel={nodeLabel}
+        onTestStep={onTestStep}
+        onViewDocs={onViewDocs}
+      />
+
+      <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none">
+          <TabsTrigger 
+            value="parameters" 
+            className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-pink-500 text-gray-400`}
+          >
+            Parameters
+          </TabsTrigger>
+          <TabsTrigger 
+            value="settings" 
+            className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400`}
+          >
+            Settings
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-auto">
+          <ParametersTab
+            conditions={conditions}
+            logicOperator={logicOperator}
+            convertTypes={convertTypes}
+            onConditionsChange={onConditionsChange}
+            onLogicOperatorChange={onLogicOperatorChange}
+            onConvertTypesChange={onConvertTypesChange}
+          />
+        </TabsContent>
+
+        <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-auto">
+          <SettingsTab
+            label={label}
+            description={description}
+            onLabelChange={onLabelChange}
+            onDescriptionChange={onDescriptionChange}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
