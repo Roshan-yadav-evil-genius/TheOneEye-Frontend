@@ -1,18 +1,19 @@
 "use client";
 
-import { Search, Copy, Download } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Play, Copy, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-interface InputSectionProps {
-  activeInputTab: "schema" | "json";
-  onInputTabChange: (value: "schema" | "json") => void;
+interface OutputSectionProps {
+  activeOutputTab: "schema" | "json";
+  onOutputTabChange: (value: "schema" | "json") => void;
 }
 
-export function InputSection({ activeInputTab, onInputTabChange }: InputSectionProps) {
-  const sampleJson = `[
+export function OutputSection({ activeOutputTab, onOutputTabChange }: OutputSectionProps) {
+  // Sample output data - this would come from the node execution
+  const outputJson = `[
   {
     "row_number": 2,
     "Name": "Kenneth Smith",
@@ -23,7 +24,9 @@ export function InputSection({ activeInputTab, onInputTabChange }: InputSectionP
       "nested": {
         "deepkey": "deepValue"
       }
-    }
+    },
+    "filtered": true,
+    "result": "Age is greater than 50"
   },
   {
     "row_number": 3,
@@ -35,22 +38,38 @@ export function InputSection({ activeInputTab, onInputTabChange }: InputSectionP
       "nested": {
         "deepkey": "anotherValue"
       }
-    }
+    },
+    "filtered": false,
+    "result": "Age is not greater than 50"
   }
 ]`;
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(sampleJson);
+    navigator.clipboard.writeText(outputJson);
+  };
+
+  const handleExecute = () => {
+    // This would trigger the node execution
+    console.log("Executing node...");
   };
 
   return (
-    <div className="w-1/3 border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
+    <div className="w-1/3 flex flex-col bg-gray-900 overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <h3 className="text-white font-medium">INPUT</h3>
+          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+          <h3 className="text-white font-medium">OUTPUT</h3>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExecute}
+            className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 px-3"
+          >
+            <Play className="w-4 h-4 mr-1" />
+            Execute
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -66,11 +85,17 @@ export function InputSection({ activeInputTab, onInputTabChange }: InputSectionP
           >
             <Download className="w-4 h-4" />
           </Button>
-          <Search className="w-4 h-4 text-gray-400" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
       </div>
       
-      <Tabs value={activeInputTab} onValueChange={(value) => onInputTabChange(value as "schema" | "json")} className="flex-1 flex flex-col overflow-hidden">
+      <Tabs value={activeOutputTab} onValueChange={(value) => onOutputTabChange(value as "schema" | "json")} className="flex-1 flex flex-col overflow-hidden">
         <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none flex-shrink-0">
           <TabsTrigger 
             value="schema" 
@@ -102,7 +127,7 @@ export function InputSection({ activeInputTab, onInputTabChange }: InputSectionP
               showLineNumbers={true}
               wrapLines={true}
             >
-              {sampleJson}
+              {outputJson}
             </SyntaxHighlighter>
           </div>
         </TabsContent>
@@ -124,6 +149,8 @@ export function InputSection({ activeInputTab, onInputTabChange }: InputSectionP
                   <div className="text-green-400 font-mono text-sm">Name: string</div>
                   <div className="text-yellow-400 font-mono text-sm">Age: number</div>
                   <div className="text-purple-400 font-mono text-sm">master: object</div>
+                  <div className="text-purple-400 font-mono text-sm">filtered: boolean</div>
+                  <div className="text-green-400 font-mono text-sm">result: string</div>
                 </div>
               </div>
             </div>

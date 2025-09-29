@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Toggle } from "@/components/ui/toggle";
 import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
+import { OutputSection } from "./output-section";
 
 interface Condition {
   id: string;
@@ -65,6 +66,7 @@ export function NodeEditDialog({
   const [logicOperator, setLogicOperator] = useState<"AND" | "OR">("AND");
   const [convertTypes, setConvertTypes] = useState(false);
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("json");
+  const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
   const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings">("parameters");
 
   // Update editData when nodeData changes
@@ -129,8 +131,8 @@ export function NodeEditDialog({
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label}</DialogTitle>
         </VisuallyHidden>
-        <div className="flex flex-col h-full">
-          <div className="flex flex-1">
+        <div className="flex flex-col h-full overflow-hidden">
+          <div className="flex flex-1 overflow-hidden">
             {/* INPUT Column */}
             <InputSection 
               activeInputTab={activeInputTab}
@@ -138,7 +140,7 @@ export function NodeEditDialog({
             />
 
             {/* Node Editor Column */}
-            <div className="w-1/3 border-r border-gray-700 flex flex-col">
+            <div className="w-1/3 border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-gray-700">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
@@ -158,7 +160,7 @@ export function NodeEditDialog({
                 </div>
               </div>
 
-              <Tabs value={activeNodeTab} onValueChange={(value) => setActiveNodeTab(value as "parameters" | "settings")} className="flex-1 flex flex-col">
+              <Tabs value={activeNodeTab} onValueChange={(value) => setActiveNodeTab(value as "parameters" | "settings")} className="flex-1 flex flex-col overflow-hidden">
                 <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none">
                   <TabsTrigger 
                     value="parameters" 
@@ -174,7 +176,7 @@ export function NodeEditDialog({
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="parameters" className="flex-1 p-4 m-0">
+                <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-auto">
                   <div className="space-y-6">
                     {/* Conditions Section */}
                     <div>
@@ -284,7 +286,7 @@ export function NodeEditDialog({
                   </div>
                 </TabsContent>
 
-                <TabsContent value="settings" className="flex-1 p-4 m-0">
+                <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-auto">
                   <div className="space-y-4">
           <div className="grid gap-2">
                       <Label htmlFor="label" className="text-white">Label</Label>
@@ -309,7 +311,16 @@ export function NodeEditDialog({
                   </div>
                 </TabsContent>
               </Tabs>
-                        {/* Footer inside the dialog - centered buttons */}
+            </div>
+
+            {/* OUTPUT Column */}
+            <OutputSection 
+              activeOutputTab={activeOutputTab}
+              onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
+            />
+          </div>
+
+          {/* Footer inside the dialog - centered buttons */}
           <div className="border-t border-gray-700 bg-gray-900 p-4 flex justify-center gap-4">
             <Button variant="outline" onClick={handleCancel} className="border-gray-600 text-white hover:bg-gray-800 px-8">
               Cancel
@@ -318,16 +329,6 @@ export function NodeEditDialog({
               Save Changes
             </Button>
           </div>
-            </div>
-
-            {/* OUTPUT Column */}
-            <InputSection 
-              activeInputTab={activeInputTab}
-              onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
-            />
-          </div>
-
-
         </div>
       </DialogContent>
     </Dialog>
