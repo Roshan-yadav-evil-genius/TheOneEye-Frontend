@@ -21,8 +21,7 @@ import {
   IconMail,
   IconFileText,
   IconClock,
-  IconCheck,
-  IconX
+  IconCheck
 } from "@tabler/icons-react";
 
 interface WorkflowSidebarProps {
@@ -35,8 +34,6 @@ interface WorkflowSidebarProps {
   onFiltersChange: (filters: { category: string; status: string }) => void;
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
 }
 
 // Mock node data - in a real app this would come from props or API
@@ -72,8 +69,6 @@ export function WorkflowSidebar({
   onFiltersChange,
   selectedNodes,
   onNodeSelect,
-  isCollapsed,
-  onToggleCollapse,
 }: WorkflowSidebarProps) {
 
   // Filter nodes based on search and filters
@@ -97,16 +92,8 @@ export function WorkflowSidebar({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4">
           <h2 className="text-lg font-semibold">Workflow Nodes</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleCollapse}
-            title="Collapse sidebar"
-          >
-            <IconX className="h-4 w-4" />
-          </Button>
         </div>
 
         {/* Search Bar */}

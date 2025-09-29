@@ -2,16 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { PanelLeftIcon } from "lucide-react";
 import { 
   IconPlayerPlay, 
   IconSquare, 
   IconClock, 
-  IconCheck, 
-  IconX,
   IconActivity,
-  IconTrendingUp,
-  IconUsers,
-  IconMenu2
+  IconTrendingUp
 } from "@tabler/icons-react";
 
 interface WorkflowStatsHeaderProps {
@@ -33,76 +31,70 @@ const mockStats = {
 
 export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar }: WorkflowStatsHeaderProps) {
   return (
-    <div className="p-4">
+    <div className="px-3 py-2">
       <div className="flex items-center justify-between">
         {/* Stats Section */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={onToggleSidebar}
-              className="h-8 w-8 p-0"
+              className="h-6 w-6"
               title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <IconMenu2 className="h-4 w-4" />
+              <PanelLeftIcon className="h-3.5 w-3.5" />
             </Button>
-            <IconActivity className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium">Workflow Stats</span>
+            <Separator
+              orientation="vertical"
+              className="mx-2 data-[orientation=vertical]:h-4"
+            />
           </div>
 
           <div className="flex items-center gap-4">
             {/* Total Runs */}
             <div className="flex items-center gap-2">
-              <div className="text-center">
-                <div className="text-lg font-semibold">{mockStats.totalRuns.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">Total Runs</div>
-              </div>
+              <div className="text-sm font-semibold">{mockStats.totalRuns.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Runs</div>
             </div>
 
             {/* Success Rate */}
             <div className="flex items-center gap-2">
-              <div className="text-center">
-                <div className="text-lg font-semibold text-green-600 dark:text-green-400">
-                  {mockStats.successRate}%
-                </div>
-                <div className="text-xs text-muted-foreground">Success Rate</div>
+              <div className="text-sm font-semibold text-green-600 dark:text-green-400">
+                {mockStats.successRate}%
               </div>
+              <div className="text-xs text-muted-foreground">Success</div>
             </div>
 
             {/* Avg Execution Time */}
             <div className="flex items-center gap-2">
-              <div className="text-center">
-                <div className="text-lg font-semibold">{mockStats.avgExecutionTime}</div>
-                <div className="text-xs text-muted-foreground">Avg Time</div>
-              </div>
+              <div className="text-sm font-semibold">{mockStats.avgExecutionTime}</div>
+              <div className="text-xs text-muted-foreground">Avg Time</div>
             </div>
 
             {/* Active Workflows */}
             <div className="flex items-center gap-2">
-              <div className="text-center">
-                <div className="text-lg font-semibold">{mockStats.activeWorkflows}</div>
-                <div className="text-xs text-muted-foreground">Active</div>
-              </div>
+              <div className="text-sm font-semibold">{mockStats.activeWorkflows}</div>
+              <div className="text-xs text-muted-foreground">Active</div>
             </div>
           </div>
         </div>
 
         {/* Status and Controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {/* Status Badge */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {isRunning ? (
               <>
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
                   Running
                 </Badge>
               </>
             ) : (
               <>
-                <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
+                <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
                   Stopped
                 </Badge>
               </>
@@ -110,51 +102,46 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
           </div>
 
           {/* Last Run Info */}
-          <div className="text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <IconClock className="h-4 w-4" />
-              <span>Last: {mockStats.lastRun}</span>
-            </div>
-            {!isRunning && (
-              <div className="flex items-center gap-1">
-                <IconTrendingUp className="h-4 w-4" />
-                <span>Next: {mockStats.nextScheduled}</span>
-              </div>
-            )}
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <IconClock className="h-3 w-3" />
+            <span>Last: {mockStats.lastRun}</span>
           </div>
 
           {/* Run/Stop Button */}
-          <Button
-            onClick={onRunStop}
-            variant={isRunning ? "destructive" : "default"}
-            size="sm"
-            className="min-w-[100px]"
-          >
-            {isRunning ? (
-              <>
-                <IconSquare className="mr-2 h-4 w-4" />
-                Stop
-              </>
-            ) : (
-              <>
-                <IconPlayerPlay className="mr-2 h-4 w-4" />
-                Run
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-1">
+            <IconActivity className="h-3.5 w-3.5 text-muted-foreground" />
+            <Button
+              onClick={onRunStop}
+              variant={isRunning ? "destructive" : "default"}
+              size="sm"
+              className="h-6 px-2 text-xs"
+            >
+              {isRunning ? (
+                <>
+                  <IconSquare className="mr-1 h-3 w-3" />
+                  Stop
+                </>
+              ) : (
+                <>
+                  <IconPlayerPlay className="mr-1 h-3 w-3" />
+                  Run
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Progress Bar (shown when running) */}
       {isRunning && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-            <span>Workflow Execution Progress</span>
+        <div className="mt-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+            <span>Execution Progress</span>
             <span>Step 3 of 7</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
             <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300"
+              className="bg-primary h-1 rounded-full transition-all duration-300"
               style={{ width: "43%" }}
             ></div>
           </div>

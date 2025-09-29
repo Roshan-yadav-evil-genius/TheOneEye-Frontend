@@ -46,8 +46,6 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onFiltersChange={setFilters}
             selectedNodes={selectedNodes}
             onNodeSelect={handleNodeSelect}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
         </div>
       )}
