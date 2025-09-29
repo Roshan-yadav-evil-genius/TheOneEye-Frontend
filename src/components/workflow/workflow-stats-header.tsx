@@ -109,23 +109,25 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
 
           {/* Run/Stop Button */}
           <div className="flex items-center gap-1">
-            <IconActivity className="h-3.5 w-3.5 text-muted-foreground" />
             <Button
-              onClick={onRunStop}
-              variant={isRunning ? "destructive" : "default"}
+              variant="ghost"
               size="sm"
               className="h-6 px-2 text-xs"
+              title="Details"
+            >
+              <IconActivity className="h-3.5 w-3.5 text-blue-500 hover:text-blue-600" />
+            </Button>
+            <Button
+              onClick={onRunStop}
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              title={isRunning ? "Stop" : "Run"}
             >
               {isRunning ? (
-                <>
-                  <IconSquare className="mr-1 h-3 w-3" />
-                  Stop
-                </>
+                <IconSquare className="h-3.5 w-3.5 text-red-500 hover:text-red-600" />
               ) : (
-                <>
-                  <IconPlayerPlay className="mr-1 h-3 w-3" />
-                  Run
-                </>
+                <IconPlayerPlay className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
               )}
             </Button>
           </div>
