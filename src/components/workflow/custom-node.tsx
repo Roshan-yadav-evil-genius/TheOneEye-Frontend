@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Handle, Position } from "reactflow";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   IconClock, 
   IconSettings, 
@@ -64,6 +65,8 @@ const iconColors = {
 
 export function CustomNode({ data, selected }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [userDescription, setUserDescription] = useState(data.description || "");
   const IconComponent = nodeIcons[data.type as keyof typeof nodeIcons] || IconSettings;
   const colorClass = nodeColors[data.type as keyof typeof nodeColors] || nodeColors.system;
   const iconColorClass = iconColors[data.type as keyof typeof iconColors] || iconColors.system;
@@ -88,14 +91,41 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
     console.log(`More options for node: ${data.label}`);
   };
 
+  const handleDescriptionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditingDescription(true);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserDescription(e.target.value);
+  };
+
+  const handleDescriptionBlur = () => {
+    setIsEditingDescription(false);
+    // Here you could save the description to your state management or API
+    console.log(`Updated description for ${data.label}: ${userDescription}`);
+  };
+
+  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setIsEditingDescription(false);
+    }
+    if (e.key === 'Escape') {
+      setUserDescription(data.description || "");
+      setIsEditingDescription(false);
+    }
+  };
+
   return (
-    <div 
-      className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
-        selected ? "ring-2 ring-primary ring-offset-2" : ""
-      } ${colorClass}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="flex flex-col items-center">
+      {/* Node Container */}
+      <div 
+        className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
+          selected ? "ring-2 ring-primary ring-offset-2" : ""
+        } ${colorClass}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       {/* Connection Handles */}
       <Handle
         type="target"
@@ -148,30 +178,43 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
         </div>
       )}
 
-      {/* Node Content */}
-      <div className="flex flex-col items-center justify-center h-full p-2">
-        {/* Center Icon */}
-        <div className="flex-1 flex items-center justify-center">
+        {/* Node Content - Just Icon */}
+        <div className="flex items-center justify-center h-full">
           <IconComponent className={`h-8 w-8 ${iconColorClass}`} />
         </div>
-        
-        {/* Bottom Title and Description */}
-        <div className="flex flex-col items-center text-center">
-          <span className="font-medium text-xs text-foreground truncate w-full">
-            {data.label}
-          </span>
-          {data.description && (
-            <span className="text-xs text-muted-foreground truncate w-full mt-0.5">
-              {data.description}
-            </span>
+
+        {/* Status Indicator */}
+        {data.status === "active" && (
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
+        )}
+      </div>
+
+      {/* External Title and Description */}
+      <div className="mt-2 text-center max-w-40">
+        <h3 className="font-semibold text-sm text-foreground leading-tight">
+          {data.label}
+        </h3>
+        <div className="mt-1">
+          {isEditingDescription ? (
+            <Input
+              value={userDescription}
+              onChange={handleDescriptionChange}
+              onBlur={handleDescriptionBlur}
+              onKeyDown={handleDescriptionKeyDown}
+              placeholder="Add a comment..."
+              className="text-xs h-6 px-2 py-1 text-center"
+              autoFocus
+            />
+          ) : (
+            <p 
+              className="text-xs text-muted-foreground leading-tight cursor-pointer hover:text-foreground transition-colors min-h-[1rem]"
+              onClick={handleDescriptionClick}
+            >
+              {userDescription || "Click to add comment..."}
+            </p>
           )}
         </div>
       </div>
-
-      {/* Status Indicator */}
-      {data.status === "active" && (
-        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-      )}
     </div>
   );
 }
