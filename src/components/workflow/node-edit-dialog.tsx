@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { 
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -19,7 +17,6 @@ import { Toggle } from "@/components/ui/toggle";
 import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
-import { ExpressionDropZone } from "./expression-drop-zone";
 import { sampleInputData } from "@/data/sample-data";
 
 interface Condition {
@@ -70,7 +67,6 @@ export function NodeEditDialog({
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
   const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings">("parameters");
-  const [expressions, setExpressions] = useState<string[]>([]);
 
   // Update editData when nodeData changes
   useEffect(() => {
@@ -141,8 +137,6 @@ export function NodeEditDialog({
               activeInputTab={activeInputTab}
               onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
               jsonData={sampleInputData}
-              expressions={expressions}
-              onExpressionsChange={setExpressions}
             />
 
             {/* Node Editor Column */}
@@ -184,18 +178,6 @@ export function NodeEditDialog({
 
                 <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-auto">
                   <div className="space-y-6">
-                    {/* Expression Drop Zone */}
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Field Expressions</h4>
-                      <ExpressionDropZone 
-                        expressions={expressions}
-                        onRemoveExpression={(index) => {
-                          const newExpressions = expressions.filter((_, i) => i !== index);
-                          setExpressions(newExpressions);
-                        }}
-                      />
-                    </div>
-
                     {/* Conditions Section */}
                     <div>
                       <h4 className="text-white font-medium mb-4">Conditions</h4>
