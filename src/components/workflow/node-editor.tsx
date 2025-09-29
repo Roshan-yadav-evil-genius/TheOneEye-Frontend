@@ -62,7 +62,7 @@ export function NodeEditor({
   onViewDocs
 }: NodeEditorProps) {
   return (
-    <div className="border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
+    <div className="border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden h-full">
       <NodeHeader
         nodeType={nodeType}
         nodeLabel={nodeLabel}
@@ -70,8 +70,8 @@ export function NodeEditor({
         onViewDocs={onViewDocs}
       />
 
-      <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none">
+      <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "parameters" | "settings")} className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none flex-shrink-0">
           <TabsTrigger 
             value="parameters" 
             className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-pink-500 text-gray-400`}
@@ -86,7 +86,7 @@ export function NodeEditor({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-auto">
+        <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0">
           <ParametersTab
             groups={groups}
             convertTypes={convertTypes}
@@ -95,7 +95,7 @@ export function NodeEditor({
           />
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-auto">
+        <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0">
           <SettingsTab
             label={label}
             description={description}

@@ -144,20 +144,22 @@ export function NodeEditDialog({
             />
 
             {/* Node Editor Column */}
-            <NodeEditor
-              nodeType="If"
-              nodeLabel="If"
-              activeTab={activeNodeTab}
-              onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings")}
-              groups={groups}
-              convertTypes={convertTypes}
-              onGroupsChange={setGroups}
-              onConvertTypesChange={setConvertTypes}
-              label={editData.label}
-              description={editData.description}
-              onLabelChange={(value) => handleEditDataChange('label', value)}
-              onDescriptionChange={(value) => handleEditDataChange('description', value)}
-            />
+            <div className="h-full overflow-hidden">
+              <NodeEditor
+                nodeType="If"
+                nodeLabel="If"
+                activeTab={activeNodeTab}
+                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings")}
+                groups={groups}
+                convertTypes={convertTypes}
+                onGroupsChange={setGroups}
+                onConvertTypesChange={setConvertTypes}
+                label={editData.label}
+                description={editData.description}
+                onLabelChange={(value) => handleEditDataChange('label', value)}
+                onDescriptionChange={(value) => handleEditDataChange('description', value)}
+              />
+            </div>
 
             {/* OUTPUT Column */}
             <OutputSection 

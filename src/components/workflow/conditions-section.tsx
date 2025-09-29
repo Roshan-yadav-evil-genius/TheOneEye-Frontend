@@ -80,16 +80,11 @@ export function ConditionsSection({
   };
 
   return (
-    <div>
-      <div className="mb-4">
-        <h4 className="text-white font-medium mb-2">Conditions</h4>
-        <p className="text-gray-400 text-xs">
-          Each group acts like parentheses (). Use operator bars to control how conditions and groups are combined.
-        </p>
-      </div>
+    <div className="h-full flex flex-col min-h-0">
 
-      {/* Condition Groups */}
-      <div className="space-y-4">
+
+      {/* Condition Groups - Scrollable area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-2 min-h-0">
         {groups.map((groupWithOp, index) => (
           <div key={groupWithOp.group.id}>
             {index > 0 && (
@@ -109,12 +104,12 @@ export function ConditionsSection({
         ))}
       </div>
 
-      {/* Add Group Button */}
-      <div className="mt-4">
+      {/* Add Group Button - Fixed at bottom */}
+      <div className="mt-4 flex-shrink-0">
         <Button
           onClick={addGroup}
           variant="outline"
-          className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+          className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 w-full"
         >
           <Plus className="w-4 h-4 mr-1" />
           Add Group

@@ -38,28 +38,17 @@ export function ParametersTab({
   onConvertTypesChange
 }: ParametersTabProps) {
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       {/* Conditions Section */}
-      <ConditionsSection
-        groups={groups}
-        onGroupsChange={onGroupsChange}
-      />
-
-      {/* Convert Types Toggle */}
-      <div className="flex items-center justify-between">
-        <Label className="text-white">Convert types where required</Label>
-        <Toggle
-          pressed={convertTypes}
-          onPressedChange={onConvertTypesChange}
-          className="data-[state=on]:bg-orange-600"
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ConditionsSection
+          groups={groups}
+          onGroupsChange={onGroupsChange}
         />
       </div>
 
-      {/* Options Section */}
-      <div>
-        <h4 className="text-white font-medium mb-2">Options</h4>
-        <p className="text-gray-400 text-sm">No properties</p>
-      </div>
+      {/* Convert Types Toggle */}
+
     </div>
   );
 }
