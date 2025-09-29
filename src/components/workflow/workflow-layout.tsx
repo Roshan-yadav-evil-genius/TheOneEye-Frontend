@@ -15,7 +15,6 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     category: "all",
-    status: "all",
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 

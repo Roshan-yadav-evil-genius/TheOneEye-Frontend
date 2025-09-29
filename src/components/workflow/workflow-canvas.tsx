@@ -23,7 +23,6 @@ interface WorkflowCanvasProps {
   searchTerm: string;
   filters: {
     category: string;
-    status: string;
   };
 }
 

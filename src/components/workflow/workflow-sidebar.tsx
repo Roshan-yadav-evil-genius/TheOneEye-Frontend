@@ -21,7 +21,9 @@ import {
   IconMail,
   IconFileText,
   IconClock,
-  IconCheck
+  IconCheck,
+  IconChevronDown,
+  IconChevronRight
 } from "@tabler/icons-react";
 
 interface WorkflowSidebarProps {
@@ -29,23 +31,46 @@ interface WorkflowSidebarProps {
   onSearchChange: (term: string) => void;
   filters: {
     category: string;
-    status: string;
   };
-  onFiltersChange: (filters: { category: string; status: string }) => void;
+  onFiltersChange: (filters: { category: string }) => void;
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
 }
 
 // Mock node data - in a real app this would come from props or API
 const mockNodes = [
-  { id: "start", name: "Start", type: "trigger", category: "system", status: "active" },
-  { id: "email", name: "Send Email", type: "action", category: "communication", status: "active" },
-  { id: "database", name: "Database Query", type: "action", category: "data", status: "active" },
-  { id: "api", name: "API Call", type: "action", category: "integration", status: "inactive" },
-  { id: "condition", name: "Condition", type: "logic", category: "control", status: "active" },
-  { id: "delay", name: "Delay", type: "action", category: "control", status: "active" },
-  { id: "file", name: "File Process", type: "action", category: "data", status: "active" },
-  { id: "end", name: "End", type: "trigger", category: "system", status: "active" },
+  // System nodes
+  { id: "start", name: "Start", type: "trigger", category: "system", description: "Initiates the workflow execution" },
+  { id: "end", name: "End", type: "trigger", category: "system", description: "Terminates the workflow execution" },
+  
+  // Email nodes
+  { id: "send-email", name: "Send Email", type: "action", category: "email", description: "Sends email notifications to recipients" },
+  { id: "email-listener", name: "Email Listener", type: "trigger", category: "email", description: "Listens for incoming emails" },
+  { id: "email-template", name: "Email Template", type: "action", category: "email", description: "Uses predefined email templates" },
+  
+  // Database nodes
+  { id: "db-query", name: "Database Query", type: "action", category: "database", description: "Executes SQL queries on connected databases" },
+  { id: "db-insert", name: "Database Insert", type: "action", category: "database", description: "Inserts data into database tables" },
+  { id: "db-update", name: "Database Update", type: "action", category: "database", description: "Updates existing database records" },
+  
+  // API nodes
+  { id: "api-call", name: "API Call", type: "action", category: "api", description: "Makes HTTP requests to external APIs" },
+  { id: "webhook", name: "Webhook", type: "trigger", category: "api", description: "Receives webhook notifications" },
+  { id: "rest-api", name: "REST API", type: "action", category: "api", description: "Makes RESTful API calls" },
+  
+  // Logic nodes
+  { id: "condition", name: "Condition", type: "logic", category: "logic", description: "Evaluates conditions and branches workflow" },
+  { id: "switch", name: "Switch", type: "logic", category: "logic", description: "Multi-way conditional branching" },
+  { id: "loop", name: "Loop", type: "logic", category: "logic", description: "Repeats actions for multiple items" },
+  
+  // Control nodes
+  { id: "delay", name: "Delay", type: "action", category: "control", description: "Pauses workflow execution for specified time" },
+  { id: "schedule", name: "Schedule", type: "trigger", category: "control", description: "Triggers workflow at scheduled times" },
+  
+  // File nodes
+  { id: "file-read", name: "File Read", type: "action", category: "file", description: "Reads content from files" },
+  { id: "file-write", name: "File Write", type: "action", category: "file", description: "Writes content to files" },
+  { id: "file-process", name: "File Process", type: "action", category: "file", description: "Processes and transforms files" },
 ];
 
 const nodeIcons = {
@@ -53,6 +78,16 @@ const nodeIcons = {
   action: IconSettings,
   logic: IconCheck,
   system: IconDatabase,
+};
+
+const categoryIcons = {
+  system: IconDatabase,
+  email: IconMail,
+  database: IconDatabase,
+  api: IconApi,
+  logic: IconCheck,
+  control: IconClock,
+  file: IconFileText,
 };
 
 const nodeColors = {
@@ -70,21 +105,46 @@ export function WorkflowSidebar({
   selectedNodes,
   onNodeSelect,
 }: WorkflowSidebarProps) {
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['system', 'email', 'database', 'api', 'logic', 'control', 'file']));
 
   // Filter nodes based on search and filters
   const filteredNodes = mockNodes.filter(node => {
-    const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         node.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filters.category === "all" || node.category === filters.category;
-    const matchesStatus = filters.status === "all" || node.status === filters.status;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory;
   });
 
   const categories = Array.from(new Set(mockNodes.map(node => node.category)));
+  
+  // Group nodes by category
+  const groupedNodes = categories.reduce((acc, category) => {
+    const categoryNodes = filteredNodes.filter(node => node.category === category);
+    if (categoryNodes.length > 0) {
+      acc[category] = categoryNodes;
+    }
+    return acc;
+  }, {} as Record<string, typeof mockNodes>);
+  
+  const toggleGroup = (category: string) => {
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedGroups(newExpanded);
+  };
 
   const getNodeIcon = (type: string) => {
     const IconComponent = nodeIcons[type as keyof typeof nodeIcons] || IconSettings;
     return <IconComponent className="h-4 w-4" />;
+  };
+  
+  const getCategoryIcon = (category: string) => {
+    const IconComponent = categoryIcons[category as keyof typeof categoryIcons] || IconSettings;
+    return IconComponent;
   };
 
 
@@ -92,9 +152,6 @@ export function WorkflowSidebar({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Workflow Nodes</h2>
-        </div>
 
         {/* Search Bar */}
         <div className="relative mb-4">
@@ -126,76 +183,80 @@ export function WorkflowSidebar({
             </SelectContent>
           </Select>
 
-          <Select 
-            value={filters.status} 
-            onValueChange={(value) => onFiltersChange({ ...filters, status: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
       {/* Node List */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-2">
-          {filteredNodes.map((node) => {
-            const isSelected = selectedNodes.includes(node.id);
-            const IconComponent = nodeIcons[node.type as keyof typeof nodeIcons] || IconSettings;
+        <div className="space-y-3">
+          {Object.entries(groupedNodes).map(([category, nodes]) => {
+            const isExpanded = expandedGroups.has(category);
+            const CategoryIconComponent = getCategoryIcon(category);
             
             return (
-              <div
-                key={node.id}
-                className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${
-                  isSelected 
-                    ? "border-primary bg-primary/5" 
-                    : "border-border hover:border-primary/50"
-                }`}
-                onClick={() => onNodeSelect(node.id)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0">
-                    <IconComponent className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-sm truncate">{node.name}</span>
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${nodeColors[node.type as keyof typeof nodeColors]}`}
-                      >
-                        {node.type}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${
-                          node.status === "active" 
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                            : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
-                        }`}
-                      >
-                        {node.status}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {node.category}
-                      </span>
-                    </div>
-                  </div>
+              <div key={category} className="space-y-2">
+                {/* Category Header */}
+                <div 
+                  className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => toggleGroup(category)}
+                >
+                  {isExpanded ? (
+                    <IconChevronDown className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <IconChevronRight className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <CategoryIconComponent className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-sm capitalize">{category}</span>
+                  <span className="text-xs text-muted-foreground ml-auto">({nodes.length})</span>
                 </div>
+                
+                {/* Category Nodes */}
+                {isExpanded && (
+                  <div className="ml-6 space-y-2">
+                    {nodes.map((node) => {
+                      const isSelected = selectedNodes.includes(node.id);
+                      const IconComponent = nodeIcons[node.type as keyof typeof nodeIcons] || IconSettings;
+                      
+                      return (
+                        <div
+                          key={node.id}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${
+                            isSelected 
+                              ? "border-primary bg-primary/5" 
+                              : "border-border hover:border-primary/50"
+                          }`}
+                          onClick={() => onNodeSelect(node.id)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 mt-0.5">
+                              <IconComponent className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <span className="font-medium text-sm truncate">{node.name}</span>
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs flex-shrink-0 ${nodeColors[node.type as keyof typeof nodeColors]}`}
+                                >
+                                  {node.type}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-2">
+                                {node.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
 
-        {filteredNodes.length === 0 && (
+        {Object.keys(groupedNodes).length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <IconSearch className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No nodes found</p>
