@@ -1,11 +1,13 @@
 "use client";
 
-import { Copy, Download, Search, Play, RefreshCw } from "lucide-react";
+import { Copy, Download, Search, Play, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { DraggableSchema } from './draggable-schema';
+import { useState, useMemo } from 'react';
 
 interface JsonViewerProps {
   title: string;
@@ -32,11 +34,39 @@ export function JsonViewer({
   onDownload,
   onRefresh
 }: JsonViewerProps) {
-  const handleCopy = () => {
-    if (onCopy) {
-      onCopy();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      const jsonString = JSON.stringify(jsonData, null, 2);
+      await navigator.clipboard.writeText(jsonString);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+      
+      if (onCopy) {
+        onCopy();
+      }
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleDownload = () => {
+    if (onDownload) {
+      onDownload();
     } else {
-      navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
+      const jsonString = JSON.stringify(jsonData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${title.toLowerCase()}-data.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -45,6 +75,25 @@ export function JsonViewer({
       onExecute();
     }
   };
+
+  const filteredJsonData = useMemo(() => {
+    if (!searchTerm || activeTab !== "json") {
+      return jsonData;
+    }
+    
+    // Simple search implementation - you can enhance this for more complex filtering
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const lines = jsonString.split('\n');
+    const filteredLines = lines.filter(line => 
+      line.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    if (filteredLines.length === 0) {
+      return { message: "No matching content found" };
+    }
+    
+    return filteredLines.join('\n');
+  }, [jsonData, searchTerm, activeTab]);
 
 
   return (
@@ -59,22 +108,57 @@ export function JsonViewer({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
+            className={`text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0 ${copySuccess ? 'text-green-400' : ''}`}
+            title={copySuccess ? "Copied!" : "Copy JSON"}
           >
             <Copy className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={onDownload}
+            onClick={handleDownload}
             className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
+            title="Download JSON"
           >
             <Download className="w-4 h-4" />
           </Button>
-          <Search className="w-4 h-4 text-gray-400" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSearch(!showSearch)}
+            className={`text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0 ${showSearch ? 'bg-gray-700 text-white' : ''}`}
+            title="Search JSON"
+          >
+            <Search className="w-4 h-4" />
+          </Button>
         </div>
         <div></div>
       </div>
+      
+      {showSearch && (
+        <div className="p-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Search in JSON..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearchTerm("");
+                setShowSearch(false);
+              }}
+              className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
       
       <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "schema" | "json")} className="flex-1 flex flex-col overflow-hidden gap-0">
         <TabsList className="grid w-full grid-cols-2 rounded-none flex-shrink-0 !m-0">
@@ -106,7 +190,7 @@ export function JsonViewer({
               showLineNumbers={true}
               wrapLines={true}
             >
-              {JSON.stringify(jsonData, null, 2)}
+              {typeof filteredJsonData === 'string' ? filteredJsonData : JSON.stringify(filteredJsonData, null, 2)}
             </SyntaxHighlighter>
           </div>
         </TabsContent>
