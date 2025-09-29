@@ -20,6 +20,14 @@ import {
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { 
   Area,
   AreaChart,
@@ -213,6 +221,65 @@ export default function WorkflowDetailsPage() {
             Run Now
           </Button>
         </div>
+      </div>
+
+      <Separator />
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
+            <IconActivity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workflowData.totalRuns.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              Last run: {workflowData.lastRun}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${getSuccessRateColor(workflowData.successRate)}`}>
+              {workflowData.successRate}%
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {workflowData.errorCount} errors total
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Execution Time</CardTitle>
+            <IconClock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workflowData.avgExecutionTime}</div>
+            <p className="text-xs text-muted-foreground">
+              Total: {workflowData.totalExecutionTime}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Created By</CardTitle>
+            <IconUsers className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workflowData.createdBy}</div>
+            <p className="text-xs text-muted-foreground">
+              {workflowData.createdAt}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <Separator />
@@ -469,129 +536,6 @@ export default function WorkflowDetailsPage() {
         </Card>
       </div>
 
-      <Separator />
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
-            <IconActivity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{workflowData.totalRuns.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Last run: {workflowData.lastRun}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${getSuccessRateColor(workflowData.successRate)}`}>
-              {workflowData.successRate}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {workflowData.errorCount} errors total
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Execution Time</CardTitle>
-            <IconClock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{workflowData.avgExecutionTime}</div>
-            <p className="text-xs text-muted-foreground">
-              Total: {workflowData.totalExecutionTime}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Created By</CardTitle>
-            <IconUsers className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{workflowData.createdBy}</div>
-            <p className="text-xs text-muted-foreground">
-              {workflowData.createdAt}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Workflow Information */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Workflow Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Workflow Information</CardTitle>
-            <CardDescription>Basic details about this workflow</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Category</label>
-                <p className="text-sm">{workflowData.category}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Last Modified</label>
-                <p className="text-sm">{workflowData.lastModified}</p>
-              </div>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Tags</label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {workflowData.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Next Scheduled Run</label>
-              <p className="text-sm">{workflowData.nextRun}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Workflow Nodes */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Workflow Nodes</CardTitle>
-            <CardDescription>Components in this workflow</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {workflowData.nodes.map((node) => (
-                <div key={node.id} className="flex items-center justify-between p-2 border rounded">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${
-                      node.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
-                    }`} />
-                    <span className="text-sm font-medium">{node.label}</span>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    {node.type}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Recent Runs */}
       <Card>
         <CardHeader>
@@ -599,27 +543,47 @@ export default function WorkflowDetailsPage() {
           <CardDescription>Latest execution history</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {workflowData.recentRuns.map((run) => (
-              <div key={run.id} className="flex items-center justify-between p-3 border rounded">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    run.status === 'success' ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <div>
-                    <p className="text-sm font-medium">Run #{run.id}</p>
-                    <p className="text-xs text-muted-foreground">{run.timestamp}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">{run.duration}</span>
-                  <Badge variant="outline" className={getStatusColor(run.status)}>
-                    {run.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Run ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Timestamp</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {workflowData.recentRuns.map((run) => (
+                <TableRow key={run.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        run.status === 'success' ? 'bg-green-500' : 'bg-red-500'
+                      }`} />
+                      Run #{run.id}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={getStatusColor(run.status)}>
+                      {run.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {run.duration}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {run.timestamp}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm">
+                      View Logs
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
