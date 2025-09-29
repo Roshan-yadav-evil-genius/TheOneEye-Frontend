@@ -4,12 +4,11 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { 
   IconSearch, 
@@ -175,43 +174,53 @@ export function WorkflowSidebar({
   return (
     <div className="h-full flex flex-col">
       {/* Header - Fixed */}
-      <div className="flex-shrink-0 p-4 border-b border-border">
-
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search nodes..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
-        {/* Filters */}
-        <div className="space-y-2">
-          <Select 
-            value={filters.category} 
-            onValueChange={(value) => onFiltersChange({ ...filters, category: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+      <div className="flex-shrink-0 p-3 border-b border-border">
+        {/* Search Bar with Filter */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search nodes..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-9 h-9 text-sm"
+            />
+          </div>
+          
+          {/* Filter Icon Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-9 w-9 p-0 border border-border hover:border-primary/50 transition-colors"
+              >
+                <IconFilter className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => onFiltersChange({ ...filters, category: "all" })}
+                className={filters.category === "all" ? "bg-accent" : ""}
+              >
+                All Categories
+              </DropdownMenuItem>
               {categories.map(category => (
-                <SelectItem key={category} value={category}>
+                <DropdownMenuItem 
+                  key={category}
+                  onClick={() => onFiltersChange({ ...filters, category })}
+                  className={filters.category === category ? "bg-accent" : ""}
+                >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
-                </SelectItem>
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
-
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Node List - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent min-h-0">
+      <div className="flex-1 overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent min-h-0">
         <div className="space-y-3">
           {Object.entries(groupedNodes).map(([category, nodes]) => {
             const isExpanded = expandedGroups.has(category);
@@ -236,7 +245,7 @@ export function WorkflowSidebar({
                 
                 {/* Category Nodes */}
                 {isExpanded && (
-                  <div className="ml-6 space-y-2">
+                  <div className="ml-4 space-y-2">
                     {nodes.map((node) => {
                       const isSelected = selectedNodes.includes(node.id);
                       const IconComponent = nodeIcons[node.type as keyof typeof nodeIcons] || IconSettings;
