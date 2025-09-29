@@ -31,10 +31,25 @@ export function DroppableInput({
     }
   });
 
+  // Check if the drag is exactly over the input field
+  const [isOverInput, setIsOverInput] = useState(false);
+
   // Monitor drag events to handle drops
   useDndMonitor({
+    onDragStart: (event) => {
+      setIsOverInput(false);
+    },
+    onDragOver: (event) => {
+      const { active, over } = event;
+      if (over && over.id === (id || 'droppable-input')) {
+        setIsOverInput(true);
+      } else {
+        setIsOverInput(false);
+      }
+    },
     onDragEnd: (event) => {
       const { active, over } = event;
+      setIsOverInput(false);
       
       if (over && over.id === (id || 'droppable-input')) {
         const dragData = active.data.current;
@@ -85,8 +100,8 @@ export function DroppableInput({
     <div
       ref={setNodeRef}
       className={cn(
-        "relative",
-        isOver && "ring-2 ring-pink-500 ring-opacity-50"
+        "relative w-full",
+        isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
       )}
     >
       <Input
@@ -96,19 +111,15 @@ export function DroppableInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className={cn(
-          "bg-gray-800 border-pink-500 text-white placeholder-gray-400",
-          isOver && "border-pink-400 bg-pink-900/10",
-          hasExpressions && "border-green-500 bg-green-900/10",
+          "w-full bg-gray-800 border-pink-500 text-white placeholder-gray-400",
+          isOverInput && "border-pink-400 bg-pink-900/10",
           className
         )}
       />
-      {isOver && (
+      {isOverInput && (
         <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none">
           <span className="text-pink-400 text-sm font-medium">Drop field here</span>
         </div>
-      )}
-      {hasExpressions && !isOver && (
-        <div className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" title={`${expressions.length} expression(s) detected`} />
       )}
     </div>
   );

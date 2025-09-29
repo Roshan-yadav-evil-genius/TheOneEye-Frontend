@@ -12,16 +12,13 @@ interface SchemaField {
   path: string;
 }
 
-interface DraggableFieldProps {
+interface DraggableKeyProps {
   field: SchemaField;
-  level: number;
-  isExpanded: boolean;
-  onToggle: () => void;
 }
 
-function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldProps) {
+function DraggableKey({ field }: DraggableKeyProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: field.path,
+    id: `key-${field.path}`,
     data: {
       type: 'field',
       key: field.key,
@@ -33,6 +30,64 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined;
+
+  const handleDragStart = (e: React.DragEvent) => {
+    // Create a custom drag preview showing only the key name
+    const dragPreview = document.createElement('div');
+    dragPreview.style.cssText = `
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      border: 1px solid #374151;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    `;
+    
+    // Show only the key name
+    dragPreview.textContent = field.key;
+    
+    document.body.appendChild(dragPreview);
+    e.dataTransfer.setDragImage(dragPreview, 0, 0);
+    
+    // Clean up the preview element after a short delay
+    setTimeout(() => {
+      if (document.body.contains(dragPreview)) {
+        document.body.removeChild(dragPreview);
+      }
+    }, 0);
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      onDragStart={handleDragStart}
+      {...listeners}
+      {...attributes}
+      className={`
+        inline-block px-2 py-1 rounded text-xs font-mono
+        bg-blue-600/20 text-blue-300 border border-blue-500/30
+        hover:bg-blue-600/30 cursor-grab select-none
+        ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
+        transition-colors
+      `}
+    >
+      {field.key}
+    </div>
+  );
+}
+
+interface DraggableFieldProps {
+  field: SchemaField;
+  level: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldProps) {
 
   const handleClick = (e: React.MouseEvent) => {
     // If clicking on expand button, let it handle the click
@@ -85,16 +140,9 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
 
   return (
     <div
-      ref={setNodeRef}
-      style={{ ...style, marginLeft: `${level * 16}px` }}
+      style={{ marginLeft: `${level * 16}px` }}
       onClick={handleClick}
-      {...listeners}
-      {...attributes}
-      className={`
-        group flex items-center gap-2 py-1 px-2 rounded
-        hover:bg-gray-700/30 transition-colors select-none
-        ${isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
-      `}
+      className="group flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors"
     >
       {isExpandable && (
         <button
@@ -118,9 +166,9 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
       
       {getTypeIcon(field.type)}
       <div className="flex items-center justify-between w-full">
-        <span className={`font-mono text-sm ${getTypeColor(field.type)}`}>
-          {field.key}
-        </span>
+        <div className="flex items-center gap-2">
+          <DraggableKey field={field} />
+        </div>
         {field.type !== 'object' && field.type !== 'array' && field.value !== undefined && (
           <span className="text-gray-400 font-mono text-sm">
             {typeof field.value === 'string' ? `"${field.value}"` : field.value}
