@@ -3,7 +3,7 @@ import { ProposalPage } from "@/components/pages/proposal-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Proposal">
       <ProposalPage />
     </DashboardLayout>
   )

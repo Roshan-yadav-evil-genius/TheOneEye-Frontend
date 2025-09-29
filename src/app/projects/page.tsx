@@ -3,7 +3,7 @@ import { ProjectsPage } from "@/components/pages/projects-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Projects">
       <ProjectsPage />
     </DashboardLayout>
   )

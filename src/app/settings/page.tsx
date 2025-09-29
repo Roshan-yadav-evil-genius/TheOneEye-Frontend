@@ -3,7 +3,7 @@ import { SettingsPage } from "@/components/pages/settings-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Settings">
       <SettingsPage />
     </DashboardLayout>
   )

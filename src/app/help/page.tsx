@@ -3,7 +3,7 @@ import { HelpPage } from "@/components/pages/help-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Help">
       <HelpPage />
     </DashboardLayout>
   )

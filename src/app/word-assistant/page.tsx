@@ -3,7 +3,7 @@ import { WordAssistantPage } from "@/components/pages/word-assistant-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Word Assistant">
       <WordAssistantPage />
     </DashboardLayout>
   )

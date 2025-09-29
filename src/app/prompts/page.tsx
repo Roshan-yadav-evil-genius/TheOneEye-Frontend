@@ -3,7 +3,7 @@ import { PromptsPage } from "@/components/pages/prompts-page"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Prompts">
       <PromptsPage />
     </DashboardLayout>
   )

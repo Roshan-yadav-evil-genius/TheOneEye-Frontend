@@ -7,9 +7,10 @@ import {
 
 interface DashboardLayoutProps {
   children: React.ReactNode
+  title?: string
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   return (
     <SidebarProvider
       style={
@@ -21,7 +22,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader />
+        <SiteHeader title={title} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

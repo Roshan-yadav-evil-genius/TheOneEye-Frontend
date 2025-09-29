@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 
 export default function Page() {
   return (
-    <DashboardLayout>
+    <DashboardLayout title="Dashboard">
       <div className="px-4 lg:px-6">
         <div className="space-y-6">
           <div>
