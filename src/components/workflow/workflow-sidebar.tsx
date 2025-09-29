@@ -129,6 +129,7 @@ export function WorkflowSidebar({
   onNodeSelect,
 }: WorkflowSidebarProps) {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['system', 'email', 'database', 'api', 'logic', 'control', 'file']));
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
 
   // Filter nodes based on search and filters
   const filteredNodes = mockNodes.filter(node => {
@@ -253,12 +254,32 @@ export function WorkflowSidebar({
                       return (
                         <div
                           key={node.id}
-                          className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${
+                          className={`p-3 rounded-lg border cursor-grab transition-all hover:shadow-sm hover:cursor-grabbing ${
                             isSelected 
                               ? "border-primary bg-primary/5" 
                               : "border-border hover:border-primary/50"
+                          } ${
+                            draggedNodeId === node.id 
+                              ? "opacity-50 scale-95 shadow-lg" 
+                              : ""
                           }`}
                           onClick={() => onNodeSelect(node.id)}
+                          draggable
+                          onDragStart={(e) => {
+                            setDraggedNodeId(node.id);
+                            e.dataTransfer.setData('application/reactflow', JSON.stringify({
+                              id: node.id,
+                              name: node.name,
+                              type: node.type,
+                              category: node.category,
+                              description: node.description
+                            }));
+                            e.dataTransfer.effectAllowed = 'move';
+                          }}
+                          onDragEnd={(e) => {
+                            setDraggedNodeId(null);
+                            e.dataTransfer.clearData();
+                          }}
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 mt-0.5">

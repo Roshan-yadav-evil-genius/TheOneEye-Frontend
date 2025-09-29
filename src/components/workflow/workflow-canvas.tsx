@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Node,
   Edge,
@@ -13,6 +13,7 @@ import ReactFlow, {
   BackgroundVariant,
   MiniMap,
   NodeTypes,
+  ReactFlowInstance,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -121,10 +122,67 @@ const initialEdges: Edge[] = [
 export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
+  );
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    setIsDragOver(true);
+  }, []);
+
+  const onDragLeave = useCallback((event: React.DragEvent) => {
+    // Only set isDragOver to false if we're leaving the entire canvas area
+    if (!reactFlowWrapper.current?.contains(event.relatedTarget as Element)) {
+      setIsDragOver(false);
+    }
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+      const type = event.dataTransfer.getData('application/reactflow');
+
+      if (typeof type === 'undefined' || !type || !reactFlowBounds || !reactFlowInstance) {
+        return;
+      }
+
+      try {
+        const nodeData = JSON.parse(type);
+        const position = reactFlowInstance.project({
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        });
+
+        const newNode: Node = {
+          id: `${nodeData.id}-${Date.now()}`, // Ensure unique ID
+          type: 'custom',
+          position,
+          data: {
+            label: nodeData.name,
+            type: nodeData.type,
+            status: 'active',
+            category: nodeData.category,
+            description: nodeData.description,
+          },
+        };
+
+        setNodes((nds) => nds.concat(newNode));
+        setIsDragOver(false);
+      } catch (error) {
+        console.error('Error parsing dropped node data:', error);
+        setIsDragOver(false);
+      }
+    },
+    [reactFlowInstance, setNodes]
   );
 
   // Filter nodes based on search and filters
@@ -146,13 +204,17 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowC
   }, [nodes, selectedNodes]);
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative" ref={reactFlowWrapper}>
       <ReactFlow
         nodes={updatedNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onInit={setReactFlowInstance}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
         nodeTypes={nodeTypes}
         fitView
         className="bg-background"
@@ -173,6 +235,22 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters }: WorkflowC
         />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
+      
+      {/* Drop overlay */}
+      {isDragOver && (
+        <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary/50 rounded-lg flex items-center justify-center pointer-events-none z-10">
+          <div className="bg-background/90 backdrop-blur-sm border border-primary/20 rounded-lg px-6 py-4 shadow-lg">
+            <div className="flex items-center gap-3 text-primary">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="font-medium">Drop node here to add to workflow</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
