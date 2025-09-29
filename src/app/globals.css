@@ -120,3 +120,50 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom scrollbar styling for sidebar */
+@layer components {
+  .sidebar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--sidebar-border)) transparent;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--sidebar-border));
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--sidebar-accent));
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:active {
+    background: hsl(var(--sidebar-primary));
+  }
+  
+  /* Dark mode adjustments */
+  .dark .sidebar-scrollbar {
+    scrollbar-color: hsl(var(--sidebar-border)) transparent;
+  }
+  
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--sidebar-border));
+  }
+  
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--sidebar-accent));
+  }
+  
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb:active {
+    background: hsl(var(--sidebar-primary));
+  }
+}
