@@ -39,6 +39,7 @@ interface NodeEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   nodeData: {
+    id: string;
     label: string;
     type: string;
     status: string;
@@ -46,6 +47,7 @@ interface NodeEditDialogProps {
     description?: string;
   };
   onSave: (updatedData: {
+    id: string;
     label: string;
     type: string;
     status: string;
@@ -61,6 +63,7 @@ export function NodeEditDialog({
   onSave 
 }: NodeEditDialogProps) {
   const [editData, setEditData] = useState({
+    id: nodeData.id,
     label: nodeData.label,
     description: nodeData.description || "",
     type: nodeData.type,
@@ -90,6 +93,7 @@ export function NodeEditDialog({
   // Update editData when nodeData changes
   useEffect(() => {
     setEditData({
+      id: nodeData.id,
       label: nodeData.label,
       description: nodeData.description || "",
       type: nodeData.type,
@@ -113,6 +117,7 @@ export function NodeEditDialog({
 
   const handleCancel = () => {
     setEditData({
+      id: nodeData.id,
       label: nodeData.label,
       description: nodeData.description || "",
       type: nodeData.type,
@@ -126,7 +131,7 @@ export function NodeEditDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
         <VisuallyHidden>
-          <DialogTitle>Edit Node: {nodeData.label}</DialogTitle>
+          <DialogTitle>Edit Node: {nodeData.label} (ID: {nodeData.id})</DialogTitle>
         </VisuallyHidden>
         <DndContext>
           <div className="flex flex-col h-full overflow-hidden">
@@ -146,8 +151,9 @@ export function NodeEditDialog({
             {/* Node Editor Column */}
             <div className="h-full overflow-hidden">
               <NodeEditor
-                nodeType="If"
-                nodeLabel="If"
+                nodeType={editData.type}
+                nodeLabel={editData.label}
+                nodeId={editData.id}
                 activeTab={activeNodeTab}
                 onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings")}
                 groups={groups}

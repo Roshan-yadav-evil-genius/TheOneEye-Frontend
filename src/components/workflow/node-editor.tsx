@@ -28,6 +28,7 @@ interface GroupWithOperator {
 interface NodeEditorProps {
   nodeType: string;
   nodeLabel: string;
+  nodeId: string;
   activeTab: "parameters" | "settings";
   onTabChange: (tab: "parameters" | "settings") => void;
   // Parameters tab props
@@ -48,6 +49,7 @@ interface NodeEditorProps {
 export function NodeEditor({
   nodeType,
   nodeLabel,
+  nodeId,
   activeTab,
   onTabChange,
   groups,
@@ -66,6 +68,7 @@ export function NodeEditor({
       <NodeHeader
         nodeType={nodeType}
         nodeLabel={nodeLabel}
+        nodeId={nodeId}
         onTestStep={onTestStep}
         onViewDocs={onViewDocs}
       />
