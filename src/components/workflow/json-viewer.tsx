@@ -55,17 +55,6 @@ export function JsonViewer({
           <h3 className="text-white font-medium">{title}</h3>
         </div>
         <div className="flex items-center gap-2">
-          {showExecuteButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExecute}
-              className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 px-3"
-            >
-              <Play className="w-4 h-4 mr-1" />
-              Execute
-            </Button>
-          )}
           <Button
             variant="ghost"
             size="sm"
@@ -82,18 +71,9 @@ export function JsonViewer({
           >
             <Download className="w-4 h-4" />
           </Button>
-          {onRefresh && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onRefresh}
-              className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-          )}
           <Search className="w-4 h-4 text-gray-400" />
         </div>
+        <div></div>
       </div>
       
       <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "schema" | "json")} className="flex-1 flex flex-col overflow-hidden gap-0">
