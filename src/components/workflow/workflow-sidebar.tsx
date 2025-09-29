@@ -221,7 +221,7 @@ export function WorkflowSidebar({
       </div>
 
       {/* Node List - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent min-h-0">
+      <div className="flex-1 overflow-y-auto p-1 min-h-0 sidebar-scrollbar">
         <div className="space-y-3">
           {Object.entries(groupedNodes).map(([category, nodes]) => {
             const isExpanded = expandedGroups.has(category);

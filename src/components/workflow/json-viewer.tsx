@@ -113,7 +113,7 @@ export function JsonViewer({
         </TabsList>
         
         <TabsContent value="json" className="flex-1 overflow-hidden">
-          <div className="h-full overflow-auto">
+          <div className="h-full overflow-auto sidebar-scrollbar">
             <SyntaxHighlighter
               language="json"
               style={vscDarkPlus}

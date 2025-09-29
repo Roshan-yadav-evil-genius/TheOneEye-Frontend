@@ -86,7 +86,7 @@ export function NodeEditor({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0">
+        <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0 sidebar-scrollbar">
           <ParametersTab
             groups={groups}
             convertTypes={convertTypes}
@@ -95,7 +95,7 @@ export function NodeEditor({
           />
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0">
+        <TabsContent value="settings" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0 sidebar-scrollbar">
           <SettingsTab
             label={label}
             description={description}

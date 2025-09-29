@@ -477,7 +477,7 @@ export function DataTable({
       </div>
       <TabsContent
         value="outline"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 sidebar-scrollbar"
       >
         <div className="overflow-hidden rounded-lg border">
           <DndContext
@@ -664,7 +664,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             Showing total visitors for the last 6 months
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm sidebar-scrollbar">
           {!isMobile && (
             <>
               <ChartContainer config={chartConfig}>

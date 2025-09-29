@@ -84,7 +84,7 @@ export function ConditionsSection({
 
 
       {/* Condition Groups - Scrollable area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-2 min-h-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-2 min-h-0 sidebar-scrollbar">
         {groups.map((groupWithOp, index) => (
           <div key={groupWithOp.group.id}>
             {index > 0 && (

@@ -262,7 +262,7 @@ export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
   const totalItems = getTotalItems(schemaFields);
 
   return (
-    <div className="h-full overflow-auto p-4">
+    <div className="h-full overflow-auto p-4 sidebar-scrollbar">
       <div className="mb-3 text-gray-400 text-sm">
         {totalItems} items
       </div>
