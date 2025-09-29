@@ -1,12 +1,23 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { usePageTitle } from "@/contexts/page-title-context"
+import { useBreadcrumb } from "@/hooks/use-breadcrumb"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import Link from "next/link"
+import Image from "next/image"
 
-interface SiteHeaderProps {
-  title?: string
-}
+export function SiteHeader() {
+  const { title } = usePageTitle()
+  const breadcrumbs = useBreadcrumb()
 
-export function SiteHeader({ title = "Documents" }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
@@ -15,18 +26,32 @@ export function SiteHeader({ title = "Documents" }: SiteHeaderProps) {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-base font-medium">{title}</h1>
+        
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            {breadcrumbs.map((breadcrumb, index) => (
+              <div key={breadcrumb.href} className="flex items-center">
+                <BreadcrumbItem>
+                  {breadcrumb.isCurrentPage ? (
+                    <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+              </div>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a
-              href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
-            >
-              GitHub
-            </a>
-          </Button>
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Image src="/logo.png" width={40} height={12} alt="TheOneEye" />
+            <span className="text-sm font-semibold hidden sm:inline">TheOneEye</span>
+          </Link>
         </div>
       </div>
     </header>

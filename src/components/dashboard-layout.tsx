@@ -1,9 +1,7 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+"use client"
+
+import { usePageTitle } from "@/contexts/page-title-context"
+import { useEffect } from "react"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -11,26 +9,24 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
+  const { setTitle } = usePageTitle()
+
+  useEffect(() => {
+    if (title) {
+      setTitle(title)
+    }
+  }, [title, setTitle])
+
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader title={title} />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              {children}
-            </div>
-          </div>
+    <div className="px-4 lg:px-6">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{title || "Dashboard"}</h1>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+        <main>
+          {children}
+        </main>
+      </div>
+    </div>
   )
 }

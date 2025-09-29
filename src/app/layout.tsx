@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
+import { SidebarProviderWrapper } from "@/components/sidebar-provider";
+import { PageTitleProvider } from "@/contexts/page-title-context";
 
 
 export const metadata: Metadata = {
@@ -26,7 +28,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <PageTitleProvider>
+              <SidebarProviderWrapper>
+                {children}
+              </SidebarProviderWrapper>
+            </PageTitleProvider>
           </ThemeProvider>
         </body>
       </html>

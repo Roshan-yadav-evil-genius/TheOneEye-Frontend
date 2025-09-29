@@ -1,4 +1,5 @@
 import { IconPray, IconSettings, IconClock, IconUsers } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,6 +39,11 @@ export function WorkflowCard({
   onEdit,
   onView,
 }: WorkflowCardProps) {
+  const router = useRouter()
+
+  const handleCardClick = () => {
+    router.push(`/workflow/${id}`)
+  }
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -56,7 +62,10 @@ export function WorkflowCard({
   }
 
   return (
-    <Card className="@container/card hover:shadow-md transition-shadow cursor-pointer">
+    <Card 
+      className="@container/card hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -74,7 +83,10 @@ export function WorkflowCard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onEdit?.(id)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit?.(id)
+              }}
               className="h-8 w-8 p-0"
             >
               <IconSettings className="h-4 w-4" />
@@ -121,7 +133,10 @@ export function WorkflowCard({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onView?.(id)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onView?.(id)
+            }}
             className="flex-1 h-9"
           >
             View Details
@@ -129,7 +144,10 @@ export function WorkflowCard({
           {status === "inactive" && (
             <Button
               size="sm"
-              onClick={() => onRun?.(id)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onRun?.(id)
+              }}
               className="flex-1 h-9"
             >
               Run Now

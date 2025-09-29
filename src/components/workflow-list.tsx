@@ -68,7 +68,7 @@ export function WorkflowList({
 
   const handleView = (id: string) => {
     console.log(`Viewing workflow: ${id}`)
-    // TODO: Navigate to workflow details
+    // Navigation is now handled by the card click
   }
 
   const handleCreate = () => {
