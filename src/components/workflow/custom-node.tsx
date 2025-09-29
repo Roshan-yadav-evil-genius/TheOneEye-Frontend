@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Handle, Position } from "reactflow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NodeEditDialog } from "./node-edit-dialog";
 import { 
   IconClock, 
   IconSettings, 
@@ -16,7 +17,8 @@ import {
   IconTrash,
   IconPower,
   IconDots,
-  IconSwitch
+  IconSwitch,
+  IconEdit
 } from "@tabler/icons-react";
 
 interface CustomNodeProps {
@@ -67,6 +69,7 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [userDescription, setUserDescription] = useState(data.description || "");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const IconComponent = nodeIcons[data.type as keyof typeof nodeIcons] || IconSettings;
   const colorClass = nodeColors[data.type as keyof typeof nodeColors] || nodeColors.system;
   const iconColorClass = iconColors[data.type as keyof typeof iconColors] || iconColors.system;
@@ -89,6 +92,23 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
   const handleMore = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`More options for node: ${data.label}`);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = (updatedData: {
+    label: string;
+    type: string;
+    status: string;
+    category: string;
+    description?: string;
+  }) => {
+    // Here you would typically update the node data in your state management or API
+    console.log('Saving node data:', updatedData);
+    // You might want to update the parent component's state here
   };
 
   const handleDescriptionClick = (e: React.MouseEvent) => {
@@ -145,6 +165,14 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
       {/* Hover Actions */}
       {isHovered && (
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background border border-border rounded-md shadow-lg p-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/20"
+            onClick={handleEdit}
+          >
+            <IconEdit className="h-3 w-3" />
+          </Button>
           <Button
             size="sm"
             variant="ghost"
@@ -217,6 +245,14 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
           )}
         </div>
       </div>
+
+      {/* Edit Dialog */}
+      <NodeEditDialog
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        nodeData={data}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }
