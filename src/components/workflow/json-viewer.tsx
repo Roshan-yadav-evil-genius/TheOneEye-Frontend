@@ -48,7 +48,7 @@ export function JsonViewer({
 
 
   return (
-    <div className="w-1/3 border-r flex flex-col overflow-hidden ">
+    <div className="h-full flex flex-col overflow-hidden">
       <div className="flex items-center justify-between p-1 border-b border-gray-700 bg-gray-800 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 ${statusColor} rounded-full`}></div>

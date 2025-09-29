@@ -18,6 +18,7 @@ import { Trash2, Plus, ExternalLink, Briefcase } from "lucide-react";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
 import { sampleInputData } from "@/data/sample-data";
+import { ResizablePanels } from "@/components/ui/resizable-panel";
 
 interface Condition {
   id: string;
@@ -131,7 +132,12 @@ export function NodeEditDialog({
           <DialogTitle>Edit Node: {nodeData.label}</DialogTitle>
         </VisuallyHidden>
         <div className="flex flex-col h-full overflow-hidden">
-          <div className="flex flex-1 overflow-hidden">
+          <ResizablePanels 
+            defaultSizes={[33.33, 33.33, 33.34]}
+            minSizes={[20, 25, 20]}
+            maxSizes={[60, 60, 60]}
+            className="flex-1 overflow-hidden"
+          >
             {/* INPUT Column */}
             <InputSection 
               activeInputTab={activeInputTab}
@@ -140,7 +146,7 @@ export function NodeEditDialog({
             />
 
             {/* Node Editor Column */}
-            <div className="w-1/3 border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
+            <div className="border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-gray-700">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
@@ -319,7 +325,7 @@ export function NodeEditDialog({
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
               jsonData={sampleInputData}
             />
-          </div>
+          </ResizablePanels>
         </div>
       </DialogContent>
     </Dialog>
