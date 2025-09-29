@@ -2,7 +2,6 @@ import React from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
-import { SparklesCore } from '../ui/sparkles';
 const HeroSection = () => {
     return (
         <section className='flex flex-col justify-center items-center mt-50'>

@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { usePageTitle } from "@/contexts/page-title-context"
 import { useBreadcrumb } from "@/hooks/use-breadcrumb"
 import {
   Breadcrumb,
@@ -15,7 +13,6 @@ import Link from "next/link"
 import Image from "next/image"
 
 export function SiteHeader() {
-  const { title } = usePageTitle()
   const breadcrumbs = useBreadcrumb()
 
   return (

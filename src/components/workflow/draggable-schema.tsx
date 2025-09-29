@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText, GripVertical } from 'lucide-react';
+import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText } from 'lucide-react';
 
 interface SchemaField {
   key: string;
@@ -118,22 +118,6 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
     }
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'number':
-        return 'text-white';
-      case 'string':
-        return 'text-white';
-      case 'boolean':
-        return 'text-white';
-      case 'object':
-        return 'text-white';
-      case 'array':
-        return 'text-white';
-      default:
-        return 'text-white';
-    }
-  };
 
   const hasChildren = field.children && field.children.length > 0;
   const isExpandable = hasChildren && (field.type === 'object' || field.type === 'array');

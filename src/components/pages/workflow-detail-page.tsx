@@ -1,4 +1,3 @@
-import { Workflow } from "@/components/workflow-list"
 import { mockWorkflows } from "@/data/mock-workflows"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -28,7 +27,7 @@ export function WorkflowDetailPage({ workflowId }: WorkflowDetailPageProps) {
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold mb-2">Workflow Not Found</h1>
             <p className="text-muted-foreground">
-              The workflow with ID "{workflowId}" could not be found.
+              The workflow with ID &quot;{workflowId}&quot; could not be found.
             </p>
           </div>
         </div>

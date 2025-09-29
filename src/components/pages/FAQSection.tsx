@@ -57,7 +57,7 @@ const FAQSection = () => {
           <AccordionContent>
             <p className="mb-2">Security is built into our architecture:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong>Containerized Isolation:</strong> Each client's workflow runs inside its own Docker container, ensuring complete separation from other clients and reducing noisy-neighbor risks.</li>
+              <li><strong>Containerized Isolation:</strong> Each client&apos;s workflow runs inside its own Docker container, ensuring complete separation from other clients and reducing noisy-neighbor risks.</li>
               <li><strong>Client-Controlled Portal:</strong> You get a secure, view-only portal to store and update sensitive parameters (credentials, API keys, cookies) without touching the underlying workflow logic.</li>
             </ul>
           </AccordionContent>

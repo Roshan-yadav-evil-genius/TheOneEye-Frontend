@@ -1,4 +1,4 @@
-import { IconPray, IconSettings, IconClock, IconUsers } from "@tabler/icons-react"
+import { IconPray, IconSettings, IconClock } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
