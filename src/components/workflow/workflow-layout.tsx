@@ -34,10 +34,10 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   };
 
   return (
-    <div className="flex h-full bg-background">
+    <div className="flex h-[calc(100vh-var(--header-height))] bg-background">
       {/* Left Sidebar */}
       {!isSidebarCollapsed && (
-        <div className="w-80 border-r border-border bg-card transition-all duration-300">
+        <div className="w-80 border-r border-border bg-card transition-all duration-300 h-full flex flex-col">
           <WorkflowSidebar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}

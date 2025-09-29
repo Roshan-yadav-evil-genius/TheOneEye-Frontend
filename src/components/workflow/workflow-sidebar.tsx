@@ -71,6 +71,30 @@ const mockNodes = [
   { id: "file-read", name: "File Read", type: "action", category: "file", description: "Reads content from files" },
   { id: "file-write", name: "File Write", type: "action", category: "file", description: "Writes content to files" },
   { id: "file-process", name: "File Process", type: "action", category: "file", description: "Processes and transforms files" },
+  { id: "file-upload", name: "File Upload", type: "action", category: "file", description: "Uploads files to cloud storage" },
+  { id: "file-download", name: "File Download", type: "action", category: "file", description: "Downloads files from remote sources" },
+  { id: "file-compress", name: "File Compress", type: "action", category: "file", description: "Compresses files to reduce size" },
+  { id: "file-extract", name: "File Extract", type: "action", category: "file", description: "Extracts files from archives" },
+  
+  // Additional API nodes
+  { id: "graphql-api", name: "GraphQL API", type: "action", category: "api", description: "Makes GraphQL API calls" },
+  { id: "soap-api", name: "SOAP API", type: "action", category: "api", description: "Makes SOAP web service calls" },
+  { id: "oauth-auth", name: "OAuth Authentication", type: "action", category: "api", description: "Handles OAuth authentication flow" },
+  
+  // Additional Database nodes
+  { id: "db-delete", name: "Database Delete", type: "action", category: "database", description: "Deletes records from database" },
+  { id: "db-transaction", name: "Database Transaction", type: "action", category: "database", description: "Manages database transactions" },
+  { id: "db-backup", name: "Database Backup", type: "action", category: "database", description: "Creates database backups" },
+  
+  // Additional Logic nodes
+  { id: "merge", name: "Merge", type: "logic", category: "logic", description: "Merges multiple data streams" },
+  { id: "split", name: "Split", type: "logic", category: "logic", description: "Splits data into multiple streams" },
+  { id: "aggregate", name: "Aggregate", type: "logic", category: "logic", description: "Aggregates data from multiple sources" },
+  
+  // Additional Control nodes
+  { id: "retry", name: "Retry", type: "action", category: "control", description: "Retries failed operations" },
+  { id: "timeout", name: "Timeout", type: "action", category: "control", description: "Sets timeout for operations" },
+  { id: "parallel", name: "Parallel", type: "logic", category: "control", description: "Executes operations in parallel" },
 ];
 
 const nodeIcons = {
@@ -150,8 +174,8 @@ export function WorkflowSidebar({
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-border">
+      {/* Header - Fixed */}
+      <div className="flex-shrink-0 p-4 border-b border-border">
 
         {/* Search Bar */}
         <div className="relative mb-4">
@@ -186,8 +210,8 @@ export function WorkflowSidebar({
         </div>
       </div>
 
-      {/* Node List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Node List - Scrollable */}
+      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent min-h-0">
         <div className="space-y-3">
           {Object.entries(groupedNodes).map(([category, nodes]) => {
             const isExpanded = expandedGroups.has(category);
@@ -265,8 +289,8 @@ export function WorkflowSidebar({
         )}
       </div>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-border">
+      {/* Footer - Fixed */}
+      <div className="flex-shrink-0 p-4 border-t border-border">
         <Button className="w-full" size="sm">
           <IconPlus className="mr-2 h-4 w-4" />
           Add Custom Node
