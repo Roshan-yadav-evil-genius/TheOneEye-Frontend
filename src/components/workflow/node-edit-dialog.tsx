@@ -22,6 +22,19 @@ interface Condition {
   value: string;
 }
 
+interface ConditionWithOperator {
+  condition: Condition;
+  operator: "AND" | "OR" | "NOT";
+}
+
+interface GroupWithOperator {
+  group: {
+    id: string;
+    conditions: ConditionWithOperator[];
+  };
+  operator: "AND" | "OR" | "NOT";
+}
+
 interface NodeEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,10 +68,20 @@ export function NodeEditDialog({
     category: nodeData.category
   });
 
-  const [conditions, setConditions] = useState<Condition[]>([
-    { id: "1", field: "{{ $json[0].Age }}", operator: "is greater than", value: "50" }
+  const [groups, setGroups] = useState<GroupWithOperator[]>([
+    {
+      group: {
+        id: "1",
+        conditions: [
+          {
+            condition: { id: "1_condition", field: "{{ $json[0].Age }}", operator: "is greater than", value: "50" },
+            operator: "AND"
+          }
+        ]
+      },
+      operator: "AND"
+    }
   ]);
-  const [logicOperator, setLogicOperator] = useState<"AND" | "OR">("AND");
   const [convertTypes, setConvertTypes] = useState(false);
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
@@ -126,11 +149,9 @@ export function NodeEditDialog({
               nodeLabel="If"
               activeTab={activeNodeTab}
               onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings")}
-              conditions={conditions}
-              logicOperator={logicOperator}
+              groups={groups}
               convertTypes={convertTypes}
-              onConditionsChange={setConditions}
-              onLogicOperatorChange={setLogicOperator}
+              onGroupsChange={setGroups}
               onConvertTypesChange={setConvertTypes}
               label={editData.label}
               description={editData.description}

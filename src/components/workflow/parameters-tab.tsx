@@ -11,31 +11,38 @@ interface Condition {
   value: string;
 }
 
+interface ConditionWithOperator {
+  condition: Condition;
+  operator: "AND" | "OR" | "NOT";
+}
+
+interface GroupWithOperator {
+  group: {
+    id: string;
+    conditions: ConditionWithOperator[];
+  };
+  operator: "AND" | "OR" | "NOT";
+}
+
 interface ParametersTabProps {
-  conditions: Condition[];
-  logicOperator: "AND" | "OR";
+  groups: GroupWithOperator[];
   convertTypes: boolean;
-  onConditionsChange: (conditions: Condition[]) => void;
-  onLogicOperatorChange: (operator: "AND" | "OR") => void;
+  onGroupsChange: (groups: GroupWithOperator[]) => void;
   onConvertTypesChange: (value: boolean) => void;
 }
 
 export function ParametersTab({
-  conditions,
-  logicOperator,
+  groups,
   convertTypes,
-  onConditionsChange,
-  onLogicOperatorChange,
+  onGroupsChange,
   onConvertTypesChange
 }: ParametersTabProps) {
   return (
     <div className="space-y-6">
       {/* Conditions Section */}
       <ConditionsSection
-        conditions={conditions}
-        logicOperator={logicOperator}
-        onConditionsChange={onConditionsChange}
-        onLogicOperatorChange={onLogicOperatorChange}
+        groups={groups}
+        onGroupsChange={onGroupsChange}
       />
 
       {/* Convert Types Toggle */}

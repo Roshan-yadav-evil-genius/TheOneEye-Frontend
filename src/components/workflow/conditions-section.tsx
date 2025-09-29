@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus } from "lucide-react";
-import { DroppableInput } from "./droppable-input";
+import { Plus } from "lucide-react";
+import { ConditionGroupComponent } from "./condition-group";
+import { OperatorBar } from "./operator-bar";
 
 interface Condition {
   id: string;
@@ -13,128 +12,112 @@ interface Condition {
   value: string;
 }
 
+interface ConditionWithOperator {
+  condition: Condition;
+  operator: "AND" | "OR" | "NOT";
+}
+
+interface GroupWithOperator {
+  group: {
+    id: string;
+    conditions: ConditionWithOperator[];
+  };
+  operator: "AND" | "OR" | "NOT";
+}
+
 interface ConditionsSectionProps {
-  conditions: Condition[];
-  logicOperator: "AND" | "OR";
-  onConditionsChange: (conditions: Condition[]) => void;
-  onLogicOperatorChange: (operator: "AND" | "OR") => void;
+  groups: GroupWithOperator[];
+  onGroupsChange: (groups: GroupWithOperator[]) => void;
 }
 
 export function ConditionsSection({
-  conditions,
-  logicOperator,
-  onConditionsChange,
-  onLogicOperatorChange
+  groups,
+  onGroupsChange
 }: ConditionsSectionProps) {
-  const addCondition = () => {
+  const addGroup = () => {
     const newCondition: Condition = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + "_condition",
       field: "",
       operator: "equals",
       value: ""
     };
-    onConditionsChange([...conditions, newCondition]);
+    const newConditionWithOperator: ConditionWithOperator = {
+      condition: newCondition,
+      operator: "AND"
+    };
+    const newGroupWithOperator: GroupWithOperator = {
+      group: {
+        id: Date.now().toString(),
+        conditions: [newConditionWithOperator]
+      },
+      operator: "AND"
+    };
+    onGroupsChange([...groups, newGroupWithOperator]);
   };
 
-  const updateCondition = (id: string, field: keyof Condition, value: string) => {
-    onConditionsChange(
-      conditions.map(condition => 
-        condition.id === id ? { ...condition, [field]: value } : condition
+  const updateGroup = (groupId: string, updatedGroup: { id: string; conditions: ConditionWithOperator[] }) => {
+    onGroupsChange(
+      groups.map(groupWithOp => 
+        groupWithOp.group.id === groupId 
+          ? { ...groupWithOp, group: updatedGroup }
+          : groupWithOp
       )
     );
   };
 
-  const removeCondition = (id: string) => {
-    onConditionsChange(conditions.filter(condition => condition.id !== id));
+  const deleteGroup = (groupId: string) => {
+    onGroupsChange(groups.filter(groupWithOp => groupWithOp.group.id !== groupId));
+  };
+
+  const updateGroupOperator = (groupId: string, operator: "AND" | "OR" | "NOT") => {
+    onGroupsChange(
+      groups.map(groupWithOp => 
+        groupWithOp.group.id === groupId 
+          ? { ...groupWithOp, operator }
+          : groupWithOp
+      )
+    );
   };
 
   return (
     <div>
-      <h4 className="text-white font-medium mb-4">Conditions</h4>
-      
-      {/* Logic Selector */}
-      <div className="flex mb-4">
-        <div className="flex bg-gray-800 rounded p-1">
-          <button
-            onClick={() => onLogicOperatorChange("AND")}
-            className={`px-3 py-1 text-sm rounded ${
-              logicOperator === "AND" 
-                ? "bg-gray-700 text-white" 
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            AND
-          </button>
-          <button
-            onClick={() => onLogicOperatorChange("OR")}
-            className={`px-3 py-1 text-sm rounded ${
-              logicOperator === "OR" 
-                ? "bg-gray-700 text-white" 
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            OR
-          </button>
-        </div>
+      <div className="mb-4">
+        <h4 className="text-white font-medium mb-2">Conditions</h4>
+        <p className="text-gray-400 text-xs">
+          Each group acts like parentheses (). Use operator bars to control how conditions and groups are combined.
+        </p>
       </div>
 
-      {/* Condition Rows */}
-      <div className="space-y-3">
-        {conditions.map((condition) => (
-          <div key={condition.id} className="flex items-center gap-2">
-            <button className="bg-gray-700 text-gray-300 px-2 py-1 text-xs rounded">
-              fx
-            </button>
-            <DroppableInput
-              value={condition.field}
-              onChange={(value) => updateCondition(condition.id, "field", value)}
-              placeholder="Field expression"
-              id={`condition-field-${condition.id}`}
+      {/* Condition Groups */}
+      <div className="space-y-4">
+        {groups.map((groupWithOp, index) => (
+          <div key={groupWithOp.group.id}>
+            {index > 0 && (
+              <OperatorBar
+                operator={groupWithOp.operator}
+                onOperatorChange={(operator) => updateGroupOperator(groupWithOp.group.id, operator)}
+                size="md"
+              />
+            )}
+            <ConditionGroupComponent
+              group={groupWithOp.group}
+              onGroupChange={updateGroup}
+              onDeleteGroup={deleteGroup}
+              canDelete={groups.length > 1}
             />
-            <Select value={condition.operator} onValueChange={(value) => updateCondition(condition.id, "operator", value)}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="equals">equals</SelectItem>
-                <SelectItem value="is greater than">is greater than</SelectItem>
-                <SelectItem value="is less than">is less than</SelectItem>
-                <SelectItem value="contains">contains</SelectItem>
-              </SelectContent>
-            </Select>
-            <DroppableInput
-              value={condition.value}
-              onChange={(value) => updateCondition(condition.id, "value", value)}
-              placeholder="Value"
-              id={`condition-value-${condition.id}`}
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-            />
-            <button
-              onClick={() => removeCondition(condition.id)}
-              className="text-gray-400 hover:text-red-400"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
           </div>
         ))}
       </div>
 
-      {/* Add Condition Buttons */}
-      <div className="flex gap-2 mt-4">
+      {/* Add Group Button */}
+      <div className="mt-4">
         <Button
-          onClick={addCondition}
+          onClick={addGroup}
           variant="outline"
           className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
         >
           <Plus className="w-4 h-4 mr-1" />
-          Condition
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          Group
+          Add Group
         </Button>
       </div>
     </div>

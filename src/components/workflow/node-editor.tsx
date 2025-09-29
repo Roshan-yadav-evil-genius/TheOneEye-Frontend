@@ -12,17 +12,28 @@ interface Condition {
   value: string;
 }
 
+interface ConditionWithOperator {
+  condition: Condition;
+  operator: "AND" | "OR" | "NOT";
+}
+
+interface GroupWithOperator {
+  group: {
+    id: string;
+    conditions: ConditionWithOperator[];
+  };
+  operator: "AND" | "OR" | "NOT";
+}
+
 interface NodeEditorProps {
   nodeType: string;
   nodeLabel: string;
   activeTab: "parameters" | "settings";
   onTabChange: (tab: "parameters" | "settings") => void;
   // Parameters tab props
-  conditions: Condition[];
-  logicOperator: "AND" | "OR";
+  groups: GroupWithOperator[];
   convertTypes: boolean;
-  onConditionsChange: (conditions: Condition[]) => void;
-  onLogicOperatorChange: (operator: "AND" | "OR") => void;
+  onGroupsChange: (groups: GroupWithOperator[]) => void;
   onConvertTypesChange: (value: boolean) => void;
   // Settings tab props
   label: string;
@@ -39,11 +50,9 @@ export function NodeEditor({
   nodeLabel,
   activeTab,
   onTabChange,
-  conditions,
-  logicOperator,
+  groups,
   convertTypes,
-  onConditionsChange,
-  onLogicOperatorChange,
+  onGroupsChange,
   onConvertTypesChange,
   label,
   description,
@@ -79,11 +88,9 @@ export function NodeEditor({
 
         <TabsContent value="parameters" className="flex-1 p-4 m-0 overflow-auto">
           <ParametersTab
-            conditions={conditions}
-            logicOperator={logicOperator}
+            groups={groups}
             convertTypes={convertTypes}
-            onConditionsChange={onConditionsChange}
-            onLogicOperatorChange={onLogicOperatorChange}
+            onGroupsChange={onGroupsChange}
             onConvertTypesChange={onConvertTypesChange}
           />
         </TabsContent>
