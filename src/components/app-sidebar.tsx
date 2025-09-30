@@ -12,6 +12,7 @@ import {
   IconFolder,
   IconHelp,
   IconListDetails,
+  IconNetwork,
   IconReport,
   IconSearch,
   IconSettings,
@@ -66,6 +67,11 @@ const data = {
       title: "Team",
       url: "/team",
       icon: IconUsers,
+    },
+    {
+      title: "Nodes",
+      url: "/nodes",
+      icon: IconNetwork, // Use a network or graph icon to represent nodes
     },
   ],
   navClouds: [

@@ -36,65 +36,7 @@ interface WorkflowSidebarProps {
   onNodeSelect: (nodeId: string) => void;
 }
 
-// Mock node data - in a real app this would come from props or API
-const mockNodes = [
-  // System nodes
-  { id: "start", name: "Start", type: "trigger", category: "system", description: "Initiates the workflow execution" },
-  { id: "end", name: "End", type: "trigger", category: "system", description: "Terminates the workflow execution" },
-  
-  // Email nodes
-  { id: "send-email", name: "Send Email", type: "action", category: "email", description: "Sends email notifications to recipients" },
-  { id: "email-listener", name: "Email Listener", type: "trigger", category: "email", description: "Listens for incoming emails" },
-  { id: "email-template", name: "Email Template", type: "action", category: "email", description: "Uses predefined email templates" },
-  
-  // Database nodes
-  { id: "db-query", name: "Database Query", type: "action", category: "database", description: "Executes SQL queries on connected databases" },
-  { id: "db-insert", name: "Database Insert", type: "action", category: "database", description: "Inserts data into database tables" },
-  { id: "db-update", name: "Database Update", type: "action", category: "database", description: "Updates existing database records" },
-  
-  // API nodes
-  { id: "api-call", name: "API Call", type: "action", category: "api", description: "Makes HTTP requests to external APIs" },
-  { id: "webhook", name: "Webhook", type: "trigger", category: "api", description: "Receives webhook notifications" },
-  { id: "rest-api", name: "REST API", type: "action", category: "api", description: "Makes RESTful API calls" },
-  
-  // Logic nodes
-  { id: "condition", name: "Condition", type: "logic", category: "logic", description: "Evaluates conditions and branches workflow" },
-  { id: "switch", name: "Switch", type: "logic", category: "logic", description: "Multi-way conditional branching" },
-  { id: "loop", name: "Loop", type: "logic", category: "logic", description: "Repeats actions for multiple items" },
-  
-  // Control nodes
-  { id: "delay", name: "Delay", type: "action", category: "control", description: "Pauses workflow execution for specified time" },
-  { id: "schedule", name: "Schedule", type: "trigger", category: "control", description: "Triggers workflow at scheduled times" },
-  
-  // File nodes
-  { id: "file-read", name: "File Read", type: "action", category: "file", description: "Reads content from files" },
-  { id: "file-write", name: "File Write", type: "action", category: "file", description: "Writes content to files" },
-  { id: "file-process", name: "File Process", type: "action", category: "file", description: "Processes and transforms files" },
-  { id: "file-upload", name: "File Upload", type: "action", category: "file", description: "Uploads files to cloud storage" },
-  { id: "file-download", name: "File Download", type: "action", category: "file", description: "Downloads files from remote sources" },
-  { id: "file-compress", name: "File Compress", type: "action", category: "file", description: "Compresses files to reduce size" },
-  { id: "file-extract", name: "File Extract", type: "action", category: "file", description: "Extracts files from archives" },
-  
-  // Additional API nodes
-  { id: "graphql-api", name: "GraphQL API", type: "action", category: "api", description: "Makes GraphQL API calls" },
-  { id: "soap-api", name: "SOAP API", type: "action", category: "api", description: "Makes SOAP web service calls" },
-  { id: "oauth-auth", name: "OAuth Authentication", type: "action", category: "api", description: "Handles OAuth authentication flow" },
-  
-  // Additional Database nodes
-  { id: "db-delete", name: "Database Delete", type: "action", category: "database", description: "Deletes records from database" },
-  { id: "db-transaction", name: "Database Transaction", type: "action", category: "database", description: "Manages database transactions" },
-  { id: "db-backup", name: "Database Backup", type: "action", category: "database", description: "Creates database backups" },
-  
-  // Additional Logic nodes
-  { id: "merge", name: "Merge", type: "logic", category: "logic", description: "Merges multiple data streams" },
-  { id: "split", name: "Split", type: "logic", category: "logic", description: "Splits data into multiple streams" },
-  { id: "aggregate", name: "Aggregate", type: "logic", category: "logic", description: "Aggregates data from multiple sources" },
-  
-  // Additional Control nodes
-  { id: "retry", name: "Retry", type: "action", category: "control", description: "Retries failed operations" },
-  { id: "timeout", name: "Timeout", type: "action", category: "control", description: "Sets timeout for operations" },
-  { id: "parallel", name: "Parallel", type: "logic", category: "control", description: "Executes operations in parallel" },
-];
+import { mockNodes } from "@/data/nodes";
 
 const nodeIcons = {
   trigger: IconClock,

@@ -1,0 +1,484 @@
+// Node data and types for the application
+
+export interface Node {
+  id: string;
+  name: string;
+  type: 'trigger' | 'action' | 'logic' | 'system';
+  category: string;
+  description: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isActive?: boolean;
+  version?: string;
+  tags?: string[];
+}
+
+export const nodeTypes = ['trigger', 'action', 'logic', 'system'] as const;
+export const nodeCategories = [
+  'system',
+  'email', 
+  'database',
+  'api',
+  'logic',
+  'control',
+  'file'
+] as const;
+
+// Mock node data - in a real app this would come from an API
+export const mockNodes: Node[] = [
+  // System nodes
+  { 
+    id: "start", 
+    name: "Start", 
+    type: "trigger", 
+    category: "system", 
+    description: "Initiates the workflow execution",
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01'),
+    isActive: true,
+    version: '1.0.0',
+    tags: ['core', 'workflow']
+  },
+  { 
+    id: "end", 
+    name: "End", 
+    type: "trigger", 
+    category: "system", 
+    description: "Terminates the workflow execution",
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01'),
+    isActive: true,
+    version: '1.0.0',
+    tags: ['core', 'workflow']
+  },
+  
+  // Email nodes
+  { 
+    id: "send-email", 
+    name: "Send Email", 
+    type: "action", 
+    category: "email", 
+    description: "Sends email notifications to recipients",
+    createdAt: new Date('2024-01-02'),
+    updatedAt: new Date('2024-01-15'),
+    isActive: true,
+    version: '1.2.0',
+    tags: ['communication', 'notification']
+  },
+  { 
+    id: "email-listener", 
+    name: "Email Listener", 
+    type: "trigger", 
+    category: "email", 
+    description: "Listens for incoming emails",
+    createdAt: new Date('2024-01-02'),
+    updatedAt: new Date('2024-01-10'),
+    isActive: true,
+    version: '1.1.0',
+    tags: ['communication', 'listener']
+  },
+  { 
+    id: "email-template", 
+    name: "Email Template", 
+    type: "action", 
+    category: "email", 
+    description: "Uses predefined email templates",
+    createdAt: new Date('2024-01-03'),
+    updatedAt: new Date('2024-01-20'),
+    isActive: true,
+    version: '1.3.0',
+    tags: ['communication', 'template']
+  },
+  
+  // Database nodes
+  { 
+    id: "db-query", 
+    name: "Database Query", 
+    type: "action", 
+    category: "database", 
+    description: "Executes SQL queries on connected databases",
+    createdAt: new Date('2024-01-04'),
+    updatedAt: new Date('2024-01-18'),
+    isActive: true,
+    version: '2.0.0',
+    tags: ['database', 'sql', 'query']
+  },
+  { 
+    id: "db-insert", 
+    name: "Database Insert", 
+    type: "action", 
+    category: "database", 
+    description: "Inserts data into database tables",
+    createdAt: new Date('2024-01-04'),
+    updatedAt: new Date('2024-01-12'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['database', 'sql', 'insert']
+  },
+  { 
+    id: "db-update", 
+    name: "Database Update", 
+    type: "action", 
+    category: "database", 
+    description: "Updates existing database records",
+    createdAt: new Date('2024-01-04'),
+    updatedAt: new Date('2024-01-14'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['database', 'sql', 'update']
+  },
+  { 
+    id: "db-delete", 
+    name: "Database Delete", 
+    type: "action", 
+    category: "database", 
+    description: "Deletes records from database",
+    createdAt: new Date('2024-01-05'),
+    updatedAt: new Date('2024-01-16'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['database', 'sql', 'delete']
+  },
+  { 
+    id: "db-transaction", 
+    name: "Database Transaction", 
+    type: "action", 
+    category: "database", 
+    description: "Manages database transactions",
+    createdAt: new Date('2024-01-05'),
+    updatedAt: new Date('2024-01-22'),
+    isActive: true,
+    version: '1.6.0',
+    tags: ['database', 'transaction']
+  },
+  { 
+    id: "db-backup", 
+    name: "Database Backup", 
+    type: "action", 
+    category: "database", 
+    description: "Creates database backups",
+    createdAt: new Date('2024-01-06'),
+    updatedAt: new Date('2024-01-19'),
+    isActive: true,
+    version: '1.4.0',
+    tags: ['database', 'backup', 'maintenance']
+  },
+  
+  // API nodes
+  { 
+    id: "api-call", 
+    name: "API Call", 
+    type: "action", 
+    category: "api", 
+    description: "Makes HTTP requests to external APIs",
+    createdAt: new Date('2024-01-07'),
+    updatedAt: new Date('2024-01-21'),
+    isActive: true,
+    version: '2.1.0',
+    tags: ['api', 'http', 'integration']
+  },
+  { 
+    id: "webhook", 
+    name: "Webhook", 
+    type: "trigger", 
+    category: "api", 
+    description: "Receives webhook notifications",
+    createdAt: new Date('2024-01-07'),
+    updatedAt: new Date('2024-01-13'),
+    isActive: true,
+    version: '1.7.0',
+    tags: ['api', 'webhook', 'listener']
+  },
+  { 
+    id: "rest-api", 
+    name: "REST API", 
+    type: "action", 
+    category: "api", 
+    description: "Makes RESTful API calls",
+    createdAt: new Date('2024-01-08'),
+    updatedAt: new Date('2024-01-17'),
+    isActive: true,
+    version: '1.8.0',
+    tags: ['api', 'rest', 'http']
+  },
+  { 
+    id: "graphql-api", 
+    name: "GraphQL API", 
+    type: "action", 
+    category: "api", 
+    description: "Makes GraphQL API calls",
+    createdAt: new Date('2024-01-08'),
+    updatedAt: new Date('2024-01-23'),
+    isActive: true,
+    version: '1.9.0',
+    tags: ['api', 'graphql', 'query']
+  },
+  { 
+    id: "soap-api", 
+    name: "SOAP API", 
+    type: "action", 
+    category: "api", 
+    description: "Makes SOAP web service calls",
+    createdAt: new Date('2024-01-09'),
+    updatedAt: new Date('2024-01-11'),
+    isActive: true,
+    version: '1.3.0',
+    tags: ['api', 'soap', 'webservice']
+  },
+  { 
+    id: "oauth-auth", 
+    name: "OAuth Authentication", 
+    type: "action", 
+    category: "api", 
+    description: "Handles OAuth authentication flow",
+    createdAt: new Date('2024-01-09'),
+    updatedAt: new Date('2024-01-24'),
+    isActive: true,
+    version: '2.0.0',
+    tags: ['api', 'oauth', 'authentication']
+  },
+  
+  // Logic nodes
+  { 
+    id: "condition", 
+    name: "Condition", 
+    type: "logic", 
+    category: "logic", 
+    description: "Evaluates conditions and branches workflow",
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-25'),
+    isActive: true,
+    version: '1.4.0',
+    tags: ['logic', 'condition', 'branching']
+  },
+  { 
+    id: "switch", 
+    name: "Switch", 
+    type: "logic", 
+    category: "logic", 
+    description: "Multi-way conditional branching",
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-26'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['logic', 'switch', 'branching']
+  },
+  { 
+    id: "loop", 
+    name: "Loop", 
+    type: "logic", 
+    category: "logic", 
+    description: "Repeats actions for multiple items",
+    createdAt: new Date('2024-01-11'),
+    updatedAt: new Date('2024-01-27'),
+    isActive: true,
+    version: '1.6.0',
+    tags: ['logic', 'loop', 'iteration']
+  },
+  { 
+    id: "merge", 
+    name: "Merge", 
+    type: "logic", 
+    category: "logic", 
+    description: "Merges multiple data streams",
+    createdAt: new Date('2024-01-11'),
+    updatedAt: new Date('2024-01-28'),
+    isActive: true,
+    version: '1.7.0',
+    tags: ['logic', 'merge', 'data']
+  },
+  { 
+    id: "split", 
+    name: "Split", 
+    type: "logic", 
+    category: "logic", 
+    description: "Splits data into multiple streams",
+    createdAt: new Date('2024-01-12'),
+    updatedAt: new Date('2024-01-29'),
+    isActive: true,
+    version: '1.8.0',
+    tags: ['logic', 'split', 'data']
+  },
+  { 
+    id: "aggregate", 
+    name: "Aggregate", 
+    type: "logic", 
+    category: "logic", 
+    description: "Aggregates data from multiple sources",
+    createdAt: new Date('2024-01-12'),
+    updatedAt: new Date('2024-01-30'),
+    isActive: true,
+    version: '1.9.0',
+    tags: ['logic', 'aggregate', 'data']
+  },
+  
+  // Control nodes
+  { 
+    id: "delay", 
+    name: "Delay", 
+    type: "action", 
+    category: "control", 
+    description: "Pauses workflow execution for specified time",
+    createdAt: new Date('2024-01-13'),
+    updatedAt: new Date('2024-01-31'),
+    isActive: true,
+    version: '1.2.0',
+    tags: ['control', 'delay', 'timing']
+  },
+  { 
+    id: "schedule", 
+    name: "Schedule", 
+    type: "trigger", 
+    category: "control", 
+    description: "Triggers workflow at scheduled times",
+    createdAt: new Date('2024-01-13'),
+    updatedAt: new Date('2024-02-01'),
+    isActive: true,
+    version: '1.3.0',
+    tags: ['control', 'schedule', 'timing']
+  },
+  { 
+    id: "retry", 
+    name: "Retry", 
+    type: "action", 
+    category: "control", 
+    description: "Retries failed operations",
+    createdAt: new Date('2024-01-14'),
+    updatedAt: new Date('2024-02-02'),
+    isActive: true,
+    version: '1.4.0',
+    tags: ['control', 'retry', 'error-handling']
+  },
+  { 
+    id: "timeout", 
+    name: "Timeout", 
+    type: "action", 
+    category: "control", 
+    description: "Sets timeout for operations",
+    createdAt: new Date('2024-01-14'),
+    updatedAt: new Date('2024-02-03'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['control', 'timeout', 'error-handling']
+  },
+  { 
+    id: "parallel", 
+    name: "Parallel", 
+    type: "logic", 
+    category: "control", 
+    description: "Executes operations in parallel",
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-02-04'),
+    isActive: true,
+    version: '1.6.0',
+    tags: ['control', 'parallel', 'performance']
+  },
+  
+  // File nodes
+  { 
+    id: "file-read", 
+    name: "File Read", 
+    type: "action", 
+    category: "file", 
+    description: "Reads content from files",
+    createdAt: new Date('2024-01-16'),
+    updatedAt: new Date('2024-02-05'),
+    isActive: true,
+    version: '1.3.0',
+    tags: ['file', 'read', 'io']
+  },
+  { 
+    id: "file-write", 
+    name: "File Write", 
+    type: "action", 
+    category: "file", 
+    description: "Writes content to files",
+    createdAt: new Date('2024-01-16'),
+    updatedAt: new Date('2024-02-06'),
+    isActive: true,
+    version: '1.3.0',
+    tags: ['file', 'write', 'io']
+  },
+  { 
+    id: "file-process", 
+    name: "File Process", 
+    type: "action", 
+    category: "file", 
+    description: "Processes and transforms files",
+    createdAt: new Date('2024-01-17'),
+    updatedAt: new Date('2024-02-07'),
+    isActive: true,
+    version: '1.4.0',
+    tags: ['file', 'process', 'transform']
+  },
+  { 
+    id: "file-upload", 
+    name: "File Upload", 
+    type: "action", 
+    category: "file", 
+    description: "Uploads files to cloud storage",
+    createdAt: new Date('2024-01-17'),
+    updatedAt: new Date('2024-02-08'),
+    isActive: true,
+    version: '1.5.0',
+    tags: ['file', 'upload', 'cloud']
+  },
+  { 
+    id: "file-download", 
+    name: "File Download", 
+    type: "action", 
+    category: "file", 
+    description: "Downloads files from remote sources",
+    createdAt: new Date('2024-01-18'),
+    updatedAt: new Date('2024-02-09'),
+    isActive: true,
+    version: '1.6.0',
+    tags: ['file', 'download', 'remote']
+  },
+  { 
+    id: "file-compress", 
+    name: "File Compress", 
+    type: "action", 
+    category: "file", 
+    description: "Compresses files to reduce size",
+    createdAt: new Date('2024-01-18'),
+    updatedAt: new Date('2024-02-10'),
+    isActive: true,
+    version: '1.7.0',
+    tags: ['file', 'compress', 'optimization']
+  },
+  { 
+    id: "file-extract", 
+    name: "File Extract", 
+    type: "action", 
+    category: "file", 
+    description: "Extracts files from archives",
+    createdAt: new Date('2024-01-19'),
+    updatedAt: new Date('2024-02-11'),
+    isActive: true,
+    version: '1.8.0',
+    tags: ['file', 'extract', 'archive']
+  },
+];
+
+// Helper functions for node operations
+export const getNodeById = (id: string): Node | undefined => {
+  return mockNodes.find(node => node.id === id);
+};
+
+export const getNodesByCategory = (category: string): Node[] => {
+  return mockNodes.filter(node => node.category === category);
+};
+
+export const getNodesByType = (type: Node['type']): Node[] => {
+  return mockNodes.filter(node => node.type === type);
+};
+
+export const searchNodes = (query: string): Node[] => {
+  const lowercaseQuery = query.toLowerCase();
+  return mockNodes.filter(node => 
+    node.name.toLowerCase().includes(lowercaseQuery) ||
+    node.description.toLowerCase().includes(lowercaseQuery) ||
+    node.tags?.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+  );
+};
