@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { IconEye, IconCode, IconDownload, IconUpload, IconTrash } from "@tabler/icons-react";
 import { SurveyCreatorWrapper } from "./survey-creator";
 import { SurveyPreview } from "./survey-preview";
+import { getSampleConfiguration } from "@/data/sample-form-configurations";
 
 interface FormConfigurationManagerProps {
   initialJson?: any;
@@ -78,6 +79,16 @@ export function FormConfigurationManager({
     }
   }, [onJsonChanged]);
 
+  const handleLoadSample = useCallback((category: string) => {
+    const sampleConfig = getSampleConfiguration(category);
+    if (sampleConfig) {
+      setCurrentJson(sampleConfig);
+      if (onJsonChanged) {
+        onJsonChanged(sampleConfig);
+      }
+    }
+  }, [onJsonChanged]);
+
   const getFormStats = () => {
     if (!currentJson || !currentJson.elements) return { questions: 0, pages: 0 };
     
@@ -140,6 +151,13 @@ export function FormConfigurationManager({
               >
                 <IconTrash className="h-4 w-4" />
                 Clear
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleLoadSample('email')}
+              >
+                Load Sample
               </Button>
             </div>
           </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { Survey } from "survey-react-ui";
+import { Model } from "survey-core";
 import "survey-core/survey-core.css";
 
 interface SurveyPreviewProps {
@@ -19,43 +20,49 @@ export function SurveyPreview({
   className = "",
   readOnly = false,
 }: SurveyPreviewProps) {
-  const surveyRef = useRef<Survey>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Create survey model from JSON
+  const surveyModel = useMemo(() => {
+    if (!json || Object.keys(json).length === 0) {
+      return null;
+    }
 
-  useEffect(() => {
-    if (surveyRef.current && json) {
-      const survey = surveyRef.current;
-      
-      // Set the survey JSON
-      survey.fromJSON(json);
+    try {
+      const model = new Model(json);
       
       // Set read-only mode
       if (readOnly) {
-        survey.mode = "display";
+        model.mode = "display";
       }
 
       // Set up event handlers
       if (onComplete) {
-        survey.onComplete.add((sender, options) => {
+        model.onComplete.add((sender, options) => {
           onComplete(sender.data);
         });
       }
 
       if (onValueChanged) {
-        survey.onValueChanged.add((sender, options) => {
+        model.onValueChanged.add((sender, options) => {
           onValueChanged(sender.data);
         });
       }
 
-      setIsLoaded(true);
+      return model;
+    } catch (error) {
+      console.error('Error creating survey model:', error);
+      return null;
     }
   }, [json, onComplete, onValueChanged, readOnly]);
 
-  if (!json || !isLoaded) {
+  if (!surveyModel) {
     return (
       <div className={`survey-preview-container ${className}`}>
         <div className="flex items-center justify-center h-64 text-muted-foreground">
-          <p>No form configuration available</p>
+          <p>
+            {!json || Object.keys(json).length === 0 
+              ? "No form configuration available" 
+              : "Invalid form configuration"}
+          </p>
         </div>
       </div>
     );
@@ -63,7 +70,7 @@ export function SurveyPreview({
 
   return (
     <div className={`survey-preview-container ${className}`}>
-      <Survey ref={surveyRef} />
+      <Survey model={surveyModel} />
     </div>
   );
 }
