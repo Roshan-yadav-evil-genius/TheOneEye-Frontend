@@ -30,8 +30,16 @@ interface WorkflowCanvasProps {
   showMinimap: boolean;
 }
 
+// Wrapper component to pass delete callback to CustomNode
+const CustomNodeWrapper = memo((props: any) => {
+  const { data, ...nodeProps } = props;
+  const { onDeleteNode, ...nodeData } = data || {};
+  console.log('CustomNodeWrapper received props:', { data, nodeProps, onDeleteNode });
+  return <CustomNode {...nodeProps} data={nodeData} onDelete={onDeleteNode} />;
+});
+
 const nodeTypes: NodeTypes = {
-  custom: memo(CustomNode),
+  custom: CustomNodeWrapper,
 };
 
 // Initial nodes and edges for the workflow
@@ -177,6 +185,14 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
     [setEdges, edges, lineType]
   );
 
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    // Remove the node
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    
+    // Remove all edges connected to this node
+    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+  }, [setNodes, setEdges]);
+
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -241,13 +257,17 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
     });
   }, [nodes, searchTerm, filters]);
 
-  // Update node selection
+  // Update node selection and add delete callback
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
       ...node,
       selected: selectedNodes.includes(node.id),
+      data: {
+        ...node.data,
+        onDeleteNode: handleDeleteNode,
+      },
     }));
-  }, [nodes, selectedNodes]);
+  }, [nodes, selectedNodes, handleDeleteNode]);
 
   return (
     <div className="h-full w-full relative" ref={reactFlowWrapper}>

@@ -32,6 +32,7 @@ interface CustomNodeProps {
     description?: string;
   };
   selected?: boolean;
+  onDelete?: (nodeId: string) => void;
 }
 
 const nodeIcons = {
@@ -46,7 +47,7 @@ const nodeIcons = {
 };
 
 
-export function CustomNode({ id, data, selected }: CustomNodeProps) {
+export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [userDescription, setUserDescription] = useState(data.description || "");
@@ -62,7 +63,12 @@ export function CustomNode({ id, data, selected }: CustomNodeProps) {
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(`Deleting node: ${data.label}`);
+    console.log('Delete button clicked for node:', id, 'onDelete function:', onDelete);
+    if (onDelete) {
+      onDelete(id);
+    } else {
+      console.log('onDelete function is not available');
+    }
   };
 
   const handleShutdown = (e: React.MouseEvent) => {
