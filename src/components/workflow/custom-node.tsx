@@ -23,8 +23,8 @@ import {
 } from "@tabler/icons-react";
 
 interface CustomNodeProps {
+  id: string;
   data: {
-    id: string;
     label: string;
     type: string;
     status: string;
@@ -46,7 +46,7 @@ const nodeIcons = {
 };
 
 
-export function CustomNode({ data, selected }: CustomNodeProps) {
+export function CustomNode({ id, data, selected }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [userDescription, setUserDescription] = useState(data.description || "");
@@ -232,7 +232,7 @@ export function CustomNode({ data, selected }: CustomNodeProps) {
       <NodeEditDialog
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        nodeData={data}
+        nodeData={{ id, ...data }}
         onSave={handleSaveEdit}
       />
     </div>

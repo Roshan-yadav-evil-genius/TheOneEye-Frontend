@@ -213,7 +213,6 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
           type: 'custom',
           position,
           data: {
-            id: `${nodeData.id}-${Date.now()}`, // Store the unique ID in data
             label: nodeData.name,
             type: nodeData.type,
             status: 'active',
