@@ -180,7 +180,7 @@ export function FormConfigurationManager({
             </TabsList>
             
             <TabsContent value="designer" className="mt-4">
-              <div className="border rounded-lg overflow-hidden h-[800px]">
+              <div className="border rounded-lg overflow-hidden h-[900px]">
                 <SurveyCreatorWrapper
                   initialJson={currentJson}
                   onJsonChanged={handleJsonChanged}
@@ -191,7 +191,7 @@ export function FormConfigurationManager({
             </TabsContent>
             
             <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-lg overflow-hidden h-[800px]">
+              <div className="border rounded-lg overflow-hidden h-[900px]">
                 <SurveyPreview
                   json={currentJson}
                   onValueChanged={setPreviewData}
@@ -202,7 +202,7 @@ export function FormConfigurationManager({
             
             <TabsContent value="json" className="mt-4">
               <div className="border rounded-lg overflow-hidden">
-                <pre className="p-4 bg-muted text-sm overflow-auto max-h-[800px]">
+                <pre className="p-4 bg-muted text-sm overflow-auto max-h-[900px]">
                   {JSON.stringify(currentJson, null, 2)}
                 </pre>
               </div>
