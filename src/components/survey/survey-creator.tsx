@@ -5,6 +5,25 @@ import { SurveyCreator, SurveyCreatorComponent } from "survey-creator-react";
 import "survey-creator-core/survey-creator-core.css";
 import "survey-core/survey-core.css";
 
+// Custom styles to ensure SurveyJS Creator takes full height
+const customStyles = `
+  .survey-creator-container .svc-creator {
+    height: 100% !important;
+  }
+  .survey-creator-container .svc-creator .svc-creator__content {
+    height: 100% !important;
+  }
+  .survey-creator-container .svc-creator .svc-creator__designer {
+    height: 100% !important;
+  }
+  .survey-creator-container .svc-creator .svc-creator__designer .svc-designer {
+    height: 100% !important;
+  }
+  .survey-creator-container .svc-creator .svc-creator__designer .svc-designer .svc-designer__content {
+    height: 100% !important;
+  }
+`;
+
 interface SurveyCreatorWrapperProps {
   initialJson?: any;
   onJsonChanged?: (json: any) => void;
@@ -44,6 +63,12 @@ export function SurveyCreatorWrapper({
   // Create the creator instance only once
   useEffect(() => {
     console.log('Creating SurveyCreator instance...');
+    
+    // Inject custom styles
+    const styleElement = document.createElement('style');
+    styleElement.setAttribute('data-survey-creator-styles', 'true');
+    styleElement.textContent = customStyles;
+    document.head.appendChild(styleElement);
     
     // Create SurveyCreator instance
     const creator = new SurveyCreator({
@@ -93,6 +118,11 @@ export function SurveyCreatorWrapper({
         creatorRef.current.dispose();
         creatorRef.current = null;
       }
+      // Remove custom styles
+      const existingStyle = document.querySelector('style[data-survey-creator-styles]');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
     };
   }, []); // Empty dependency array - only run once
 
@@ -106,7 +136,7 @@ export function SurveyCreatorWrapper({
   if (!isLoaded || !creatorRef.current) {
     return (
       <div className={`survey-creator-container ${className}`}>
-        <div className="flex items-center justify-center h-64 text-muted-foreground">
+        <div className="flex items-center justify-center h-96 text-muted-foreground">
           <p>Loading form creator...</p>
         </div>
       </div>
@@ -114,12 +144,14 @@ export function SurveyCreatorWrapper({
   }
 
   return (
-    <div className={`survey-creator-container ${className}`}>
+    <div className={`survey-creator-container ${className}`} style={{ height: '100%' }}>
       {creatorRef.current && (
-        <SurveyCreatorComponent 
-          key="survey-creator" 
-          creator={creatorRef.current} 
-        />
+        <div style={{ height: '100%' }}>
+          <SurveyCreatorComponent 
+            key="survey-creator" 
+            creator={creatorRef.current} 
+          />
+        </div>
       )}
     </div>
   );

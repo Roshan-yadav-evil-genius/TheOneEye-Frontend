@@ -57,7 +57,7 @@ export function SurveyPreview({
   if (!surveyModel) {
     return (
       <div className={`survey-preview-container ${className}`}>
-        <div className="flex items-center justify-center h-64 text-muted-foreground">
+        <div className="flex items-center justify-center h-96 text-muted-foreground">
           <p>
             {!json || Object.keys(json).length === 0 
               ? "No form configuration available" 
@@ -69,8 +69,10 @@ export function SurveyPreview({
   }
 
   return (
-    <div className={`survey-preview-container ${className}`}>
-      <Survey model={surveyModel} />
+    <div className={`survey-preview-container ${className}`} style={{ height: '100%' }}>
+      <div style={{ height: '100%' }}>
+        <Survey model={surveyModel} />
+      </div>
     </div>
   );
 }
