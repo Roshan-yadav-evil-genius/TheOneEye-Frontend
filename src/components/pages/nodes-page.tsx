@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -62,11 +63,11 @@ import { mockNodes, Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { getNodeColors } from "@/constants/node-styles";
 
 export function NodesPage() {
+  const router = useRouter();
   const [nodes, setNodes] = useState<Node[]>(mockNodes);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -168,24 +169,6 @@ export function NodesPage() {
     file: IconFileText,
   };
 
-  const handleCreateNode = () => {
-    const newNode: Node = {
-      id: `node-${Date.now()}`,
-      name: editingNode.name || "New Node",
-      type: editingNode.type || "action",
-      category: editingNode.category || "system",
-      description: editingNode.description || "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
-      version: "1.0.0",
-      tags: editingNode.tags || [],
-    };
-
-    setNodes(prev => [...prev, newNode]);
-    setIsCreateDialogOpen(false);
-    setEditingNode({});
-  };
 
   const handleUpdateNode = () => {
     if (!selectedNode) return;
@@ -242,7 +225,7 @@ export function NodesPage() {
             Manage and configure workflow nodes
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
+        <Button onClick={() => router.push("/nodes/create")}>
           <IconPlus className="h-4 w-4 mr-2" />
           Create Node
         </Button>
@@ -569,107 +552,6 @@ export function NodesPage() {
         </CardContent>
       </Card>
 
-      {/* Create Node Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create New Node</DialogTitle>
-            <DialogDescription>
-              Add a new node to your workflow system.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={editingNode.name || ""}
-                  onChange={(e) => setEditingNode(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Node name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="version">Version</Label>
-                <Input
-                  id="version"
-                  value={editingNode.version || "1.0.0"}
-                  onChange={(e) => setEditingNode(prev => ({ ...prev, version: e.target.value }))}
-                  placeholder="1.0.0"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="type">Type</Label>
-                <Select 
-                  value={editingNode.type || "action"} 
-                  onValueChange={(value) => setEditingNode(prev => ({ ...prev, type: value as Node['type'] }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {nodeTypes.map(type => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Select 
-                  value={editingNode.category || "system"} 
-                  onValueChange={(value) => setEditingNode(prev => ({ ...prev, category: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {nodeCategories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={editingNode.description || ""}
-                onChange={(e) => setEditingNode(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Node description"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="tags">Tags (comma-separated)</Label>
-              <Input
-                id="tags"
-                value={editingNode.tags?.join(", ") || ""}
-                onChange={(e) => setEditingNode(prev => ({ 
-                  ...prev, 
-                  tags: e.target.value.split(",").map(tag => tag.trim()).filter(Boolean)
-                }))}
-                placeholder="tag1, tag2, tag3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreateNode}>
-              Create Node
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Node Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

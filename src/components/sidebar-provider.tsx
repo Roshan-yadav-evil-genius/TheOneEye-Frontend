@@ -27,6 +27,7 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
                          pathname.startsWith('/capture') || 
                          pathname.startsWith('/prompts') || 
                          pathname.startsWith('/team') || 
+                         pathname.startsWith('/nodes') || 
                          pathname.startsWith('/help') || 
                          pathname.startsWith('/data-library') || 
                          pathname.startsWith('/word-assistant') || 
