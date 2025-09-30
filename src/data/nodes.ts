@@ -11,6 +11,7 @@ export interface Node {
   isActive?: boolean;
   version?: string;
   tags?: string[];
+  formConfiguration?: Record<string, unknown>; // SurveyJS form configuration JSON
 }
 
 export const nodeTypes = ['trigger', 'action', 'logic', 'system'] as const;
