@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { InputSection } from "./input-section";
@@ -132,6 +133,9 @@ export function NodeEditDialog({
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label} (ID: {nodeData.id})</DialogTitle>
+          <DialogDescription>
+            Configure the parameters and settings for the {nodeData.type} node "{nodeData.label}".
+          </DialogDescription>
         </VisuallyHidden>
         <DndContext>
           <div className="flex flex-col h-full overflow-hidden">

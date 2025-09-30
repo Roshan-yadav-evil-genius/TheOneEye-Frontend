@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect, memo } from "react";
 import ReactFlow, {
   Node,
   Edge,
@@ -31,7 +31,7 @@ interface WorkflowCanvasProps {
 }
 
 const nodeTypes: NodeTypes = {
-  custom: CustomNode,
+  custom: memo(CustomNode),
 };
 
 // Initial nodes and edges for the workflow
