@@ -32,11 +32,14 @@ export function FormConfigurationManager({
   const { validateConfiguration, testConfiguration, exportConfiguration } = useFormStore();
 
   const handleJsonChanged = useCallback((json: any) => {
-    setCurrentJson(json);
-    if (onJsonChanged) {
-      onJsonChanged(json);
+    // Only update if the JSON is actually different to prevent unnecessary re-renders
+    if (JSON.stringify(currentJson) !== JSON.stringify(json)) {
+      setCurrentJson(json);
+      if (onJsonChanged) {
+        onJsonChanged(json);
+      }
     }
-  }, [onJsonChanged]);
+  }, [onJsonChanged, currentJson]);
 
   const handleSave = useCallback(async () => {
     try {
@@ -213,6 +216,7 @@ export function FormConfigurationManager({
             <TabsContent value="designer" className="mt-4">
               <div className="border rounded-lg overflow-hidden h-[900px]">
                 <SurveyCreatorWrapper
+                  key={`designer-${activeTab}`}
                   initialJson={currentJson}
                   onJsonChanged={handleJsonChanged}
                   onSurveySaved={handleSave}

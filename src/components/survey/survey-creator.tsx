@@ -60,62 +60,76 @@ export function SurveyCreatorWrapper({
     callbacksRef.current = { onJsonChanged, onSurveySaved };
   }, [onJsonChanged, onSurveySaved]);
 
-  // Create the creator instance only once
+  // Create the creator instance
   useEffect(() => {
     console.log('Creating SurveyCreator instance...');
     
-    // Inject custom styles
-    const styleElement = document.createElement('style');
-    styleElement.setAttribute('data-survey-creator-styles', 'true');
-    styleElement.textContent = customStyles;
-    document.head.appendChild(styleElement);
-    
-    // Create SurveyCreator instance
-    const creator = new SurveyCreator({
-      showDesignerTab,
-      showTestSurveyTab,
-      showEmbededSurveyTab,
-      showJSONEditorTab,
-      showTranslationTab,
-      showLogicTab,
-      isAutoSave: true,
-      readOnly,
-    });
+    try {
+      // Inject custom styles
+      const styleElement = document.createElement('style');
+      styleElement.setAttribute('data-survey-creator-styles', 'true');
+      styleElement.textContent = customStyles;
+      document.head.appendChild(styleElement);
+      
+      // Create SurveyCreator instance
+      const creator = new SurveyCreator({
+        showDesignerTab,
+        showTestSurveyTab,
+        showEmbededSurveyTab,
+        showJSONEditorTab,
+        showTranslationTab,
+        showLogicTab,
+        isAutoSave: true,
+        readOnly,
+      });
 
-    // Set initial JSON if provided
-    if (initialJson) {
-      creator.JSON = initialJson;
+      // Set initial JSON if provided
+      if (initialJson) {
+        creator.JSON = initialJson;
+      }
+
+      // Set up event handlers
+      creator.onSurveyInstanceCreated.add((sender, options) => {
+        // You can customize the survey instance here if needed
+      });
+
+      creator.onModified.add((sender, options) => {
+        const { onJsonChanged } = callbacksRef.current;
+        if (onJsonChanged) {
+          // Use a small delay to prevent rapid-fire updates
+          setTimeout(() => {
+            if (creatorRef.current) {
+              onJsonChanged(creatorRef.current.JSON);
+            }
+          }, 100);
+        }
+      });
+
+      // Track state changes to detect when survey is saved
+      creator.onStateChanged.add((sender, options) => {
+        const { onSurveySaved } = callbacksRef.current;
+        if (options.newState === "saved" && onSurveySaved) {
+          onSurveySaved(creator.JSON);
+        }
+      });
+
+      creatorRef.current = creator;
+      setIsLoaded(true);
+      console.log('SurveyCreator instance created and loaded');
+    } catch (error) {
+      console.error('Error creating SurveyCreator instance:', error);
+      setIsLoaded(false);
     }
-
-    // Set up event handlers
-    creator.onSurveyInstanceCreated.add((sender, options) => {
-      // You can customize the survey instance here if needed
-    });
-
-    creator.onModified.add((sender, options) => {
-      const { onJsonChanged } = callbacksRef.current;
-      if (onJsonChanged) {
-        onJsonChanged(creator.JSON);
-      }
-    });
-
-    // Track state changes to detect when survey is saved
-    creator.onStateChanged.add((sender, options) => {
-      const { onSurveySaved } = callbacksRef.current;
-      if (options.newState === "saved" && onSurveySaved) {
-        onSurveySaved(creator.JSON);
-      }
-    });
-
-    creatorRef.current = creator;
-    setIsLoaded(true);
-    console.log('SurveyCreator instance created and loaded');
 
     // Cleanup function
     return () => {
       console.log('Disposing SurveyCreator instance...');
       if (creatorRef.current) {
-        creatorRef.current.dispose();
+        try {
+          creatorRef.current.dispose();
+        } catch (error) {
+          console.error('Error disposing SurveyCreator instance:', error);
+        }
         creatorRef.current = null;
       }
       // Remove custom styles
@@ -124,12 +138,24 @@ export function SurveyCreatorWrapper({
         existingStyle.remove();
       }
     };
-  }, []); // Empty dependency array - only run once
+  }, [
+    showDesignerTab,
+    showTestSurveyTab,
+    showEmbededSurveyTab,
+    showJSONEditorTab,
+    showTranslationTab,
+    showLogicTab,
+    readOnly
+  ]); // Don't include initialJson to prevent recreation on every change
 
-  // Update JSON when initialJson prop changes
+  // Update JSON when initialJson prop changes (only if different)
   useEffect(() => {
     if (creatorRef.current && initialJson !== undefined) {
-      creatorRef.current.JSON = initialJson;
+      const currentJson = creatorRef.current.JSON;
+      // Only update if the JSON is actually different to prevent unnecessary re-renders
+      if (JSON.stringify(currentJson) !== JSON.stringify(initialJson)) {
+        creatorRef.current.JSON = initialJson;
+      }
     }
   }, [initialJson]);
 
@@ -148,8 +174,8 @@ export function SurveyCreatorWrapper({
       {creatorRef.current && (
         <div style={{ height: '100%' }}>
           <SurveyCreatorComponent 
-            key="survey-creator" 
-            creator={creatorRef.current} 
+            key={`survey-creator-${isLoaded}`} 
+            creator={creatorRef.current}
           />
         </div>
       )}

@@ -48,8 +48,11 @@ export function CreateNodePage() {
   };
 
   const handleFormConfigurationChange = useCallback((json: any) => {
-    setFormData(prev => ({ ...prev, formConfiguration: json }));
-  }, []);
+    // Only update if the JSON is actually different to prevent unnecessary re-renders
+    if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
+      setFormData(prev => ({ ...prev, formConfiguration: json }));
+    }
+  }, [formData.formConfiguration]);
 
   // Set active page on mount
   useEffect(() => {
