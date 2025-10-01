@@ -193,30 +193,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const mockWorkflows: Workflow[] = [
-            {
-              id: 'workflow-1',
-              name: 'Email Marketing Campaign',
-              description: 'Automated email marketing workflow',
-              nodes: [],
-              connections: [],
-              status: 'draft',
-              createdAt: new Date('2024-01-01'),
-              updatedAt: new Date('2024-01-01'),
-              createdBy: 'user-1',
-            },
-            {
-              id: 'workflow-2',
-              name: 'Data Processing Pipeline',
-              description: 'Process and analyze incoming data',
-              nodes: [],
-              connections: [],
-              status: 'active',
-              createdAt: new Date('2024-01-02'),
-              updatedAt: new Date('2024-01-02'),
-              createdBy: 'user-1',
-            },
-          ];
+          // Import mock data from dummy folder
+          const { mockWorkflowsStore } = await import('@/dummy');
+          const mockWorkflows = mockWorkflowsStore;
 
           set({
             workflows: mockWorkflows,

@@ -182,60 +182,9 @@ export const useNodesStore = create<NodesStore>()(
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const mockNodes: Node[] = [
-            {
-              id: 'node-1',
-              name: 'Email Sender',
-              type: 'action',
-              category: 'system',
-              description: 'Sends emails to specified recipients',
-              version: '1.0.0',
-              tags: ['email', 'communication'],
-              formConfiguration: {
-                title: 'Email Configuration',
-                elements: [
-                  {
-                    type: 'text',
-                    name: 'recipient',
-                    title: 'Recipient Email',
-                    isRequired: true,
-                  },
-                  {
-                    type: 'text',
-                    name: 'subject',
-                    title: 'Email Subject',
-                    isRequired: true,
-                  },
-                ],
-              },
-              createdAt: new Date('2024-01-01'),
-              updatedAt: new Date('2024-01-01'),
-              isActive: true,
-            },
-            {
-              id: 'node-2',
-              name: 'Database Query',
-              type: 'action',
-              category: 'system',
-              description: 'Executes database queries',
-              version: '1.0.0',
-              tags: ['database', 'query'],
-              formConfiguration: {
-                title: 'Database Configuration',
-                elements: [
-                  {
-                    type: 'text',
-                    name: 'query',
-                    title: 'SQL Query',
-                    isRequired: true,
-                  },
-                ],
-              },
-              createdAt: new Date('2024-01-02'),
-              updatedAt: new Date('2024-01-02'),
-              isActive: true,
-            },
-          ];
+          // Import mock data from dummy folder
+          const { mockNodesStore } = await import('@/dummy');
+          const mockNodes = mockNodesStore;
 
           set({
             nodes: mockNodes,
