@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +18,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconArrowLeft, IconPlus, IconSettings, IconForms } from "@tabler/icons-react";
 import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { FormConfigurationManager } from "@/components/survey/form-configuration-manager";
+import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 
 export function CreateNodePage() {
   const router = useRouter();
-  const [isCreating, setIsCreating] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [formData, setFormData] = useState<Partial<Node>>({
     name: "",
@@ -32,6 +32,11 @@ export function CreateNodePage() {
     tags: [],
     formConfiguration: {},
   });
+
+  // Zustand store hooks
+  const { createNode, isLoading: isCreatingNode, error: nodeError } = useNodesStore();
+  const { createFormConfiguration, isLoading: isCreatingForm } = useFormStore();
+  const { setActivePage } = useUIStore();
 
   const handleInputChange = (field: keyof Node, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -46,38 +51,49 @@ export function CreateNodePage() {
     setFormData(prev => ({ ...prev, formConfiguration: json }));
   }, []);
 
+  // Set active page on mount
+  useEffect(() => {
+    setActivePage("Create Node");
+  }, [setActivePage]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsCreating(true);
 
     try {
-      // Here you would typically make an API call to create the node
-      // For now, we'll simulate the creation
-      const newNode: Node = {
-        id: `node-${Date.now()}`,
+      // Create the node using Zustand store
+      const newNode = await createNode({
         name: formData.name || "New Node",
-        type: formData.type || "action",
+        type: (formData.type || "action") as Node['type'],
         category: formData.category || "system",
         description: formData.description || "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isActive: true,
         version: formData.version || "1.0.0",
         tags: formData.tags || [],
         formConfiguration: formData.formConfiguration || {},
-      };
+        isActive: true,
+      });
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Create associated form configuration if it exists
+      if (formData.formConfiguration && Object.keys(formData.formConfiguration).length > 0) {
+        await createFormConfiguration({
+          name: `${formData.name} Configuration`,
+          description: `Form configuration for ${formData.name}`,
+          json: formData.formConfiguration,
+          nodeId: newNode.id,
+        });
+      }
+
+      // Show success notification
+      uiHelpers.showSuccess("Success!", "Node created successfully");
 
       // Navigate back to nodes page after successful creation
       router.push("/nodes");
     } catch (error) {
       console.error("Error creating node:", error);
-    } finally {
-      setIsCreating(false);
+      uiHelpers.showError("Error", "Failed to create node. Please try again.");
     }
   };
+
+  const isCreating = isCreatingNode || isCreatingForm;
 
   return (
     <div className="space-y-6">

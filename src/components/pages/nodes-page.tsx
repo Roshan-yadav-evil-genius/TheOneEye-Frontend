@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,16 +61,29 @@ import {
 } from "@tabler/icons-react";
 import { mockNodes, Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { getNodeColors } from "@/constants/node-styles";
+import { useNodesStore, useUIStore, uiHelpers, storeSelectors } from "@/stores";
 
 export function NodesPage() {
   const router = useRouter();
-  const [nodes, setNodes] = useState<Node[]>(mockNodes);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  
+  // Zustand store hooks
+  const { 
+    nodes, 
+    loadNodes, 
+    updateNode, 
+    deleteNode, 
+    isLoading, 
+    error,
+    filters,
+    setFilters,
+    selectNode,
+    selectedNode: storeSelectedNode
+  } = useNodesStore();
+  const { setActivePage } = useUIStore();
+
+  // Local state for UI
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [editingNode, setEditingNode] = useState<Partial<Node>>({});
   
   // Table state
@@ -79,20 +92,19 @@ export function NodesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Filter and sort nodes
+  // Load nodes on component mount
+  useEffect(() => {
+    loadNodes();
+    setActivePage("Nodes");
+  }, [loadNodes, setActivePage]);
+
+  // Filter and sort nodes using store selectors
   const filteredAndSortedNodes = useMemo(() => {
-    let filtered = nodes.filter(node => {
-      const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           node.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           node.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = selectedCategory === "all" || node.category === selectedCategory;
-      const matchesType = selectedType === "all" || node.type === selectedType;
-      
-      return matchesSearch && matchesCategory && matchesType;
-    });
+    // Use store selectors for filtering
+    let filtered = storeSelectors.getFilteredNodes();
 
     // Sort nodes
-    filtered.sort((a, b) => {
+    filtered.sort((a: Node, b: Node) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
       
@@ -118,7 +130,7 @@ export function NodesPage() {
     });
 
     return filtered;
-  }, [nodes, searchTerm, selectedCategory, selectedType, sortField, sortDirection]);
+  }, [nodes, filters, sortField, sortDirection]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedNodes.length / itemsPerPage);
@@ -138,17 +150,17 @@ export function NodesPage() {
 
   // Reset pagination when filters change
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
+    setFilters({ search: value || undefined });
     setCurrentPage(1);
   };
 
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+    setFilters({ category: value === "all" ? undefined : value });
     setCurrentPage(1);
   };
 
   const handleTypeChange = (value: string) => {
-    setSelectedType(value);
+    setFilters({ type: value === "all" ? undefined : value });
     setCurrentPage(1);
   };
 
@@ -170,39 +182,41 @@ export function NodesPage() {
   };
 
 
-  const handleUpdateNode = () => {
-    if (!selectedNode) return;
+  const handleUpdateNode = async () => {
+    if (!storeSelectedNode) return;
 
-    const updatedNode = {
-      ...selectedNode,
-      ...editingNode,
-      updatedAt: new Date(),
-    };
-
-    setNodes(prev => prev.map(node => 
-      node.id === selectedNode.id ? updatedNode : node
-    ));
-    setIsEditDialogOpen(false);
-    setSelectedNode(null);
-    setEditingNode({});
+    try {
+      await updateNode(storeSelectedNode.id, editingNode);
+      uiHelpers.showSuccess("Success!", "Node updated successfully");
+      setIsEditDialogOpen(false);
+      selectNode(null);
+      setEditingNode({});
+    } catch (error) {
+      uiHelpers.showError("Error", "Failed to update node. Please try again.");
+    }
   };
 
-  const handleDeleteNode = () => {
-    if (!selectedNode) return;
+  const handleDeleteNode = async () => {
+    if (!storeSelectedNode) return;
 
-    setNodes(prev => prev.filter(node => node.id !== selectedNode.id));
-    setIsDeleteDialogOpen(false);
-    setSelectedNode(null);
+    try {
+      await deleteNode(storeSelectedNode.id);
+      uiHelpers.showSuccess("Success!", "Node deleted successfully");
+      setIsDeleteDialogOpen(false);
+      selectNode(null);
+    } catch (error) {
+      uiHelpers.showError("Error", "Failed to delete node. Please try again.");
+    }
   };
 
   const openEditDialog = (node: Node) => {
-    setSelectedNode(node);
+    selectNode(node);
     setEditingNode(node);
     setIsEditDialogOpen(true);
   };
 
   const openDeleteDialog = (node: Node) => {
-    setSelectedNode(node);
+    selectNode(node);
     setIsDeleteDialogOpen(true);
   };
 
@@ -243,13 +257,13 @@ export function NodesPage() {
                 <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search nodes..."
-                  value={searchTerm}
+                  value={filters.search || ""}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-9"
                 />
               </div>
             </div>
-            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+            <Select value={filters.category || "all"} onValueChange={handleCategoryChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -262,7 +276,7 @@ export function NodesPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={selectedType} onValueChange={handleTypeChange}>
+            <Select value={filters.type || "all"} onValueChange={handleTypeChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
@@ -409,7 +423,7 @@ export function NodesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedNodes.map((node) => {
+                {paginatedNodes.map((node: Node) => {
                   const { colorClass } = getNodeColors(node.type);
                   
                   return (
@@ -453,7 +467,7 @@ export function NodesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1 max-w-[150px]">
-                          {node.tags?.slice(0, 2).map((tag, index) => (
+                          {node.tags?.slice(0, 2).map((tag: string, index: number) => (
                             <Badge key={index} variant="secondary" className="text-xs">
                               <IconTag className="h-3 w-3 mr-1" />
                               {tag}
@@ -661,7 +675,7 @@ export function NodesPage() {
           <DialogHeader>
             <DialogTitle>Delete Node</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedNode?.name}"? This action cannot be undone.
+              Are you sure you want to delete "{storeSelectedNode?.name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

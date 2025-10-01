@@ -6,6 +6,7 @@ import { SidebarProviderWrapper } from "@/components/sidebar-provider";
 import { PageTitleProvider } from "@/contexts/page-title-context";
 import { AlertProvider } from "@/contexts/alert-context";
 import { Toaster } from "sonner";
+import { StoreInitializer } from "@/components/store-initializer";
 
 
 export const metadata: Metadata = {
@@ -30,19 +31,21 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <AlertProvider>
-              <PageTitleProvider>
-                <SidebarProviderWrapper>
-                  {children}
-                  <Toaster 
-                    position="top-right"
-                    expand={true}
-                    richColors={true}
-                    closeButton={true}
-                  />
-                </SidebarProviderWrapper>
-              </PageTitleProvider>
-            </AlertProvider>
+            <StoreInitializer>
+              <AlertProvider>
+                <PageTitleProvider>
+                  <SidebarProviderWrapper>
+                    {children}
+                    <Toaster 
+                      position="top-right"
+                      expand={true}
+                      richColors={true}
+                      closeButton={true}
+                    />
+                  </SidebarProviderWrapper>
+                </PageTitleProvider>
+              </AlertProvider>
+            </StoreInitializer>
           </ThemeProvider>
         </body>
       </html>

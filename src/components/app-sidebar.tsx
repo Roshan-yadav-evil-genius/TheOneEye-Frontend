@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link"
+import { useUserStore, useUIStore } from "@/stores"
 
 const data = {
   user: {
@@ -159,8 +160,22 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // Zustand store hooks
+  const { user } = useUserStore();
+  const { sidebarOpen, setSidebarOpen } = useUIStore();
+
+  // Use store user data if available, fallback to static data
+  const userData = user ? {
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar || "/avatars/shadcn.jpg"
+  } : data.user;
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar 
+      collapsible="offcanvas" 
+      {...props}
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -183,7 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )

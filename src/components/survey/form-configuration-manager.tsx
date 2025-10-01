@@ -9,6 +9,7 @@ import { IconEye, IconCode, IconDownload, IconUpload, IconTrash } from "@tabler/
 import { SurveyCreatorWrapper } from "./survey-creator";
 import { SurveyPreview } from "./survey-preview";
 import { getSampleConfiguration } from "@/data/sample-form-configurations";
+import { useFormStore, uiHelpers } from "@/stores";
 
 interface FormConfigurationManagerProps {
   initialJson?: any;
@@ -27,6 +28,9 @@ export function FormConfigurationManager({
   const [activeTab, setActiveTab] = useState("designer");
   const [previewData, setPreviewData] = useState<any>(null);
 
+  // Zustand store hooks
+  const { validateConfiguration, testConfiguration, exportConfiguration } = useFormStore();
+
   const handleJsonChanged = useCallback((json: any) => {
     setCurrentJson(json);
     if (onJsonChanged) {
@@ -34,23 +38,50 @@ export function FormConfigurationManager({
     }
   }, [onJsonChanged]);
 
-  const handleSave = useCallback(() => {
-    if (onSave) {
-      onSave(currentJson);
-    }
-  }, [currentJson, onSave]);
+  const handleSave = useCallback(async () => {
+    try {
+      // Validate configuration before saving
+      const validation = await validateConfiguration({
+        id: 'temp',
+        name: 'Form Configuration',
+        description: '',
+        json: currentJson,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-  const handleDownload = useCallback(() => {
-    const dataStr = JSON.stringify(currentJson, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = 'form-configuration.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  }, [currentJson]);
+      if (!validation.isValid) {
+        uiHelpers.showError('Validation Error', validation.errors.join(', '));
+        return;
+      }
+
+      if (onSave) {
+        onSave(currentJson);
+      }
+      
+      uiHelpers.showSuccess('Success', 'Form configuration saved successfully');
+    } catch (error) {
+      uiHelpers.showError('Error', 'Failed to save form configuration');
+    }
+  }, [currentJson, onSave, validateConfiguration]);
+
+  const handleDownload = useCallback(async () => {
+    try {
+      const jsonString = await exportConfiguration('temp');
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(jsonString);
+      
+      const exportFileDefaultName = 'form-configuration.json';
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      uiHelpers.showSuccess('Success', 'Form configuration exported successfully');
+    } catch (error) {
+      uiHelpers.showError('Error', 'Failed to export form configuration');
+    }
+  }, [currentJson, exportConfiguration]);
 
   const handleUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
