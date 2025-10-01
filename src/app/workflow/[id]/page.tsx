@@ -1,11 +1,12 @@
 import { WorkflowLayout } from "@/components/workflow/workflow-layout"
 
 interface WorkflowPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default function WorkflowPage({ params }: WorkflowPageProps) {
-  return <WorkflowLayout workflowId={params.id} />
+export default async function WorkflowPage({ params }: WorkflowPageProps) {
+  const { id } = await params
+  return <WorkflowLayout workflowId={id} />
 }
