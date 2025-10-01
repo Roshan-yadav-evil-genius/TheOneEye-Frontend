@@ -4,6 +4,7 @@ import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/sidebar-provider";
 import { PageTitleProvider } from "@/contexts/page-title-context";
+import { AlertProvider } from "@/contexts/alert-context";
 import { Toaster } from "sonner";
 
 
@@ -29,17 +30,19 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <PageTitleProvider>
-              <SidebarProviderWrapper>
-                {children}
-                <Toaster 
-                  position="top-right"
-                  expand={true}
-                  richColors={true}
-                  closeButton={true}
-                />
-              </SidebarProviderWrapper>
-            </PageTitleProvider>
+            <AlertProvider>
+              <PageTitleProvider>
+                <SidebarProviderWrapper>
+                  {children}
+                  <Toaster 
+                    position="top-right"
+                    expand={true}
+                    richColors={true}
+                    closeButton={true}
+                  />
+                </SidebarProviderWrapper>
+              </PageTitleProvider>
+            </AlertProvider>
           </ThemeProvider>
         </body>
       </html>

@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { ToastDemo } from "@/components/toast-demo"
+import { AlertDemo } from "@/components/alert-demo"
 
 export default function Page() {
   return (
@@ -14,6 +15,7 @@ export default function Page() {
           </div>
           
           <ToastDemo />
+          <AlertDemo />
         </div>
       </div>
     </DashboardLayout>
