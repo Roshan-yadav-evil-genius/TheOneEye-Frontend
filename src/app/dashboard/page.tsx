@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { ToastDemo } from "@/components/toast-demo"
 
 export default function Page() {
   return (
@@ -11,6 +12,8 @@ export default function Page() {
               Overview of your application and key metrics.
             </p>
           </div>
+          
+          <ToastDemo />
         </div>
       </div>
     </DashboardLayout>

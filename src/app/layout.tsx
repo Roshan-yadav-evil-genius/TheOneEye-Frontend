@@ -4,6 +4,7 @@ import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/sidebar-provider";
 import { PageTitleProvider } from "@/contexts/page-title-context";
+import { Toaster } from "sonner";
 
 
 export const metadata: Metadata = {
@@ -31,6 +32,12 @@ export default function RootLayout({
             <PageTitleProvider>
               <SidebarProviderWrapper>
                 {children}
+                <Toaster 
+                  position="top-right"
+                  expand={true}
+                  richColors={true}
+                  closeButton={true}
+                />
               </SidebarProviderWrapper>
             </PageTitleProvider>
           </ThemeProvider>
