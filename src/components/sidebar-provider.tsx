@@ -19,19 +19,8 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
   const isWorkflowEditor = pathname.match(/^\/workflow\/[^\/]+$/)
   const isDashboardPage = pathname.startsWith('/dashboard') || 
                          pathname.startsWith('/workflow') || 
-                         pathname.startsWith('/settings') || 
-                         pathname.startsWith('/analytics') || 
                          pathname.startsWith('/projects') || 
-                         pathname.startsWith('/proposal') || 
-                         pathname.startsWith('/search') || 
-                         pathname.startsWith('/capture') || 
-                         pathname.startsWith('/prompts') || 
-                         pathname.startsWith('/team') || 
-                         pathname.startsWith('/nodes') || 
-                         pathname.startsWith('/help') || 
-                         pathname.startsWith('/data-library') || 
-                         pathname.startsWith('/word-assistant') || 
-                         pathname.startsWith('/reports')
+                         pathname.startsWith('/nodes')
 
   if (!isDashboardPage) {
     // For non-dashboard pages, just render children without sidebar

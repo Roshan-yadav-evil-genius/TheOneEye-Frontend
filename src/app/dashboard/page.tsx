@@ -1,6 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { ToastDemo } from "@/components/toast-demo"
-import { AlertDemo } from "@/components/alert-demo"
+import { DashboardControls } from "@/components/dashboard-controls"
 
 export default function Page() {
   return (
@@ -10,12 +9,11 @@ export default function Page() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">
-              Overview of your application and key metrics.
+              Overview of your application and key metrics. Test dialog and notification functionality.
             </p>
           </div>
           
-          <ToastDemo />
-          <AlertDemo />
+          <DashboardControls />
         </div>
       </div>
     </DashboardLayout>
