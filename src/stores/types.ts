@@ -135,6 +135,7 @@ export interface UIStoreState {
   sidebarOpen: boolean;
   theme: 'light' | 'dark' | 'system';
   activePage: string;
+  pageTitle: string;
   breadcrumbs: Breadcrumb[];
   notifications: Notification[];
   modals: {

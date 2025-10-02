@@ -13,6 +13,7 @@ interface UIActions {
   
   // Page navigation
   setActivePage: (page: string) => void;
+  setPageTitle: (title: string) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
   addBreadcrumb: (breadcrumb: Breadcrumb) => void;
   removeBreadcrumb: (index: number) => void;
@@ -40,6 +41,7 @@ const initialState: UIStoreState = {
   sidebarOpen: true,
   theme: 'system',
   activePage: 'dashboard',
+  pageTitle: 'Documents',
   breadcrumbs: [],
   notifications: [],
   modals: {
@@ -94,6 +96,10 @@ export const useUIStore = create<UIStore>()(
         // Page navigation
         setActivePage: (page: string) => {
           set({ activePage: page });
+        },
+
+        setPageTitle: (title: string) => {
+          set({ pageTitle: title });
         },
 
         setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
@@ -211,6 +217,7 @@ export const useUIStore = create<UIStore>()(
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
           activePage: state.activePage,
+          pageTitle: state.pageTitle,
         }),
       }
     ),

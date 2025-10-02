@@ -3,7 +3,6 @@ import "./globals.css";
 import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/sidebar-provider";
-import { PageTitleProvider } from "@/contexts/page-title-context";
 import { AlertProvider } from "@/contexts/alert-context";
 import { Toaster } from "sonner";
 import { StoreInitializer } from "@/components/store-initializer";
@@ -33,17 +32,15 @@ export default function RootLayout({
           >
             <StoreInitializer>
               <AlertProvider>
-                <PageTitleProvider>
-                  <SidebarProviderWrapper>
-                    {children}
-                    <Toaster 
-                      position="top-right"
-                      expand={true}
-                      richColors={true}
-                      closeButton={true}
-                    />
-                  </SidebarProviderWrapper>
-                </PageTitleProvider>
+                <SidebarProviderWrapper>
+                  {children}
+                  <Toaster 
+                    position="top-right"
+                    expand={true}
+                    richColors={true}
+                    closeButton={true}
+                  />
+                </SidebarProviderWrapper>
               </AlertProvider>
             </StoreInitializer>
           </ThemeProvider>

@@ -1,6 +1,6 @@
 "use client"
 
-import { usePageTitle } from "@/contexts/page-title-context"
+import { useUIStore } from "@/stores/ui-store"
 import { useEffect } from "react"
 
 interface DashboardLayoutProps {
@@ -9,13 +9,13 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
-  const { setTitle } = usePageTitle()
+  const setPageTitle = useUIStore((state) => state.setPageTitle)
 
   useEffect(() => {
     if (title) {
-      setTitle(title)
+      setPageTitle(title)
     }
-  }, [title, setTitle])
+  }, [title, setPageTitle])
 
   return (
     <div className="px-4 lg:px-6">
