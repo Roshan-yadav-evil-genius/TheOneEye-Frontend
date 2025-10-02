@@ -17,6 +17,8 @@ interface FormConfigurationManagerProps {
   onJsonChanged?: (json: any) => void;
   onSave?: (json: any) => void;
   className?: string;
+  nodeName?: string;
+  nodeDescription?: string;
 }
 
 export function FormConfigurationManager({
@@ -24,6 +26,8 @@ export function FormConfigurationManager({
   onJsonChanged,
   onSave,
   className = "",
+  nodeName,
+  nodeDescription,
 }: FormConfigurationManagerProps) {
   const [currentJson, setCurrentJson] = useState(initialJson || {});
   const [activeTab, setActiveTab] = useState("designer");
@@ -268,6 +272,8 @@ export function FormConfigurationManager({
         onOpenChange={setIsPreviewDialogOpen}
         formJson={currentJson}
         formTitle="Form Preview - Custom Layout"
+        nodeName={nodeName}
+        nodeDescription={nodeDescription}
         onFormDataChange={setPreviewData}
       />
     </div>

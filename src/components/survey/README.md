@@ -1,144 +1,246 @@
-# SurveyJS Form Creator Integration
+# Custom Form System
 
-This directory contains the SurveyJS form creator integration for the node creation system. The form creator allows users to design custom forms for each workflow node using a visual drag-and-drop interface.
+This directory contains a custom form system built with Shadcn UI components that provides better control and flexibility compared to SurveyJS.
+
+## Overview
+
+The custom form system consists of:
+
+- **Field Components**: Individual Shadcn UI-based form field components
+- **Form Renderer**: Maps form JSON to appropriate field components
+- **Validation System**: Comprehensive form validation with custom validators
+- **State Management**: Custom hook for form state management
+- **Form Preview**: Custom form preview component
+- **JSON Converter**: Utilities to convert between SurveyJS and custom formats
 
 ## Components
 
-### 1. SurveyCreatorComponent (`survey-creator.tsx`)
-A React wrapper around the SurveyJS Creator component that provides:
-- Visual form designer with drag-and-drop interface
-- Real-time JSON schema generation
-- Tabbed interface (Designer, Test Survey, JSON Editor, Logic)
-- Event handlers for form changes and saves
-- Configurable tab visibility
+### Field Components (`/fields/`)
 
-**Props:**
-- `initialJson`: Initial form configuration JSON
-- `onJsonChanged`: Callback when form JSON changes
-- `onSurveySaved`: Callback when form is saved
-- `readOnly`: Enable read-only mode
-- `showDesignerTab`: Show/hide designer tab
-- `showTestSurveyTab`: Show/hide test survey tab
-- `showJSONEditorTab`: Show/hide JSON editor tab
-- `showLogicTab`: Show/hide logic tab
+- `TextField` - Text input with various input types (text, email, password, number, etc.)
+- `TextareaField` - Multi-line text input
+- `DropdownField` - Select dropdown with choices
+- `CheckboxField` - Single checkbox (boolean)
+- `RadioField` - Radio button group
+- `DateField` - Date picker
+- `TimeField` - Time picker
+- `FileField` - File upload
 
-### 2. SurveyPreview (`survey-preview.tsx`)
-A component for previewing and testing forms:
-- Renders forms from JSON configuration
-- Supports form completion and value change events
-- Read-only mode support
-- Real-time form validation
+### Core Components
 
-**Props:**
-- `json`: Form configuration JSON
-- `onComplete`: Callback when form is completed
-- `onValueChanged`: Callback when form values change
-- `readOnly`: Enable read-only mode
+- `FormFieldRenderer` - Renders appropriate field component based on field type
+- `CustomFormPreview` - Main form preview component
+- `FormPreviewDialog` - Dialog wrapper for form preview
 
-### 3. FormConfigurationManager (`form-configuration-manager.tsx`)
-A comprehensive form management component that combines:
-- SurveyJS Creator integration
-- Form preview functionality
-- JSON export/import capabilities
-- Form statistics display
-- Tabbed interface for different views
+### Utilities
 
-**Features:**
-- **Designer Tab**: Visual form builder
-- **Preview Tab**: Live form preview
-- **JSON Tab**: Raw JSON editor/viewer
-- **Export/Import**: Download/upload form configurations
-- **Statistics**: Shows question count and form complexity
+- `useFormState` - Custom hook for form state management
+- `form-validation.ts` - Validation utilities and custom validators
+- `survey-json-converter.ts` - Convert between SurveyJS and custom formats
 
-## Integration with Node Creation
+## Usage
 
-The form creator is integrated into the node creation process through the `CreateNodePage` component:
-
-1. **Tabbed Interface**: Node creation now has two tabs:
-   - **Node Details**: Basic node information (name, type, category, etc.)
-   - **Form Configuration**: SurveyJS form creator
-
-2. **State Management**: Form configuration is stored in the node's `formConfiguration` field
-
-3. **JSON Schema**: The form creator outputs a JSON schema that can be used with SurveyJS to render the form
-
-## Sample Form Configurations
-
-The system includes pre-built form configurations for common node types in `sample-form-configurations.ts`:
-
-- **Email**: Email configuration forms
-- **Database**: Database connection and query forms
-- **API**: API endpoint and request configuration
-- **Logic**: Conditional logic and branching forms
-- **File**: File operation configuration
-
-## Usage Example
+### Basic Form Preview
 
 ```tsx
-import { FormConfigurationManager } from "@/components/survey/form-configuration-manager";
+import { CustomFormPreview } from '@/components/survey';
 
-function MyComponent() {
-  const [formConfig, setFormConfig] = useState({});
+const formConfig = {
+  title: "Contact Form",
+  description: "Please fill out the form below",
+  elements: [
+    {
+      type: "text",
+      name: "name",
+      title: "Full Name",
+      isRequired: true,
+      placeholder: "Enter your name"
+    },
+    {
+      type: "email",
+      name: "email",
+      title: "Email Address",
+      isRequired: true,
+      placeholder: "Enter your email"
+    },
+    {
+      type: "comment",
+      name: "message",
+      title: "Message",
+      isRequired: true,
+      placeholder: "Enter your message"
+    }
+  ]
+};
 
-  const handleFormChange = (json) => {
-    setFormConfig(json);
+function MyForm() {
+  const handleDataChange = (data) => {
+    console.log('Form data changed:', data);
+  };
+
+  const handleSubmit = (data) => {
+    console.log('Form submitted:', data);
   };
 
   return (
-    <FormConfigurationManager
-      initialJson={formConfig}
-      onJsonChanged={handleFormChange}
-      onSave={handleFormChange}
+    <CustomFormPreview
+      configuration={formConfig}
+      onDataChange={handleDataChange}
+      onSubmit={handleSubmit}
     />
   );
 }
 ```
 
-## JSON Schema Structure
+### Using Form State Hook
 
-The form creator generates JSON schemas compatible with SurveyJS. Example structure:
+```tsx
+import { useFormState } from '@/components/survey';
 
-```json
-{
-  "title": "Form Title",
-  "description": "Form description",
-  "elements": [
-    {
-      "type": "text",
-      "name": "fieldName",
-      "title": "Field Label",
-      "isRequired": true,
-      "placeholder": "Enter value"
-    }
-  ]
+function MyForm() {
+  const {
+    data,
+    errors,
+    isValid,
+    updateField,
+    validateForm,
+    getFieldError
+  } = useFormState({
+    fields: formConfig.elements,
+    onDataChange: (data) => console.log(data),
+    onValidationChange: (isValid, errors) => console.log(isValid, errors)
+  });
+
+  return (
+    <form>
+      {formConfig.elements.map(field => (
+        <FormFieldRenderer
+          key={field.name}
+          field={field}
+          value={data[field.name]}
+          onChange={(value) => updateField(field.name, value)}
+          error={getFieldError(field.name)}
+        />
+      ))}
+    </form>
+  );
 }
 ```
 
-## Supported Form Elements
+## Field Types
 
-The SurveyJS Creator supports a wide variety of form elements:
-- Text inputs (single line, multi-line, email, password, etc.)
-- Choice questions (dropdown, radio, checkbox, etc.)
-- Rating scales
-- Date/time pickers
-- File uploads
-- Matrix questions
-- Dynamic panels
-- Custom HTML elements
+### Text Fields
+- `text` - Basic text input
+- `email` - Email input with validation
+- `password` - Password input
+- `number` - Number input
+- `tel` - Telephone input
+- `url` - URL input
 
-## Styling
+### Other Fields
+- `comment` - Multi-line text (textarea)
+- `dropdown` - Select dropdown
+- `checkbox` - Single checkbox
+- `boolean` - Boolean checkbox (alias for checkbox)
+- `radio` - Radio button group
+- `file` - File upload
+- `date` - Date picker
+- `time` - Time picker
+- `datetime` - Date and time picker
 
-The components use SurveyJS's default styling with CSS imports:
-- `survey-core/survey-core.css`: Core SurveyJS styles
-- `survey-creator-core/survey-creator-core.css`: Creator-specific styles
+## Field Configuration
 
-## Future Enhancements
+Each field supports the following properties:
 
-Potential improvements for the form creator system:
-1. **Template Library**: Pre-built form templates for common use cases
-2. **Conditional Logic**: Advanced conditional logic builder
-3. **Validation Rules**: Custom validation rule builder
-4. **Theme Customization**: Custom styling and theming options
-5. **Form Analytics**: Usage analytics and form performance metrics
-6. **Collaboration**: Multi-user form editing capabilities
-7. **Version Control**: Form versioning and change tracking
+```typescript
+interface FormField {
+  type: FormFieldType;
+  name: string;
+  title: string;
+  description?: string;
+  placeholder?: string;
+  isRequired?: boolean;
+  defaultValue?: any;
+  inputType?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';
+  choices?: FormFieldChoice[]; // For dropdown/radio
+  min?: number;
+  max?: number;
+  step?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  rows?: number; // For textarea
+  validation?: {
+    message?: string;
+    custom?: string;
+  };
+  conditional?: {
+    dependsOn: string;
+    condition: string;
+    value: any;
+  };
+}
+```
+
+## Validation
+
+The system includes built-in validation for:
+
+- Required fields
+- Email format
+- URL format
+- Number ranges
+- String length limits
+- Pattern matching
+- Custom validators
+
+### Custom Validators
+
+```typescript
+import { customValidators } from '@/components/survey';
+
+// Pattern validation
+const isValid = customValidators.pattern(value, '^[A-Z]+$');
+
+// Range validation
+const isInRange = customValidators.range(value, 1, 100);
+
+// Length validation
+const isValidLength = customValidators.length(value, 5, 50);
+
+// Choice validation
+const isValidChoice = customValidators.oneOf(value, ['option1', 'option2']);
+
+// Not empty validation
+const isNotEmpty = customValidators.notEmpty(value);
+```
+
+## Migration from SurveyJS
+
+To migrate from SurveyJS to the custom form system:
+
+1. Use the converter utility:
+```typescript
+import { convertSurveyJSJsonToCustomFormat } from '@/components/survey';
+
+const customConfig = convertSurveyJSJsonToCustomFormat(surveyJSJson);
+```
+
+2. Replace `SurveyPreview` with `CustomFormPreview`:
+```tsx
+// Before
+<SurveyPreview json={surveyJSJson} onValueChanged={handleChange} />
+
+// After
+<CustomFormPreview configuration={customConfig} onDataChange={handleChange} />
+```
+
+## Benefits
+
+- **Better Control**: Full control over styling and behavior
+- **Consistent UI**: Uses Shadcn UI components for consistent design
+- **Type Safety**: Full TypeScript support
+- **Flexible Validation**: Custom validation system
+- **Performance**: Lighter weight than SurveyJS
+- **Extensibility**: Easy to add new field types
+- **Accessibility**: Built-in accessibility features from Shadcn UI

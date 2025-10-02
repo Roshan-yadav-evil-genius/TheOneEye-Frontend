@@ -12,7 +12,7 @@ import {
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { InputSection } from "../workflow/input-section";
 import { OutputSection } from "../workflow/output-section";
-import { SurveyPreview } from "./survey-preview";
+import { CustomFormPreview } from "./custom-form-preview";
 import { sampleInputData } from "@/data/sample-data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,8 @@ interface FormPreviewDialogProps {
   onOpenChange: (open: boolean) => void;
   formJson: any;
   formTitle?: string;
+  nodeName?: string;
+  nodeDescription?: string;
   onFormDataChange?: (data: any) => void;
 }
 
@@ -31,6 +33,8 @@ export function FormPreviewDialog({
   onOpenChange, 
   formJson,
   formTitle = "Form Preview",
+  nodeName,
+  nodeDescription,
   onFormDataChange
 }: FormPreviewDialogProps) {
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
@@ -72,6 +76,33 @@ export function FormPreviewDialog({
               {/* FORM PREVIEW Column */}
               <div className="h-full overflow-hidden bg-gray-800 border-r border-gray-700">
                 <div className="h-full flex flex-col">
+                  {/* Header with Logo, Node Name and Description */}
+                  {(formJson?.logo || nodeName || nodeDescription) && (
+                    <div className="border-b border-gray-700 p-4 bg-gray-800">
+                      <div className="flex items-start gap-4">
+                        {formJson?.logo && (
+                          <img 
+                            src={formJson.logo} 
+                            alt="Node Logo" 
+                            className="w-12 h-12 object-contain flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          {nodeName && (
+                            <h2 className="text-lg font-semibold text-white mb-1">
+                              {nodeName}
+                            </h2>
+                          )}
+                          {nodeDescription && (
+                            <p className="text-sm text-gray-300">
+                              {nodeDescription}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="border-b border-gray-700 p-4">
                     <Tabs value={activePreviewTab} onValueChange={(value) => setActivePreviewTab(value as "preview" | "json")}>
                       <TabsList className="grid w-full grid-cols-2">
@@ -91,10 +122,11 @@ export function FormPreviewDialog({
                     <Tabs value={activePreviewTab} onValueChange={(value) => setActivePreviewTab(value as "preview" | "json")}>
                       <TabsContent value="preview" className="h-full m-0">
                         <div className="h-full p-4">
-                          <SurveyPreview
-                            json={formJson}
-                            onValueChanged={handleFormDataChange}
+                          <CustomFormPreview
+                            configuration={formJson}
+                            onDataChange={handleFormDataChange}
                             className="h-full"
+                            showSubmitButton={false}
                           />
                         </div>
                       </TabsContent>
