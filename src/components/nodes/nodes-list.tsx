@@ -33,7 +33,6 @@ export function NodesList({
   }
 
   const handleCreate = () => {
-    console.log("Creating new node")
     router.push("/nodes/create")
   }
 

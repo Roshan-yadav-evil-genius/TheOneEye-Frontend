@@ -27,12 +27,10 @@ export function WorkflowList({
   const router = useRouter()
 
   const handleRun = (id: string) => {
-    console.log(`Running workflow: ${id}`)
     // TODO: Implement workflow execution
   }
 
   const handleStop = (id: string) => {
-    console.log(`Stopping workflow: ${id}`)
     // TODO: Implement workflow stop
   }
 
@@ -45,12 +43,10 @@ export function WorkflowList({
   }
 
   const handleDelete = (id: string) => {
-    console.log(`Deleting workflow: ${id}`)
     // TODO: Implement workflow deletion
   }
 
   const handleCreate = () => {
-    console.log("Creating new workflow")
     // TODO: Navigate to workflow creation
   }
 

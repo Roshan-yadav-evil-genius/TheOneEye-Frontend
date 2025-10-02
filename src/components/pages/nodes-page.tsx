@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -23,23 +20,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { 
-  IconNetwork,
-  IconClock,
-  IconSettings,
-  IconCheck,
-} from "@tabler/icons-react";
-import { mockNodes, Node, nodeTypes, nodeCategories } from "@/data/nodes";
+import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { useNodesStore, useUIStore, uiHelpers } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 
 export const NodesPage = memo(function NodesPage() {
-  const router = useRouter();
-  
   // Zustand store hooks - optimized selectors
   const nodes = useNodesStore((state) => state.nodes);
-  const isLoading = useNodesStore((state) => state.isLoading);
-  const error = useNodesStore((state) => state.error);
   const selectedNode = useNodesStore((state) => state.selectedNode);
   
   const loadNodes = useNodesStore((state) => state.loadNodes);
@@ -91,32 +78,31 @@ export const NodesPage = memo(function NodesPage() {
   const openEditDialog = (nodeId: string) => {
     const node = nodes.find(n => n.id === nodeId);
     if (node) {
-      selectNode(node);
-      setEditingNode(node);
-      setIsEditDialogOpen(true);
+    selectNode(node);
+    setEditingNode(node);
+    setIsEditDialogOpen(true);
     }
   };
 
   const openDeleteDialog = (nodeId: string) => {
     const node = nodes.find(n => n.id === nodeId);
     if (node) {
-      selectNode(node);
-      setIsDeleteDialogOpen(true);
+    selectNode(node);
+    setIsDeleteDialogOpen(true);
     }
   };
 
   return (
     <div className="space-y-6">
-
-
       {/* Nodes Table */}
       <NodesList 
         nodes={nodes} 
         onEdit={openEditDialog}
-        onView={(id) => console.log(`Viewing node: ${id}`)}
+        onView={(id) => {
+          // TODO: Implement node view functionality
+        }}
         onDelete={openDeleteDialog}
       />
-
 
       {/* Edit Node Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
