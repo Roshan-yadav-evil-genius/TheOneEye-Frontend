@@ -20,9 +20,11 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   return (
     <div className="px-4 lg:px-6">
       <div className="space-y-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title || "Dashboard"}</h1>
-        </div>
+        {title && (
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          </div>
+        )}
         <main>
           {children}
         </main>

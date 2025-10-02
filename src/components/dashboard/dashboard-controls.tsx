@@ -220,6 +220,39 @@ export function DashboardControls() {
 
   return (
     <div className="space-y-6">
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <IconPlus className="h-5 w-5" />
+            Quick Actions
+          </CardTitle>
+          <CardDescription>
+            Common actions you can perform from the dashboard.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="default" className="justify-start">
+              <IconPlus className="h-4 w-4 mr-2" />
+              Create New Workflow
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <IconEdit className="h-4 w-4 mr-2" />
+              Edit Existing Workflow
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <IconSettings className="h-4 w-4 mr-2" />
+              Configure Settings
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <IconBell className="h-4 w-4 mr-2" />
+              View Notifications
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Dashboard Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
@@ -378,38 +411,6 @@ export function DashboardControls() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <IconPlus className="h-5 w-5" />
-            Quick Actions
-          </CardTitle>
-          <CardDescription>
-            Common actions you can perform from the dashboard.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button variant="default" className="justify-start">
-              <IconPlus className="h-4 w-4 mr-2" />
-              Create New Workflow
-            </Button>
-            <Button variant="outline" className="justify-start">
-              <IconEdit className="h-4 w-4 mr-2" />
-              Edit Existing Workflow
-            </Button>
-            <Button variant="outline" className="justify-start">
-              <IconSettings className="h-4 w-4 mr-2" />
-              Configure Settings
-            </Button>
-            <Button variant="outline" className="justify-start">
-              <IconBell className="h-4 w-4 mr-2" />
-              View Notifications
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

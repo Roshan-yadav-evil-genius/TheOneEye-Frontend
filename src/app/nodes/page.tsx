@@ -3,7 +3,7 @@ import { NodesPage } from "@/components/pages/nodes-page"
 
 export default function Page() {
   return (
-    <DashboardLayout title="Nodes">
+    <DashboardLayout>
       <NodesPage />
     </DashboardLayout>
   )
