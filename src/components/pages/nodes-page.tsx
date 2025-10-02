@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,23 +63,23 @@ import { mockNodes, Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { getNodeColors } from "@/constants/node-styles";
 import { useNodesStore, useUIStore, uiHelpers, storeSelectors } from "@/stores";
 
-export function NodesPage() {
+export const NodesPage = memo(function NodesPage() {
   const router = useRouter();
   
-  // Zustand store hooks
-  const { 
-    nodes, 
-    loadNodes, 
-    updateNode, 
-    deleteNode, 
-    isLoading, 
-    error,
-    filters,
-    setFilters,
-    selectNode,
-    selectedNode: storeSelectedNode
-  } = useNodesStore();
-  const { setActivePage } = useUIStore();
+  // Zustand store hooks - optimized selectors
+  const nodes = useNodesStore((state) => state.nodes);
+  const isLoading = useNodesStore((state) => state.isLoading);
+  const error = useNodesStore((state) => state.error);
+  const filters = useNodesStore((state) => state.filters);
+  const selectedNode = useNodesStore((state) => state.selectedNode);
+  
+  const loadNodes = useNodesStore((state) => state.loadNodes);
+  const updateNode = useNodesStore((state) => state.updateNode);
+  const deleteNode = useNodesStore((state) => state.deleteNode);
+  const setFilters = useNodesStore((state) => state.setFilters);
+  const selectNode = useNodesStore((state) => state.selectNode);
+  
+  const setActivePage = useUIStore((state) => state.setActivePage);
 
   // Local state for UI
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -183,10 +183,10 @@ export function NodesPage() {
 
 
   const handleUpdateNode = async () => {
-    if (!storeSelectedNode) return;
+    if (!selectedNode) return;
 
     try {
-      await updateNode(storeSelectedNode.id, editingNode);
+      await updateNode(selectedNode.id, editingNode);
       uiHelpers.showSuccess("Success!", "Node updated successfully");
       setIsEditDialogOpen(false);
       selectNode(null);
@@ -197,10 +197,10 @@ export function NodesPage() {
   };
 
   const handleDeleteNode = async () => {
-    if (!storeSelectedNode) return;
+    if (!selectedNode) return;
 
     try {
-      await deleteNode(storeSelectedNode.id);
+      await deleteNode(selectedNode.id);
       uiHelpers.showSuccess("Success!", "Node deleted successfully");
       setIsDeleteDialogOpen(false);
       selectNode(null);
@@ -675,7 +675,7 @@ export function NodesPage() {
           <DialogHeader>
             <DialogTitle>Delete Node</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{storeSelectedNode?.name}"? This action cannot be undone.
+              Are you sure you want to delete "{selectedNode?.name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -690,4 +690,4 @@ export function NodesPage() {
       </Dialog>
     </div>
   );
-}
+});

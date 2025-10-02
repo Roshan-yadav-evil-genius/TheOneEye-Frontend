@@ -214,11 +214,24 @@ export const useUIStore = create<UIStore>()(
       {
         name: 'ui-store',
         partialize: (state) => ({
+          // Only persist user preferences, not temporary UI state
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
-          activePage: state.activePage,
-          pageTitle: state.pageTitle,
+          // Don't persist activePage and pageTitle as they should reset on app start
         }),
+        // Add version for future migrations
+        version: 1,
+        migrate: (persistedState: any, version: number) => {
+          // Handle future migrations here
+          if (version === 0) {
+            // Example migration from v0 to v1
+            return {
+              ...persistedState,
+              pageTitle: 'Documents', // Add default value for new field
+            };
+          }
+          return persistedState;
+        },
       }
     ),
     {
@@ -226,6 +239,37 @@ export const useUIStore = create<UIStore>()(
     }
   )
 );
+
+// Optimized selectors for better performance
+export const uiSelectors = {
+  // Sidebar selectors
+  getSidebarState: () => useUIStore.getState().sidebarOpen,
+  
+  // Theme selectors
+  getTheme: () => useUIStore.getState().theme,
+  
+  // Page selectors
+  getActivePage: () => useUIStore.getState().activePage,
+  getPageTitle: () => useUIStore.getState().pageTitle,
+  
+  // Notification selectors
+  getNotifications: () => useUIStore.getState().notifications,
+  getUnreadNotifications: () => 
+    useUIStore.getState().notifications.filter(n => !n.read),
+  
+  // Modal selectors
+  getModalState: (modalName: keyof UIStoreState['modals']) => 
+    useUIStore.getState().modals[modalName],
+  getOpenModals: () => {
+    const modals = useUIStore.getState().modals;
+    return Object.entries(modals)
+      .filter(([_, isOpen]) => isOpen)
+      .map(([modalName, _]) => modalName);
+  },
+  
+  // Breadcrumb selectors
+  getBreadcrumbs: () => useUIStore.getState().breadcrumbs,
+};
 
 // Helper functions for common UI operations
 export const uiHelpers = {
