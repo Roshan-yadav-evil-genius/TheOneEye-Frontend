@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { IconEye, IconCode, IconDownload, IconUpload, IconTrash } from "@tabler/icons-react";
 import { SurveyCreatorWrapper } from "./survey-creator";
 import { SurveyPreview } from "./survey-preview";
+import { FormPreviewDialog } from "./form-preview-dialog";
 import { getSampleConfiguration } from "@/data/sample-form-configurations";
 import { useFormStore, uiHelpers } from "@/stores";
 
@@ -27,6 +28,7 @@ export function FormConfigurationManager({
   const [currentJson, setCurrentJson] = useState(initialJson || {});
   const [activeTab, setActiveTab] = useState("designer");
   const [previewData, setPreviewData] = useState<any>(null);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
 
   // Zustand store hooks
   const { validateConfiguration, testConfiguration, exportConfiguration } = useFormStore();
@@ -226,12 +228,26 @@ export function FormConfigurationManager({
             </TabsContent>
             
             <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-lg overflow-hidden h-[900px]">
-                <SurveyPreview
-                  json={currentJson}
-                  onValueChanged={setPreviewData}
-                  className="h-full p-4"
-                />
+              <div className="border rounded-lg overflow-hidden h-[900px] flex flex-col">
+                <div className="p-4 border-b bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Form Preview</h3>
+                    <Button 
+                      onClick={() => setIsPreviewDialogOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <IconEye className="h-4 w-4" />
+                      Open in Custom Layout
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex-1 p-4">
+                  <SurveyPreview
+                    json={currentJson}
+                    onValueChanged={setPreviewData}
+                    className="h-full"
+                  />
+                </div>
               </div>
             </TabsContent>
             
@@ -245,6 +261,15 @@ export function FormConfigurationManager({
           </Tabs>
         </CardContent>
       </Card>
+      
+      {/* Form Preview Dialog */}
+      <FormPreviewDialog
+        isOpen={isPreviewDialogOpen}
+        onOpenChange={setIsPreviewDialogOpen}
+        formJson={currentJson}
+        formTitle="Form Preview - Custom Layout"
+        onFormDataChange={setPreviewData}
+      />
     </div>
   );
 }
