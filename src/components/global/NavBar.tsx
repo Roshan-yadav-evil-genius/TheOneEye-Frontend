@@ -3,6 +3,7 @@ import { MenuIcon, XIcon, Package, DollarSign, Users, BookOpen, LayoutDashboard 
 import Image from 'next/image';
 import Link from 'next/link'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 // Types
 interface NavItem {
@@ -54,18 +55,35 @@ const Logo = () => (
 )
 
 // Desktop Navigation Component
-const DesktopNav = () => (
-    <nav className='absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%] hidden md:block'>
-        <div className='flex gap-4'>
-            {navItems.map(item => (
-                <Link key={item.label} href={item.link} className="flex items-center gap-2 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">
-                    <item.icon size={16} />
-                    {item.label}
-                </Link>
-            ))}
-        </div>
-    </nav>
-)
+const DesktopNav = () => {
+    const pathname = usePathname()
+    
+    return (
+        <nav className='absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%] hidden md:block'>
+            <div className='flex gap-4'>
+                {navItems.map(item => {
+                    const isActive = pathname === item.link || 
+                        (item.link !== '/' && pathname.startsWith(item.link))
+                    
+                    return (
+                        <Link 
+                            key={item.label} 
+                            href={item.link} 
+                            className={`flex items-center gap-2 transition-colors ${
+                                isActive 
+                                    ? 'text-yellow-600 dark:text-yellow-400 font-medium' 
+                                    : 'hover:text-yellow-600 dark:hover:text-yellow-400'
+                            }`}
+                        >
+                            <item.icon size={16} />
+                            {item.label}
+                        </Link>
+                    )
+                })}
+            </div>
+        </nav>
+    )
+}
 
 // Mobile Menu Toggle Button Component
 const MobileMenuToggle = ({ isOpen, onToggle }: MobileMenuToggleProps) => (
@@ -101,23 +119,36 @@ const MobileMenuHeader = ({ onClose }: MobileMenuHeaderProps) => (
 )
 
 // Mobile Navigation Links Component
-const MobileNavLinks = ({ onClose }: MobileNavLinksProps) => (
-    <nav className="flex-1 p-6">
-        <div className="flex flex-col gap-6">
-            {navItems.map(item => (
-                <Link
-                    key={item.label}
-                    href={item.link}
-                    onClick={onClose}
-                    className="flex items-center gap-3 text-lg font-medium hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
-                >
-                    <item.icon size={20} />
-                    {item.label}
-                </Link>
-            ))}
-        </div>
-    </nav>
-)
+const MobileNavLinks = ({ onClose }: MobileNavLinksProps) => {
+    const pathname = usePathname()
+    
+    return (
+        <nav className="flex-1 p-6">
+            <div className="flex flex-col gap-6">
+                {navItems.map(item => {
+                    const isActive = pathname === item.link || 
+                        (item.link !== '/' && pathname.startsWith(item.link))
+                    
+                    return (
+                        <Link
+                            key={item.label}
+                            href={item.link}
+                            onClick={onClose}
+                            className={`flex items-center gap-3 text-lg font-medium transition-colors ${
+                                isActive 
+                                    ? 'text-yellow-600 dark:text-yellow-400 font-semibold' 
+                                    : 'hover:text-yellow-600 dark:hover:text-yellow-400'
+                            }`}
+                        >
+                            <item.icon size={20} />
+                            {item.label}
+                        </Link>
+                    )
+                })}
+            </div>
+        </nav>
+    )
+}
 
 // Mobile Menu Footer Component
 const MobileMenuFooter = () => (
