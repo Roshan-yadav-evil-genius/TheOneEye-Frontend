@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,36 +11,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
+import { Node } from "@/data/nodes";
 import { useNodesStore, useUIStore } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 
 export const NodesPage = memo(function NodesPage() {
+  const router = useRouter();
+  
   // Zustand store hooks - optimized selectors
   const nodes = useNodesStore((state) => state.nodes);
   const selectedNode = useNodesStore((state) => state.selectedNode);
   
   const loadNodes = useNodesStore((state) => state.loadNodes);
-  const updateNode = useNodesStore((state) => state.updateNode);
   const deleteNode = useNodesStore((state) => state.deleteNode);
   const selectNode = useNodesStore((state) => state.selectNode);
   
   const setActivePage = useUIStore((state) => state.setActivePage);
 
   // Local state for UI
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingNode, setEditingNode] = useState<Partial<Node>>({});
 
   // Load nodes on component mount
   useEffect(() => {
@@ -48,19 +38,6 @@ export const NodesPage = memo(function NodesPage() {
   }, [loadNodes, setActivePage]);
 
 
-  const handleUpdateNode = async () => {
-    if (!selectedNode) return;
-
-    try {
-      await updateNode(selectedNode.id, editingNode, true); // showToast = true
-      setIsEditDialogOpen(false);
-      selectNode(null);
-      setEditingNode({});
-    } catch (error) {
-      // Error toast is handled by the store
-      console.error('Update node error:', error);
-    }
-  };
 
   const handleDeleteNode = async () => {
     if (!selectedNode) return;
@@ -76,12 +53,8 @@ export const NodesPage = memo(function NodesPage() {
   };
 
   const openEditDialog = (nodeId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (node) {
-    selectNode(node);
-    setEditingNode(node);
-    setIsEditDialogOpen(true);
-    }
+    // Navigate to the edit page instead of opening a dialog
+    router.push(`/nodes/edit/${nodeId}`);
   };
 
   const openDeleteDialog = (nodeId: string) => {
@@ -104,107 +77,6 @@ export const NodesPage = memo(function NodesPage() {
         onDelete={openDeleteDialog}
       />
 
-      {/* Edit Node Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Edit Node</DialogTitle>
-            <DialogDescription>
-              Update the node configuration.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-name">Name</Label>
-                <Input
-                  id="edit-name"
-                  value={editingNode.name || ""}
-                  onChange={(e) => setEditingNode(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Node name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-version">Version</Label>
-                <Input
-                  id="edit-version"
-                  value={editingNode.version || ""}
-                  onChange={(e) => setEditingNode(prev => ({ ...prev, version: e.target.value }))}
-                  placeholder="1.0.0"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-type">Type</Label>
-                <Select 
-                  value={editingNode.type || "action"} 
-                  onValueChange={(value) => setEditingNode(prev => ({ ...prev, type: value as Node['type'] }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {nodeTypes.map(type => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="edit-category">Category</Label>
-                <Select 
-                  value={editingNode.category || "system"} 
-                  onValueChange={(value) => setEditingNode(prev => ({ ...prev, category: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {nodeCategories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea
-                id="edit-description"
-                value={editingNode.description || ""}
-                onChange={(e) => setEditingNode(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Node description"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-tags">Tags (comma-separated)</Label>
-              <Input
-                id="edit-tags"
-                value={editingNode.tags?.join(", ") || ""}
-                onChange={(e) => setEditingNode(prev => ({ 
-                  ...prev, 
-                  tags: e.target.value.split(",").map(tag => tag.trim()).filter(Boolean)
-                }))}
-                placeholder="tag1, tag2, tag3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateNode}>
-              Update Node
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
