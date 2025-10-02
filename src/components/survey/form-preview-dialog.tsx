@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { 
   Dialog,
@@ -13,6 +13,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { InputSection } from "../workflow/input-section";
 import { OutputSection } from "../workflow/output-section";
 import { CustomFormPreview } from "./custom-form-preview";
+import { convertSurveyJSJsonToCustomFormat } from "./survey-json-converter";
 import { sampleInputData } from "@/data/sample-data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,6 +42,29 @@ export function FormPreviewDialog({
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
   const [activePreviewTab, setActivePreviewTab] = useState<"preview" | "json">("preview");
   const [formData, setFormData] = useState<any>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // Convert SurveyJS format to custom format for header display
+  const convertedConfig = useMemo(() => {
+    if (!formJson) return null;
+    
+    try {
+      // Check if it's already in custom format
+      if (formJson.elements && Array.isArray(formJson.elements)) {
+        return formJson;
+      }
+      
+      // Convert SurveyJS format
+      if (formJson.pages || formJson.questions || formJson.elements) {
+        return convertSurveyJSJsonToCustomFormat(formJson);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error converting form configuration:', error);
+      return null;
+    }
+  }, [formJson]);
 
   const handleFormDataChange = (data: any) => {
     setFormData(data);
@@ -48,6 +72,7 @@ export function FormPreviewDialog({
       onFormDataChange(data);
     }
   };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -77,26 +102,38 @@ export function FormPreviewDialog({
               <div className="h-full overflow-hidden bg-gray-800 border-r border-gray-700">
                 <div className="h-full flex flex-col">
                   {/* Header with Logo, Node Name and Description */}
-                  {(formJson?.logo || nodeName || nodeDescription) && (
-                    <div className="border-b border-gray-700 p-4 bg-gray-800">
-                      <div className="flex items-start gap-4">
-                        {formJson?.logo && (
+                  {formJson && (
+                    <div className="border-b border-gray-700 p-2 bg-gray-800">
+                      <div className="flex items-start gap-2">
+                        {convertedConfig?.logo && (
                           <img 
-                            src={formJson.logo} 
+                            src={convertedConfig.logo} 
                             alt="Node Logo" 
-                            className="w-12 h-12 object-contain flex-shrink-0"
+                            className="w-10 h-10 object-contain flex-shrink-0"
                           />
                         )}
                         <div className="flex-1 min-w-0">
-                          {nodeName && (
-                            <h2 className="text-lg font-semibold text-white mb-1">
-                              {nodeName}
-                            </h2>
-                          )}
-                          {nodeDescription && (
-                            <p className="text-sm text-gray-300">
-                              {nodeDescription}
-                            </p>
+                          <h2 className="text-sm font-semibold text-white mb-0.5">
+                            {nodeName || convertedConfig?.title || "Form Preview"}
+                          </h2>
+                          {(nodeDescription || convertedConfig?.description) && (
+                            <div className="text-xs text-gray-300">
+                              {isDescriptionExpanded ? (
+                                <p>{nodeDescription || convertedConfig?.description}</p>
+                              ) : (
+                                <span>
+                                  {(nodeDescription || convertedConfig?.description)?.split(' ').slice(0, 5).join(' ')}
+                                  {(nodeDescription || convertedConfig?.description)?.split(' ').length > 5 && (
+                                    <button
+                                      onClick={() => setIsDescriptionExpanded(true)}
+                                      className="text-blue-400 hover:text-blue-300 ml-1 cursor-pointer"
+                                    >
+                                      ...
+                                    </button>
+                                  )}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>

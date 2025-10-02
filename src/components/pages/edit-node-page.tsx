@@ -361,6 +361,8 @@ export function EditNodePage() {
             initialJson={formData.formConfiguration}
             onJsonChanged={handleFormConfigurationChange}
             onSave={handleFormConfigurationChange}
+            nodeName={formData.name}
+            nodeDescription={formData.description}
           />
         </TabsContent>
       </Tabs>
