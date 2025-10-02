@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
-import { useNodesStore, useUIStore, uiHelpers } from "@/stores";
+import { useNodesStore, useUIStore } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 
 export const NodesPage = memo(function NodesPage() {
@@ -52,13 +52,13 @@ export const NodesPage = memo(function NodesPage() {
     if (!selectedNode) return;
 
     try {
-      await updateNode(selectedNode.id, editingNode);
-      uiHelpers.showSuccess("Success!", "Node updated successfully");
+      await updateNode(selectedNode.id, editingNode, true); // showToast = true
       setIsEditDialogOpen(false);
       selectNode(null);
       setEditingNode({});
     } catch (error) {
-      uiHelpers.showError("Error", "Failed to update node. Please try again.");
+      // Error toast is handled by the store
+      console.error('Update node error:', error);
     }
   };
 
@@ -66,12 +66,12 @@ export const NodesPage = memo(function NodesPage() {
     if (!selectedNode) return;
 
     try {
-      await deleteNode(selectedNode.id);
-      uiHelpers.showSuccess("Success!", "Node deleted successfully");
+      await deleteNode(selectedNode.id, true); // showToast = true
       setIsDeleteDialogOpen(false);
       selectNode(null);
     } catch (error) {
-      uiHelpers.showError("Error", "Failed to delete node. Please try again.");
+      // Error toast is handled by the store
+      console.error('Delete node error:', error);
     }
   };
 

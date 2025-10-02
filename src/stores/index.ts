@@ -44,7 +44,7 @@ export const initializeStores = async () => {
   try {
     // Load initial data in parallel
     await Promise.all([
-      loadNodes(),
+      loadNodes({}, false), // Don't show toast on initial load
       loadWorkflows(),
       loadFormConfigurations(),
       loadProjects(),

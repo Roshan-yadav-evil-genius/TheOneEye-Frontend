@@ -6,13 +6,24 @@ export interface Node {
   type: 'trigger' | 'action' | 'logic' | 'system';
   category: string;
   description: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  isActive?: boolean;
-  version?: string;
-  tags?: string[];
-  formConfiguration?: Record<string, unknown>; // SurveyJS form configuration JSON
+  version: string;
+  isActive: boolean;
+  createdAt: string; // ISO string format from backend
+  updatedAt: string; // ISO string format from backend
+  createdBy: string; // Username of the creator
+  formConfiguration: Record<string, unknown>; // SurveyJS form configuration JSON
+  tags: string[];
 }
+
+// Helper function to format date strings
+export const formatNodeDate = (dateString: string): string => {
+  if (!dateString) return "Never";
+  try {
+    return new Date(dateString).toLocaleDateString();
+  } catch (error) {
+    return "Invalid Date";
+  }
+};
 
 export const nodeTypes = ['trigger', 'action', 'logic', 'system'] as const;
 export const nodeCategories = [

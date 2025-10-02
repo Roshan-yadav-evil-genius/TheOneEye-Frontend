@@ -14,12 +14,13 @@ export interface Node {
   type: 'trigger' | 'action' | 'logic' | 'system';
   category: string;
   description: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  isActive?: boolean;
-  version?: string;
-  tags?: string[];
-  formConfiguration?: Record<string, unknown>;
+  version: string;
+  isActive: boolean;
+  createdAt: string; // ISO string format from backend
+  updatedAt: string; // ISO string format from backend
+  createdBy: string; // Username of the creator
+  formConfiguration: Record<string, unknown>; // SurveyJS form configuration JSON
+  tags: string[];
 }
 
 export interface Workflow {

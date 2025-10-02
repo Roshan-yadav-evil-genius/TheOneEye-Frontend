@@ -1,18 +1,20 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { Node, NodesState } from './types';
+import { nodesApi, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/lib/api/nodes';
+import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 
 interface NodesActions {
   // CRUD operations
-  createNode: (nodeData: Omit<Node, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Node>;
-  updateNode: (id: string, nodeData: Partial<Node>) => Promise<Node>;
-  deleteNode: (id: string) => Promise<void>;
+  createNode: (nodeData: NodeCreateData, showToast?: boolean) => Promise<Node>;
+  updateNode: (id: string, nodeData: NodeUpdateData, showToast?: boolean) => Promise<Node>;
+  deleteNode: (id: string, showToast?: boolean) => Promise<void>;
   getNode: (id: string) => Promise<Node | null>;
   
   // Bulk operations
-  loadNodes: () => Promise<void>;
-  createMultipleNodes: (nodes: Omit<Node, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<Node[]>;
-  deleteMultipleNodes: (ids: string[]) => Promise<void>;
+  loadNodes: (filters?: NodeFilters, showToast?: boolean) => Promise<void>;
+  createMultipleNodes: (nodes: NodeCreateData[], showToast?: boolean) => Promise<Node[]>;
+  deleteMultipleNodes: (ids: string[], showToast?: boolean) => Promise<void>;
   
   // Selection and filtering
   selectNode: (node: Node | null) => void;
@@ -45,22 +47,11 @@ export const useNodesStore = create<NodesStore>()(
       ...initialState,
 
       // CRUD operations
-      createNode: async (nodeData: Omit<Node, 'id' | 'createdAt' | 'updatedAt'>) => {
+      createNode: async (nodeData: NodeCreateData, showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await nodesApi.createNode(nodeData);
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          const newNode: Node = {
-            ...nodeData,
-            id: `node-${Date.now()}`,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
+          const newNode = await nodesApi.createNode(nodeData);
 
           set((state) => ({
             nodes: [...state.nodes, newNode],
@@ -68,60 +59,88 @@ export const useNodesStore = create<NodesStore>()(
             error: null,
           }));
 
+          if (showToast) {
+            toastSuccess('Node created successfully!', {
+              description: `"${newNode.name}" has been created.`,
+            });
+          }
+
           return newNode;
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to create node';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to create node',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to create node', {
+              description: errorMessage,
+            });
+          }
+          
           throw error;
         }
       },
 
-      updateNode: async (id: string, nodeData: Partial<Node>) => {
+      updateNode: async (id: string, nodeData: NodeUpdateData, showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await nodesApi.updateNode(id, nodeData);
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          const updatedNode: Node = {
-            ...nodeData,
-            id,
-            updatedAt: new Date(),
-          } as Node;
+          const updatedNode = await nodesApi.updateNode(id, nodeData);
 
           set((state) => ({
             nodes: state.nodes.map((node) =>
-              node.id === id ? { ...node, ...updatedNode } : node
+              node.id === id ? updatedNode : node
             ),
             selectedNode: state.selectedNode?.id === id ? updatedNode : state.selectedNode,
             isLoading: false,
             error: null,
           }));
 
+          if (showToast) {
+            toastSuccess('Node updated successfully!', {
+              description: `"${updatedNode.name}" has been updated.`,
+            });
+          }
+
           return updatedNode;
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to update node';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to update node',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to update node', {
+              description: errorMessage,
+            });
+          }
+          
           throw error;
         }
       },
 
-      deleteNode: async (id: string) => {
+      deleteNode: async (id: string, showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // await nodesApi.deleteNode(id);
+          // Get node name before deletion for toast message
+          const nodeToDelete = get().nodes.find(node => node.id === id);
+          const nodeName = nodeToDelete?.name || 'Node';
           
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await nodesApi.deleteNode(id);
           
           set((state) => ({
             nodes: state.nodes.filter((node) => node.id !== id),
@@ -129,11 +148,30 @@ export const useNodesStore = create<NodesStore>()(
             isLoading: false,
             error: null,
           }));
+
+          if (showToast) {
+            toastSuccess('Node deleted successfully!', {
+              description: `"${nodeName}" has been deleted.`,
+            });
+          }
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to delete node';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to delete node',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to delete node', {
+              description: errorMessage,
+            });
+          }
+          
           throw error;
         }
       },
@@ -149,19 +187,14 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await nodesApi.getNode(id);
+          const fetchedNode = await nodesApi.getNode(id);
           
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // For now, return null if not found in local state
           set({
             isLoading: false,
             error: null,
           });
           
-          return null;
+          return fetchedNode;
         } catch (error) {
           set({
             isLoading: false,
@@ -172,49 +205,48 @@ export const useNodesStore = create<NodesStore>()(
       },
 
       // Bulk operations
-      loadNodes: async () => {
+      loadNodes: async (filters: NodeFilters = {}, showToast = false) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await nodesApi.getNodes();
-          
-          // Simulate API call with mock data
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Import mock data from dummy folder
-          const { mockNodesStore } = await import('@/dummy');
-          const mockNodes = mockNodesStore;
+          const response = await nodesApi.getNodes(filters);
 
           set({
-            nodes: mockNodes,
+            nodes: response.results,
             isLoading: false,
             error: null,
           });
+
+          if (showToast && response.results.length > 0) {
+            toastInfo(`Loaded ${response.results.length} nodes`, {
+              description: `Found ${response.count} total nodes.`,
+            });
+          }
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to load nodes';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to load nodes',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to load nodes', {
+              description: errorMessage,
+            });
+          }
         }
       },
 
-      createMultipleNodes: async (nodes: Omit<Node, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+      createMultipleNodes: async (nodes: NodeCreateData[], showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await nodesApi.createMultipleNodes(nodes);
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          
-          const newNodes: Node[] = nodes.map((nodeData) => ({
-            ...nodeData,
-            id: `node-${Date.now()}-${Math.random()}`,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }));
+          const newNodes = await nodesApi.bulkCreateNodes(nodes);
 
           set((state) => ({
             nodes: [...state.nodes, ...newNodes],
@@ -222,25 +254,40 @@ export const useNodesStore = create<NodesStore>()(
             error: null,
           }));
 
+          if (showToast) {
+            toastSuccess(`${newNodes.length} nodes created successfully!`, {
+              description: `Created ${newNodes.length} new nodes.`,
+            });
+          }
+
           return newNodes;
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to create nodes';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to create nodes',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to create nodes', {
+              description: errorMessage,
+            });
+          }
+          
           throw error;
         }
       },
 
-      deleteMultipleNodes: async (ids: string[]) => {
+      deleteMultipleNodes: async (ids: string[], showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // await nodesApi.deleteMultipleNodes(ids);
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await nodesApi.bulkDeleteNodes(ids);
           
           set((state) => ({
             nodes: state.nodes.filter((node) => !ids.includes(node.id)),
@@ -250,11 +297,30 @@ export const useNodesStore = create<NodesStore>()(
             isLoading: false,
             error: null,
           }));
+
+          if (showToast) {
+            toastSuccess(`${ids.length} nodes deleted successfully!`, {
+              description: `Deleted ${ids.length} nodes.`,
+            });
+          }
         } catch (error) {
+          const errorMessage = error instanceof ApiError 
+            ? error.message 
+            : error instanceof Error 
+            ? error.message 
+            : 'Failed to delete nodes';
+          
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to delete nodes',
+            error: errorMessage,
           });
+
+          if (showToast) {
+            toastError('Failed to delete nodes', {
+              description: errorMessage,
+            });
+          }
+          
           throw error;
         }
       },

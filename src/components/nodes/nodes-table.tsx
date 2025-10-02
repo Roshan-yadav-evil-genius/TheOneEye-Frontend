@@ -49,7 +49,7 @@ import {
   IconFileText,
   IconTag,
 } from "@tabler/icons-react";
-import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
+import { Node, nodeTypes, nodeCategories, formatNodeDate } from "@/data/nodes";
 import { getNodeColors } from "@/constants/node-styles";
 
 interface ColumnConfig {
@@ -383,7 +383,7 @@ export function NodesTable({
                   )}
                   {columns.find(col => col.id === "updatedAt")?.visible && (
                     <TableCell className="text-sm text-muted-foreground">
-                      {node.updatedAt?.toLocaleDateString() || "Never"}
+                      {formatNodeDate(node.updatedAt)}
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "tags")?.visible && (
