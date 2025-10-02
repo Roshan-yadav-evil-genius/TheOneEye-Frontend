@@ -37,8 +37,15 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconColumns,
 } from "@tabler/icons-react";
 import { Workflow } from "./workflow-list";
+
+interface ColumnConfig {
+  id: string;
+  label: string;
+  visible: boolean;
+}
 
 interface WorkflowTableProps {
   workflows: Workflow[];
@@ -61,6 +68,17 @@ export function WorkflowTable({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  // Column configuration state
+  const [columns, setColumns] = useState<ColumnConfig[]>([
+    { id: "name", label: "Name", visible: true },
+    { id: "status", label: "Status", visible: true },
+    { id: "category", label: "Category", visible: true },
+    { id: "lastRun", label: "Last Run", visible: true },
+    { id: "nextRun", label: "Next Run", visible: true },
+    { id: "runsCount", label: "Runs Count", visible: true },
+    { id: "successRate", label: "Success Rate", visible: true },
+  ]);
 
   const totalPages = Math.ceil(workflows.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -126,8 +144,43 @@ export function WorkflowTable({
     setSelectedRows([]); // Clear selection
   };
 
+  const toggleColumnVisibility = (columnId: string) => {
+    setColumns(prev => 
+      prev.map(col => 
+        col.id === columnId ? { ...col, visible: !col.visible } : col
+      )
+    );
+  };
+
   return (
     <div className="space-y-4">
+      {/* Customize Columns Button */}
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8">
+              <IconColumns className="mr-2 h-4 w-4" />
+              Customize Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {columns.map((column) => (
+              <DropdownMenuItem
+                key={column.id}
+                onSelect={(e) => e.preventDefault()}
+                className="flex items-center space-x-2"
+              >
+                <Checkbox
+                  checked={column.visible}
+                  onCheckedChange={() => toggleColumnVisibility(column.id)}
+                />
+                <span>{column.label}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {/* Table */}
       <div className="rounded-md border">
         <Table>
@@ -142,13 +195,13 @@ export function WorkflowTable({
                   }}
                 />
               </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Last Run</TableHead>
-              <TableHead>Next Run</TableHead>
-              <TableHead>Runs Count</TableHead>
-              <TableHead>Success Rate</TableHead>
+              {columns.find(col => col.id === "name")?.visible && <TableHead>Name</TableHead>}
+              {columns.find(col => col.id === "status")?.visible && <TableHead>Status</TableHead>}
+              {columns.find(col => col.id === "category")?.visible && <TableHead>Category</TableHead>}
+              {columns.find(col => col.id === "lastRun")?.visible && <TableHead>Last Run</TableHead>}
+              {columns.find(col => col.id === "nextRun")?.visible && <TableHead>Next Run</TableHead>}
+              {columns.find(col => col.id === "runsCount")?.visible && <TableHead>Runs Count</TableHead>}
+              {columns.find(col => col.id === "successRate")?.visible && <TableHead>Success Rate</TableHead>}
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -161,30 +214,44 @@ export function WorkflowTable({
                     onCheckedChange={(checked) => handleSelectRow(workflow.id, checked as boolean)}
                   />
                 </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{workflow.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {workflow.description}
+                {columns.find(col => col.id === "name")?.visible && (
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{workflow.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {workflow.description}
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>{getStatusBadge(workflow.status)}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary">{workflow.category || "Uncategorized"}</Badge>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {workflow.lastRun || "Never"}
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {workflow.nextRun || "Not scheduled"}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {workflow.runsCount.toLocaleString()}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {formatSuccessRate(workflow.successRate)}
-                </TableCell>
+                  </TableCell>
+                )}
+                {columns.find(col => col.id === "status")?.visible && (
+                  <TableCell>{getStatusBadge(workflow.status)}</TableCell>
+                )}
+                {columns.find(col => col.id === "category")?.visible && (
+                  <TableCell>
+                    <Badge variant="secondary">{workflow.category || "Uncategorized"}</Badge>
+                  </TableCell>
+                )}
+                {columns.find(col => col.id === "lastRun")?.visible && (
+                  <TableCell className="text-sm text-muted-foreground">
+                    {workflow.lastRun || "Never"}
+                  </TableCell>
+                )}
+                {columns.find(col => col.id === "nextRun")?.visible && (
+                  <TableCell className="text-sm text-muted-foreground">
+                    {workflow.nextRun || "Not scheduled"}
+                  </TableCell>
+                )}
+                {columns.find(col => col.id === "runsCount")?.visible && (
+                  <TableCell className="text-sm">
+                    {workflow.runsCount.toLocaleString()}
+                  </TableCell>
+                )}
+                {columns.find(col => col.id === "successRate")?.visible && (
+                  <TableCell className="text-sm">
+                    {formatSuccessRate(workflow.successRate)}
+                  </TableCell>
+                )}
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
