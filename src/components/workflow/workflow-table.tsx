@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -38,6 +39,9 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
   IconColumns,
+  IconSearch,
+  IconFilter,
+  IconPlus,
 } from "@tabler/icons-react";
 import { Workflow } from "./workflow-list";
 
@@ -54,6 +58,7 @@ interface WorkflowTableProps {
   onEdit?: (id: string) => void;
   onView?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onCreate?: () => void;
 }
 
 export function WorkflowTable({
@@ -63,11 +68,17 @@ export function WorkflowTable({
   onEdit,
   onView,
   onDelete,
+  onCreate,
 }: WorkflowTableProps) {
   const router = useRouter();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  // Search and filter state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   
   // Column configuration state
   const [columns, setColumns] = useState<ColumnConfig[]>([
@@ -80,10 +91,30 @@ export function WorkflowTable({
     { id: "successRate", label: "Success Rate", visible: true },
   ]);
 
-  const totalPages = Math.ceil(workflows.length / rowsPerPage);
+  // Get unique categories from workflows
+  const categories = Array.from(
+    new Set(workflows.map(w => w.category).filter((category): category is string => Boolean(category)))
+  );
+
+  // Filter workflows based on search and filters
+  const filteredWorkflows = workflows.filter(workflow => {
+    const matchesSearch = workflow.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+      workflow.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === "all" || workflow.status === statusFilter
+    const matchesCategory = categoryFilter === "all" || workflow.category === categoryFilter
+    
+    return matchesSearch && matchesStatus && matchesCategory
+  });
+
+  const totalPages = Math.ceil(filteredWorkflows.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const currentWorkflows = workflows.slice(startIndex, endIndex);
+  const currentWorkflows = filteredWorkflows.slice(startIndex, endIndex);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -154,31 +185,111 @@ export function WorkflowTable({
 
   return (
     <div className="space-y-4">
-      {/* Customize Columns Button */}
-      <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8">
-              <IconColumns className="mr-2 h-4 w-4" />
-              Customize Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {columns.map((column) => (
-              <DropdownMenuItem
-                key={column.id}
-                onSelect={(e) => e.preventDefault()}
-                className="flex items-center space-x-2"
-              >
-                <Checkbox
-                  checked={column.visible}
-                  onCheckedChange={() => toggleColumnVisibility(column.id)}
-                />
-                <span>{column.label}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Control Buttons Row */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Left side - Search and Results count */}
+        <div className="flex items-center gap-4">
+          {/* Search Field */}
+          <div className="relative">
+            <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search workflows..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-64 h-8"
+            />
+          </div>
+          
+          {/* Results count */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <IconFilter className="h-4 w-4" />
+            <span>
+              {filteredWorkflows.length} of {workflows.length} workflows
+            </span>
+          </div>
+        </div>
+        
+        {/* Right side - Control buttons */}
+        <div className="flex flex-wrap gap-2">
+
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <IconFilter className="mr-2 h-4 w-4" />
+                Filter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <div className="p-2 space-y-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Status</label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="error">Error</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {categories.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Category</label>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {categories.map(category => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Customize Columns */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <IconColumns className="mr-2 h-4 w-4" />
+                Customize Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {columns.map((column) => (
+                <DropdownMenuItem
+                  key={column.id}
+                  onSelect={(e) => e.preventDefault()}
+                  className="flex items-center space-x-2"
+                >
+                  <Checkbox
+                    checked={column.visible}
+                    onCheckedChange={() => toggleColumnVisibility(column.id)}
+                  />
+                  <span>{column.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Create Workflow */}
+          <Button onClick={onCreate} size="sm" className="h-8">
+            <IconPlus className="mr-2 h-4 w-4" />
+            Create Workflow
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -191,7 +302,7 @@ export function WorkflowTable({
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
                   ref={(el) => {
-                    if (el) el.indeterminate = isIndeterminate;
+                    if (el) (el as any).indeterminate = isIndeterminate;
                   }}
                 />
               </TableHead>
@@ -299,7 +410,7 @@ export function WorkflowTable({
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          {selectedRows.length} of {workflows.length} row(s) selected.
+          {selectedRows.length} of {filteredWorkflows.length} row(s) selected.
         </div>
         
         <div className="flex items-center space-x-2">
