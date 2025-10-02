@@ -1,0 +1,302 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  IconDots,
+  IconPlayerPlay,
+  IconPlayerStop,
+  IconEdit,
+  IconEye,
+  IconTrash,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsLeft,
+  IconChevronsRight,
+} from "@tabler/icons-react";
+import { Workflow } from "./workflow-list";
+
+interface WorkflowTableProps {
+  workflows: Workflow[];
+  onRun?: (id: string) => void;
+  onStop?: (id: string) => void;
+  onEdit?: (id: string) => void;
+  onView?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+export function WorkflowTable({
+  workflows,
+  onRun,
+  onStop,
+  onEdit,
+  onView,
+  onDelete,
+}: WorkflowTableProps) {
+  const router = useRouter();
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const totalPages = Math.ceil(workflows.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentWorkflows = workflows.slice(startIndex, endIndex);
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(currentWorkflows.map((workflow) => workflow.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (workflowId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows((prev) => [...prev, workflowId]);
+    } else {
+      setSelectedRows((prev) => prev.filter((id) => id !== workflowId));
+    }
+  };
+
+  const isAllSelected = currentWorkflows.length > 0 && selectedRows.length === currentWorkflows.length;
+  const isIndeterminate = selectedRows.length > 0 && selectedRows.length < currentWorkflows.length;
+
+  const getStatusBadge = (status: "active" | "inactive" | "error") => {
+    if (status === "active") {
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+          <div className="w-2 h-2 bg-green-500 rounded-full mr-1" />
+          Active
+        </Badge>
+      );
+    }
+    if (status === "error") {
+      return (
+        <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+          <div className="w-2 h-2 bg-red-500 rounded-full mr-1" />
+          Error
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline" className="text-gray-600 border-gray-300 dark:text-gray-400 dark:border-gray-600">
+        <div className="w-2 h-2 bg-gray-400 rounded-full mr-1" />
+        Inactive
+      </Badge>
+    );
+  };
+
+  const formatSuccessRate = (rate: number) => {
+    return `${rate.toFixed(1)}%`;
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedRows([]); // Clear selection when changing pages
+  };
+
+  const handleRowsPerPageChange = (value: string) => {
+    setRowsPerPage(Number(value));
+    setCurrentPage(1); // Reset to first page
+    setSelectedRows([]); // Clear selection
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Table */}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  ref={(el) => {
+                    if (el) el.indeterminate = isIndeterminate;
+                  }}
+                />
+              </TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Last Run</TableHead>
+              <TableHead>Next Run</TableHead>
+              <TableHead>Runs Count</TableHead>
+              <TableHead>Success Rate</TableHead>
+              <TableHead className="w-12"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentWorkflows.map((workflow) => (
+              <TableRow key={workflow.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedRows.includes(workflow.id)}
+                    onCheckedChange={(checked) => handleSelectRow(workflow.id, checked as boolean)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{workflow.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {workflow.description}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>{getStatusBadge(workflow.status)}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary">{workflow.category || "Uncategorized"}</Badge>
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {workflow.lastRun || "Never"}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {workflow.nextRun || "Not scheduled"}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {workflow.runsCount.toLocaleString()}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {formatSuccessRate(workflow.successRate)}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <IconDots className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {workflow.status === "active" && (
+                        <DropdownMenuItem onClick={() => onStop?.(workflow.id)}>
+                          <IconPlayerStop className="mr-2 h-4 w-4" />
+                          Stop
+                        </DropdownMenuItem>
+                      )}
+                      {(workflow.status === "inactive" || workflow.status === "error") && (
+                        <DropdownMenuItem onClick={() => onRun?.(workflow.id)}>
+                          <IconPlayerPlay className="mr-2 h-4 w-4" />
+                          Run Now
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={() => onView?.(workflow.id)}>
+                        <IconEye className="mr-2 h-4 w-4" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit?.(workflow.id)}>
+                        <IconEdit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onDelete?.(workflow.id)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <IconTrash className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {selectedRows.length} of {workflows.length} row(s) selected.
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Rows per page</p>
+            <Select value={rowsPerPage.toString()} onValueChange={handleRowsPerPageChange}>
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={pageSize.toString()}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
+            </p>
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className="h-8 w-8 p-0"
+              >
+                <IconChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-8 w-8 p-0"
+              >
+                <IconChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="h-8 w-8 p-0"
+              >
+                <IconChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className="h-8 w-8 p-0"
+              >
+                <IconChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

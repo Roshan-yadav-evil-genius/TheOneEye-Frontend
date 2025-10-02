@@ -26,6 +26,17 @@ export const mockWorkflows: Workflow[] = [
     tags: ["backup", "database", "security"]
   },
   {
+    id: "wf-011",
+    name: "Database Migration",
+    description: "Automated migration of legacy database to new schema",
+    status: "error",
+    lastRun: "2 hours ago",
+    runsCount: 3,
+    successRate: 0,
+    category: "Infrastructure",
+    tags: ["migration", "database", "legacy"]
+  },
+  {
     id: "wf-003",
     name: "Customer Support Ticket Routing",
     description: "Intelligent routing of support tickets based on priority and category",
@@ -47,6 +58,17 @@ export const mockWorkflows: Workflow[] = [
     successRate: 100,
     category: "Finance",
     tags: ["billing", "invoices", "subscription"]
+  },
+  {
+    id: "wf-012",
+    name: "API Rate Limiting",
+    description: "Monitor and enforce API rate limits across all services",
+    status: "error",
+    lastRun: "1 hour ago",
+    runsCount: 45,
+    successRate: 22.2,
+    category: "Security",
+    tags: ["api", "rate-limiting", "monitoring"]
   },
   {
     id: "wf-005",
@@ -114,5 +136,16 @@ export const mockWorkflows: Workflow[] = [
     successRate: 0,
     category: "Sales",
     tags: ["leads", "scoring", "ai"]
+  },
+  {
+    id: "wf-013",
+    name: "Content Moderation",
+    description: "AI-powered content moderation for user-generated content",
+    status: "error",
+    lastRun: "30 minutes ago",
+    runsCount: 156,
+    successRate: 15.4,
+    category: "Content",
+    tags: ["moderation", "ai", "content"]
   }
 ]

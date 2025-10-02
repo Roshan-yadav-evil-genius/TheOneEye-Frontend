@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { WorkflowCard } from "@/components/workflow/workflow-card"
+import { WorkflowTable } from "@/components/workflow/workflow-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -17,7 +17,7 @@ export interface Workflow {
   id: string
   name: string
   description: string
-  status: "active" | "inactive"
+  status: "active" | "inactive" | "error"
   lastRun?: string
   nextRun?: string
   runsCount: number
@@ -63,13 +63,22 @@ export function WorkflowList({
     // TODO: Implement workflow execution
   }
 
+  const handleStop = (id: string) => {
+    console.log(`Stopping workflow: ${id}`)
+    // TODO: Implement workflow stop
+  }
+
   const handleEdit = (id: string) => {
-    console.log(`Editing workflow: ${id}`)
-    // TODO: Navigate to workflow editor
+    router.push(`/workflow/${id}`)
   }
 
   const handleView = (id: string) => {
     router.push(`/workflow/${id}/details`)
+  }
+
+  const handleDelete = (id: string) => {
+    console.log(`Deleting workflow: ${id}`)
+    // TODO: Implement workflow deletion
   }
 
   const handleCreate = () => {
@@ -101,6 +110,7 @@ export function WorkflowList({
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="error">Error</SelectItem>
               </SelectContent>
             </Select>
             
@@ -136,19 +146,16 @@ export function WorkflowList({
         </span>
       </div>
 
-      {/* Workflow cards grid */}
+      {/* Workflow table */}
       {filteredWorkflows.length > 0 ? (
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:grid-cols-2 xl:grid-cols-3">
-          {filteredWorkflows.map((workflow) => (
-            <WorkflowCard
-              key={workflow.id}
-              {...workflow}
-              onRun={handleRun}
-              onEdit={handleEdit}
-              onView={handleView}
-            />
-          ))}
-        </div>
+        <WorkflowTable
+          workflows={filteredWorkflows}
+          onRun={handleRun}
+          onStop={handleStop}
+          onEdit={handleEdit}
+          onView={handleView}
+          onDelete={handleDelete}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="rounded-full bg-muted p-3 mb-4">
