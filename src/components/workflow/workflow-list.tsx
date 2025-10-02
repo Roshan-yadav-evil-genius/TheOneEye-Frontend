@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { WorkflowCard } from "@/components/workflow-card"
+import { WorkflowCard } from "@/components/workflow/workflow-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 

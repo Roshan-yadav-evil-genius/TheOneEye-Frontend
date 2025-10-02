@@ -1,4 +1,4 @@
-import { WorkflowList } from "@/components/workflow-list"
+import { WorkflowList } from "@/components/workflow/workflow-list"
 import { mockWorkflows } from "@/data/mock-workflows"
 
 export function WorkflowPage() {

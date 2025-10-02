@@ -1,4 +1,4 @@
-import { Workflow } from "@/components/workflow-list"
+import { Workflow } from "@/components/workflow/workflow-list"
 
 export const mockWorkflows: Workflow[] = [
   {

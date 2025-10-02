@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
-import { SidebarProviderWrapper } from "@/components/sidebar-provider";
+import { SidebarProviderWrapper } from "@/components/layout/sidebar-provider";
 import { AlertProvider } from "@/contexts/alert-context";
 import { Toaster } from "sonner";
-import { StoreInitializer } from "@/components/store-initializer";
+import { StoreInitializer } from "@/components/common/store-initializer";
 
 
 export const metadata: Metadata = {
