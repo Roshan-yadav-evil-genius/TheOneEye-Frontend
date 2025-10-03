@@ -1,6 +1,6 @@
-import { Project } from "@/stores/projects-store";
+import { TProject } from "@/types";
 
-export const mockProjects: Project[] = [
+export const mockProjects: TProject[] = [
   {
     id: 'project-1',
     name: 'Marketing Automation Platform',

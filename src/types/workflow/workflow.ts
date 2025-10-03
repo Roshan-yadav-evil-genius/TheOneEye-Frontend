@@ -1,5 +1,5 @@
 // Workflow-specific types
-export interface WorkflowNode {
+export interface TWorkflowNode {
   id: string;
   type: string;
   position: {
@@ -9,7 +9,7 @@ export interface WorkflowNode {
   data: Record<string, any>;
 }
 
-export interface WorkflowEdge {
+export interface TWorkflowEdge {
   id: string;
   source: string;
   target: string;
@@ -17,7 +17,7 @@ export interface WorkflowEdge {
   targetHandle?: string;
 }
 
-export interface WorkflowCanvas {
-  nodes: WorkflowNode[];
-  edges: WorkflowEdge[];
+export interface TWorkflowCanvas {
+  nodes: TWorkflowNode[];
+  edges: TWorkflowEdge[];
 }

@@ -1,24 +1,24 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Node, NodesState, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/types';
+import { TNode, TNodesState, TNodeCreateData, TNodeUpdateData, TNodeFilters, TApiError } from '@/types';
 import { getNodesApi } from '@/lib/api/config';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 
 interface NodesActions {
   // CRUD operations
-  createNode: (nodeData: NodeCreateData, showToast?: boolean) => Promise<Node>;
-  updateNode: (id: string, nodeData: NodeUpdateData, showToast?: boolean) => Promise<Node>;
+  createNode: (nodeData: TNodeCreateData, showToast?: boolean) => Promise<TNode>;
+  updateNode: (id: string, nodeData: TTNodeUpdateData, showToast?: boolean) => Promise<TNode>;
   deleteNode: (id: string, showToast?: boolean) => Promise<void>;
-  getNode: (id: string) => Promise<Node | null>;
+  getNode: (id: string) => Promise<TNode | null>;
   
   // Bulk operations
-  loadNodes: (filters?: NodeFilters, showToast?: boolean) => Promise<void>;
-  createMultipleNodes: (nodes: NodeCreateData[], showToast?: boolean) => Promise<Node[]>;
+  loadNodes: (filters?: TTNodeFilters, showToast?: boolean) => Promise<void>;
+  createMultipleNodes: (nodes: TNodeCreateData[], showToast?: boolean) => Promise<TNode[]>;
   deleteMultipleNodes: (ids: string[], showToast?: boolean) => Promise<void>;
   
   // Selection and filtering
-  selectNode: (node: Node | null) => void;
-  setFilters: (filters: Partial<NodesState['filters']>) => void;
+  selectNode: (node: TNode | null) => void;
+  setFilters: (filters: Partial<TNodesState['filters']>) => void;
   clearFilters: () => void;
   
   // Utility actions
@@ -27,9 +27,9 @@ interface NodesActions {
   clearError: () => void;
 }
 
-type NodesStore = NodesState & NodesActions;
+type NodesStore = TNodesState & NodesActions;
 
-const initialState: NodesState = {
+const initialState: TNodesState = {
   nodes: [],
   selectedNode: null,
   isLoading: false,
@@ -47,7 +47,7 @@ export const useNodesStore = create<NodesStore>()(
       ...initialState,
 
       // CRUD operations
-      createNode: async (nodeData: NodeCreateData, showToast = true) => {
+      createNode: async (nodeData: TNodeCreateData, showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -88,7 +88,7 @@ export const useNodesStore = create<NodesStore>()(
         }
       },
 
-      updateNode: async (id: string, nodeData: NodeUpdateData, showToast = true) => {
+      updateNode: async (id: string, nodeData: TNodeUpdateData, showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -205,7 +205,7 @@ export const useNodesStore = create<NodesStore>()(
       },
 
       // Bulk operations
-      loadNodes: async (filters: NodeFilters = {}, showToast = false) => {
+      loadNodes: async (filters: TNodeFilters = {}, showToast = false) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -242,7 +242,7 @@ export const useNodesStore = create<NodesStore>()(
         }
       },
 
-      createMultipleNodes: async (nodes: NodeCreateData[], showToast = true) => {
+      createMultipleNodes: async (nodes: TNodeCreateData[], showToast = true) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -326,7 +326,7 @@ export const useNodesStore = create<NodesStore>()(
       },
 
       // Selection and filtering
-      selectNode: (node: Node | null) => {
+      selectNode: (node: TNode | null) => {
         set({ selectedNode: node });
       },
 

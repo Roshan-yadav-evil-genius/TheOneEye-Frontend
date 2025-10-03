@@ -43,7 +43,7 @@ import {
   IconFilter,
   IconPlus,
 } from "@tabler/icons-react";
-import { Workflow } from "./workflow-list";
+import { TWorkflow } from "@/types";
 
 interface ColumnConfig {
   id: string;
@@ -52,7 +52,7 @@ interface ColumnConfig {
 }
 
 interface WorkflowTableProps {
-  workflows: Workflow[];
+  workflows: TWorkflow[];
   onRun?: (id: string) => void;
   onStop?: (id: string) => void;
   onEdit?: (id: string) => void;

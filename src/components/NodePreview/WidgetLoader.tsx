@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Node } from "@/types";
+import { TNode } from "@/types";
 
 interface WidgetLoaderProps {
-  nodeData: Partial<Node>;
+  nodeData: Partial<TNode>;
   children: (widgets: any[]) => React.ReactNode;
 }
 

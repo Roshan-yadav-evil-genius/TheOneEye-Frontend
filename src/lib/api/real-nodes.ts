@@ -1,11 +1,11 @@
-import { Node } from '@/types';
+import { TNode } from '@/types';
 import { 
-  NodeCreateData, 
-  NodeUpdateData, 
-  NodeFilters, 
-  PaginatedResponse,
-  NodeStats,
-  ApiError 
+  TTNodeCreateData, 
+  TTNodeUpdateData, 
+  TTNodeFilters, 
+  TTPaginatedResponse,
+  TTNodeStats,
+  TApiError 
 } from './types';
 
 // Real API client implementation
@@ -31,7 +31,7 @@ class RealNodesApiClient {
   }
 
   // Helper method to build query parameters
-  private buildQueryParams(filters: NodeFilters): string {
+  private buildQueryParams(filters: TNodeFilters): string {
     const params = new URLSearchParams();
     
     Object.entries(filters).forEach(([key, value]) => {
@@ -48,7 +48,7 @@ class RealNodesApiClient {
   }
 
   // Transform backend node to frontend node format
-  private transformNode(backendNode: any): Node {
+  private transformNode(backendNode: any): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
@@ -67,7 +67,7 @@ class RealNodesApiClient {
   }
 
   // Transform frontend node data to backend format
-  private transformNodeData(nodeData: NodeCreateData | NodeUpdateData): any {
+  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): any {
     return {
       name: nodeData.name,
       type: nodeData.type,
@@ -83,7 +83,7 @@ class RealNodesApiClient {
   }
 
   // CRUD Operations
-  async getNodes(filters: NodeFilters = {}): Promise<PaginatedResponse<Node>> {
+  async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
     const queryString = this.buildQueryParams(filters);
     const url = `${this.baseUrl}/nodes/${queryString ? `?${queryString}` : ''}`;
     
@@ -98,13 +98,13 @@ class RealNodesApiClient {
     };
   }
 
-  async getNode(id: string): Promise<Node> {
+  async getNode(id: string): Promise<TNode> {
     const response = await fetch(`${this.baseUrl}/nodes/${id}/`);
     const data = await this.handleResponse<any>(response);
     return this.transformNode(data);
   }
 
-  async createNode(nodeData: NodeCreateData): Promise<Node> {
+  async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
     // Check if there's a logo file to upload
@@ -147,7 +147,7 @@ class RealNodesApiClient {
     return this.transformNode(data);
   }
 
-  async updateNode(id: string, nodeData: NodeUpdateData): Promise<Node> {
+  async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
     const response = await fetch(`${this.baseUrl}/nodes/${id}/`, {
@@ -177,7 +177,7 @@ class RealNodesApiClient {
     }
   }
 
-  async bulkCreateNodes(nodesData: NodeCreateData[]): Promise<Node[]> {
+  async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<Node[]> {
     const transformedData = nodesData.map(nodeData => this.transformNodeData(nodeData));
     
     const response = await fetch(`${this.baseUrl}/nodes/bulk_create/`, {
@@ -192,7 +192,7 @@ class RealNodesApiClient {
     return data.map((node: any) => this.transformNode(node));
   }
 
-  async getNodeStats(): Promise<NodeStats> {
+  async getTNodeStats(): Promise<TNodeStats> {
     const response = await fetch(`${this.baseUrl}/nodes/stats/`);
     const data = await this.handleResponse<any>(response);
     

@@ -1,55 +1,55 @@
 // Import stores for internal use
-import { useUserStore } from './user-store';
+import { useTUserStore } from './user-store';
 import { useNodesStore } from './nodes-store';
 import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
-import { useWorkflowStore } from './workflow-store';
+import { useTWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
-import { useProjectsStore } from './projects-store';
+import { useTProjectsStore } from './projects-store';
 
 // Re-export stores for external use
-export { useUserStore } from './user-store';
+export { useTUserStore as useUserStore } from './user-store';
 export { useNodesStore } from './nodes-store';
 export { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
-export { useWorkflowStore } from './workflow-store';
+export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
-export { useProjectsStore } from './projects-store';
+export { useTProjectsStore as useProjectsStore } from './projects-store';
 
 // Export all types
 export type {
-  User,
-  Node,
-  Workflow,
-  WorkflowConnection,
-  Project,
-  FormConfiguration,
-  UIState,
-  Breadcrumb,
-  Notification,
-  UserState,
-  NodesState,
-  WorkflowState,
-  ProjectsState,
-  FormState,
-  UIStoreState,
+  TUser,
+  TNode,
+  TWorkflow,
+  TWorkflowConnection,
+  TProject,
+  TFormConfiguration,
+  TUIState,
+  TBreadcrumb,
+  TNotification,
+  TUserState,
+  TNodesState,
+  TWorkflowState,
+  TProjectsState,
+  TFormState,
+  TUIStoreState,
 } from './types';
 
 // Store initialization utilities
 export const initializeStores = async () => {
   // Initialize stores with default data if needed
   const { loadNodes } = useEnhancedNodesStore.getState();
-  const { loadWorkflows } = useWorkflowStore.getState();
-  const { loadFormConfigurations } = useFormStore.getState();
-  const { loadProjects } = useProjectsStore.getState();
+  const { loadTWorkflows } = useTWorkflowStore.getState();
+  const { loadTFormConfigurations } = useFormStore.getState();
+  const { loadTProjects } = useTProjectsStore.getState();
 
   try {
     // Load initial data in parallel
     await Promise.all([
       loadNodes({}, { showToast: false }), // Don't show toast on initial load
-      loadWorkflows(),
-      loadFormConfigurations(),
-      loadProjects(),
+      loadTWorkflows(),
+      loadTFormConfigurations(),
+      loadTProjects(),
     ]);
   } catch (error) {
     console.error('Failed to initialize stores:', error);
@@ -59,9 +59,9 @@ export const initializeStores = async () => {
 // Store reset utilities
 export const resetAllStores = () => {
   // Reset all stores to initial state
-  useUserStore.getState().logout();
+  useTUserStore.getState().logout();
   useEnhancedNodesStore.getState().reset();
-  useWorkflowStore.setState({
+  useTWorkflowStore.setState({
     workflows: [],
     activeWorkflow: null,
     isLoading: false,
@@ -75,7 +75,7 @@ export const resetAllStores = () => {
     isLoading: false,
     error: null,
   });
-  useProjectsStore.setState({
+  useTProjectsStore.setState({
     projects: [],
     activeProject: null,
     isLoading: false,
@@ -87,8 +87,8 @@ export const resetAllStores = () => {
 // Store synchronization utilities
 export const syncStores = () => {
   // Sync related data between stores
-  const { workflows } = useWorkflowStore.getState();
-  const { projects } = useProjectsStore.getState();
+  const { workflows } = useTWorkflowStore.getState();
+  const { projects } = useTProjectsStore.getState();
   
   // Update project workflows if needed
   projects.forEach((project) => {
@@ -102,7 +102,7 @@ export const syncStores = () => {
     
     if (invalidWorkflowIds.length > 0) {
       invalidWorkflowIds.forEach((workflowId) => {
-        useProjectsStore.getState().removeWorkflowFromProject(project.id, workflowId);
+        useTProjectsStore.getState().removeWorkflowFromProject(project.id, workflowId);
       });
     }
   });
@@ -111,8 +111,8 @@ export const syncStores = () => {
 // Store selectors for common use cases
 export const storeSelectors = {
   // User selectors
-  getCurrentUser: () => useUserStore.getState().user,
-  isAuthenticated: () => useUserStore.getState().isAuthenticated,
+  getCurrentUser: () => useTUserStore.getState().user,
+  isAuthenticated: () => useTUserStore.getState().isAuthenticated,
   
   // Node selectors
   getNodesByType: (type: string) => 
@@ -130,14 +130,14 @@ export const storeSelectors = {
   },
   
   // Workflow selectors
-  getActiveWorkflow: () => useWorkflowStore.getState().activeWorkflow,
+  getActiveWorkflow: () => useTWorkflowStore.getState().activeWorkflow,
   getWorkflowsByStatus: (status: string) => 
-    useWorkflowStore.getState().workflows.filter((workflow) => workflow.status === status),
+    useTWorkflowStore.getState().workflows.filter((workflow) => workflow.status === status),
   
   // Project selectors
-  getActiveProject: () => useProjectsStore.getState().activeProject,
+  getActiveProject: () => useTProjectsStore.getState().activeProject,
   getProjectsByStatus: (status: string) => 
-    useProjectsStore.getState().projects.filter((project) => project.status === status),
+    useTProjectsStore.getState().projects.filter((project) => project.status === status),
   
   // Form selectors
   getFormConfigurationsByNode: (nodeId: string) => 
@@ -171,7 +171,7 @@ export const storeActions = {
   },
   
   createWorkflowWithNodes: async (workflowData: any, nodeIds: string[]) => {
-    const { createWorkflow } = useWorkflowStore.getState();
+    const { createWorkflow } = useTWorkflowStore.getState();
     const { nodes } = useNodesStore.getState();
     
     const workflow = await createWorkflow(workflowData);
@@ -179,20 +179,20 @@ export const storeActions = {
     
     // Add nodes to workflow
     for (const node of workflowNodes) {
-      await useWorkflowStore.getState().addNodeToWorkflow(workflow.id, node);
+      await useTWorkflowStore.getState().addNodeToWorkflow(workflow.id, node);
     }
     
     return { workflow, nodes: workflowNodes };
   },
   
   createProjectWithWorkflows: async (projectData: any, workflowIds: string[]) => {
-    const { createProject } = useProjectsStore.getState();
+    const { createProject } = useTProjectsStore.getState();
     
     const project = await createProject(projectData);
     
     // Add workflows to project
     for (const workflowId of workflowIds) {
-      await useProjectsStore.getState().addWorkflowToProject(project.id, workflowId);
+      await useTProjectsStore.getState().addWorkflowToProject(project.id, workflowId);
     }
     
     return project;
@@ -215,8 +215,8 @@ export const storeActions = {
   },
   
   deleteWorkflowAndNodes: async (workflowId: string) => {
-    const { workflows } = useWorkflowStore.getState();
-    const { deleteWorkflow } = useWorkflowStore.getState();
+    const { workflows } = useTWorkflowStore.getState();
+    const { deleteWorkflow } = useTWorkflowStore.getState();
     const { deleteNode } = useNodesStore.getState();
     
     const workflow = workflows.find((w) => w.id === workflowId);

@@ -1,6 +1,6 @@
-import { Workflow } from "@/types";
+import { TWorkflow } from "@/types";
 
-export const mockWorkflowsStore: Workflow[] = [
+export const mockWorkflowsStore: TWorkflow[] = [
   {
     id: 'workflow-1',
     name: 'Email Marketing Campaign',

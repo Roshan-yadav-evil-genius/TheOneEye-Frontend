@@ -1,17 +1,17 @@
 // API Response Types
-export interface ApiResponse<T> {
+export interface TApiResponse<T> {
   data: T;
   message?: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface TPaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
   results: T[];
 }
 
-export interface NodeStats {
+export interface TNodeStats {
   total_nodes: number;
   active_nodes: number;
   inactive_nodes: number;

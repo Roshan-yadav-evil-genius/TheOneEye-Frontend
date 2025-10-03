@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { WidgetConfig } from '../inputs';
 import { Input } from '../../ui/input';

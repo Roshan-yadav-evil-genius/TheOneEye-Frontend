@@ -3,12 +3,12 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { IconInfoCircle, IconTag } from "@tabler/icons-react";
-import { Node } from "@/types";
+import { TNode } from "@/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getNodeColors } from "@/constants/node-styles";
 
 interface NodeHeaderProps {
-  nodeData: Partial<Node>;
+  nodeData: Partial<TNode>;
   logoPreview?: string | null;
 }
 

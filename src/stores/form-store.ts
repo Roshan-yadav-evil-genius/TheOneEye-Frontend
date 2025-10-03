@@ -1,32 +1,32 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { FormConfiguration, FormState } from './types';
+import { TTFormConfiguration, TTFormState } from './types';
 
 interface FormActions {
   // CRUD operations
-  createFormConfiguration: (configData: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'>) => Promise<FormConfiguration>;
-  updateFormConfiguration: (id: string, configData: Partial<FormConfiguration>) => Promise<FormConfiguration>;
-  deleteFormConfiguration: (id: string) => Promise<void>;
-  getFormConfiguration: (id: string) => Promise<FormConfiguration | null>;
+  createTFormConfiguration: (configData: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'>) => Promise<TFormConfiguration>;
+  updateTFormConfiguration: (id: string, configData: Partial<TFormConfiguration>) => Promise<TFormConfiguration>;
+  deleteTFormConfiguration: (id: string) => Promise<void>;
+  getTFormConfiguration: (id: string) => Promise<TFormConfiguration | null>;
   
   // Bulk operations
-  loadFormConfigurations: () => Promise<void>;
-  createMultipleFormConfigurations: (configs: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<FormConfiguration[]>;
-  deleteMultipleFormConfigurations: (ids: string[]) => Promise<void>;
+  loadTFormConfigurations: () => Promise<void>;
+  createMultipleTFormConfigurations: (configs: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<TFormConfiguration[]>;
+  deleteMultipleTFormConfigurations: (ids: string[]) => Promise<void>;
   
   // Form management
-  setActiveConfiguration: (config: FormConfiguration | null) => void;
-  duplicateConfiguration: (id: string) => Promise<FormConfiguration>;
+  setActiveConfiguration: (config: TFormConfiguration | null) => void;
+  duplicateConfiguration: (id: string) => Promise<TFormConfiguration>;
   exportConfiguration: (id: string) => Promise<string>;
-  importConfiguration: (jsonString: string) => Promise<FormConfiguration>;
+  importConfiguration: (jsonString: string) => Promise<TFormConfiguration>;
   
   // Form validation and testing
-  validateConfiguration: (config: FormConfiguration) => Promise<{ isValid: boolean; errors: string[] }>;
-  testConfiguration: (config: FormConfiguration, testData: Record<string, any>) => Promise<{ success: boolean; result: any; errors: string[] }>;
+  validateConfiguration: (config: TFormConfiguration) => Promise<{ isValid: boolean; errors: string[] }>;
+  testConfiguration: (config: TFormConfiguration, testData: Record<string, any>) => Promise<{ success: boolean; result: any; errors: string[] }>;
   
   // Template management
-  loadTemplates: () => Promise<FormConfiguration[]>;
-  saveAsTemplate: (config: FormConfiguration, templateName: string) => Promise<FormConfiguration>;
+  loadTemplates: () => Promise<TFormConfiguration[]>;
+  saveAsTemplate: (config: TFormConfiguration, templateName: string) => Promise<TFormConfiguration>;
   
   // Utility actions
   setLoading: (loading: boolean) => void;
@@ -34,9 +34,9 @@ interface FormActions {
   clearError: () => void;
 }
 
-type FormStore = FormState & FormActions;
+type FormStore = TFormState & FormActions;
 
-const initialState: FormState = {
+const initialState: TFormState = {
   configurations: [],
   activeConfiguration: null,
   isLoading: false,
@@ -49,7 +49,7 @@ export const useFormStore = create<FormStore>()(
       ...initialState,
 
       // CRUD operations
-      createFormConfiguration: async (configData: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'>) => {
+      createTFormConfiguration: async (configData: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'>) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -59,7 +59,7 @@ export const useFormStore = create<FormStore>()(
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const newConfiguration: FormConfiguration = {
+          const newConfiguration: TFormConfiguration = {
             ...configData,
             id: `form-config-${Date.now()}`,
             createdAt: new Date(),
@@ -82,7 +82,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      updateFormConfiguration: async (id: string, configData: Partial<FormConfiguration>) => {
+      updateTFormConfiguration: async (id: string, configData: Partial<TFormConfiguration>) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -92,11 +92,11 @@ export const useFormStore = create<FormStore>()(
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          const updatedConfiguration: FormConfiguration = {
+          const updatedConfiguration: TFormConfiguration = {
             ...configData,
             id,
             updatedAt: new Date(),
-          } as FormConfiguration;
+          } as TFormConfiguration;
 
           set((state) => ({
             configurations: state.configurations.map((config) =>
@@ -117,7 +117,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      deleteFormConfiguration: async (id: string) => {
+      deleteTFormConfiguration: async (id: string) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -142,7 +142,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      getFormConfiguration: async (id: string) => {
+      getTFormConfiguration: async (id: string) => {
         const { configurations } = get();
         const config = configurations.find((c) => c.id === id);
         
@@ -176,7 +176,7 @@ export const useFormStore = create<FormStore>()(
       },
 
       // Bulk operations
-      loadFormConfigurations: async () => {
+      loadTFormConfigurations: async () => {
         set({ isLoading: true, error: null });
         
         try {
@@ -186,7 +186,7 @@ export const useFormStore = create<FormStore>()(
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const mockConfigurations: FormConfiguration[] = [
+          const mockConfigurations: TFormConfiguration[] = [
             {
               id: 'form-config-1',
               name: 'Email Configuration Form',
@@ -275,7 +275,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      createMultipleFormConfigurations: async (configs: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+      createMultipleTFormConfigurations: async (configs: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'>[]) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -285,7 +285,7 @@ export const useFormStore = create<FormStore>()(
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1500));
           
-          const newConfigurations: FormConfiguration[] = configs.map((configData) => ({
+          const newConfigurations: TFormConfiguration[] = configs.map((configData) => ({
             ...configData,
             id: `form-config-${Date.now()}-${Math.random()}`,
             createdAt: new Date(),
@@ -308,7 +308,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      deleteMultipleFormConfigurations: async (ids: string[]) => {
+      deleteMultipleTFormConfigurations: async (ids: string[]) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -336,7 +336,7 @@ export const useFormStore = create<FormStore>()(
       },
 
       // Form management
-      setActiveConfiguration: (config: FormConfiguration | null) => {
+      setActiveConfiguration: (config: TFormConfiguration | null) => {
         set({ activeConfiguration: config });
       },
 
@@ -348,14 +348,14 @@ export const useFormStore = create<FormStore>()(
           throw new Error('Configuration not found');
         }
 
-        const duplicatedConfig: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
+        const duplicatedConfig: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
           name: `${originalConfig.name} (Copy)`,
           description: originalConfig.description,
           json: { ...originalConfig.json },
           nodeId: originalConfig.nodeId,
         };
 
-        return await get().createFormConfiguration(duplicatedConfig);
+        return await get().createTFormConfiguration(duplicatedConfig);
       },
 
       exportConfiguration: async (id: string) => {
@@ -378,21 +378,21 @@ export const useFormStore = create<FormStore>()(
             throw new Error('Invalid configuration format');
           }
 
-          const importedConfig: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
+          const importedConfig: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
             name: configData.name,
             description: configData.description || '',
             json: configData.json,
             nodeId: configData.nodeId,
           };
 
-          return await get().createFormConfiguration(importedConfig);
+          return await get().createTFormConfiguration(importedConfig);
         } catch (error) {
           throw new Error('Failed to import configuration: ' + (error instanceof Error ? error.message : 'Invalid JSON'));
         }
       },
 
       // Form validation and testing
-      validateConfiguration: async (config: FormConfiguration) => {
+      validateConfiguration: async (config: TFormConfiguration) => {
         try {
           // TODO: Implement actual validation logic
           // This could include checking for required fields, valid JSON structure, etc.
@@ -423,7 +423,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      testConfiguration: async (config: FormConfiguration, testData: Record<string, any>) => {
+      testConfiguration: async (config: TFormConfiguration, testData: Record<string, any>) => {
         try {
           // TODO: Implement actual form testing logic
           // This could include rendering the form and validating the test data
@@ -464,7 +464,7 @@ export const useFormStore = create<FormStore>()(
           // Simulate API call with mock template data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const mockTemplates: FormConfiguration[] = [
+          const mockTemplates: TFormConfiguration[] = [
             {
               id: 'template-1',
               name: 'Contact Form Template',
@@ -498,15 +498,15 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      saveAsTemplate: async (config: FormConfiguration, templateName: string) => {
-        const templateConfig: Omit<FormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
+      saveAsTemplate: async (config: TFormConfiguration, templateName: string) => {
+        const templateConfig: Omit<TFormConfiguration, 'id' | 'createdAt' | 'updatedAt'> = {
           name: templateName,
           description: `Template based on ${config.name}`,
           json: { ...config.json },
           nodeId: undefined, // Templates don't belong to specific nodes
         };
 
-        return await get().createFormConfiguration(templateConfig);
+        return await get().createTFormConfiguration(templateConfig);
       },
 
       // Utility actions

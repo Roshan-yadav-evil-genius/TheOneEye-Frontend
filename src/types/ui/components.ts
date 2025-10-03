@@ -1,7 +1,7 @@
 // UI Component Types
-export type NodeType = 'trigger' | 'action' | 'logic' | 'system' | 'communication' | 'data' | 'integration' | 'control';
+export type TNodeType = 'trigger' | 'action' | 'logic' | 'system' | 'communication' | 'data' | 'integration' | 'control';
 
-export type CategoryType = 
+export type TCategoryType = 
   | 'system' 
   | 'email' 
   | 'database' 

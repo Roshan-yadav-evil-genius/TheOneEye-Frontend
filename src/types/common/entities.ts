@@ -1,5 +1,5 @@
 // Core entity types
-export interface User {
+export interface TUser {
   id: string;
   name: string;
   email: string;
@@ -8,7 +8,7 @@ export interface User {
   permissions?: string[];
 }
 
-export interface Node {
+export interface TNode {
   id: string;
   name: string;
   type: 'trigger' | 'action' | 'logic' | 'system';
@@ -24,19 +24,19 @@ export interface Node {
   logo?: string; // URL to the node logo image
 }
 
-export interface Workflow {
+export interface TWorkflow {
   id: string;
   name: string;
   description: string;
-  nodes: Node[];
-  connections: WorkflowConnection[];
+  nodes: TNode[];
+  connections: TWorkflowConnection[];
   status: 'draft' | 'active' | 'paused' | 'archived';
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
 }
 
-export interface WorkflowConnection {
+export interface TWorkflowConnection {
   id: string;
   sourceNodeId: string;
   targetNodeId: string;
@@ -44,7 +44,7 @@ export interface WorkflowConnection {
   targetHandle?: string;
 }
 
-export interface Project {
+export interface TProject {
   id: string;
   name: string;
   description: string;
@@ -56,7 +56,7 @@ export interface Project {
   createdBy: string;
 }
 
-export interface FormConfiguration {
+export interface TFormConfiguration {
   id: string;
   name: string;
   description: string;

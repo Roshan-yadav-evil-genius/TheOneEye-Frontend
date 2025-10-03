@@ -1,21 +1,21 @@
-import { User, Node, Workflow, Project, FormConfiguration } from '../common';
+import { TUser, TNode, TWorkflow, TProject, TFormConfiguration } from '../common';
 
 // UI State Types
-export interface UIState {
+export interface TUIState {
   sidebarOpen: boolean;
   theme: 'light' | 'dark' | 'system';
   activePage: string;
-  breadcrumbs: Breadcrumb[];
-  notifications: Notification[];
+  breadcrumbs: TBreadcrumb[];
+  notifications: TNotification[];
 }
 
-export interface Breadcrumb {
+export interface TBreadcrumb {
   label: string;
   href?: string;
   isActive?: boolean;
 }
 
-export interface Notification {
+export interface TNotification {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
   title: string;
@@ -25,16 +25,16 @@ export interface Notification {
 }
 
 // Store State Types
-export interface UserState {
-  user: User | null;
+export interface TUserState {
+  user: TUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
 }
 
-export interface NodesState {
-  nodes: Node[];
-  selectedNode: Node | null;
+export interface TNodesState {
+  nodes: TNode[];
+  selectedNode: TNode | null;
   isLoading: boolean;
   error: string | null;
   filters: {
@@ -44,36 +44,36 @@ export interface NodesState {
   };
 }
 
-export interface WorkflowState {
-  workflows: Workflow[];
-  activeWorkflow: Workflow | null;
+export interface TWorkflowState {
+  workflows: TWorkflow[];
+  activeWorkflow: TWorkflow | null;
   isLoading: boolean;
   error: string | null;
   selectedNodes: string[];
   selectedConnections: string[];
 }
 
-export interface ProjectsState {
-  projects: Project[];
-  activeProject: Project | null;
+export interface TProjectsState {
+  projects: TProject[];
+  activeProject: TProject | null;
   isLoading: boolean;
   error: string | null;
 }
 
-export interface FormState {
-  configurations: FormConfiguration[];
-  activeConfiguration: FormConfiguration | null;
+export interface TFormState {
+  configurations: TFormConfiguration[];
+  activeConfiguration: TFormConfiguration | null;
   isLoading: boolean;
   error: string | null;
 }
 
-export interface UIStoreState {
+export interface TUIStoreState {
   sidebarOpen: boolean;
   theme: 'light' | 'dark' | 'system';
   activePage: string;
   pageTitle: string;
-  breadcrumbs: Breadcrumb[];
-  notifications: Notification[];
+  breadcrumbs: TBreadcrumb[];
+  notifications: TNotification[];
   modals: {
     createNode: boolean;
     editNode: boolean;

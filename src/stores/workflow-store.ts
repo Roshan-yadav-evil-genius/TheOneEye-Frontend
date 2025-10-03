@@ -1,37 +1,37 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Workflow, WorkflowState, WorkflowConnection, Node } from './types';
+import { TWorkflow, TWorkflowState, TWorkflowConnection, TNode } from './types';
 
-interface WorkflowActions {
+interface TWorkflowActions {
   // CRUD operations
-  createWorkflow: (workflowData: Omit<Workflow, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Workflow>;
-  updateWorkflow: (id: string, workflowData: Partial<Workflow>) => Promise<Workflow>;
-  deleteWorkflow: (id: string) => Promise<void>;
-  getWorkflow: (id: string) => Promise<Workflow | null>;
+  createTWorkflow: (workflowData: Omit<TWorkflow, 'id' | 'createdAt' | 'updatedAt'>) => Promise<TWorkflow>;
+  updateTWorkflow: (id: string, workflowData: Partial<TWorkflow>) => Promise<TWorkflow>;
+  deleteTWorkflow: (id: string) => Promise<void>;
+  getTWorkflow: (id: string) => Promise<TWorkflow | null>;
   
   // Bulk operations
-  loadWorkflows: () => Promise<void>;
+  loadTWorkflows: () => Promise<void>;
   
-  // Workflow management
-  setActiveWorkflow: (workflow: Workflow | null) => void;
-  addNodeToWorkflow: (workflowId: string, node: Node) => Promise<void>;
-  removeNodeFromWorkflow: (workflowId: string, nodeId: string) => Promise<void>;
-  updateWorkflowNodes: (workflowId: string, nodes: Node[]) => Promise<void>;
+  // TWorkflow management
+  setActiveTWorkflow: (workflow: TWorkflow | null) => void;
+  addNodeToTWorkflow: (workflowId: string, node: TNode) => Promise<void>;
+  removeNodeFromTWorkflow: (workflowId: string, nodeId: string) => Promise<void>;
+  updateTWorkflowNodes: (workflowId: string, nodes: TNode[]) => Promise<void>;
   
   // Connection management
-  addConnection: (workflowId: string, connection: WorkflowConnection) => Promise<void>;
+  addConnection: (workflowId: string, connection: TTWorkflowConnection) => Promise<void>;
   removeConnection: (workflowId: string, connectionId: string) => Promise<void>;
-  updateConnections: (workflowId: string, connections: WorkflowConnection[]) => Promise<void>;
+  updateConnections: (workflowId: string, connections: TTWorkflowConnection[]) => Promise<void>;
   
   // Selection management
   selectNodes: (nodeIds: string[]) => void;
   selectConnections: (connectionIds: string[]) => void;
   clearSelection: () => void;
   
-  // Workflow execution
-  startWorkflow: (workflowId: string) => Promise<void>;
-  pauseWorkflow: (workflowId: string) => Promise<void>;
-  stopWorkflow: (workflowId: string) => Promise<void>;
+  // TWorkflow execution
+  startTWorkflow: (workflowId: string) => Promise<void>;
+  pauseTWorkflow: (workflowId: string) => Promise<void>;
+  stopTWorkflow: (workflowId: string) => Promise<void>;
   
   // Utility actions
   setLoading: (loading: boolean) => void;
@@ -39,34 +39,34 @@ interface WorkflowActions {
   clearError: () => void;
 }
 
-type WorkflowStore = WorkflowState & WorkflowActions;
+type TWorkflowStore = TTWorkflowState & TWorkflowActions;
 
-const initialState: WorkflowState = {
+const initialState: TTWorkflowState = {
   workflows: [],
-  activeWorkflow: null,
+  activeTWorkflow: null,
   isLoading: false,
   error: null,
   selectedNodes: [],
   selectedConnections: [],
 };
 
-export const useWorkflowStore = create<WorkflowStore>()(
+export const useTWorkflowStore = create<TWorkflowStore>()(
   devtools(
     (set, get) => ({
       ...initialState,
 
       // CRUD operations
-      createWorkflow: async (workflowData: Omit<Workflow, 'id' | 'createdAt' | 'updatedAt'>) => {
+      createTWorkflow: async (workflowData: Omit<TWorkflow, 'id' | 'createdAt' | 'updatedAt'>) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await workflowApi.createWorkflow(workflowData);
+          // const response = await workflowApi.createTWorkflow(workflowData);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const newWorkflow: Workflow = {
+          const newTWorkflow: TWorkflow = {
             ...workflowData,
             id: `workflow-${Date.now()}`,
             createdAt: new Date(),
@@ -74,12 +74,12 @@ export const useWorkflowStore = create<WorkflowStore>()(
           };
 
           set((state) => ({
-            workflows: [...state.workflows, newWorkflow],
+            workflows: [...state.workflows, newTWorkflow],
             isLoading: false,
             error: null,
           }));
 
-          return newWorkflow;
+          return newTWorkflow;
         } catch (error) {
           set({
             isLoading: false,
@@ -89,32 +89,32 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      updateWorkflow: async (id: string, workflowData: Partial<Workflow>) => {
+      updateTWorkflow: async (id: string, workflowData: Partial<TWorkflow>) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await workflowApi.updateWorkflow(id, workflowData);
+          // const response = await workflowApi.updateTWorkflow(id, workflowData);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          const updatedWorkflow: Workflow = {
+          const updatedTWorkflow: TWorkflow = {
             ...workflowData,
             id,
             updatedAt: new Date(),
-          } as Workflow;
+          } as TWorkflow;
 
           set((state) => ({
             workflows: state.workflows.map((workflow) =>
-              workflow.id === id ? { ...workflow, ...updatedWorkflow } : workflow
+              workflow.id === id ? { ...workflow, ...updatedTWorkflow } : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === id ? updatedWorkflow : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === id ? updatedTWorkflow : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
 
-          return updatedWorkflow;
+          return updatedTWorkflow;
         } catch (error) {
           set({
             isLoading: false,
@@ -124,19 +124,19 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      deleteWorkflow: async (id: string) => {
+      deleteTWorkflow: async (id: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.deleteWorkflow(id);
+          // await workflowApi.deleteTWorkflow(id);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
           
           set((state) => ({
             workflows: state.workflows.filter((workflow) => workflow.id !== id),
-            activeWorkflow: state.activeWorkflow?.id === id ? null : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === id ? null : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -149,7 +149,7 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      getWorkflow: async (id: string) => {
+      getTWorkflow: async (id: string) => {
         const { workflows } = get();
         const workflow = workflows.find((w) => w.id === id);
         
@@ -161,7 +161,7 @@ export const useWorkflowStore = create<WorkflowStore>()(
         
         try {
           // TODO: Replace with actual API call
-          // const response = await workflowApi.getWorkflow(id);
+          // const response = await workflowApi.getTWorkflow(id);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -183,22 +183,22 @@ export const useWorkflowStore = create<WorkflowStore>()(
       },
 
       // Bulk operations
-      loadWorkflows: async () => {
+      loadTWorkflows: async () => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await workflowApi.getWorkflows();
+          // const response = await workflowApi.getTWorkflows();
           
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           // Import mock data from dummy folder
-          const { mockWorkflowsStore } = await import('@/dummy');
-          const mockWorkflows = mockWorkflowsStore;
+          const { mockTWorkflowsStore } = await import('@/dummy');
+          const mockTWorkflows = mockTWorkflowsStore;
 
           set({
-            workflows: mockWorkflows,
+            workflows: mockTWorkflows,
             isLoading: false,
             error: null,
           });
@@ -210,17 +210,17 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      // Workflow management
-      setActiveWorkflow: (workflow: Workflow | null) => {
-        set({ activeWorkflow: workflow });
+      // TWorkflow management
+      setActiveTWorkflow: (workflow: TWorkflow | null) => {
+        set({ activeTWorkflow: workflow });
       },
 
-      addNodeToWorkflow: async (workflowId: string, node: Node) => {
+      addNodeToTWorkflow: async (workflowId: string, node: TNode) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.addNodeToWorkflow(workflowId, node);
+          // await workflowApi.addNodeToTWorkflow(workflowId, node);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -231,9 +231,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, nodes: [...workflow.nodes, node], updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, nodes: [...state.activeWorkflow.nodes, node], updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, nodes: [...state.activeTWorkflow.nodes, node], updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -246,12 +246,12 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      removeNodeFromWorkflow: async (workflowId: string, nodeId: string) => {
+      removeNodeFromTWorkflow: async (workflowId: string, nodeId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.removeNodeFromWorkflow(workflowId, nodeId);
+          // await workflowApi.removeNodeFromTWorkflow(workflowId, nodeId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -269,16 +269,16 @@ export const useWorkflowStore = create<WorkflowStore>()(
                   }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
               ? { 
-                  ...state.activeWorkflow, 
-                  nodes: state.activeWorkflow.nodes.filter((node) => node.id !== nodeId),
-                  connections: state.activeWorkflow.connections.filter(
+                  ...state.activeTWorkflow, 
+                  nodes: state.activeTWorkflow.nodes.filter((node) => node.id !== nodeId),
+                  connections: state.activeTWorkflow.connections.filter(
                     (conn) => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
                   ),
                   updatedAt: new Date()
                 }
-              : state.activeWorkflow,
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -291,12 +291,12 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      updateWorkflowNodes: async (workflowId: string, nodes: Node[]) => {
+      updateTWorkflowNodes: async (workflowId: string, nodes: TNode[]) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.updateWorkflowNodes(workflowId, nodes);
+          // await workflowApi.updateTWorkflowNodes(workflowId, nodes);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -307,9 +307,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, nodes, updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, nodes, updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, nodes, updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -323,7 +323,7 @@ export const useWorkflowStore = create<WorkflowStore>()(
       },
 
       // Connection management
-      addConnection: async (workflowId: string, connection: WorkflowConnection) => {
+      addConnection: async (workflowId: string, connection: TTWorkflowConnection) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -339,9 +339,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, connections: [...workflow.connections, connection], updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, connections: [...state.activeWorkflow.connections, connection], updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, connections: [...state.activeTWorkflow.connections, connection], updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -374,13 +374,13 @@ export const useWorkflowStore = create<WorkflowStore>()(
                   }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
               ? { 
-                  ...state.activeWorkflow, 
-                  connections: state.activeWorkflow.connections.filter((conn) => conn.id !== connectionId),
+                  ...state.activeTWorkflow, 
+                  connections: state.activeTWorkflow.connections.filter((conn) => conn.id !== connectionId),
                   updatedAt: new Date()
                 }
-              : state.activeWorkflow,
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -393,7 +393,7 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      updateConnections: async (workflowId: string, connections: WorkflowConnection[]) => {
+      updateConnections: async (workflowId: string, connections: TTWorkflowConnection[]) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -409,9 +409,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, connections, updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, connections, updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, connections, updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -437,13 +437,13 @@ export const useWorkflowStore = create<WorkflowStore>()(
         set({ selectedNodes: [], selectedConnections: [] });
       },
 
-      // Workflow execution
-      startWorkflow: async (workflowId: string) => {
+      // TWorkflow execution
+      startTWorkflow: async (workflowId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.startWorkflow(workflowId);
+          // await workflowApi.startTWorkflow(workflowId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -454,9 +454,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, status: 'active', updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, status: 'active', updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, status: 'active', updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -469,12 +469,12 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      pauseWorkflow: async (workflowId: string) => {
+      pauseTWorkflow: async (workflowId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.pauseWorkflow(workflowId);
+          // await workflowApi.pauseTWorkflow(workflowId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -485,9 +485,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, status: 'paused', updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, status: 'paused', updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, status: 'paused', updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));
@@ -500,12 +500,12 @@ export const useWorkflowStore = create<WorkflowStore>()(
         }
       },
 
-      stopWorkflow: async (workflowId: string) => {
+      stopTWorkflow: async (workflowId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await workflowApi.stopWorkflow(workflowId);
+          // await workflowApi.stopTWorkflow(workflowId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -516,9 +516,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 ? { ...workflow, status: 'archived', updatedAt: new Date() }
                 : workflow
             ),
-            activeWorkflow: state.activeWorkflow?.id === workflowId
-              ? { ...state.activeWorkflow, status: 'archived', updatedAt: new Date() }
-              : state.activeWorkflow,
+            activeTWorkflow: state.activeTWorkflow?.id === workflowId
+              ? { ...state.activeTWorkflow, status: 'archived', updatedAt: new Date() }
+              : state.activeTWorkflow,
             isLoading: false,
             error: null,
           }));

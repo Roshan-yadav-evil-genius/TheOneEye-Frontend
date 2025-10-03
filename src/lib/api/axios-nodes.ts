@@ -1,11 +1,11 @@
 import { 
-  Node,
-  NodeCreateData, 
-  NodeUpdateData, 
-  NodeFilters, 
-  PaginatedResponse,
-  NodeStats,
-  ApiError 
+  TNode,
+  TNodeCreateData, 
+  TNodeUpdateData, 
+  TNodeFilters, 
+  TPaginatedResponse,
+  TNodeStats,
+  TApiError 
 } from '@/types';
 import { axiosApiClient } from './axios-client';
 
@@ -19,7 +19,7 @@ class AxiosNodesApiClient {
   }
 
   // Helper method to build query parameters
-  private buildQueryParams(filters: NodeFilters): Record<string, any> {
+  private buildQueryParams(filters: TNodeFilters): Record<string, any> {
     const params: Record<string, any> = {};
     
     Object.entries(filters).forEach(([key, value]) => {
@@ -37,7 +37,7 @@ class AxiosNodesApiClient {
   }
 
   // Transform backend node to frontend node format
-  private transformNode(backendNode: any): Node {
+  private transformNode(backendNode: any): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
@@ -56,7 +56,7 @@ class AxiosNodesApiClient {
   }
 
   // Transform frontend node data to backend format
-  private transformNodeData(nodeData: NodeCreateData | NodeUpdateData): any {
+  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): any {
     return {
       name: nodeData.name,
       type: nodeData.type,
@@ -71,7 +71,7 @@ class AxiosNodesApiClient {
   }
 
   // CRUD Operations
-  async getNodes(filters: NodeFilters = {}): Promise<PaginatedResponse<Node>> {
+  async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
     const queryParams = this.buildQueryParams(filters);
     
     const data = await axiosApiClient.get<any>('/nodes/', {
@@ -86,12 +86,12 @@ class AxiosNodesApiClient {
     };
   }
 
-  async getNode(id: string): Promise<Node> {
+  async getNode(id: string): Promise<TNode> {
     const data = await axiosApiClient.get<any>(`/nodes/${id}/`);
     return this.transformNode(data);
   }
 
-  async createNode(nodeData: NodeCreateData): Promise<Node> {
+  async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
     // Check if there's a logo file to upload
@@ -124,7 +124,7 @@ class AxiosNodesApiClient {
     return this.transformNode(data);
   }
 
-  async updateNode(id: string, nodeData: NodeUpdateData): Promise<Node> {
+  async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
     const data = await axiosApiClient.put<any>(`/nodes/${id}/`, transformedData);
@@ -135,14 +135,14 @@ class AxiosNodesApiClient {
     await axiosApiClient.delete(`/nodes/${id}/`);
   }
 
-  async bulkCreateNodes(nodesData: NodeCreateData[]): Promise<Node[]> {
+  async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
     const transformedData = nodesData.map(nodeData => this.transformNodeData(nodeData));
     
     const data = await axiosApiClient.post<any>('/nodes/bulk_create/', transformedData);
     return data.map((node: any) => this.transformNode(node));
   }
 
-  async getNodeStats(): Promise<NodeStats> {
+  async getNodeStats(): Promise<TNodeStats> {
     const data = await axiosApiClient.get<any>('/nodes/stats/');
     
     return {
@@ -162,16 +162,16 @@ class AxiosNodesApiClient {
     await Promise.all(ids.map(id => this.deleteNode(id)));
   }
 
-  async searchNodes(query: string, filters: Omit<NodeFilters, 'search'> = {}): Promise<PaginatedResponse<Node>> {
+  async searchNodes(query: string, filters: Omit<TNodeFilters, 'search'> = {}): Promise<TPaginatedResponse<TNode>> {
     return this.getNodes({ ...filters, search: query });
   }
 
-  async getNodesByType(type: string): Promise<Node[]> {
+  async getNodesByType(type: string): Promise<TNode[]> {
     const response = await this.getNodes({ type });
     return response.results;
   }
 
-  async getNodesByCategory(category: string): Promise<Node[]> {
+  async getNodesByCategory(category: string): Promise<TNode[]> {
     const response = await this.getNodes({ category });
     return response.results;
   }

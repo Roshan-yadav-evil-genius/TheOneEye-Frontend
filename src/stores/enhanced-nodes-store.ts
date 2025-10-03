@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { Node, NodesState, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/types';
+import { TNode, TNodesState, TNodeCreateData, TNodeUpdateData, TNodeFilters, TApiError } from '@/types';
 import { ApiService } from '@/lib/api/api-service';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 
 // Enhanced state interface with additional features
-interface EnhancedNodesState extends NodesState {
+interface EnhancedNodesState extends TNodesState {
   // Pagination state
   pagination: {
     currentPage: number;
@@ -45,18 +45,18 @@ interface EnhancedNodesState extends NodesState {
 
 interface EnhancedNodesActions {
   // CRUD operations with enhanced error handling
-  createNode: (nodeData: NodeCreateData, options?: { showToast?: boolean; optimistic?: boolean }) => Promise<Node>;
-  updateNode: (id: string, nodeData: NodeUpdateData, options?: { showToast?: boolean; optimistic?: boolean }) => Promise<Node>;
+  createNode: (nodeData: TNodeCreateData, options?: { showToast?: boolean; optimistic?: boolean }) => Promise<TNode>;
+  updateNode: (id: string, nodeData: TNodeUpdateData, options?: { showToast?: boolean; optimistic?: boolean }) => Promise<TNode>;
   deleteNode: (id: string, options?: { showToast?: boolean; optimistic?: boolean }) => Promise<void>;
-  getNode: (id: string, options?: { forceRefresh?: boolean }) => Promise<Node | null>;
+  getNode: (id: string, options?: { forceRefresh?: boolean }) => Promise<TNode | null>;
   
   // Bulk operations
-  loadNodes: (filters?: NodeFilters, options?: { showToast?: boolean; forceRefresh?: boolean }) => Promise<void>;
-  createMultipleNodes: (nodes: NodeCreateData[], options?: { showToast?: boolean; optimistic?: boolean }) => Promise<Node[]>;
+  loadNodes: (filters?: TNodeFilters, options?: { showToast?: boolean; forceRefresh?: boolean }) => Promise<void>;
+  createMultipleNodes: (nodes: TNodeCreateData[], options?: { showToast?: boolean; optimistic?: boolean }) => Promise<TNode[]>;
   deleteMultipleNodes: (ids: string[], options?: { showToast?: boolean; optimistic?: boolean }) => Promise<void>;
   
   // Selection and filtering
-  selectNode: (node: Node | null) => void;
+  selectNode: (node: TNode | null) => void;
   selectNodes: (nodeIds: string[]) => void;
   toggleNodeSelection: (nodeId: string) => void;
   clearSelection: () => void;
@@ -126,12 +126,12 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
         ...initialState,
 
         // CRUD operations with enhanced error handling
-        createNode: async (nodeData: NodeCreateData, options = {}) => {
+        createNode: async (nodeData: TNodeCreateData, options = {}) => {
           const { showToast = true, optimistic = false } = options;
           
           if (optimistic) {
             // Optimistic update - add temporary node
-            const tempNode: Node = {
+            const tempNode: TNode = {
               id: `temp-${Date.now()}`,
               ...nodeData,
               isActive: nodeData.isActive ?? true,
@@ -179,7 +179,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
 
             return newNode;
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -205,7 +205,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           }
         },
 
-        updateNode: async (id: string, nodeData: NodeUpdateData, options = {}) => {
+        updateNode: async (id: string, nodeData: TNodeUpdateData, options = {}) => {
           const { showToast = true, optimistic = false } = options;
           
           if (optimistic) {
@@ -251,7 +251,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
 
             return updatedNode;
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -326,7 +326,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               });
             }
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -391,7 +391,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
         },
 
         // Bulk operations
-        loadNodes: async (filters: NodeFilters = {}, options = {}) => {
+        loadNodes: async (filters: TNodeFilters = {}, options = {}) => {
           const { showToast = false, forceRefresh = false } = options;
           const { cache, pagination } = get();
           
@@ -429,7 +429,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               });
             }
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -448,12 +448,12 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           }
         },
 
-        createMultipleNodes: async (nodes: NodeCreateData[], options = {}) => {
+        createMultipleNodes: async (nodes: TNodeCreateData[], options = {}) => {
           const { showToast = true, optimistic = false } = options;
           
           if (optimistic) {
             // Optimistic update
-            const tempNodes: Node[] = nodes.map((nodeData, index) => ({
+            const tempNodes: TNode[] = nodes.map((nodeData, index) => ({
               id: `temp-${Date.now()}-${index}`,
               ...nodeData,
               isActive: nodeData.isActive ?? true,
@@ -497,7 +497,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
 
             return newNodes;
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -574,7 +574,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               });
             }
           } catch (error) {
-            const errorMessage = error instanceof ApiError 
+            const errorMessage = error instanceof TApiError 
               ? error.message 
               : error instanceof Error 
               ? error.message 
@@ -596,7 +596,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
         },
 
         // Selection and filtering
-        selectNode: (node: Node | null) => {
+        selectNode: (node: TNode | null) => {
           set((state) => {
             state.selectedNode = node;
             state.selectedNodes = node ? [node.id] : [];
@@ -794,8 +794,8 @@ export const nodesSelectors = {
     
     // Sort nodes
     filtered.sort((a, b) => {
-      const aValue = a[sortBy as keyof Node];
-      const bValue = b[sortBy as keyof Node];
+      const aValue = a[sortBy as keyof TNode];
+      const bValue = b[sortBy as keyof TNode];
       
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;

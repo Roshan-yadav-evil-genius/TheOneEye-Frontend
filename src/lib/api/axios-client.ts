@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { ApiError } from './types';
+import { TTApiError } from './types';
 
 // Axios-based API client with better error handling and interceptors
 class AxiosApiClient {
@@ -42,10 +42,10 @@ class AxiosApiClient {
       (error: AxiosError) => {
         console.error('❌ API Error:', error.response?.status, error.message);
         
-        // Transform axios error to our custom ApiError
+        // Transform axios error to our custom TApiError
         if (error.response) {
           // Server responded with error status
-          const apiError = new ApiError(
+          const apiError = new TApiError(
             error.response.data?.message || `HTTP ${error.response.status}: ${error.response.statusText}`,
             error.response.status,
             error.response.data
@@ -53,7 +53,7 @@ class AxiosApiClient {
           return Promise.reject(apiError);
         } else if (error.request) {
           // Request was made but no response received
-          const apiError = new ApiError(
+          const apiError = new TApiError(
             'Network error: No response from server',
             0,
             { originalError: error.message }
@@ -61,7 +61,7 @@ class AxiosApiClient {
           return Promise.reject(apiError);
         } else {
           // Something else happened
-          const apiError = new ApiError(
+          const apiError = new TApiError(
             error.message || 'An unexpected error occurred',
             0,
             { originalError: error }

@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { User, UserState } from './types';
+import { TUser, TUserState } from './types';
 
-interface UserActions {
+interface TUserActions {
   // Authentication actions
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (userData: Partial<User> & { password: string }) => Promise<void>;
+  register: (userData: Partial<TUser> & { password: string }) => Promise<void>;
   
-  // User data actions
-  updateUser: (userData: Partial<User>) => Promise<void>;
-  refreshUser: () => Promise<void>;
+  // TUser data actions
+  updateTUser: (userData: Partial<TUser>) => Promise<void>;
+  refreshTUser: () => Promise<void>;
   
   // Utility actions
   setLoading: (loading: boolean) => void;
@@ -18,16 +18,16 @@ interface UserActions {
   clearError: () => void;
 }
 
-type UserStore = UserState & UserActions;
+type TUserStore = TTUserState & TUserActions;
 
-const initialState: UserState = {
+const initialState: TTUserState = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
 };
 
-export const useUserStore = create<UserStore>()(
+export const useTUserStore = create<TUserStore>()(
   devtools(
     persist(
       (set, get) => ({
@@ -45,7 +45,7 @@ export const useUserStore = create<UserStore>()(
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Mock user data - replace with actual response
-            const user: User = {
+            const user: TUser = {
               id: '1',
               name: 'Roshan Yadav',
               email: 'roshan.yadav@12thwonder.com',
@@ -78,7 +78,7 @@ export const useUserStore = create<UserStore>()(
           });
         },
 
-        register: async (userData: Partial<User> & { password: string }) => {
+        register: async (userData: Partial<TUser> & { password: string }) => {
           set({ isLoading: true, error: null });
           
           try {
@@ -89,9 +89,9 @@ export const useUserStore = create<UserStore>()(
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Mock user data - replace with actual response
-            const user: User = {
+            const user: TUser = {
               id: Date.now().toString(),
-              name: userData.name || 'New User',
+              name: userData.name || 'New TUser',
               email: userData.email || '',
               avatar: userData.avatar,
               role: 'user',
@@ -114,8 +114,8 @@ export const useUserStore = create<UserStore>()(
           }
         },
 
-        // User data actions
-        updateUser: async (userData: Partial<User>) => {
+        // TUser data actions
+        updateTUser: async (userData: Partial<TUser>) => {
           const { user } = get();
           if (!user) return;
 
@@ -123,15 +123,15 @@ export const useUserStore = create<UserStore>()(
           
           try {
             // TODO: Replace with actual API call
-            // const response = await userApi.updateUser(user.id, userData);
+            // const response = await userApi.updateTUser(user.id, userData);
             
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            const updatedUser = { ...user, ...userData };
+            const updatedTUser = { ...user, ...userData };
             
             set({
-              user: updatedUser,
+              user: updatedTUser,
               isLoading: false,
               error: null,
             });
@@ -143,7 +143,7 @@ export const useUserStore = create<UserStore>()(
           }
         },
 
-        refreshUser: async () => {
+        refreshTUser: async () => {
           const { user } = get();
           if (!user) return;
 
@@ -151,7 +151,7 @@ export const useUserStore = create<UserStore>()(
           
           try {
             // TODO: Replace with actual API call
-            // const response = await userApi.getUser(user.id);
+            // const response = await userApi.getTUser(user.id);
             
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 500));

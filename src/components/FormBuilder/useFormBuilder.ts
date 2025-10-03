@@ -1,13 +1,14 @@
+"use client";
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { WidgetConfig, WidgetType, generateWidgetId, WIDGET_DEFINITIONS } from './inputs';
+import { TWidgetConfig, TWidgetType, generateWidgetId, WIDGET_DEFINITIONS } from './inputs';
 
 export interface FormBuilderState {
-  widgets: WidgetConfig[];
+  widgets: TWidgetConfig[];
   selectedWidget: string | null;
   isJsonMode: boolean;
 }
 
-export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange?: (widgets: WidgetConfig[]) => void) => {
+export const useFormBuilder = (initialWidgets: TWidgetConfig[] = [], onFormChange?: (widgets: TWidgetConfig[]) => void) => {
   const [state, setState] = useState<FormBuilderState>({
     widgets: initialWidgets,
     selectedWidget: null,
@@ -15,17 +16,17 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
   });
 
   // Helper function to notify parent of changes
-  const notifyParent = useCallback((widgets: WidgetConfig[]) => {
+  const notifyParent = useCallback((widgets: TWidgetConfig[]) => {
     if (onFormChange) {
       onFormChange(widgets);
     }
   }, [onFormChange]);
 
-  const addWidget = useCallback((type: WidgetType) => {
+  const addWidget = useCallback((type: TWidgetType) => {
     const definition = WIDGET_DEFINITIONS.find(def => def.type === type);
     if (!definition) return;
 
-    const newWidget: WidgetConfig = {
+    const newWidget: TWidgetConfig = {
       id: generateWidgetId(),
       type,
       label: definition.label,
@@ -44,7 +45,7 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
     });
   }, [notifyParent]);
 
-  const updateWidget = useCallback((id: string, updates: Partial<WidgetConfig>) => {
+  const updateWidget = useCallback((id: string, updates: Partial<TWidgetConfig>) => {
     setState(prev => {
       const newState = {
         ...prev,
@@ -97,7 +98,7 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
     const widget = state.widgets.find(w => w.id === id);
     if (!widget) return;
 
-    const duplicatedWidget: WidgetConfig = {
+    const duplicatedWidget: TWidgetConfig = {
       ...widget,
       id: generateWidgetId(),
       label: `${widget.label} (Copy)`,
@@ -123,7 +124,7 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
     }));
   }, []);
 
-  const updateWidgetsFromJson = useCallback((newWidgets: WidgetConfig[]) => {
+  const updateWidgetsFromJson = useCallback((newWidgets: TWidgetConfig[]) => {
     setState(prev => ({
       ...prev,
       widgets: newWidgets,

@@ -1,28 +1,28 @@
 import { axiosApiClient } from './axios-client';
 import { 
-  Node,
-  NodeCreateData, 
-  NodeUpdateData, 
-  NodeFilters, 
-  PaginatedResponse,
-  NodeStats,
-  ApiError 
+  TNode,
+  TNodeCreateData, 
+  TNodeUpdateData, 
+  TNodeFilters, 
+  TPaginatedResponse,
+  TNodeStats,
+  TApiError 
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
   // Node operations
-  static async getNodes(filters: NodeFilters = {}): Promise<PaginatedResponse<Node>> {
-    return axiosApiClient.get<PaginatedResponse<Node>>('/nodes/', {
+  static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
+    return axiosApiClient.get<TPaginatedResponse<TNode>>('/nodes/', {
       params: filters,
     });
   }
 
-  static async getNode(id: string): Promise<Node> {
-    return axiosApiClient.get<Node>(`/nodes/${id}/`);
+  static async getNode(id: string): Promise<TNode> {
+    return axiosApiClient.get<TNode>(`/nodes/${id}/`);
   }
 
-  static async createNode(nodeData: NodeCreateData): Promise<Node> {
+  static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const hasLogoFile = nodeData.logoFile instanceof File;
     
     if (hasLogoFile) {
@@ -41,20 +41,20 @@ export class ApiService {
       
       return axiosApiClient.uploadFile<Node>('/nodes/', formData);
     } else {
-      return axiosApiClient.post<Node>('/nodes/', nodeData);
+      return axiosApiClient.post<TNode>('/nodes/', nodeData);
     }
   }
 
-  static async updateNode(id: string, nodeData: NodeUpdateData): Promise<Node> {
-    return axiosApiClient.put<Node>(`/nodes/${id}/`, nodeData);
+  static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
+    return axiosApiClient.put<TNode>(`/nodes/${id}/`, nodeData);
   }
 
   static async deleteNode(id: string): Promise<void> {
     return axiosApiClient.delete(`/nodes/${id}/`);
   }
 
-  static async bulkCreateNodes(nodesData: NodeCreateData[]): Promise<Node[]> {
-    return axiosApiClient.post<Node[]>('/nodes/bulk_create/', nodesData);
+  static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
+    return axiosApiClient.post<TNode[]>('/nodes/bulk_create/', nodesData);
   }
 
   static async bulkDeleteNodes(ids: string[]): Promise<void> {
@@ -63,8 +63,8 @@ export class ApiService {
     await Promise.all(ids.map(id => this.deleteNode(id)));
   }
 
-  static async getNodeStats(): Promise<NodeStats> {
-    return axiosApiClient.get<NodeStats>('/nodes/stats/');
+  static async getNodeStats(): Promise<TNodeStats> {
+    return axiosApiClient.get<TNodeStats>('/nodes/stats/');
   }
 
   // Workflow operations (placeholder for future implementation)

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useUserStore } from "@/stores/user-store"
+import { useUserStore } from "@/stores"
 import { toast } from "sonner"
 
 export function SignupForm({

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { UIStoreState, Breadcrumb, Notification } from './types';
+import { TTUIStoreState, TTBreadcrumb, TTNotification } from './types';
 
 interface UIActions {
   // Sidebar management
@@ -14,30 +14,30 @@ interface UIActions {
   // Page navigation
   setActivePage: (page: string) => void;
   setPageTitle: (title: string) => void;
-  setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
-  addBreadcrumb: (breadcrumb: Breadcrumb) => void;
-  removeBreadcrumb: (index: number) => void;
-  clearBreadcrumbs: () => void;
+  setTBreadcrumbs: (breadcrumbs: TBreadcrumb[]) => void;
+  addTBreadcrumb: (breadcrumb: TBreadcrumb) => void;
+  removeTBreadcrumb: (index: number) => void;
+  clearTBreadcrumbs: () => void;
   
-  // Notification management
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
-  removeNotification: (id: string) => void;
-  markNotificationAsRead: (id: string) => void;
-  markAllNotificationsAsRead: () => void;
-  clearNotifications: () => void;
+  // TNotification management
+  addTNotification: (notification: Omit<TNotification, 'id' | 'timestamp'>) => void;
+  removeTNotification: (id: string) => void;
+  markTNotificationAsRead: (id: string) => void;
+  markAllTNotificationsAsRead: () => void;
+  clearTNotifications: () => void;
   
   // Modal management
-  openModal: (modalName: keyof UIStoreState['modals']) => void;
-  closeModal: (modalName: keyof UIStoreState['modals']) => void;
+  openModal: (modalName: keyof TUIStoreState['modals']) => void;
+  closeModal: (modalName: keyof TUIStoreState['modals']) => void;
   closeAllModals: () => void;
   
   // Utility actions
   resetUI: () => void;
 }
 
-type UIStore = UIStoreState & UIActions;
+type UIStore = TUIStoreState & UIActions;
 
-const initialState: UIStoreState = {
+const initialState: TUIStoreState = {
   sidebarOpen: true,
   theme: 'system',
   activePage: 'dashboard',
@@ -102,53 +102,53 @@ export const useUIStore = create<UIStore>()(
           set({ pageTitle: title });
         },
 
-        setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
+        setTBreadcrumbs: (breadcrumbs: TBreadcrumb[]) => {
           set({ breadcrumbs });
         },
 
-        addBreadcrumb: (breadcrumb: Breadcrumb) => {
+        addTBreadcrumb: (breadcrumb: TBreadcrumb) => {
           set((state) => ({
             breadcrumbs: [...state.breadcrumbs, breadcrumb],
           }));
         },
 
-        removeBreadcrumb: (index: number) => {
+        removeTBreadcrumb: (index: number) => {
           set((state) => ({
             breadcrumbs: state.breadcrumbs.filter((_, i) => i !== index),
           }));
         },
 
-        clearBreadcrumbs: () => {
+        clearTBreadcrumbs: () => {
           set({ breadcrumbs: [] });
         },
 
-        // Notification management
-        addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => {
-          const newNotification: Notification = {
+        // TNotification management
+        addTNotification: (notification: Omit<TNotification, 'id' | 'timestamp'>) => {
+          const newTNotification: TNotification = {
             ...notification,
             id: `notification-${Date.now()}-${Math.random()}`,
             timestamp: new Date(),
           };
 
           set((state) => ({
-            notifications: [...state.notifications, newNotification],
+            notifications: [...state.notifications, newTNotification],
           }));
 
           // Auto-remove notification after 5 seconds for success/info types
           if (notification.type === 'success' || notification.type === 'info') {
             setTimeout(() => {
-              get().removeNotification(newNotification.id);
+              get().removeTNotification(newTNotification.id);
             }, 5000);
           }
         },
 
-        removeNotification: (id: string) => {
+        removeTNotification: (id: string) => {
           set((state) => ({
             notifications: state.notifications.filter((notification) => notification.id !== id),
           }));
         },
 
-        markNotificationAsRead: (id: string) => {
+        markTNotificationAsRead: (id: string) => {
           set((state) => ({
             notifications: state.notifications.map((notification) =>
               notification.id === id ? { ...notification, read: true } : notification
@@ -156,7 +156,7 @@ export const useUIStore = create<UIStore>()(
           }));
         },
 
-        markAllNotificationsAsRead: () => {
+        markAllTNotificationsAsRead: () => {
           set((state) => ({
             notifications: state.notifications.map((notification) => ({
               ...notification,
@@ -165,12 +165,12 @@ export const useUIStore = create<UIStore>()(
           }));
         },
 
-        clearNotifications: () => {
+        clearTNotifications: () => {
           set({ notifications: [] });
         },
 
         // Modal management
-        openModal: (modalName: keyof UIStoreState['modals']) => {
+        openModal: (modalName: keyof TUIStoreState['modals']) => {
           set((state) => ({
             modals: {
               ...state.modals,
@@ -179,7 +179,7 @@ export const useUIStore = create<UIStore>()(
           }));
         },
 
-        closeModal: (modalName: keyof UIStoreState['modals']) => {
+        closeModal: (modalName: keyof TUIStoreState['modals']) => {
           set((state) => ({
             modals: {
               ...state.modals,
@@ -252,13 +252,13 @@ export const uiSelectors = {
   getActivePage: () => useUIStore.getState().activePage,
   getPageTitle: () => useUIStore.getState().pageTitle,
   
-  // Notification selectors
-  getNotifications: () => useUIStore.getState().notifications,
-  getUnreadNotifications: () => 
+  // TNotification selectors
+  getTNotifications: () => useUIStore.getState().notifications,
+  getUnreadTNotifications: () => 
     useUIStore.getState().notifications.filter(n => !n.read),
   
   // Modal selectors
-  getModalState: (modalName: keyof UIStoreState['modals']) => 
+  getModalState: (modalName: keyof TUIStoreState['modals']) => 
     useUIStore.getState().modals[modalName],
   getOpenModals: () => {
     const modals = useUIStore.getState().modals;
@@ -267,15 +267,15 @@ export const uiSelectors = {
       .map(([modalName, _]) => modalName);
   },
   
-  // Breadcrumb selectors
-  getBreadcrumbs: () => useUIStore.getState().breadcrumbs,
+  // TBreadcrumb selectors
+  getTBreadcrumbs: () => useUIStore.getState().breadcrumbs,
 };
 
 // Helper functions for common UI operations
 export const uiHelpers = {
-  // Notification helpers
+  // TNotification helpers
   showSuccess: (title: string, message: string) => {
-    useUIStore.getState().addNotification({
+    useUIStore.getState().addTNotification({
       type: 'success',
       title,
       message,
@@ -284,7 +284,7 @@ export const uiHelpers = {
   },
 
   showError: (title: string, message: string) => {
-    useUIStore.getState().addNotification({
+    useUIStore.getState().addTNotification({
       type: 'error',
       title,
       message,
@@ -293,7 +293,7 @@ export const uiHelpers = {
   },
 
   showWarning: (title: string, message: string) => {
-    useUIStore.getState().addNotification({
+    useUIStore.getState().addTNotification({
       type: 'warning',
       title,
       message,
@@ -302,7 +302,7 @@ export const uiHelpers = {
   },
 
   showInfo: (title: string, message: string) => {
-    useUIStore.getState().addNotification({
+    useUIStore.getState().addTNotification({
       type: 'info',
       title,
       message,
@@ -310,14 +310,14 @@ export const uiHelpers = {
     });
   },
 
-  // Breadcrumb helpers
-  setPageBreadcrumbs: (page: string, additionalBreadcrumbs: Breadcrumb[] = []) => {
-    const breadcrumbs: Breadcrumb[] = [
+  // TBreadcrumb helpers
+  setPageTBreadcrumbs: (page: string, additionalTBreadcrumbs: TBreadcrumb[] = []) => {
+    const breadcrumbs: TBreadcrumb[] = [
       { label: 'Dashboard', href: '/dashboard' },
       { label: page, isActive: true },
-      ...additionalBreadcrumbs,
+      ...additionalTBreadcrumbs,
     ];
-    useUIStore.getState().setBreadcrumbs(breadcrumbs);
+    useUIStore.getState().setTBreadcrumbs(breadcrumbs);
   },
 
   // Modal helpers

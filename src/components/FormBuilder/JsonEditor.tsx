@@ -1,5 +1,6 @@
+"use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { WidgetConfig } from './inputs';
+import { TTWidgetConfig } from './inputs';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, CheckCircle } from 'lucide-react';
@@ -7,8 +8,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface JsonEditorProps {
-  widgets: WidgetConfig[];
-  onWidgetsChange: (widgets: WidgetConfig[]) => void;
+  widgets: TTWidgetConfig[];
+  onWidgetsChange: (widgets: TTWidgetConfig[]) => void;
 }
 
 const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => {

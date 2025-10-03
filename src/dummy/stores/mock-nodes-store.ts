@@ -1,6 +1,6 @@
-import { Node } from "@/types";
+import { TNode } from "@/types";
 
-export const mockNodesStore: Node[] = [
+export const mockNodesStore: TNode[] = [
   {
     id: 'node-1',
     name: 'Email Sender',

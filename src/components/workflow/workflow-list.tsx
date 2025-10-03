@@ -3,22 +3,10 @@ import { useRouter } from "next/navigation"
 import { WorkflowTable } from "@/components/workflow/workflow-table"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
-
-export interface Workflow {
-  id: string
-  name: string
-  description: string
-  status: "active" | "inactive" | "error"
-  lastRun?: string
-  nextRun?: string
-  runsCount: number
-  successRate: number
-  category?: string
-  tags?: string[]
-}
+import { TWorkflow } from "@/types"
 
 interface WorkflowListProps {
-  workflows: Workflow[]
+  workflows: TWorkflow[]
 }
 
 export function WorkflowList({

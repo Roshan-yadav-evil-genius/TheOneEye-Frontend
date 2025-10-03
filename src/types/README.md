@@ -33,15 +33,15 @@ types/
 Import types from the main index file:
 
 ```typescript
-import { Node, User, Workflow, ApiResponse, UIState } from '@/types';
+import { TNode, TUser, TWorkflow, TApiResponse, TUIState } from '@/types';
 ```
 
 Or import from specific categories:
 
 ```typescript
-import { Node, User } from '@/types/common';
-import { ApiResponse } from '@/types/api';
-import { UIState } from '@/types/ui';
+import { TNode, TUser } from '@/types/common';
+import { TApiResponse } from '@/types/api';
+import { TUIState } from '@/types/ui';
 ```
 
 ## Migration Notes

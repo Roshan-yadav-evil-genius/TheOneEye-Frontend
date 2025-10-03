@@ -1,16 +1,16 @@
-import { Node } from '@/types';
+import { TNode } from '@/types';
 import { mockNodes } from '@/dummy/nodes/mock-nodes';
 import { 
-  NodeCreateData, 
-  NodeUpdateData, 
-  NodeFilters, 
-  PaginatedResponse,
-  NodeStats 
+  TTNodeCreateData, 
+  TTNodeUpdateData, 
+  TTNodeFilters, 
+  TTPaginatedResponse,
+  TTNodeStats 
 } from './types';
 
 // Mock API implementation using dummy data
 class MockNodesApiClient {
-  private nodes: Node[] = [...mockNodes];
+  private nodes: TNode[] = [...mockNodes];
   private nextId = 1000; // Start from a high number to avoid conflicts
 
   // Simulate network delay
@@ -24,7 +24,7 @@ class MockNodesApiClient {
   }
 
   // Format dates properly
-  private formatNode(node: any): Node {
+  private formatNode(node: any): TNode {
     return {
       ...node,
       createdAt: typeof node.createdAt === 'string' ? node.createdAt : node.createdAt.toISOString(),
@@ -35,7 +35,7 @@ class MockNodesApiClient {
   }
 
   // CRUD Operations
-  async getNodes(filters: NodeFilters = {}): Promise<PaginatedResponse<Node>> {
+  async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
     await this.delay();
     
     let filteredNodes = [...this.nodes];
@@ -99,7 +99,7 @@ class MockNodesApiClient {
     };
   }
 
-  async getNode(id: string): Promise<Node> {
+  async getNode(id: string): Promise<TNode> {
     await this.delay();
     
     const node = this.nodes.find(n => n.id === id);
@@ -110,10 +110,10 @@ class MockNodesApiClient {
     return this.formatNode(node);
   }
 
-  async createNode(nodeData: NodeCreateData): Promise<Node> {
+  async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     await this.delay();
     
-    const newNode: Node = {
+    const newNode: TNode = {
       id: this.generateId(),
       name: nodeData.name,
       type: nodeData.type,
@@ -132,7 +132,7 @@ class MockNodesApiClient {
     return this.formatNode(newNode);
   }
 
-  async updateNode(id: string, nodeData: NodeUpdateData): Promise<Node> {
+  async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     await this.delay();
     
     const nodeIndex = this.nodes.findIndex(n => n.id === id);
@@ -141,7 +141,7 @@ class MockNodesApiClient {
     }
 
     const existingNode = this.nodes[nodeIndex];
-    const updatedNode: Node = {
+    const updatedNode: TNode = {
       ...existingNode,
       ...nodeData,
       id: existingNode.id, // Don't allow ID changes
@@ -164,10 +164,10 @@ class MockNodesApiClient {
   }
 
   // Bulk Operations
-  async bulkCreateNodes(nodesData: NodeCreateData[]): Promise<Node[]> {
+  async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<Node[]> {
     await this.delay();
     
-    const newNodes: Node[] = nodesData.map(nodeData => ({
+    const newNodes: TNode[] = nodesData.map(nodeData => ({
       id: this.generateId(),
       name: nodeData.name,
       type: nodeData.type,
@@ -235,7 +235,7 @@ class MockNodesApiClient {
     };
   }
 
-  async getNodeStats(): Promise<NodeStats> {
+  async getTNodeStats(): Promise<TNodeStats> {
     await this.delay(100);
     
     const totalNodes = this.nodes.length;
@@ -267,7 +267,7 @@ class MockNodesApiClient {
     };
   }
 
-  async searchNodes(query: string, filters: Omit<NodeFilters, 'search'> = {}): Promise<PaginatedResponse<Node>> {
+  async searchNodes(query: string, filters: Omit<TNodeFilters, 'search'> = {}): Promise<TPaginatedResponse<TNode>> {
     return this.getNodes({ ...filters, search: query });
   }
 }

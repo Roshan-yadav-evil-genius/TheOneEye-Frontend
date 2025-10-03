@@ -1,7 +1,7 @@
 // Form widget types
-export interface WidgetConfig {
+export interface TWidgetConfig {
   id: string;
-  type: WidgetType;
+  type: TWidgetType;
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -13,7 +13,7 @@ export interface WidgetConfig {
   };
 }
 
-export type WidgetType = 
+export type TWidgetType = 
   | 'text'
   | 'email'
   | 'password'
@@ -25,10 +25,10 @@ export type WidgetType =
   | 'date'
   | 'file';
 
-export interface WidgetDefinition {
-  type: WidgetType;
+export interface TWidgetDefinition {
+  type: TWidgetType;
   label: string;
   icon: string;
   description: string;
-  defaultConfig: Partial<WidgetConfig>;
+  defaultConfig: Partial<TWidgetConfig>;
 }

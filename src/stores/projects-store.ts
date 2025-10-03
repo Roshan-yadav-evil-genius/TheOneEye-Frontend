@@ -1,33 +1,33 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Project, ProjectsState } from './types';
+import { TProject, TProjectsState } from './types';
 
-interface ProjectsActions {
+interface TProjectsActions {
   // CRUD operations
-  createProject: (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Project>;
-  updateProject: (id: string, projectData: Partial<Project>) => Promise<Project>;
-  deleteProject: (id: string) => Promise<void>;
-  getProject: (id: string) => Promise<Project | null>;
+  createTProject: (projectData: Omit<TProject, 'id' | 'createdAt' | 'updatedAt'>) => Promise<TProject>;
+  updateTProject: (id: string, projectData: Partial<TProject>) => Promise<TProject>;
+  deleteTProject: (id: string) => Promise<void>;
+  getTProject: (id: string) => Promise<TProject | null>;
   
   // Bulk operations
-  loadProjects: () => Promise<void>;
-  createMultipleProjects: (projects: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<Project[]>;
-  deleteMultipleProjects: (ids: string[]) => Promise<void>;
+  loadTProjects: () => Promise<void>;
+  createMultipleTProjects: (projects: Omit<TProject, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<TProject[]>;
+  deleteMultipleTProjects: (ids: string[]) => Promise<void>;
   
-  // Project management
-  setActiveProject: (project: Project | null) => void;
-  addWorkflowToProject: (projectId: string, workflowId: string) => Promise<void>;
-  removeWorkflowFromProject: (projectId: string, workflowId: string) => Promise<void>;
-  addTeamMemberToProject: (projectId: string, userId: string) => Promise<void>;
-  removeTeamMemberFromProject: (projectId: string, userId: string) => Promise<void>;
+  // TProject management
+  setActiveTProject: (project: TProject | null) => void;
+  addWorkflowToTProject: (projectId: string, workflowId: string) => Promise<void>;
+  removeWorkflowFromTProject: (projectId: string, workflowId: string) => Promise<void>;
+  addTeamMemberToTProject: (projectId: string, userId: string) => Promise<void>;
+  removeTeamMemberFromTProject: (projectId: string, userId: string) => Promise<void>;
   
-  // Project status management
-  updateProjectStatus: (projectId: string, status: Project['status']) => Promise<void>;
-  archiveProject: (projectId: string) => Promise<void>;
-  restoreProject: (projectId: string) => Promise<void>;
+  // TProject status management
+  updateTProjectStatus: (projectId: string, status: TProject['status']) => Promise<void>;
+  archiveTProject: (projectId: string) => Promise<void>;
+  restoreTProject: (projectId: string) => Promise<void>;
   
-  // Project analytics and insights
-  getProjectAnalytics: (projectId: string) => Promise<{
+  // TProject analytics and insights
+  getTProjectAnalytics: (projectId: string) => Promise<{
     totalWorkflows: number;
     activeWorkflows: number;
     completedWorkflows: number;
@@ -41,32 +41,32 @@ interface ProjectsActions {
   clearError: () => void;
 }
 
-type ProjectsStore = ProjectsState & ProjectsActions;
+type TProjectsStore = TTProjectsState & TProjectsActions;
 
-const initialState: ProjectsState = {
+const initialState: TTProjectsState = {
   projects: [],
-  activeProject: null,
+  activeTProject: null,
   isLoading: false,
   error: null,
 };
 
-export const useProjectsStore = create<ProjectsStore>()(
+export const useTProjectsStore = create<TProjectsStore>()(
   devtools(
     (set, get) => ({
       ...initialState,
 
       // CRUD operations
-      createProject: async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
+      createTProject: async (projectData: Omit<TProject, 'id' | 'createdAt' | 'updatedAt'>) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await projectsApi.createProject(projectData);
+          // const response = await projectsApi.createTProject(projectData);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const newProject: Project = {
+          const newTProject: TProject = {
             ...projectData,
             id: `project-${Date.now()}`,
             createdAt: new Date(),
@@ -74,12 +74,12 @@ export const useProjectsStore = create<ProjectsStore>()(
           };
 
           set((state) => ({
-            projects: [...state.projects, newProject],
+            projects: [...state.projects, newTProject],
             isLoading: false,
             error: null,
           }));
 
-          return newProject;
+          return newTProject;
         } catch (error) {
           set({
             isLoading: false,
@@ -89,32 +89,32 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      updateProject: async (id: string, projectData: Partial<Project>) => {
+      updateTProject: async (id: string, projectData: Partial<TProject>) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await projectsApi.updateProject(id, projectData);
+          // const response = await projectsApi.updateTProject(id, projectData);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          const updatedProject: Project = {
+          const updatedTProject: TProject = {
             ...projectData,
             id,
             updatedAt: new Date(),
-          } as Project;
+          } as TProject;
 
           set((state) => ({
             projects: state.projects.map((project) =>
-              project.id === id ? { ...project, ...updatedProject } : project
+              project.id === id ? { ...project, ...updatedTProject } : project
             ),
-            activeProject: state.activeProject?.id === id ? updatedProject : state.activeProject,
+            activeTProject: state.activeTProject?.id === id ? updatedTProject : state.activeTProject,
             isLoading: false,
             error: null,
           }));
 
-          return updatedProject;
+          return updatedTProject;
         } catch (error) {
           set({
             isLoading: false,
@@ -124,19 +124,19 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      deleteProject: async (id: string) => {
+      deleteTProject: async (id: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.deleteProject(id);
+          // await projectsApi.deleteTProject(id);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
           
           set((state) => ({
             projects: state.projects.filter((project) => project.id !== id),
-            activeProject: state.activeProject?.id === id ? null : state.activeProject,
+            activeTProject: state.activeTProject?.id === id ? null : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -149,7 +149,7 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      getProject: async (id: string) => {
+      getTProject: async (id: string) => {
         const { projects } = get();
         const project = projects.find((p) => p.id === id);
         
@@ -161,7 +161,7 @@ export const useProjectsStore = create<ProjectsStore>()(
         
         try {
           // TODO: Replace with actual API call
-          // const response = await projectsApi.getProject(id);
+          // const response = await projectsApi.getTProject(id);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -183,21 +183,21 @@ export const useProjectsStore = create<ProjectsStore>()(
       },
 
       // Bulk operations
-      loadProjects: async () => {
+      loadTProjects: async () => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await projectsApi.getProjects();
+          // const response = await projectsApi.getTProjects();
           
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           // Import mock data from dummy folder
-          const { mockProjects } = await import('@/dummy');
+          const { mockTProjects } = await import('@/dummy');
 
           set({
-            projects: mockProjects,
+            projects: mockTProjects,
             isLoading: false,
             error: null,
           });
@@ -209,17 +209,17 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      createMultipleProjects: async (projects: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+      createMultipleTProjects: async (projects: Omit<TProject, 'id' | 'createdAt' | 'updatedAt'>[]) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // const response = await projectsApi.createMultipleProjects(projects);
+          // const response = await projectsApi.createMultipleTProjects(projects);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1500));
           
-          const newProjects: Project[] = projects.map((projectData) => ({
+          const newTProjects: TProject[] = projects.map((projectData) => ({
             ...projectData,
             id: `project-${Date.now()}-${Math.random()}`,
             createdAt: new Date(),
@@ -227,12 +227,12 @@ export const useProjectsStore = create<ProjectsStore>()(
           }));
 
           set((state) => ({
-            projects: [...state.projects, ...newProjects],
+            projects: [...state.projects, ...newTProjects],
             isLoading: false,
             error: null,
           }));
 
-          return newProjects;
+          return newTProjects;
         } catch (error) {
           set({
             isLoading: false,
@@ -242,21 +242,21 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      deleteMultipleProjects: async (ids: string[]) => {
+      deleteMultipleTProjects: async (ids: string[]) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.deleteMultipleProjects(ids);
+          // await projectsApi.deleteMultipleTProjects(ids);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           set((state) => ({
             projects: state.projects.filter((project) => !ids.includes(project.id)),
-            activeProject: state.activeProject && ids.includes(state.activeProject.id) 
+            activeTProject: state.activeTProject && ids.includes(state.activeTProject.id) 
               ? null 
-              : state.activeProject,
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -269,17 +269,17 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      // Project management
-      setActiveProject: (project: Project | null) => {
-        set({ activeProject: project });
+      // TProject management
+      setActiveTProject: (project: TProject | null) => {
+        set({ activeTProject: project });
       },
 
-      addWorkflowToProject: async (projectId: string, workflowId: string) => {
+      addWorkflowToTProject: async (projectId: string, workflowId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.addWorkflowToProject(projectId, workflowId);
+          // await projectsApi.addWorkflowToTProject(projectId, workflowId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -294,13 +294,13 @@ export const useProjectsStore = create<ProjectsStore>()(
                   }
                 : project
             ),
-            activeProject: state.activeProject?.id === projectId
+            activeTProject: state.activeTProject?.id === projectId
               ? { 
-                  ...state.activeProject, 
-                  workflows: [...state.activeProject.workflows, workflowId],
+                  ...state.activeTProject, 
+                  workflows: [...state.activeTProject.workflows, workflowId],
                   updatedAt: new Date()
                 }
-              : state.activeProject,
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -313,12 +313,12 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      removeWorkflowFromProject: async (projectId: string, workflowId: string) => {
+      removeWorkflowFromTProject: async (projectId: string, workflowId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.removeWorkflowFromProject(projectId, workflowId);
+          // await projectsApi.removeWorkflowFromTProject(projectId, workflowId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -333,13 +333,13 @@ export const useProjectsStore = create<ProjectsStore>()(
                   }
                 : project
             ),
-            activeProject: state.activeProject?.id === projectId
+            activeTProject: state.activeTProject?.id === projectId
               ? { 
-                  ...state.activeProject, 
-                  workflows: state.activeProject.workflows.filter((id) => id !== workflowId),
+                  ...state.activeTProject, 
+                  workflows: state.activeTProject.workflows.filter((id) => id !== workflowId),
                   updatedAt: new Date()
                 }
-              : state.activeProject,
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -352,12 +352,12 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      addTeamMemberToProject: async (projectId: string, userId: string) => {
+      addTeamMemberToTProject: async (projectId: string, userId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.addTeamMemberToProject(projectId, userId);
+          // await projectsApi.addTeamMemberToTProject(projectId, userId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -372,13 +372,13 @@ export const useProjectsStore = create<ProjectsStore>()(
                   }
                 : project
             ),
-            activeProject: state.activeProject?.id === projectId
+            activeTProject: state.activeTProject?.id === projectId
               ? { 
-                  ...state.activeProject, 
-                  team: [...state.activeProject.team, userId],
+                  ...state.activeTProject, 
+                  team: [...state.activeTProject.team, userId],
                   updatedAt: new Date()
                 }
-              : state.activeProject,
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -391,12 +391,12 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      removeTeamMemberFromProject: async (projectId: string, userId: string) => {
+      removeTeamMemberFromTProject: async (projectId: string, userId: string) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.removeTeamMemberFromProject(projectId, userId);
+          // await projectsApi.removeTeamMemberFromTProject(projectId, userId);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -411,13 +411,13 @@ export const useProjectsStore = create<ProjectsStore>()(
                   }
                 : project
             ),
-            activeProject: state.activeProject?.id === projectId
+            activeTProject: state.activeTProject?.id === projectId
               ? { 
-                  ...state.activeProject, 
-                  team: state.activeProject.team.filter((id) => id !== userId),
+                  ...state.activeTProject, 
+                  team: state.activeTProject.team.filter((id) => id !== userId),
                   updatedAt: new Date()
                 }
-              : state.activeProject,
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -430,13 +430,13 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      // Project status management
-      updateProjectStatus: async (projectId: string, status: Project['status']) => {
+      // TProject status management
+      updateTProjectStatus: async (projectId: string, status: TProject['status']) => {
         set({ isLoading: true, error: null });
         
         try {
           // TODO: Replace with actual API call
-          // await projectsApi.updateProjectStatus(projectId, status);
+          // await projectsApi.updateTProjectStatus(projectId, status);
           
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -447,9 +447,9 @@ export const useProjectsStore = create<ProjectsStore>()(
                 ? { ...project, status, updatedAt: new Date() }
                 : project
             ),
-            activeProject: state.activeProject?.id === projectId
-              ? { ...state.activeProject, status, updatedAt: new Date() }
-              : state.activeProject,
+            activeTProject: state.activeTProject?.id === projectId
+              ? { ...state.activeTProject, status, updatedAt: new Date() }
+              : state.activeTProject,
             isLoading: false,
             error: null,
           }));
@@ -462,25 +462,25 @@ export const useProjectsStore = create<ProjectsStore>()(
         }
       },
 
-      archiveProject: async (projectId: string) => {
-        return await get().updateProjectStatus(projectId, 'on-hold');
+      archiveTProject: async (projectId: string) => {
+        return await get().updateTProjectStatus(projectId, 'on-hold');
       },
 
-      restoreProject: async (projectId: string) => {
-        return await get().updateProjectStatus(projectId, 'active');
+      restoreTProject: async (projectId: string) => {
+        return await get().updateTProjectStatus(projectId, 'active');
       },
 
-      // Project analytics and insights
-      getProjectAnalytics: async (projectId: string) => {
+      // TProject analytics and insights
+      getTProjectAnalytics: async (projectId: string) => {
         const { projects } = get();
         const project = projects.find((p) => p.id === projectId);
         
         if (!project) {
-          throw new Error('Project not found');
+          throw new Error('TProject not found');
         }
 
         // TODO: Replace with actual API call
-        // const response = await projectsApi.getProjectAnalytics(projectId);
+        // const response = await projectsApi.getTProjectAnalytics(projectId);
         
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 500));

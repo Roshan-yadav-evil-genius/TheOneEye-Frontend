@@ -16,7 +16,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IconDeviceFloppy, IconUpload, IconX, IconX as IconClose, IconTag } from "@tabler/icons-react";
-import { Node, nodeTypes, nodeCategories } from "@/types";
+import { TNode, nodeTypes, nodeCategories } from "@/types";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 
@@ -25,7 +25,7 @@ export function EditNodePage() {
   const params = useParams();
   const nodeId = params.id as string;
   
-  const [formData, setFormData] = useState<Partial<Node>>({
+  const [formData, setFormData] = useState<Partial<TNode>>({
     name: "",
     type: "action",
     category: "system",
@@ -101,7 +101,7 @@ export function EditNodePage() {
     setActivePage("Edit Node");
   }, [setActivePage]);
 
-  const handleInputChange = (field: keyof Node, value: string) => {
+  const handleInputChange = (field: keyof TNode, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

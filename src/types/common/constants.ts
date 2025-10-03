@@ -10,5 +10,5 @@ export const nodeCategories = [
   'file'
 ] as const;
 
-export type NodeType = typeof nodeTypes[number];
-export type NodeCategory = typeof nodeCategories[number];
+export type TNodeTypeEnum = typeof nodeTypes[number];
+export type TNodeCategoryEnum = typeof nodeCategories[number];

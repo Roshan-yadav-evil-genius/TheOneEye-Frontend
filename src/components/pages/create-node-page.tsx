@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Node } from "@/types";
+import { TNode } from "@/types";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 import { NodePreview } from "@/components/NodePreview";
@@ -20,7 +20,7 @@ export function CreateNodePage() {
   const router = useRouter();
   
   // React Hook Form setup
-  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Partial<Node>>({
+  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Partial<TNode>>({
     defaultValues: {
       name: "",
       type: "action",
@@ -74,7 +74,7 @@ export function CreateNodePage() {
     setActivePage("Create Node");
   }, [setActivePage]);
 
-  const onSubmit = async (data: Partial<Node>) => {
+  const onSubmit = async (data: Partial<TNode>) => {
     console.log('Form submitted with data:', data);
     console.log('Form configuration in submitted data:', data.formConfiguration);
     try {

@@ -1,5 +1,5 @@
 // Node data and types for the application
-import { Node } from '@/types';
+import { TNode } from '@/types';
 
 // Helper function to format date strings
 export const formatNodeDate = (dateString: string): string => {
@@ -21,19 +21,19 @@ import { mockNodes } from '@/dummy';
 export { mockNodes };
 
 // Helper functions for node operations
-export const getNodeById = (id: string): Node | undefined => {
+export const getNodeById = (id: string): TNode | undefined => {
   return mockNodes.find(node => node.id === id);
 };
 
-export const getNodesByCategory = (category: string): Node[] => {
+export const getNodesByCategory = (category: string): TNode[] => {
   return mockNodes.filter(node => node.category === category);
 };
 
-export const getNodesByType = (type: Node['type']): Node[] => {
+export const getNodesByType = (type: TNode['type']): TNode[] => {
   return mockNodes.filter(node => node.type === type);
 };
 
-export const searchNodes = (query: string): Node[] => {
+export const searchNodes = (query: string): TNode[] => {
   const lowercaseQuery = query.toLowerCase();
   return mockNodes.filter(node => 
     node.name.toLowerCase().includes(lowercaseQuery) ||

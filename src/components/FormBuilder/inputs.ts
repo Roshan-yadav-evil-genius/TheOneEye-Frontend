@@ -1,7 +1,7 @@
 // Re-export widget types from centralized types
-export { WidgetConfig, WidgetType, WidgetDefinition } from '@/types/forms';
+export { TWidgetConfig, TWidgetType, TWidgetDefinition } from '@/types/forms';
 
-export const WIDGET_DEFINITIONS: WidgetDefinition[] = [
+export const WIDGET_DEFINITIONS: TWidgetDefinition[] = [
   {
     type: 'text',
     label: 'Text Input',

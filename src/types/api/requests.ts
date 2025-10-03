@@ -1,9 +1,9 @@
-import { Node } from '../common';
+import { TNode } from '../common';
 
 // API Request Types
-export interface NodeCreateData {
+export interface TNodeCreateData {
   name: string;
-  type: Node['type'];
+  type: TNode['type'];
   category: string;
   description?: string;
   version?: string;
@@ -13,9 +13,9 @@ export interface NodeCreateData {
   logoFile?: File; // Optional logo file
 }
 
-export interface NodeUpdateData extends Partial<NodeCreateData> {}
+export interface TNodeUpdateData extends Partial<TNodeCreateData> {}
 
-export interface NodeFilters {
+export interface TNodeFilters {
   type?: string;
   category?: string;
   is_active?: boolean;

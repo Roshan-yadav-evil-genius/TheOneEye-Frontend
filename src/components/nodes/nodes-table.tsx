@@ -45,7 +45,7 @@ import {
   IconDatabase,
   IconTag,
 } from "@tabler/icons-react";
-import { Node, nodeTypes } from "@/types";
+import { TNode, nodeTypes } from "@/types";
 import { formatNodeDate } from "@/data/nodes";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
@@ -56,7 +56,7 @@ interface ColumnConfig {
 }
 
 interface NodesTableProps {
-  nodes: Node[];
+  nodes: TNode[];
   onEdit?: (id: string) => void;
   onView?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -155,7 +155,7 @@ export function NodesTable({
     return <IconComponent className="h-4 w-4" />;
   };
 
-  const renderNodeLogo = (node: Node) => {
+  const renderNodeLogo = (node: TNode) => {
     if (node.logo) {
       return (
         <img 

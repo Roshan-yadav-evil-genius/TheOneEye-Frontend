@@ -16,7 +16,7 @@ import {
   IconChartBar,
   IconWorld
 } from "@tabler/icons-react";
-import { NodeType as BaseNodeType, CategoryType as BaseCategoryType } from '@/types/ui';
+import { TNodeType as BaseNodeType, TCategoryType as BaseCategoryType } from '@/types/ui';
 
 export const nodeColors = {
   trigger: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
