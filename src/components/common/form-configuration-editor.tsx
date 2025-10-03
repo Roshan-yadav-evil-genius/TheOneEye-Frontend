@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { IconForms, IconCheck, IconX } from "@tabler/icons-react";
+import FormBuilder from "../FormBuilder/FormBuilder";
 
 interface FormConfigurationEditorProps {
   value: Record<string, unknown>;
@@ -81,57 +79,7 @@ export function FormConfigurationEditor({ value, onChange, disabled = false }: F
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="form-config">JSON Configuration</Label>
-          <Textarea
-            id="form-config"
-            value={jsonString}
-            onChange={(e) => handleJsonChange(e.target.value)}
-            placeholder='{"fields": [{"name": "input", "type": "text", "required": true}]}'
-            rows={8}
-            className={`font-mono text-sm ${!isValid ? "border-red-500" : ""}`}
-            disabled={disabled}
-          />
-          {error && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <IconX className="h-4 w-4" />
-              {error}
-            </p>
-          )}
-          {isValid && jsonString.trim() !== "" && (
-            <p className="text-sm text-green-500 flex items-center gap-1">
-              <IconCheck className="h-4 w-4" />
-              Valid JSON configuration
-            </p>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleFormat}
-            disabled={disabled || jsonString.trim() === ""}
-          >
-            Format JSON
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleClear}
-            disabled={disabled}
-          >
-            Clear
-          </Button>
-        </div>
-        
-        <div className="text-sm text-muted-foreground">
-          <p>Enter a valid JSON object to define form fields, validation rules, and other configuration options.</p>
-          <p className="mt-1">
-          </p>
-        </div>
+        <FormBuilder/>
       </CardContent>
     </Card>
   );
