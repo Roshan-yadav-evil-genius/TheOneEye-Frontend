@@ -39,17 +39,13 @@ import {
   IconSearch,
   IconFilter,
   IconPlus,
-  IconNetwork,
   IconCheck,
   IconSettings,
   IconClock,
   IconDatabase,
-  IconMail,
-  IconApi,
-  IconFileText,
   IconTag,
 } from "@tabler/icons-react";
-import { Node, nodeTypes, nodeCategories, formatNodeDate } from "@/data/nodes";
+import { Node, nodeTypes, formatNodeDate } from "@/data/nodes";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
 interface ColumnConfig {

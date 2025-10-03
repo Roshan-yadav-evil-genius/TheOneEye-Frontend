@@ -105,9 +105,7 @@ class RealNodesApiClient {
   }
 
   async createNode(nodeData: NodeCreateData): Promise<Node> {
-    console.log('Real API: Creating node with data:', nodeData);
     const transformedData = this.transformNodeData(nodeData);
-    console.log('Real API: Transformed data:', transformedData);
     
     // Check if there's a logo file to upload
     const hasLogoFile = transformedData.logo instanceof File;
@@ -145,9 +143,7 @@ class RealNodesApiClient {
       body: requestBody,
     });
     
-    console.log('Real API: Response status:', response.status);
     const data = await this.handleResponse<any>(response);
-    console.log('Real API: Response data:', data);
     return this.transformNode(data);
   }
 
