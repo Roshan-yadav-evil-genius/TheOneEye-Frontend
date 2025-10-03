@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 
 interface WidgetLoaderProps {
   nodeData: Partial<Node>;

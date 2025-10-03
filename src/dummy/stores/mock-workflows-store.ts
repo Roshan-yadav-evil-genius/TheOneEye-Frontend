@@ -1,4 +1,4 @@
-import { Workflow } from "@/stores/types";
+import { Workflow } from "@/types";
 
 export const mockWorkflowsStore: Workflow[] = [
   {

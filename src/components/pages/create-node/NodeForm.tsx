@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
+import { Node, nodeTypes, nodeCategories } from "@/types";
 
 interface NodeFormProps {
   control: Control<Partial<Node>>;

@@ -16,7 +16,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IconDeviceFloppy, IconUpload, IconX, IconX as IconClose, IconTag } from "@tabler/icons-react";
-import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
+import { Node, nodeTypes, nodeCategories } from "@/types";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 

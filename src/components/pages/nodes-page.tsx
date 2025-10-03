@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 import { useNodesStore, useUIStore } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 

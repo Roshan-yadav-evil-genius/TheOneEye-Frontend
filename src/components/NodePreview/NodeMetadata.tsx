@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
 interface NodeMetadataProps {

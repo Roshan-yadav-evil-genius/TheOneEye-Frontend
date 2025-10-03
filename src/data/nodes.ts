@@ -1,20 +1,5 @@
 // Node data and types for the application
-
-export interface Node {
-  id: string;
-  name: string;
-  type: 'trigger' | 'action' | 'logic' | 'system';
-  category: string;
-  description: string;
-  version: string;
-  isActive: boolean;
-  createdAt: string; // ISO string format from backend
-  updatedAt: string; // ISO string format from backend
-  createdBy: string; // Username of the creator
-  formConfiguration: Record<string, unknown>; // Form configuration JSON
-  tags: string[];
-  logo?: string; // URL to the node logo image
-}
+import { Node } from '@/types';
 
 // Helper function to format date strings
 export const formatNodeDate = (dateString: string): string => {
@@ -26,16 +11,8 @@ export const formatNodeDate = (dateString: string): string => {
   }
 };
 
-export const nodeTypes = ['trigger', 'action', 'logic', 'system'] as const;
-export const nodeCategories = [
-  'system',
-  'email', 
-  'database',
-  'api',
-  'logic',
-  'control',
-  'file'
-] as const;
+// Re-export constants from types
+export { nodeTypes, nodeCategories } from '@/types';
 
 // Import mock data from dummy folder
 import { mockNodes } from '@/dummy';

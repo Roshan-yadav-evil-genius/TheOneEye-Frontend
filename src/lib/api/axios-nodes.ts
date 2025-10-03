@@ -1,12 +1,12 @@
-import { Node } from '@/data/nodes';
 import { 
+  Node,
   NodeCreateData, 
   NodeUpdateData, 
   NodeFilters, 
   PaginatedResponse,
   NodeStats,
   ApiError 
-} from './types';
+} from '@/types';
 import { axiosApiClient } from './axios-client';
 
 // Axios-based API client implementation
@@ -64,7 +64,6 @@ class AxiosNodesApiClient {
       description: nodeData.description,
       version: nodeData.version,
       is_active: nodeData.isActive,
-      created_by: nodeData.createdBy,
       form_configuration: nodeData.formConfiguration,
       tags: nodeData.tags,
       logo: nodeData.logoFile, // Include logo file

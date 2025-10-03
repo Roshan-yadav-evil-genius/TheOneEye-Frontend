@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 import { NodesTable } from "@/components/nodes/nodes-table"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
-import { Node } from "@/data/nodes"
+import { Node } from "@/types"
 
 interface NodesListProps {
   nodes: Node[]

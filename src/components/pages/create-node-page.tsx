@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 import { NodePreview } from "@/components/NodePreview";

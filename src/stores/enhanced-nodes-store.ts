@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { Node, NodesState } from './types';
-import { NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/lib/api/types';
+import { Node, NodesState, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/types';
 import { ApiService } from '@/lib/api/api-service';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 

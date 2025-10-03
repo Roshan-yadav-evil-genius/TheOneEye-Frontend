@@ -16,6 +16,7 @@ import {
   IconChartBar,
   IconWorld
 } from "@tabler/icons-react";
+import { NodeType as BaseNodeType, CategoryType as BaseCategoryType } from '@/types/ui';
 
 export const nodeColors = {
   trigger: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
@@ -39,7 +40,7 @@ export const iconColors = {
   control: "text-indigo-600 dark:text-indigo-400",
 } as const;
 
-export type NodeType = keyof typeof nodeColors;
+export type NodeType = BaseNodeType;
 
 // Category icon mapping for consistency across components
 export const categoryIcons = {
@@ -62,7 +63,7 @@ export const categoryIcons = {
   web: IconWorld,
 } as const;
 
-export type CategoryType = keyof typeof categoryIcons;
+export type CategoryType = BaseCategoryType;
 
 // Helper function to get node colors
 export const getNodeColors = (nodeType: string) => {

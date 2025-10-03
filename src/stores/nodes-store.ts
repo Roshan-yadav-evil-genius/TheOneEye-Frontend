@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Node, NodesState } from './types';
-import { NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/lib/api/types';
+import { Node, NodesState, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/types';
 import { getNodesApi } from '@/lib/api/config';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 

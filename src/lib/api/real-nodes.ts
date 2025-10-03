@@ -1,4 +1,4 @@
-import { Node } from '@/data/nodes';
+import { Node } from '@/types';
 import { 
   NodeCreateData, 
   NodeUpdateData, 

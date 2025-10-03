@@ -3,7 +3,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { IconInfoCircle, IconTag } from "@tabler/icons-react";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getNodeColors } from "@/constants/node-styles";
 

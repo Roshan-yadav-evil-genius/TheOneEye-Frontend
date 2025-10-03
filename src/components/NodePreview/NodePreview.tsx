@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Node } from "@/data/nodes";
+import { Node } from "@/types";
 import { NodeHeader } from "./NodeHeader";
 import { NodeMetadata } from "./NodeMetadata";
 import { FormFieldsSection } from "./FormFieldsSection";

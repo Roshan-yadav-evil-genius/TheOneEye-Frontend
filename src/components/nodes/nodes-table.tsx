@@ -45,7 +45,8 @@ import {
   IconDatabase,
   IconTag,
 } from "@tabler/icons-react";
-import { Node, nodeTypes, formatNodeDate } from "@/data/nodes";
+import { Node, nodeTypes } from "@/types";
+import { formatNodeDate } from "@/data/nodes";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
 interface ColumnConfig {

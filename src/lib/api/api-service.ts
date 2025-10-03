@@ -1,13 +1,13 @@
 import { axiosApiClient } from './axios-client';
-import { Node } from '@/data/nodes';
 import { 
+  Node,
   NodeCreateData, 
   NodeUpdateData, 
   NodeFilters, 
   PaginatedResponse,
   NodeStats,
   ApiError 
-} from './types';
+} from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
