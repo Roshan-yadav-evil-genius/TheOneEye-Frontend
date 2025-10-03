@@ -1,6 +1,7 @@
 // Import stores for internal use
 import { useUserStore } from './user-store';
 import { useNodesStore } from './nodes-store';
+import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
 import { useWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
@@ -9,6 +10,7 @@ import { useProjectsStore } from './projects-store';
 // Re-export stores for external use
 export { useUserStore } from './user-store';
 export { useNodesStore } from './nodes-store';
+export { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
 export { useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
@@ -36,7 +38,7 @@ export type {
 // Store initialization utilities
 export const initializeStores = async () => {
   // Initialize stores with default data if needed
-  const { loadNodes } = useNodesStore.getState();
+  const { loadNodes } = useEnhancedNodesStore.getState();
   const { loadWorkflows } = useWorkflowStore.getState();
   const { loadFormConfigurations } = useFormStore.getState();
   const { loadProjects } = useProjectsStore.getState();
@@ -44,7 +46,7 @@ export const initializeStores = async () => {
   try {
     // Load initial data in parallel
     await Promise.all([
-      loadNodes({}, false), // Don't show toast on initial load
+      loadNodes({}, { showToast: false }), // Don't show toast on initial load
       loadWorkflows(),
       loadFormConfigurations(),
       loadProjects(),
@@ -58,17 +60,7 @@ export const initializeStores = async () => {
 export const resetAllStores = () => {
   // Reset all stores to initial state
   useUserStore.getState().logout();
-  useNodesStore.setState({
-    nodes: [],
-    selectedNode: null,
-    isLoading: false,
-    error: null,
-    filters: {
-      type: undefined,
-      category: undefined,
-      search: undefined,
-    },
-  });
+  useEnhancedNodesStore.getState().reset();
   useWorkflowStore.setState({
     workflows: [],
     activeWorkflow: null,
