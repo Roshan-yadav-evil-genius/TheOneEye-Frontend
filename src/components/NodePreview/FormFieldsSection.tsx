@@ -30,13 +30,6 @@ export function FormFieldsSection({ nodeData }: FormFieldsSectionProps) {
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-1 w-8 bg-primary rounded-full"></div>
-          <h3 className="text-lg font-semibold text-foreground">
-            Form Fields ({widgets.length} field{widgets.length !== 1 ? 's' : ''})
-          </h3>
-        </div>
-        
         <div className="space-y-4">
           {widgets.map((widget: any, index: number) => (
             <div key={widget.id || index} className="group">

@@ -50,7 +50,7 @@ import {
   IconTag,
 } from "@tabler/icons-react";
 import { Node, nodeTypes, nodeCategories, formatNodeDate } from "@/data/nodes";
-import { getNodeColors } from "@/constants/node-styles";
+import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
 interface ColumnConfig {
   id: string;
@@ -158,17 +158,8 @@ export function NodesTable({
     return <IconComponent className="h-4 w-4" />;
   };
 
-  const getCategoryIcon = (category: string) => {
-    const categoryIcons = {
-      system: IconDatabase,
-      email: IconMail,
-      database: IconDatabase,
-      api: IconApi,
-      logic: IconCheck,
-      control: IconClock,
-      file: IconFileText,
-    };
-    const IconComponent = categoryIcons[category as keyof typeof categoryIcons] || IconSettings;
+  const renderCategoryIcon = (category: string) => {
+    const IconComponent = getCategoryIcon(category);
     return <IconComponent className="h-4 w-4" />;
   };
 
@@ -357,7 +348,7 @@ export function NodesTable({
                   {columns.find(col => col.id === "category")?.visible && (
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {getCategoryIcon(node.category)}
+                        {renderCategoryIcon(node.category)}
                         <span className="capitalize">{node.category}</span>
                       </div>
                     </TableCell>

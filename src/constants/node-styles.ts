@@ -1,5 +1,22 @@
 // Shared node styling constants for consistency across components
 
+import { 
+  IconDatabase, 
+  IconMail, 
+  IconApi, 
+  IconFileText, 
+  IconClock, 
+  IconCheck, 
+  IconSettings,
+  IconCloud,
+  IconServer,
+  IconCode,
+  IconShield,
+  IconUsers,
+  IconChartBar,
+  IconWorld
+} from "@tabler/icons-react";
+
 export const nodeColors = {
   trigger: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
   action: "border-green-400 bg-green-50 dark:bg-green-950/20",
@@ -24,6 +41,29 @@ export const iconColors = {
 
 export type NodeType = keyof typeof nodeColors;
 
+// Category icon mapping for consistency across components
+export const categoryIcons = {
+  system: IconDatabase,
+  email: IconMail,
+  database: IconDatabase,
+  api: IconApi,
+  logic: IconCheck,
+  control: IconClock,
+  file: IconFileText,
+  communication: IconMail,
+  data: IconDatabase,
+  integration: IconApi,
+  cloud: IconCloud,
+  server: IconServer,
+  code: IconCode,
+  security: IconShield,
+  user: IconUsers,
+  analytics: IconChartBar,
+  web: IconWorld,
+} as const;
+
+export type CategoryType = keyof typeof categoryIcons;
+
 // Helper function to get node colors
 export const getNodeColors = (nodeType: string) => {
   const type = nodeType as NodeType;
@@ -31,4 +71,10 @@ export const getNodeColors = (nodeType: string) => {
     colorClass: nodeColors[type] || nodeColors.system,
     iconColorClass: iconColors[type] || iconColors.system,
   };
+};
+
+// Helper function to get category icon
+export const getCategoryIcon = (category: string) => {
+  const cat = category as CategoryType;
+  return categoryIcons[cat] || IconSettings;
 };

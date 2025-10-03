@@ -24,6 +24,7 @@ import {
   IconChevronDown,
   IconChevronRight
 } from "@tabler/icons-react";
+import { getCategoryIcon } from "@/constants/node-styles";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -45,15 +46,6 @@ const nodeIcons = {
   system: IconDatabase,
 };
 
-const categoryIcons = {
-  system: IconDatabase,
-  email: IconMail,
-  database: IconDatabase,
-  api: IconApi,
-  logic: IconCheck,
-  control: IconClock,
-  file: IconFileText,
-};
 
 const nodeColors = {
   trigger: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -108,8 +100,8 @@ export function WorkflowSidebar({
     return <IconComponent className="h-4 w-4" />;
   };
   
-  const getCategoryIcon = (category: string) => {
-    const IconComponent = categoryIcons[category as keyof typeof categoryIcons] || IconSettings;
+  const renderCategoryIcon = (category: string) => {
+    const IconComponent = getCategoryIcon(category);
     return IconComponent;
   };
 
@@ -167,7 +159,7 @@ export function WorkflowSidebar({
         <div className="space-y-3">
           {Object.entries(groupedNodes).map(([category, nodes]) => {
             const isExpanded = expandedGroups.has(category);
-            const CategoryIconComponent = getCategoryIcon(category);
+            const CategoryIconComponent = renderCategoryIcon(category);
             
             return (
               <div key={category} className="space-y-2">
