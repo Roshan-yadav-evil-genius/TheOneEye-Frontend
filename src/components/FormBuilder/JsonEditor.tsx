@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { WidgetConfig } from './inputs';
 import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, CheckCircle } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface JsonEditorProps {
   widgets: WidgetConfig[];
@@ -14,6 +15,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
   const [jsonString, setJsonString] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   // Initialize JSON string when widgets change
   useEffect(() => {
@@ -27,6 +30,14 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
       setIsValid(false);
     }
   }, [widgets]);
+
+  // Sync scroll between textarea and syntax highlighter
+  const handleScroll = () => {
+    if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+      highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
+    }
+  };
 
   const handleJsonChange = (value: string) => {
     setJsonString(value);
@@ -123,19 +134,78 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
           <label className="text-sm font-medium text-slate-300">
             Form Configuration JSON
           </label>
-          <Textarea
-            value={jsonString}
-            onChange={(e) => handleJsonChange(e.target.value)}
-            className="min-h-[400px] font-mono text-sm bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
-            placeholder="Enter your form configuration JSON here..."
-          />
+          <div className="relative border border-slate-700 rounded-lg overflow-hidden">
+            {/* Syntax highlighting background */}
+            <div 
+              ref={highlightRef}
+              className="absolute inset-0 pointer-events-none overflow-auto"
+              style={{ 
+                background: '#0f172a',
+                zIndex: 1,
+                padding: '1rem',
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                fontSize: '0.875rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word'
+              }}
+            >
+              <SyntaxHighlighter
+                language="json"
+                style={vscDarkPlus}
+                customStyle={{
+                  background: 'transparent',
+                  margin: 0,
+                  padding: 0,
+                  fontSize: 'inherit',
+                  fontFamily: 'inherit',
+                  lineHeight: 'inherit',
+                }}
+                showLineNumbers={false}
+                wrapLines={true}
+                wrapLongLines={true}
+              >
+                {jsonString || 'Enter your form configuration JSON here...'}
+              </SyntaxHighlighter>
+            </div>
+            
+            {/* Editable textarea */}
+            <textarea
+              ref={textareaRef}
+              value={jsonString}
+              onChange={(e) => handleJsonChange(e.target.value)}
+              onScroll={handleScroll}
+              className="relative w-full min-h-[400px] font-mono text-sm bg-transparent border-0 text-transparent caret-slate-200 placeholder:text-slate-500 focus:outline-none p-4 resize-none z-10"
+              placeholder="Enter your form configuration JSON here..."
+              spellCheck={false}
+              style={{
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                fontSize: '0.875rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word'
+              }}
+            />
+          </div>
         </div>
 
         <div className="text-xs text-slate-500 space-y-1">
           <p><strong>Structure:</strong> The JSON should contain a "widgets" array with widget objects.</p>
           <p><strong>Required fields:</strong> Each widget must have id, type, and label.</p>
           <p><strong>Example:</strong></p>
-          <pre className="bg-slate-900 p-2 rounded text-xs overflow-x-auto">
+          <div className="bg-slate-900 p-2 rounded text-xs overflow-x-auto">
+            <SyntaxHighlighter
+              language="json"
+              style={vscDarkPlus}
+              customStyle={{
+                background: 'transparent',
+                margin: 0,
+                padding: 0,
+                fontSize: '0.75rem',
+                fontFamily: 'inherit',
+              }}
+              showLineNumbers={false}
+            >
 {`{
   "widgets": [
     {
@@ -147,7 +217,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
     }
   ]
 }`}
-          </pre>
+            </SyntaxHighlighter>
+          </div>
         </div>
       </div>
     </div>
