@@ -4,12 +4,14 @@ import { WidgetConfig, WidgetType, generateWidgetId, WIDGET_DEFINITIONS } from '
 export interface FormBuilderState {
   widgets: WidgetConfig[];
   selectedWidget: string | null;
+  isJsonMode: boolean;
 }
 
 export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange?: (widgets: WidgetConfig[]) => void) => {
   const [state, setState] = useState<FormBuilderState>({
     widgets: initialWidgets,
     selectedWidget: null,
+    isJsonMode: false,
   });
 
   // Helper function to notify parent of changes
@@ -113,6 +115,24 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
     });
   }, [state.widgets, notifyParent]);
 
+  const toggleJsonMode = useCallback((isJsonMode: boolean) => {
+    setState(prev => ({
+      ...prev,
+      isJsonMode,
+      selectedWidget: isJsonMode ? null : prev.selectedWidget, // Clear selection in JSON mode
+    }));
+  }, []);
+
+  const updateWidgetsFromJson = useCallback((newWidgets: WidgetConfig[]) => {
+    setState(prev => ({
+      ...prev,
+      widgets: newWidgets,
+      selectedWidget: null,
+    }));
+    // Notify parent after state update
+    setTimeout(() => notifyParent(newWidgets), 0);
+  }, [notifyParent]);
+
   return {
     ...state,
     addWidget,
@@ -121,5 +141,7 @@ export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange
     selectWidget,
     moveWidget,
     duplicateWidget,
+    toggleJsonMode,
+    updateWidgetsFromJson,
   };
 };

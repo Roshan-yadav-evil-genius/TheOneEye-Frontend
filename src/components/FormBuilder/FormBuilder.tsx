@@ -4,6 +4,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import BuilderCanvas from './BuilderCanvas';
 import FieldsMenuBar from './FieldsMenuBar';
+import JsonEditor from './JsonEditor';
 import { useFormBuilder } from './useFormBuilder';
 import { WidgetType, WidgetConfig } from './inputs';
 import { Card } from '../ui/card';
@@ -17,12 +18,15 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets 
   const {
     widgets,
     selectedWidget,
+    isJsonMode,
     addWidget,
     updateWidget,
     removeWidget,
     selectWidget,
     moveWidget,
     duplicateWidget,
+    toggleJsonMode,
+    updateWidgetsFromJson,
   } = useFormBuilder(initialWidgets, onFormChange);
 
   const [activeId, setActiveId] = React.useState<string | null>(null);
@@ -74,19 +78,30 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets 
       modifiers={[restrictToVerticalAxis]}
     >
       <div className="bg-slate-800 rounded-lg overflow-hidden">
-        <FieldsMenuBar onAddWidget={addWidget} />
+        <FieldsMenuBar 
+          onAddWidget={addWidget}
+          isJsonMode={isJsonMode}
+          onToggleMode={toggleJsonMode}
+        />
         
-        <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
-          <BuilderCanvas
+        {isJsonMode ? (
+          <JsonEditor
             widgets={widgets}
-            selectedWidget={selectedWidget}
-            onSelectWidget={selectWidget}
-            onUpdateWidget={updateWidget}
-            onDeleteWidget={removeWidget}
-            onDuplicateWidget={duplicateWidget}
-            onMoveWidget={moveWidget}
+            onWidgetsChange={updateWidgetsFromJson}
           />
-        </SortableContext>
+        ) : (
+          <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
+            <BuilderCanvas
+              widgets={widgets}
+              selectedWidget={selectedWidget}
+              onSelectWidget={selectWidget}
+              onUpdateWidget={updateWidget}
+              onDeleteWidget={removeWidget}
+              onDuplicateWidget={duplicateWidget}
+              onMoveWidget={moveWidget}
+            />
+          </SortableContext>
+        )}
 
         <DragOverlay>
           {renderDragOverlay()}
