@@ -77,6 +77,7 @@ class RealNodesApiClient {
       created_by: nodeData.createdBy,
       form_configuration: nodeData.formConfiguration,
       tags: nodeData.tags,
+      logo: nodeData.logoFile, // Include logo file
     };
   }
 
@@ -107,12 +108,40 @@ class RealNodesApiClient {
     const transformedData = this.transformNodeData(nodeData);
     console.log('Real API: Transformed data:', transformedData);
     
+    // Check if there's a logo file to upload
+    const hasLogoFile = transformedData.logo instanceof File;
+    
+    let requestBody: FormData | string;
+    let headers: Record<string, string> = {};
+    
+    if (hasLogoFile) {
+      // Use FormData for file upload
+      const formData = new FormData();
+      
+      // Add all fields to FormData
+      Object.entries(transformedData).forEach(([key, value]) => {
+        if (key === 'logo' && value instanceof File) {
+          formData.append('logo', value);
+        } else if (key === 'form_configuration' || key === 'tags') {
+          // Convert objects/arrays to JSON strings
+          formData.append(key, JSON.stringify(value));
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+      
+      requestBody = formData;
+      // Don't set Content-Type header for FormData - let browser set it with boundary
+    } else {
+      // Use JSON for regular data
+      requestBody = JSON.stringify(transformedData);
+      headers['Content-Type'] = 'application/json';
+    }
+    
     const response = await fetch(`${this.baseUrl}/nodes/`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(transformedData),
+      headers,
+      body: requestBody,
     });
     
     console.log('Real API: Response status:', response.status);

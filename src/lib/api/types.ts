@@ -22,6 +22,7 @@ export interface NodeCreateData {
   isActive?: boolean; // Optional for creation, defaults to true
   formConfiguration?: Record<string, unknown>;
   tags?: string[];
+  logoFile?: File; // Optional logo file
 }
 
 export interface NodeUpdateData extends Partial<NodeCreateData> {}

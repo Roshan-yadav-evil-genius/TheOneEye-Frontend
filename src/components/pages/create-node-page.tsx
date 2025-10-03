@@ -88,10 +88,12 @@ export function CreateNodePage() {
         isActive: data.isActive !== undefined ? data.isActive : true,
         formConfiguration: data.formConfiguration || {},
         tags: data.tags || [],
+        logoFile: logoFile, // Include the logo file
       };
 
       console.log('Prepared node data:', nodeData);
       console.log('Form configuration being sent to API:', nodeData.formConfiguration);
+      console.log('Logo file being sent to API:', logoFile);
 
       // Create the node using the store
       await createNode(nodeData);
