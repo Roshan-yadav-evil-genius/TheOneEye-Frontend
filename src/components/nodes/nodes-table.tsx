@@ -138,15 +138,10 @@ export function NodesTable({
   const isIndeterminate = selectedRows.length > 0 && selectedRows.length < currentNodes.length;
 
   const getTypeBadge = (type: string) => {
-    const typeColors = {
-      trigger: "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800",
-      action: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
-      logic: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
-      system: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800",
-    };
+    const { colorClass, iconColorClass } = getNodeColors(type);
     
     return (
-      <Badge variant="outline" className={typeColors[type as keyof typeof typeColors] || "text-gray-600 border-gray-300 dark:text-gray-400 dark:border-gray-600"}>
+      <Badge variant="outline" className={`${colorClass} ${iconColorClass}`}>
         {type}
       </Badge>
     );

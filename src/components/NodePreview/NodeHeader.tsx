@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { IconInfoCircle, IconTag } from "@tabler/icons-react";
 import { Node } from "@/data/nodes";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { getNodeColors } from "@/constants/node-styles";
 
 interface NodeHeaderProps {
   nodeData: Partial<Node>;
@@ -12,6 +13,8 @@ interface NodeHeaderProps {
 }
 
 export function NodeHeader({ nodeData, logoPreview }: NodeHeaderProps) {
+  const { colorClass, iconColorClass } = getNodeColors(nodeData.type || "system");
+  
   return (
     <div className="flex items-center gap-2">
       <div>
@@ -25,16 +28,16 @@ export function NodeHeader({ nodeData, logoPreview }: NodeHeaderProps) {
                 className="h-10 w-10 object-cover rounded border-2 border-border shadow-sm"
               />
             ) : (
-              <div className="h-20 w-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border-2 border-border flex items-center justify-center shadow-sm">
-                <span className="text-xl font-bold text-primary">
+              <div className={`h-20 w-20 rounded-xl border-2 flex items-center justify-center shadow-sm ${colorClass}`}>
+                <span className={`text-xl font-bold ${iconColorClass}`}>
                   {nodeData.name?.charAt(0).toUpperCase() || "N"}
                 </span>
               </div>
             )}
           </div>
           <div>
-            {/* Titel */}
-            <div className="flex">
+            {/* Title */}
+            <div className="flex items-center gap-1">
               <h1 className="text-xl font-bold text-foreground">
                 {nodeData.name || "Unnamed Node"}
               </h1>
