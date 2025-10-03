@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -29,15 +30,22 @@ import {
 
 export function CreateNodePage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<Partial<Node>>({
-    name: "",
-    type: "action",
-    category: "system",
-    description: "",
-    version: "1.0.0",
-    tags: [],
-    formConfiguration: {},
+  
+  // React Hook Form setup
+  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Partial<Node>>({
+    defaultValues: {
+      name: "",
+      type: "action",
+      category: "system",
+      description: "",
+      version: "1.0.0",
+      tags: [],
+      formConfiguration: {},
+    },
   });
+  
+  // Watch form values for real-time updates
+  const formData = watch();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [currentTagInput, setCurrentTagInput] = useState<string>("");
@@ -49,20 +57,20 @@ export function CreateNodePage() {
   const { setActivePage } = useUIStore();
 
   const handleInputChange = (field: keyof Node, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setValue(field, value);
   };
 
   const handleVersionChange = (value: string) => {
     // Only allow semantic versioning format (x.y.z where x, y, z are numbers)
     const versionRegex = /^\d+\.\d+\.\d+$/;
     if (value === "" || versionRegex.test(value)) {
-      setFormData(prev => ({ ...prev, version: value }));
+      setValue("version", value);
     }
   };
 
   const handleTagsChange = (value: string) => {
     const tags = value.split(",").map(tag => tag.trim()).filter(Boolean);
-    setFormData(prev => ({ ...prev, tags }));
+    setValue("tags", tags);
   };
 
   const handleTagInputChange = (value: string) => {
@@ -73,7 +81,7 @@ export function CreateNodePage() {
       const newTag = value.replace(',', '').trim();
       if (newTag && !formData.tags?.includes(newTag)) {
         const updatedTags = [...(formData.tags || []), newTag];
-        setFormData(prev => ({ ...prev, tags: updatedTags }));
+        setValue("tags", updatedTags);
       }
       setCurrentTagInput(""); // Clear input after adding tag
     }
@@ -85,19 +93,19 @@ export function CreateNodePage() {
       const newTag = currentTagInput.trim();
       if (newTag && !formData.tags?.includes(newTag)) {
         const updatedTags = [...(formData.tags || []), newTag];
-        setFormData(prev => ({ ...prev, tags: updatedTags }));
+        setValue("tags", updatedTags);
       }
       setCurrentTagInput("");
     } else if (e.key === 'Backspace' && currentTagInput === '' && formData.tags && formData.tags.length > 0) {
       // Remove last tag if input is empty and backspace is pressed
       const updatedTags = formData.tags.slice(0, -1);
-      setFormData(prev => ({ ...prev, tags: updatedTags }));
+      setValue("tags", updatedTags);
     }
   };
 
   const removeTag = (tagToRemove: string) => {
     const updatedTags = formData.tags?.filter(tag => tag !== tagToRemove) || [];
-    setFormData(prev => ({ ...prev, tags: updatedTags }));
+    setValue("tags", updatedTags);
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,50 +142,34 @@ export function CreateNodePage() {
   const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
     // Only update if the JSON is actually different to prevent unnecessary re-renders
     if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
-      setFormData(prev => ({ ...prev, formConfiguration: json }));
+      setValue("formConfiguration", json);
     }
-  }, [formData.formConfiguration]);
+  }, [formData.formConfiguration, setValue]);
 
   // Set active page on mount
   useEffect(() => {
     setActivePage("Create Node");
   }, [setActivePage]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (data: Partial<Node>) => {
+    // Log the form data instead of persisting
+    console.log("Form data:", {
+      ...data,
+      logoFile: logoFile ? {
+        name: logoFile.name,
+        size: logoFile.size,
+        type: logoFile.type
+      } : null,
+      logoPreview: logoPreview ? "Image preview available" : null
+    });
+    
+    // Show success notification
+    uiHelpers.showSuccess("Success!", "Form data logged to console");
+  };
 
-    try {
-      // Create the node using Zustand store
-      const newNode = await createNode({
-        name: formData.name || "New Node",
-        type: (formData.type || "action") as Node['type'],
-        category: formData.category || "system",
-        description: formData.description || "",
-        version: formData.version || "1.0.0",
-        tags: formData.tags || [],
-        formConfiguration: formData.formConfiguration || {},
-        isActive: true,
-      });
-
-      // Create associated form configuration if it exists
-      if (formData.formConfiguration && Object.keys(formData.formConfiguration).length > 0) {
-        await createFormConfiguration({
-          name: `${formData.name} Configuration`,
-          description: `Form configuration for ${formData.name}`,
-          json: formData.formConfiguration,
-          nodeId: newNode.id,
-        });
-      }
-
-      // Show success notification
-      uiHelpers.showSuccess("Success!", "Node created successfully");
-
-      // Navigate back to nodes page after successful creation
-      router.push("/nodes");
-    } catch (error) {
-      console.error("Error creating node:", error);
-      uiHelpers.showError("Error", "Failed to create node. Please try again.");
-    }
+  const onError = (errors: any) => {
+    console.log("Form validation errors:", errors);
+    uiHelpers.showError("Validation Error", "Please check the form for errors");
   };
 
   const isCreating = isCreatingNode || isCreatingForm;
@@ -188,26 +180,40 @@ export function CreateNodePage() {
         {/* Create Node Form */}
         <Card>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
               {/* Node Name and Version in one row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Node Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name || ""}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    placeholder="Enter node name"
-                    required
+                  <Controller
+                    name="name"
+                    control={control}
+                    rules={{ required: "Node name is required" }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="name"
+                        placeholder="Enter node name"
+                      />
+                    )}
                   />
+                  {errors.name && (
+                    <p className="text-sm text-red-500">{errors.name.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="version">Version</Label>
-                  <Input
-                    id="version"
-                    value={formData.version || "1.0.0"}
-                    onChange={(e) => handleVersionChange(e.target.value)}
-                    placeholder="1.0.0"
+                  <Controller
+                    name="version"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="version"
+                        placeholder="1.0.0"
+                        onChange={(e) => handleVersionChange(e.target.value)}
+                      />
+                    )}
                   />
                 </div>
               </div>
@@ -216,39 +222,53 @@ export function CreateNodePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="type">Type *</Label>
-                  <Select 
-                    value={formData.type || "action"} 
-                    onValueChange={(value) => handleInputChange("type", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {nodeTypes.map(type => (
-                        <SelectItem key={type} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="type"
+                    control={control}
+                    rules={{ required: "Type is required" }}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {nodeTypes.map(type => (
+                            <SelectItem key={type} value={type}>
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.type && (
+                    <p className="text-sm text-red-500">{errors.type.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="category">Category *</Label>
-                  <Select 
-                    value={formData.category || "system"} 
-                    onValueChange={(value) => handleInputChange("category", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {nodeCategories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="category"
+                    control={control}
+                    rules={{ required: "Category is required" }}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {nodeCategories.map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.category && (
+                    <p className="text-sm text-red-500">{errors.category.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -337,12 +357,17 @@ export function CreateNodePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description || ""}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  placeholder="Describe what this node does"
-                  rows={4}
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id="description"
+                      placeholder="Describe what this node does"
+                      rows={4}
+                    />
+                  )}
                 />
               </div>
             </form>
@@ -370,8 +395,8 @@ export function CreateNodePage() {
         </Button>
         <Button
           type="submit"
-          onClick={handleSubmit}
-          disabled={isCreating || !formData.name}
+          disabled={isCreating}
+          onClick={() => console.log("Current form data:", formData)}
           className="flex items-center gap-2"
         >
           <IconDeviceFloppy className="h-4 w-4" />
