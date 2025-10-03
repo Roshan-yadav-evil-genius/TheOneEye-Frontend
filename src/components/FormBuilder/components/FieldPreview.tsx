@@ -47,7 +47,7 @@ const FieldPreview: React.FC<FieldPreviewProps> = ({ widget }) => {
               <SelectValue placeholder={widget.placeholder || 'Select an option'} />
             </SelectTrigger>
             <SelectContent>
-              {widget.options?.map((option, index) => (
+              {widget.options?.filter(option => option && option.trim() !== '').map((option, index) => (
                 <SelectItem key={index} value={option}>
                   {option}
                 </SelectItem>
@@ -67,7 +67,7 @@ const FieldPreview: React.FC<FieldPreviewProps> = ({ widget }) => {
       case 'radio':
         return (
           <div className="space-y-2">
-            {widget.options?.map((option, index) => (
+            {widget.options?.filter(option => option && option.trim() !== '').map((option, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <input
                   type="radio"

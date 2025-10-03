@@ -54,7 +54,7 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
             className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 appearance-none"
           >
             <option value="">{widget.placeholder || "Select an option..."}</option>
-            {widget.options?.slice(0, 3).map((option: string, idx: number) => (
+            {widget.options?.filter(option => option && option.trim() !== '').slice(0, 3).map((option: string, idx: number) => (
               <option key={idx} value={option}>{option}</option>
             ))}
           </select>
@@ -80,7 +80,7 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
     case 'radio':
       return (
         <div className="space-y-2">
-          {widget.options?.slice(0, 3).map((option: string, idx: number) => (
+          {widget.options?.filter(option => option && option.trim() !== '').slice(0, 3).map((option: string, idx: number) => (
             <div key={idx} className="flex items-center gap-3">
               <input
                 type="radio"
