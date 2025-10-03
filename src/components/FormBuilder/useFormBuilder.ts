@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { WidgetConfig, WidgetType, generateWidgetId, WIDGET_DEFINITIONS } from './inputs';
 
 export interface FormBuilderState {
@@ -6,11 +6,18 @@ export interface FormBuilderState {
   selectedWidget: string | null;
 }
 
-export const useFormBuilder = () => {
+export const useFormBuilder = (initialWidgets: WidgetConfig[] = [], onFormChange?: (widgets: WidgetConfig[]) => void) => {
   const [state, setState] = useState<FormBuilderState>({
-    widgets: [],
+    widgets: initialWidgets,
     selectedWidget: null,
   });
+
+  // Helper function to notify parent of changes
+  const notifyParent = useCallback((widgets: WidgetConfig[]) => {
+    if (onFormChange) {
+      onFormChange(widgets);
+    }
+  }, [onFormChange]);
 
   const addWidget = useCallback((type: WidgetType) => {
     const definition = WIDGET_DEFINITIONS.find(def => def.type === type);
@@ -23,29 +30,44 @@ export const useFormBuilder = () => {
       ...definition.defaultConfig,
     };
 
-    setState(prev => ({
-      ...prev,
-      widgets: [...prev.widgets, newWidget],
-      selectedWidget: newWidget.id,
-    }));
-  }, []);
+    setState(prev => {
+      const newState = {
+        ...prev,
+        widgets: [...prev.widgets, newWidget],
+        selectedWidget: newWidget.id,
+      };
+      // Notify parent after state update
+      setTimeout(() => notifyParent(newState.widgets), 0);
+      return newState;
+    });
+  }, [notifyParent]);
 
   const updateWidget = useCallback((id: string, updates: Partial<WidgetConfig>) => {
-    setState(prev => ({
-      ...prev,
-      widgets: prev.widgets.map(widget =>
-        widget.id === id ? { ...widget, ...updates } : widget
-      ),
-    }));
-  }, []);
+    setState(prev => {
+      const newState = {
+        ...prev,
+        widgets: prev.widgets.map(widget =>
+          widget.id === id ? { ...widget, ...updates } : widget
+        ),
+      };
+      // Notify parent after state update
+      setTimeout(() => notifyParent(newState.widgets), 0);
+      return newState;
+    });
+  }, [notifyParent]);
 
   const removeWidget = useCallback((id: string) => {
-    setState(prev => ({
-      ...prev,
-      widgets: prev.widgets.filter(widget => widget.id !== id),
-      selectedWidget: prev.selectedWidget === id ? null : prev.selectedWidget,
-    }));
-  }, []);
+    setState(prev => {
+      const newState = {
+        ...prev,
+        widgets: prev.widgets.filter(widget => widget.id !== id),
+        selectedWidget: prev.selectedWidget === id ? null : prev.selectedWidget,
+      };
+      // Notify parent after state update
+      setTimeout(() => notifyParent(newState.widgets), 0);
+      return newState;
+    });
+  }, [notifyParent]);
 
   const selectWidget = useCallback((id: string | null) => {
     setState(prev => ({
@@ -59,12 +81,15 @@ export const useFormBuilder = () => {
       const newWidgets = [...prev.widgets];
       const [movedWidget] = newWidgets.splice(fromIndex, 1);
       newWidgets.splice(toIndex, 0, movedWidget);
-      return {
+      const newState = {
         ...prev,
         widgets: newWidgets,
       };
+      // Notify parent after state update
+      setTimeout(() => notifyParent(newState.widgets), 0);
+      return newState;
     });
-  }, []);
+  }, [notifyParent]);
 
   const duplicateWidget = useCallback((id: string) => {
     const widget = state.widgets.find(w => w.id === id);
@@ -76,12 +101,17 @@ export const useFormBuilder = () => {
       label: `${widget.label} (Copy)`,
     };
 
-    setState(prev => ({
-      ...prev,
-      widgets: [...prev.widgets, duplicatedWidget],
-      selectedWidget: duplicatedWidget.id,
-    }));
-  }, [state.widgets]);
+    setState(prev => {
+      const newState = {
+        ...prev,
+        widgets: [...prev.widgets, duplicatedWidget],
+        selectedWidget: duplicatedWidget.id,
+      };
+      // Notify parent after state update
+      setTimeout(() => notifyParent(newState.widgets), 0);
+      return newState;
+    });
+  }, [state.widgets, notifyParent]);
 
   return {
     ...state,

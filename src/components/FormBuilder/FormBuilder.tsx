@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import BuilderCanvas from './BuilderCanvas';
 import FieldsMenuBar from './FieldsMenuBar';
 import { useFormBuilder } from './useFormBuilder';
-import { WidgetType } from './inputs';
+import { WidgetType, WidgetConfig } from './inputs';
 import { Card } from '../ui/card';
 
-const FormBuilder: React.FC = () => {
+interface FormBuilderProps {
+  onFormChange?: (widgets: WidgetConfig[]) => void;
+  initialWidgets?: WidgetConfig[];
+}
+
+const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets = [] }) => {
   const {
     widgets,
     selectedWidget,
@@ -18,7 +23,7 @@ const FormBuilder: React.FC = () => {
     selectWidget,
     moveWidget,
     duplicateWidget,
-  } = useFormBuilder();
+  } = useFormBuilder(initialWidgets, onFormChange);
 
   const [activeId, setActiveId] = React.useState<string | null>(null);
 

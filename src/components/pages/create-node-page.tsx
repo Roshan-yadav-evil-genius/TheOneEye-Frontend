@@ -15,10 +15,17 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { IconPlus, IconUpload, IconX, IconX as IconClose, IconTag } from "@tabler/icons-react";
+import { IconPlus, IconUpload, IconX, IconX as IconClose, IconTag, IconEye, IconDeviceFloppy } from "@tabler/icons-react";
 import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
+import { NodePreview } from "@/components/NodePreview";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export function CreateNodePage() {
   const router = useRouter();
@@ -34,6 +41,7 @@ export function CreateNodePage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [currentTagInput, setCurrentTagInput] = useState<string>("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
 
   // Zustand store hooks
   const { createNode, isLoading: isCreatingNode } = useNodesStore();
@@ -348,6 +356,41 @@ export function CreateNodePage() {
           disabled={isCreating}
         />
       </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3 pt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setIsPreviewOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <IconEye className="h-4 w-4" />
+          Preview
+        </Button>
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={isCreating || !formData.name}
+          className="flex items-center gap-2"
+        >
+          <IconDeviceFloppy className="h-4 w-4" />
+          {isCreating ? "Saving..." : "Save"}
+        </Button>
+      </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Node Preview</DialogTitle>
+          </DialogHeader>
+          <NodePreview 
+            nodeData={formData} 
+            logoPreview={logoPreview}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

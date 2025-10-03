@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconForms, IconCheck, IconX } from "@tabler/icons-react";
 import FormBuilder from "../FormBuilder/FormBuilder";
+import { WidgetConfig } from "../FormBuilder/inputs";
 
 interface FormConfigurationEditorProps {
   value: Record<string, unknown>;
@@ -67,6 +68,19 @@ export function FormConfigurationEditor({ value, onChange, disabled = false }: F
     }
   };
 
+  // Handle form builder changes
+  const handleFormBuilderChange = useCallback((widgets: WidgetConfig[]) => {
+    // Convert widgets to form configuration format
+    const formConfig = {
+      widgets: widgets,
+      metadata: {
+        totalFields: widgets.length,
+        lastUpdated: new Date().toISOString()
+      }
+    };
+    onChange(formConfig);
+  }, [onChange]);
+
   return (
     <Card>
       <CardHeader>
@@ -79,7 +93,7 @@ export function FormConfigurationEditor({ value, onChange, disabled = false }: F
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormBuilder/>
+        <FormBuilder onFormChange={handleFormBuilderChange} initialWidgets={value.widgets as WidgetConfig[] || []}/>
       </CardContent>
     </Card>
   );
