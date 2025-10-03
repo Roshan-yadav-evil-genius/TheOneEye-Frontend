@@ -11,12 +11,10 @@ interface OutputSectionProps {
 export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: OutputSectionProps) {
   const handleExecute = () => {
     // This would trigger the node execution
-    console.log("Executing node...");
   };
 
   const handleRefresh = () => {
     // This would refresh the output data
-    console.log("Refreshing output...");
   };
 
   return (

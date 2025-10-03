@@ -69,12 +69,10 @@ export function EditNodePage() {
         
         // If not found, try to load it individually
         if (!node) {
-          console.log('Node not found in store, fetching individually...');
           node = await getNode(nodeId);
         }
 
         if (node) {
-          console.log('Node loaded successfully:', node);
           setFormData({
             name: node.name,
             type: node.type,
@@ -86,12 +84,10 @@ export function EditNodePage() {
           });
           setIsLoadingNode(false);
         } else {
-          console.log('Node not found after all attempts');
           setNodeLoadError(`Node with ID "${nodeId}" not found`);
           setIsLoadingNode(false);
         }
       } catch (error) {
-        console.error('Error loading node:', error);
         setNodeLoadError(`Failed to load node: ${error instanceof Error ? error.message : 'Unknown error'}`);
         setIsLoadingNode(false);
       }
@@ -232,7 +228,6 @@ export function EditNodePage() {
       // Navigate back to nodes page after successful update
       router.push("/nodes");
     } catch (error) {
-      console.error("Error updating node:", error);
       uiHelpers.showError("Error", "Failed to update node. Please try again.");
     }
   };

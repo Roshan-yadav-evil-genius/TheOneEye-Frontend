@@ -48,7 +48,7 @@ export const NodesPage = memo(function NodesPage() {
       selectNode(null);
     } catch (error) {
       // Error toast is handled by the store
-      console.error('Delete node error:', error);
+      // Delete node error
     }
   };
 

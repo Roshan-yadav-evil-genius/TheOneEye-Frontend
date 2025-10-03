@@ -34,7 +34,6 @@ interface WorkflowCanvasProps {
 const CustomNodeWrapper = memo((props: any) => {
   const { data, ...nodeProps } = props;
   const { onDeleteNode, ...nodeData } = data || {};
-  console.log('CustomNodeWrapper received props:', { data, nodeProps, onDeleteNode });
   return <CustomNode {...nodeProps} data={nodeData} onDelete={onDeleteNode} />;
 });
 
@@ -168,7 +167,6 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
       );
       
       if (connectionExists) {
-        console.log('Connection already exists');
         return;
       }
       
@@ -240,7 +238,6 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
         setNodes((nds) => nds.concat(newNode));
         setIsDragOver(false);
       } catch (error) {
-        console.error('Error parsing dropped node data:', error);
         setIsDragOver(false);
       }
     },

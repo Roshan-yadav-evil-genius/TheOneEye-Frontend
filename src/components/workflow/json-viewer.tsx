@@ -49,7 +49,7 @@ export function JsonViewer({
         onCopy();
       }
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      // Failed to copy text
     }
   };
 

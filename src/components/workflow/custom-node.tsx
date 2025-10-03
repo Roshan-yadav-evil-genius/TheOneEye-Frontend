@@ -58,27 +58,21 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
 
   const handlePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(`Playing node: ${data.label}`);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Delete button clicked for node:', id, 'onDelete function:', onDelete);
     if (onDelete) {
       onDelete(id);
-    } else {
-      console.log('onDelete function is not available');
     }
   };
 
   const handleShutdown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(`Shutting down node: ${data.label}`);
   };
 
   const handleMore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(`More options for node: ${data.label}`);
   };
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -95,7 +89,6 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
     description?: string;
   }) => {
     // Here you would typically update the node data in your state management or API
-    console.log('Saving node data:', updatedData);
     // You might want to update the parent component's state here
   };
 
@@ -111,7 +104,6 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const handleDescriptionBlur = () => {
     setIsEditingDescription(false);
     // Here you could save the description to your state management or API
-    console.log(`Updated description for ${data.label}: ${userDescription}`);
   };
 
   const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

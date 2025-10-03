@@ -343,7 +343,7 @@ export function CreateNodePage() {
 
         {/* Form Configuration Component */}
         <FormConfigurationEditor
-          value={formData.formConfiguration}
+          value={formData.formConfiguration || {}}
           onChange={handleFormConfigurationChange}
           disabled={isCreating}
         />
