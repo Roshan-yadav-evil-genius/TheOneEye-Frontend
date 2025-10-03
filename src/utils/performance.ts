@@ -116,7 +116,7 @@ export const withPerformanceMonitor = <P extends object>(
     
     React.useEffect(measureRender);
     
-    return <Component {...props} />;
+    return React.createElement(Component, props);
   };
   
   WrappedComponent.displayName = `withPerformanceMonitor(${Component.displayName || Component.name})`;

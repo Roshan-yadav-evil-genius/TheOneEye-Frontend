@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NodeHeader } from "./node-header";
 import { ParametersTab } from "./parameters-tab";
 import { SettingsTab } from "./settings-tab";
+import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 
 interface Condition {
   id: string;
@@ -29,8 +30,8 @@ interface NodeEditorProps {
   nodeType: string;
   nodeLabel: string;
   nodeId: string;
-  activeTab: "parameters" | "settings";
-  onTabChange: (tab: "parameters" | "settings") => void;
+  activeTab: "parameters" | "settings" | "form";
+  onTabChange: (tab: "parameters" | "settings" | "form") => void;
   // Parameters tab props
   groups: GroupWithOperator[];
   convertTypes: boolean;
@@ -41,6 +42,9 @@ interface NodeEditorProps {
   description: string;
   onLabelChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
+  // Form tab props
+  formConfiguration?: Record<string, unknown>;
+  onFormConfigurationChange?: (value: Record<string, unknown>) => void;
   // Header actions
   onTestStep?: () => void;
   onViewDocs?: () => void;
@@ -60,6 +64,8 @@ export function NodeEditor({
   description,
   onLabelChange,
   onDescriptionChange,
+  formConfiguration,
+  onFormConfigurationChange,
   onTestStep,
   onViewDocs
 }: NodeEditorProps) {
@@ -73,8 +79,8 @@ export function NodeEditor({
         onViewDocs={onViewDocs}
       />
 
-      <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "parameters" | "settings")} className="flex-1 flex flex-col overflow-hidden min-h-0">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-b border-gray-700 rounded-none flex-shrink-0">
+      <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "parameters" | "settings" | "form")} className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-800 border-b border-gray-700 rounded-none flex-shrink-0">
           <TabsTrigger 
             value="parameters" 
             className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-pink-500 text-gray-400`}
@@ -86,6 +92,12 @@ export function NodeEditor({
             className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400`}
           >
             Settings
+          </TabsTrigger>
+          <TabsTrigger 
+            value="form" 
+            className={`data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400`}
+          >
+            Form
           </TabsTrigger>
         </TabsList>
 
@@ -105,6 +117,19 @@ export function NodeEditor({
             onLabelChange={onLabelChange}
             onDescriptionChange={onDescriptionChange}
           />
+        </TabsContent>
+
+        <TabsContent value="form" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0 sidebar-scrollbar">
+          {onFormConfigurationChange ? (
+            <FormConfigurationEditor
+              value={formConfiguration || {}}
+              onChange={onFormConfigurationChange}
+            />
+          ) : (
+            <div className="text-gray-400 text-center py-8">
+              Form configuration not available for this node type
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -7,12 +7,12 @@ import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-t
 interface NodesActions {
   // CRUD operations
   createNode: (nodeData: TNodeCreateData, showToast?: boolean) => Promise<TNode>;
-  updateNode: (id: string, nodeData: TTNodeUpdateData, showToast?: boolean) => Promise<TNode>;
+  updateNode: (id: string, nodeData: TNodeUpdateData, showToast?: boolean) => Promise<TNode>;
   deleteNode: (id: string, showToast?: boolean) => Promise<void>;
   getNode: (id: string) => Promise<TNode | null>;
   
   // Bulk operations
-  loadNodes: (filters?: TTNodeFilters, showToast?: boolean) => Promise<void>;
+  loadNodes: (filters?: TNodeFilters, showToast?: boolean) => Promise<void>;
   createMultipleNodes: (nodes: TNodeCreateData[], showToast?: boolean) => Promise<TNode[]>;
   deleteMultipleNodes: (ids: string[], showToast?: boolean) => Promise<void>;
   
@@ -67,7 +67,7 @@ export const useNodesStore = create<NodesStore>()(
 
           return newNode;
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -111,7 +111,7 @@ export const useNodesStore = create<NodesStore>()(
 
           return updatedNode;
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -155,7 +155,7 @@ export const useNodesStore = create<NodesStore>()(
             });
           }
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -223,7 +223,7 @@ export const useNodesStore = create<NodesStore>()(
             });
           }
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -262,7 +262,7 @@ export const useNodesStore = create<NodesStore>()(
 
           return newNodes;
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -304,7 +304,7 @@ export const useNodesStore = create<NodesStore>()(
             });
           }
         } catch (error) {
-          const errorMessage = error instanceof ApiError 
+          const errorMessage = error instanceof TApiError 
             ? error.message 
             : error instanceof Error 
             ? error.message 
@@ -330,7 +330,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ selectedNode: node });
       },
 
-      setFilters: (filters: Partial<NodesState['filters']>) => {
+      setFilters: (filters: Partial<TNodesState['filters']>) => {
         set((state) => ({
           filters: { ...state.filters, ...filters },
         }));

@@ -5,7 +5,6 @@ import { DndContext } from "@dnd-kit/core";
 import { 
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
@@ -46,14 +45,16 @@ interface NodeEditDialogProps {
     status: string;
     category: string;
     description?: string;
+    formConfiguration?: Record<string, unknown>;
   };
-  onSave: (updatedData: {
+  onSave?: (updatedData: {
     id: string;
     label: string;
     type: string;
     status: string;
     category: string;
     description?: string;
+    formConfiguration?: Record<string, unknown>;
   }) => void;
 }
 
@@ -69,7 +70,8 @@ export function NodeEditDialog({
     description: nodeData.description || "",
     type: nodeData.type,
     status: nodeData.status,
-    category: nodeData.category
+    category: nodeData.category,
+    formConfiguration: nodeData.formConfiguration || {}
   });
 
   const [groups, setGroups] = useState<GroupWithOperator[]>([
@@ -89,7 +91,7 @@ export function NodeEditDialog({
   const [convertTypes, setConvertTypes] = useState(false);
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
-  const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings">("parameters");
+  const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings" | "form">("parameters");
 
   // Update editData when nodeData changes
   useEffect(() => {
@@ -99,34 +101,28 @@ export function NodeEditDialog({
       description: nodeData.description || "",
       type: nodeData.type,
       status: nodeData.status,
-      category: nodeData.category
+      category: nodeData.category,
+      formConfiguration: nodeData.formConfiguration || {}
     });
   }, [nodeData]);
 
-  const handleEditDataChange = (field: string, value: string) => {
+  const handleEditDataChange = (field: string, value: string | Record<string, unknown>) => {
     setEditData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-
-  const handleSave = () => {
-    onSave(editData);
-    onOpenChange(false);
+  const handleFormConfigurationChange = (formConfig: Record<string, unknown>) => {
+    setEditData(prev => ({
+      ...prev,
+      formConfiguration: formConfig
+    }));
   };
 
-  const handleCancel = () => {
-    setEditData({
-      id: nodeData.id,
-      label: nodeData.label,
-      description: nodeData.description || "",
-      type: nodeData.type,
-      status: nodeData.status,
-      category: nodeData.category
-    });
-    onOpenChange(false);
-  };
+
+  // Note: Save and Cancel handlers are available but not currently used in the UI
+  // They can be added to action buttons when needed
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -134,7 +130,7 @@ export function NodeEditDialog({
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label} (ID: {nodeData.id})</DialogTitle>
           <DialogDescription>
-            Configure the parameters and settings for the {nodeData.type} node "{nodeData.label}".
+            Configure the parameters and settings for the {nodeData.type} node &quot;{nodeData.label}&quot;.
           </DialogDescription>
         </VisuallyHidden>
         <DndContext>
@@ -159,7 +155,7 @@ export function NodeEditDialog({
                 nodeLabel={editData.label}
                 nodeId={editData.id}
                 activeTab={activeNodeTab}
-                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings")}
+                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings" | "form")}
                 groups={groups}
                 convertTypes={convertTypes}
                 onGroupsChange={setGroups}
@@ -168,6 +164,8 @@ export function NodeEditDialog({
                 description={editData.description}
                 onLabelChange={(value) => handleEditDataChange('label', value)}
                 onDescriptionChange={(value) => handleEditDataChange('description', value)}
+                formConfiguration={editData.formConfiguration}
+                onFormConfigurationChange={handleFormConfigurationChange}
               />
             </div>
 

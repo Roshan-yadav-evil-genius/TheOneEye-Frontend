@@ -1,12 +1,4 @@
-import { TNode } from '@/types';
-import { 
-  TTNodeCreateData, 
-  TTNodeUpdateData, 
-  TTNodeFilters, 
-  TTPaginatedResponse,
-  TTNodeStats,
-  TApiError 
-} from './types';
+import { TNode, TNodeCreateData, TNodeUpdateData, TNodeFilters, TPaginatedResponse, TNodeStats, TApiError } from '@/types';
 
 // Real API client implementation
 class RealNodesApiClient {
@@ -17,11 +9,25 @@ class RealNodesApiClient {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
   }
 
+  // Construct full logo URL from relative path
+  private constructLogoUrl(logoPath: string): string {
+    if (!logoPath) return '';
+    
+    // If it's already a full URL, return as is
+    if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) {
+      return logoPath;
+    }
+    
+    // Construct full URL by combining base URL with media path
+    const baseUrl = this.baseUrl.replace('/api', ''); // Remove /api from base URL
+    return `${baseUrl}/media/${logoPath}`;
+  }
+
   // Helper method to handle API responses
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new ApiError(
+      throw new TApiError(
         errorData.message || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
         errorData
@@ -62,7 +68,7 @@ class RealNodesApiClient {
       createdBy: backendNode.created_by || 'Unknown',
       formConfiguration: backendNode.form_configuration || {},
       tags: backendNode.tags || [],
-      logo: backendNode.logo, // Include logo URL from backend
+      logo: backendNode.logo ? this.constructLogoUrl(backendNode.logo) : undefined, // Include logo URL from backend
     };
   }
 
@@ -111,7 +117,7 @@ class RealNodesApiClient {
     const hasLogoFile = transformedData.logo instanceof File;
     
     let requestBody: FormData | string;
-    let headers: Record<string, string> = {};
+    const headers: Record<string, string> = {};
     
     if (hasLogoFile) {
       // Use FormData for file upload
@@ -150,12 +156,40 @@ class RealNodesApiClient {
   async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
+    // Check if there's a logo file to upload
+    const hasLogoFile = transformedData.logo instanceof File;
+    
+    let requestBody: FormData | string;
+    const headers: Record<string, string> = {};
+    
+    if (hasLogoFile) {
+      // Use FormData for file upload
+      const formData = new FormData();
+      
+      // Add all fields to FormData
+      Object.entries(transformedData).forEach(([key, value]) => {
+        if (key === 'logo' && value instanceof File) {
+          formData.append('logo', value);
+        } else if (key === 'form_configuration' || key === 'tags') {
+          // Convert objects/arrays to JSON strings
+          formData.append(key, JSON.stringify(value));
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+      
+      requestBody = formData;
+      // Don't set Content-Type header for FormData - let browser set it with boundary
+    } else {
+      // Use JSON for regular data
+      requestBody = JSON.stringify(transformedData);
+      headers['Content-Type'] = 'application/json';
+    }
+    
     const response = await fetch(`${this.baseUrl}/nodes/${id}/`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(transformedData),
+      headers,
+      body: requestBody,
     });
     
     const data = await this.handleResponse<any>(response);
@@ -169,7 +203,7 @@ class RealNodesApiClient {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new ApiError(
+      throw new TApiError(
         errorData.message || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
         errorData
@@ -177,7 +211,7 @@ class RealNodesApiClient {
     }
   }
 
-  async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<Node[]> {
+  async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
     const transformedData = nodesData.map(nodeData => this.transformNodeData(nodeData));
     
     const response = await fetch(`${this.baseUrl}/nodes/bulk_create/`, {
@@ -192,7 +226,7 @@ class RealNodesApiClient {
     return data.map((node: any) => this.transformNode(node));
   }
 
-  async getTNodeStats(): Promise<TNodeStats> {
+  async getNodeStats(): Promise<TNodeStats> {
     const response = await fetch(`${this.baseUrl}/nodes/stats/`);
     const data = await this.handleResponse<any>(response);
     

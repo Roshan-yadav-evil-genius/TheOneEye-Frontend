@@ -13,7 +13,6 @@ import {
   IconDatabase,
   IconMail,
   IconApi,
-  IconFileText,
   IconPlayerPlay,
   IconTrash,
   IconPower,
@@ -30,6 +29,7 @@ interface CustomNodeProps {
     status: string;
     category: string;
     description?: string;
+    formConfiguration?: Record<string, unknown>;
   };
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
@@ -87,9 +87,11 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
     status: string;
     category: string;
     description?: string;
+    formConfiguration?: Record<string, unknown>;
   }) => {
     // Here you would typically update the node data in your state management or API
     // You might want to update the parent component's state here
+    console.log('Node updated:', updatedData);
   };
 
   const handleDescriptionClick = (e: React.MouseEvent) => {

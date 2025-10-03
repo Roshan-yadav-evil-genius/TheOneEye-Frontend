@@ -82,6 +82,12 @@ export function EditNodePage() {
             tags: node.tags || [],
             formConfiguration: node.formConfiguration || {},
           });
+          
+          // Set existing logo if available
+          if (node.logo) {
+            setLogoPreview(node.logo);
+          }
+          
           setIsLoadingNode(false);
         } else {
           setNodeLoadError(`Node with ID "${nodeId}" not found`);
@@ -203,13 +209,14 @@ export function EditNodePage() {
       // Update the node using Zustand store
       await updateNode(nodeId, {
         name: formData.name || "Updated Node",
-        type: (formData.type || "action") as Node['type'],
+        type: (formData.type || "action") as TNode['type'],
         category: formData.category || "system",
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],
         formConfiguration: formData.formConfiguration || {},
         isActive: true,
+        logoFile: logoFile || undefined, // Include the logo file if uploaded
       }, true); // showToast = true
 
       // Create associated form configuration if it exists and is different
@@ -435,13 +442,42 @@ export function EditNodePage() {
                 />
               </div>
 
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push("/nodes")}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="flex items-center gap-2"
+                >
+                  {isUpdating ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <IconDeviceFloppy className="h-4 w-4" />
+                      Update Node
+                    </>
+                  )}
+                </Button>
+              </div>
+
             </form>
           </CardContent>
         </Card>
 
         {/* Form Configuration Component */}
         <FormConfigurationEditor
-          value={formData.formConfiguration}
+          value={formData.formConfiguration || {}}
           onChange={handleFormConfigurationChange}
           disabled={isUpdating}
         />

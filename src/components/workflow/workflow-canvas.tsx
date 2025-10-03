@@ -232,6 +232,7 @@ export function WorkflowCanvas({ selectedNodes, searchTerm, filters, lineType, s
             status: 'active',
             category: nodeData.category,
             description: nodeData.description,
+            formConfiguration: nodeData.formConfiguration || {},
           },
         };
 

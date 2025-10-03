@@ -1,12 +1,4 @@
-import { 
-  TNode,
-  TNodeCreateData, 
-  TNodeUpdateData, 
-  TNodeFilters, 
-  TPaginatedResponse,
-  TNodeStats,
-  TApiError 
-} from '@/types';
+import { TNode, TNodeCreateData, TNodeUpdateData, TNodeFilters, TPaginatedResponse, TNodeStats, TApiError } from '@/types';
 import { axiosApiClient } from './axios-client';
 
 // Axios-based API client implementation
@@ -16,6 +8,20 @@ class AxiosNodesApiClient {
   constructor() {
     // Use the backend URL from environment or default to localhost
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
+  }
+
+  // Construct full logo URL from relative path
+  private constructLogoUrl(logoPath: string): string {
+    if (!logoPath) return '';
+    
+    // If it's already a full URL, return as is
+    if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) {
+      return logoPath;
+    }
+    
+    // Construct full URL by combining base URL with media path
+    const baseUrl = this.baseUrl.replace('/api', ''); // Remove /api from base URL
+    return `${baseUrl}/media/${logoPath}`;
   }
 
   // Helper method to build query parameters
@@ -51,7 +57,7 @@ class AxiosNodesApiClient {
       createdBy: backendNode.created_by || 'Unknown',
       formConfiguration: backendNode.form_configuration || {},
       tags: backendNode.tags || [],
-      logo: backendNode.logo, // Include logo URL from backend
+      logo: backendNode.logo ? this.constructLogoUrl(backendNode.logo) : undefined, // Include logo URL from backend
     };
   }
 
