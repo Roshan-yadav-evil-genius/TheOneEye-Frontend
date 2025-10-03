@@ -1,11 +1,14 @@
 "use client";
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { WorkflowTable } from "@/components/workflow/workflow-table"
 import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog"
+import { DeleteWorkflowDialog } from "@/components/workflow/delete-workflow-dialog"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
 import { TWorkflow } from "@/types"
 import { useUIStore, uiHelpers } from "@/stores/ui-store"
+import { useWorkflowStore } from "@/stores"
 
 interface WorkflowListProps {
   workflows: TWorkflow[]
@@ -16,6 +19,12 @@ export function WorkflowList({
 }: WorkflowListProps) {
   const router = useRouter()
   const { modals } = useUIStore()
+  const { deleteTWorkflow } = useWorkflowStore()
+  
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [workflowToDelete, setWorkflowToDelete] = useState<{ id: string; name: string } | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleRun = (id: string) => {
     // TODO: Implement workflow execution
@@ -34,7 +43,39 @@ export function WorkflowList({
   }
 
   const handleDelete = (id: string) => {
-    // TODO: Implement workflow deletion
+    const workflow = workflows.find(w => w.id === id);
+    if (workflow) {
+      setWorkflowToDelete({ id, name: workflow.name });
+      setDeleteDialogOpen(true);
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!workflowToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteTWorkflow(workflowToDelete.id);
+      uiHelpers.showSuccess(
+        "Workflow Deleted",
+        `Workflow "${workflowToDelete.name}" has been deleted successfully.`
+      );
+      setDeleteDialogOpen(false);
+      setWorkflowToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete workflow:", error);
+      uiHelpers.showError(
+        "Deletion Failed",
+        "Failed to delete workflow. Please try again."
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setWorkflowToDelete(null);
   }
 
   const handleCreate = () => {
@@ -78,6 +119,15 @@ export function WorkflowList({
             useUIStore.getState().closeModal('createWorkflow');
           }
         }}
+      />
+
+      {/* Delete Workflow Dialog */}
+      <DeleteWorkflowDialog
+        open={deleteDialogOpen}
+        onOpenChange={handleCancelDelete}
+        workflowName={workflowToDelete?.name || ""}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
       />
     </div>
   )

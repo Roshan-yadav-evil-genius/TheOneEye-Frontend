@@ -149,11 +149,7 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // await workflowApi.deleteTWorkflow(id);
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await ApiService.deleteWorkflow(id);
           
           set((state) => ({
             workflows: state.workflows.filter((workflow) => workflow.id !== id),
