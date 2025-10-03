@@ -1,0 +1,30 @@
+[
+  { "key": "username", "type": "text", "label": "Username", "placeholder": "Enter username", "required": true },
+  { "key": "password", "type": "password", "label": "Password", "placeholder": "Enter password", "required": true },
+  { "key": "email", "type": "email", "label": "Email", "placeholder": "example@mail.com" },
+  { "key": "phone", "type": "tel", "label": "Phone", "placeholder": "+1 555 123456" },
+  { "key": "website", "type": "url", "label": "Website", "placeholder": "https://example.com" },
+  { "key": "search_query", "type": "search", "label": "Search", "placeholder": "Search here..." },
+  { "key": "age", "type": "number", "label": "Age", "min": 0, "max": 120, "step": 1 },
+  { "key": "birth_date", "type": "date", "label": "Birth Date" },
+  { "key": "meeting_time", "type": "time", "label": "Meeting Time" },
+  { "key": "appointment", "type": "datetime-local", "label": "Appointment" },
+  { "key": "billing_month", "type": "month", "label": "Billing Month" },
+  { "key": "work_week", "type": "week", "label": "Work Week" },
+  { "key": "favorite_color", "type": "color", "label": "Favorite Color" },
+  { "key": "resume", "type": "file", "label": "Upload Resume" },
+  { "key": "subscribe", "type": "checkbox", "label": "Subscribe to Newsletter" },
+  { "key": "gender", "type": "radio", "label": "Gender", "options": [
+      { "label": "Male", "value": "male" },
+      { "label": "Female", "value": "female" }
+    ]
+  },
+  { "key": "satisfaction", "type": "range", "label": "Satisfaction Level", "min": 0, "max": 10, "step": 1 },
+  { "key": "hidden_token", "type": "hidden", "value": "abc123xyz" },
+  { "key": "bio", "type": "textarea", "label": "Biography", "placeholder": "Write about yourself..." },
+  { "key": "country", "type": "select", "label": "Country", "options": [
+      { "label": "India", "value": "IN" },
+      { "label": "USA", "value": "US" }
+    ]
+  }
+]

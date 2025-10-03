@@ -50,6 +50,7 @@ const WidgetButton: React.FC<WidgetButtonProps> = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            type="button"
             onClick={handleClick}
             size="sm"
             variant="outline"

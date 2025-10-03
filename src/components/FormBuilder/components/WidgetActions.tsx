@@ -11,6 +11,7 @@ const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete }) 
   return (
     <div className="flex items-center gap-1">
       <Button
+        type="button"
         size="sm"
         variant="ghost"
         onClick={(e) => {
@@ -22,6 +23,7 @@ const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete }) 
         <Copy className="w-3 h-3" />
       </Button>
       <Button
+        type="button"
         size="sm"
         variant="ghost"
         onClick={(e) => {

@@ -94,6 +94,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
           <h3 className="text-lg font-semibold text-slate-200">JSON Editor</h3>
           <div className="flex gap-2">
             <Button
+              type="button"
               onClick={handleReset}
               variant="outline"
               size="sm"
@@ -102,6 +103,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
               Reset
             </Button>
             <Button
+              type="button"
               onClick={handleApplyJson}
               disabled={!isValid || !!error}
               size="sm"

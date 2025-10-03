@@ -61,9 +61,11 @@ export function CreateNodePage() {
   };
 
   const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
+    console.log('Form configuration changed:', json);
     // Only update if the JSON is actually different to prevent unnecessary re-renders
     if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
       setValue("formConfiguration", json);
+      console.log('Form configuration updated in form state');
     }
   }, [formData.formConfiguration, setValue]);
 
@@ -72,20 +74,34 @@ export function CreateNodePage() {
     setActivePage("Create Node");
   }, [setActivePage]);
 
-  const onSubmit = (data: Partial<Node>) => {
-    // Log the form data instead of persisting
-    console.log("Form data:", {
-      ...data,
-      logoFile: logoFile ? {
-        name: logoFile.name,
-        size: logoFile.size,
-        type: logoFile.type
-      } : null,
-      logoPreview: logoPreview ? "Image preview available" : null
-    });
-    
-    // Show success notification
-    uiHelpers.showSuccess("Success!", "Form data logged to console");
+  const onSubmit = async (data: Partial<Node>) => {
+    console.log('Form submitted with data:', data);
+    console.log('Form configuration in submitted data:', data.formConfiguration);
+    try {
+      // Prepare the node data for creation
+      const nodeData = {
+        name: data.name || '',
+        type: data.type || 'action',
+        category: data.category || 'system',
+        description: data.description || '',
+        version: data.version || '1.0.0',
+        isActive: data.isActive !== undefined ? data.isActive : true,
+        formConfiguration: data.formConfiguration || {},
+        tags: data.tags || [],
+      };
+
+      console.log('Prepared node data:', nodeData);
+      console.log('Form configuration being sent to API:', nodeData.formConfiguration);
+
+      // Create the node using the store
+      await createNode(nodeData);
+      
+      // Navigate back to nodes list on success
+      router.push('/nodes');
+    } catch (error) {
+      console.error('Error creating node:', error);
+      // Error handling is done in the store
+    }
   };
 
   const onError = (errors: any) => {
@@ -116,25 +132,28 @@ export function CreateNodePage() {
                 />
                 <LogoUpload onLogoChange={handleLogoChange} />
               </div>
+
+              {/* Form Configuration Component */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Form Configuration</label>
+                <FormConfigurationEditor
+                  value={formData.formConfiguration || {}}
+                  onChange={handleFormConfigurationChange}
+                  disabled={isCreating}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <FormActions
+                isCreating={isCreating}
+                onPreview={() => setIsPreviewOpen(true)}
+                onSave={() => {}} // This will be handled by form submission
+                formData={formData}
+              />
             </form>
           </CardContent>
         </Card>
-
-        {/* Form Configuration Component */}
-        <FormConfigurationEditor
-          value={formData.formConfiguration || {}}
-          onChange={handleFormConfigurationChange}
-          disabled={isCreating}
-        />
       </div>
-
-      {/* Action Buttons */}
-      <FormActions
-        isCreating={isCreating}
-        onPreview={() => setIsPreviewOpen(true)}
-        onSave={() => {}}
-        formData={formData}
-      />
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>

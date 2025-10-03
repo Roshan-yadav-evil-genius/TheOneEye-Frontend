@@ -19,6 +19,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({ widgetCount, onPreviewForm 
       
       {widgetCount > 0 && onPreviewForm && (
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={onPreviewForm}

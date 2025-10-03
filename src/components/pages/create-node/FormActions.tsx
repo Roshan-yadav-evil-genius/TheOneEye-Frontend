@@ -26,8 +26,7 @@ export function FormActions({ isCreating, onPreview, onSave, formData }: FormAct
         type="submit"
         disabled={isCreating}
         onClick={() => {
-          console.log("Current form data:", formData);
-          onSave();
+          console.log('Save button clicked, form data:', formData);
         }}
         className="flex items-center gap-2"
       >

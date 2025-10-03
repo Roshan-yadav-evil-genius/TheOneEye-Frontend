@@ -1,0 +1,188 @@
+import { Node } from '@/data/nodes';
+import { 
+  NodeCreateData, 
+  NodeUpdateData, 
+  NodeFilters, 
+  PaginatedResponse,
+  NodeStats,
+  ApiError 
+} from './types';
+
+// Real API client implementation
+class RealNodesApiClient {
+  private baseUrl: string;
+
+  constructor() {
+    // Use the backend URL from environment or default to localhost
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
+  }
+
+  // Helper method to handle API responses
+  private async handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new ApiError(
+        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+        response.status,
+        errorData
+      );
+    }
+    return response.json();
+  }
+
+  // Helper method to build query parameters
+  private buildQueryParams(filters: NodeFilters): string {
+    const params = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value)) {
+          value.forEach(item => params.append(key, item.toString()));
+        } else {
+          params.append(key, value.toString());
+        }
+      }
+    });
+    
+    return params.toString();
+  }
+
+  // Transform backend node to frontend node format
+  private transformNode(backendNode: any): Node {
+    return {
+      id: backendNode.id,
+      name: backendNode.name,
+      type: backendNode.type,
+      category: backendNode.category,
+      description: backendNode.description || '',
+      version: backendNode.version || '1.0.0',
+      isActive: backendNode.is_active,
+      createdAt: backendNode.created_at,
+      updatedAt: backendNode.updated_at,
+      createdBy: backendNode.created_by || 'Unknown',
+      formConfiguration: backendNode.form_configuration || {},
+      tags: backendNode.tags || [],
+    };
+  }
+
+  // Transform frontend node data to backend format
+  private transformNodeData(nodeData: NodeCreateData | NodeUpdateData): any {
+    return {
+      name: nodeData.name,
+      type: nodeData.type,
+      category: nodeData.category,
+      description: nodeData.description,
+      version: nodeData.version,
+      is_active: nodeData.isActive,
+      created_by: nodeData.createdBy,
+      form_configuration: nodeData.formConfiguration,
+      tags: nodeData.tags,
+    };
+  }
+
+  // CRUD Operations
+  async getNodes(filters: NodeFilters = {}): Promise<PaginatedResponse<Node>> {
+    const queryString = this.buildQueryParams(filters);
+    const url = `${this.baseUrl}/nodes/${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await fetch(url);
+    const data = await this.handleResponse<any>(response);
+    
+    return {
+      count: data.count || data.length,
+      next: data.next,
+      previous: data.previous,
+      results: data.results ? data.results.map((node: any) => this.transformNode(node)) : data.map((node: any) => this.transformNode(node))
+    };
+  }
+
+  async getNode(id: string): Promise<Node> {
+    const response = await fetch(`${this.baseUrl}/nodes/${id}/`);
+    const data = await this.handleResponse<any>(response);
+    return this.transformNode(data);
+  }
+
+  async createNode(nodeData: NodeCreateData): Promise<Node> {
+    console.log('Real API: Creating node with data:', nodeData);
+    const transformedData = this.transformNodeData(nodeData);
+    console.log('Real API: Transformed data:', transformedData);
+    
+    const response = await fetch(`${this.baseUrl}/nodes/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transformedData),
+    });
+    
+    console.log('Real API: Response status:', response.status);
+    const data = await this.handleResponse<any>(response);
+    console.log('Real API: Response data:', data);
+    return this.transformNode(data);
+  }
+
+  async updateNode(id: string, nodeData: NodeUpdateData): Promise<Node> {
+    const transformedData = this.transformNodeData(nodeData);
+    
+    const response = await fetch(`${this.baseUrl}/nodes/${id}/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transformedData),
+    });
+    
+    const data = await this.handleResponse<any>(response);
+    return this.transformNode(data);
+  }
+
+  async deleteNode(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/nodes/${id}/`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new ApiError(
+        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+        response.status,
+        errorData
+      );
+    }
+  }
+
+  async bulkCreateNodes(nodesData: NodeCreateData[]): Promise<Node[]> {
+    const transformedData = nodesData.map(nodeData => this.transformNodeData(nodeData));
+    
+    const response = await fetch(`${this.baseUrl}/nodes/bulk_create/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transformedData),
+    });
+    
+    const data = await this.handleResponse<any>(response);
+    return data.map((node: any) => this.transformNode(node));
+  }
+
+  async getNodeStats(): Promise<NodeStats> {
+    const response = await fetch(`${this.baseUrl}/nodes/stats/`);
+    const data = await this.handleResponse<any>(response);
+    
+    return {
+      total_nodes: data.total_nodes,
+      active_nodes: data.active_nodes,
+      inactive_nodes: data.inactive_nodes,
+      by_type: data.by_type,
+      by_category: data.by_category,
+      recent_created: data.recent_created,
+    };
+  }
+}
+
+// Export singleton instance
+export const realNodesApi = new RealNodesApiClient();
+
+// Export the class for testing
+export { RealNodesApiClient };

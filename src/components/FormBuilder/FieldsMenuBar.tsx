@@ -21,6 +21,7 @@ const FieldsMenuBar: React.FC<FieldsMenuBarProps> = ({ onAddWidget, isJsonMode, 
             <Tooltip>
               <TooltipTrigger asChild>
                 <Toggle
+                  type="button"
                   pressed={isJsonMode}
                   onPressedChange={onToggleMode}
                   className="border-slate-600 hover:border-blue-500 hover:bg-slate-700/50 data-[state=on]:bg-blue-600 data-[state=on]:border-blue-500"
