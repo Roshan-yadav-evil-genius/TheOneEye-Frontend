@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { TWorkflow, TWorkflowState, TWorkflowConnection, TNode } from './types';
+import { ApiService } from '@/lib/api/api-service';
 
 interface TWorkflowActions {
   // CRUD operations
@@ -60,17 +61,37 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await workflowApi.createTWorkflow(workflowData);
+          // Transform frontend data to backend format
+          const backendData = {
+            name: workflowData.name,
+            description: workflowData.description,
+            category: workflowData.category,
+            status: workflowData.status,
+            runs_count: workflowData.runsCount,
+            success_rate: workflowData.successRate,
+            tags: workflowData.tags,
+            created_by: workflowData.createdBy,
+          };
+
+          const response = await ApiService.createWorkflow(backendData);
           
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
+          // Transform backend response to frontend format
           const newTWorkflow: TWorkflow = {
-            ...workflowData,
-            id: `workflow-${Date.now()}`,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            id: response.id,
+            name: response.name,
+            description: response.description,
+            category: response.category,
+            nodes: [],
+            connections: [],
+            status: response.status,
+            lastRun: response.last_run,
+            nextRun: response.next_run,
+            runsCount: response.runs_count,
+            successRate: response.success_rate,
+            tags: response.tags || [],
+            createdAt: new Date(response.created_at),
+            updatedAt: new Date(response.updated_at),
+            createdBy: response.created_by,
           };
 
           set((state) => ({
@@ -187,18 +208,29 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await workflowApi.getTWorkflows();
+          const response = await ApiService.getWorkflows();
           
-          // Simulate API call with mock data
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Import mock data from dummy folder
-          const { mockTWorkflowsStore } = await import('@/dummy');
-          const mockTWorkflows = mockTWorkflowsStore;
+          // Transform backend response to frontend format
+          const workflows: TWorkflow[] = response.map((workflow: any) => ({
+            id: workflow.id,
+            name: workflow.name,
+            description: workflow.description,
+            category: workflow.category,
+            nodes: [],
+            connections: [],
+            status: workflow.status,
+            lastRun: workflow.last_run,
+            nextRun: workflow.next_run,
+            runsCount: workflow.runs_count,
+            successRate: workflow.success_rate,
+            tags: workflow.tags || [],
+            createdAt: new Date(workflow.created_at),
+            updatedAt: new Date(workflow.updated_at),
+            createdBy: workflow.created_by,
+          }));
 
           set({
-            workflows: mockTWorkflows,
+            workflows,
             isLoading: false,
             error: null,
           });

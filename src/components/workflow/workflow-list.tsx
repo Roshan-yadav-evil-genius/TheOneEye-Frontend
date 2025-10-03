@@ -1,9 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation"
 import { WorkflowTable } from "@/components/workflow/workflow-table"
+import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
 import { TWorkflow } from "@/types"
+import { useUIStore, uiHelpers } from "@/stores/ui-store"
 
 interface WorkflowListProps {
   workflows: TWorkflow[]
@@ -13,6 +15,7 @@ export function WorkflowList({
   workflows,
 }: WorkflowListProps) {
   const router = useRouter()
+  const { modals } = useUIStore()
 
   const handleRun = (id: string) => {
     // TODO: Implement workflow execution
@@ -35,7 +38,7 @@ export function WorkflowList({
   }
 
   const handleCreate = () => {
-    // TODO: Navigate to workflow creation
+    uiHelpers.openCreateWorkflowModal()
   }
 
   return (
@@ -66,6 +69,16 @@ export function WorkflowList({
           </Button>
         </div>
       )}
+
+      {/* Create Workflow Dialog */}
+      <CreateWorkflowDialog
+        open={modals.createWorkflow}
+        onOpenChange={(open) => {
+          if (!open) {
+            useUIStore.getState().closeModal('createWorkflow');
+          }
+        }}
+      />
     </div>
   )
 }

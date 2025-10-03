@@ -28,9 +28,15 @@ export interface TWorkflow {
   id: string;
   name: string;
   description: string;
+  category?: string;
   nodes: TNode[];
   connections: TWorkflowConnection[];
-  status: 'draft' | 'active' | 'paused' | 'archived';
+  status: 'active' | 'inactive' | 'error';
+  lastRun?: string;
+  nextRun?: string;
+  runsCount: number;
+  successRate: number;
+  tags: string[];
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;

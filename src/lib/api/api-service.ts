@@ -67,25 +67,21 @@ export class ApiService {
     return axiosApiClient.get<TNodeStats>('/nodes/stats/');
   }
 
-  // Workflow operations (placeholder for future implementation)
+  // Workflow operations
   static async getWorkflows(): Promise<any[]> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve([]);
+    return axiosApiClient.get<any[]>('/workflow/');
   }
 
   static async createWorkflow(workflowData: any): Promise<any> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve(workflowData);
+    return axiosApiClient.post<any>('/workflow/', workflowData);
   }
 
   static async updateWorkflow(id: string, workflowData: any): Promise<any> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve(workflowData);
+    return axiosApiClient.put<any>(`/workflow/${id}/`, workflowData);
   }
 
   static async deleteWorkflow(id: string): Promise<void> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve();
+    return axiosApiClient.delete<void>(`/workflow/${id}/`);
   }
 
   // Project operations (placeholder for future implementation)
