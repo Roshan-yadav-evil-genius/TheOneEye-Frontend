@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { Node, NodesState } from './types';
-import { nodesApi, NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/lib/api/nodes';
+import { NodeCreateData, NodeUpdateData, NodeFilters, ApiError } from '@/lib/api/types';
+import { getNodesApi } from '@/lib/api/config';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 
 interface NodesActions {
@@ -51,7 +52,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const newNode = await nodesApi.createNode(nodeData);
+          const newNode = await getNodesApi().createNode(nodeData);
 
           set((state) => ({
             nodes: [...state.nodes, newNode],
@@ -92,7 +93,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const updatedNode = await nodesApi.updateNode(id, nodeData);
+          const updatedNode = await getNodesApi().updateNode(id, nodeData);
 
           set((state) => ({
             nodes: state.nodes.map((node) =>
@@ -140,7 +141,7 @@ export const useNodesStore = create<NodesStore>()(
           const nodeToDelete = get().nodes.find(node => node.id === id);
           const nodeName = nodeToDelete?.name || 'Node';
           
-          await nodesApi.deleteNode(id);
+          await getNodesApi().deleteNode(id);
           
           set((state) => ({
             nodes: state.nodes.filter((node) => node.id !== id),
@@ -187,7 +188,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const fetchedNode = await nodesApi.getNode(id);
+          const fetchedNode = await getNodesApi().getNode(id);
           
           set({
             isLoading: false,
@@ -209,7 +210,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await nodesApi.getNodes(filters);
+          const response = await getNodesApi().getNodes(filters);
 
           set({
             nodes: response.results,
@@ -246,7 +247,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const newNodes = await nodesApi.bulkCreateNodes(nodes);
+          const newNodes = await getNodesApi().bulkCreateNodes(nodes);
 
           set((state) => ({
             nodes: [...state.nodes, ...newNodes],
@@ -287,7 +288,7 @@ export const useNodesStore = create<NodesStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          await nodesApi.bulkDeleteNodes(ids);
+          await getNodesApi().bulkDeleteNodes(ids);
           
           set((state) => ({
             nodes: state.nodes.filter((node) => !ids.includes(node.id)),

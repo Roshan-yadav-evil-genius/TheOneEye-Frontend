@@ -11,7 +11,7 @@ export interface Node {
   createdAt: string; // ISO string format from backend
   updatedAt: string; // ISO string format from backend
   createdBy: string; // Username of the creator
-  formConfiguration: Record<string, unknown>; // SurveyJS form configuration JSON
+  formConfiguration: Record<string, unknown>; // Form configuration JSON
   tags: string[];
 }
 

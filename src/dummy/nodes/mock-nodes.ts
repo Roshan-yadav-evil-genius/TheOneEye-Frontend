@@ -11,7 +11,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-01'),
     isActive: true,
     version: '1.0.0',
-    tags: ['core', 'workflow']
+    tags: ['core', 'workflow'],
+    createdBy: 'system'
   },
   { 
     id: "end", 
@@ -23,7 +24,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-01'),
     isActive: true,
     version: '1.0.0',
-    tags: ['core', 'workflow']
+    tags: ['core', 'workflow'],
+    createdBy: 'system'
   },
   
   // Email nodes
@@ -37,7 +39,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-15'),
     isActive: true,
     version: '1.2.0',
-    tags: ['communication', 'notification']
+    tags: ['communication', 'notification'],
+    createdBy: 'admin'
   },
   { 
     id: "email-listener", 
@@ -49,7 +52,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-10'),
     isActive: true,
     version: '1.1.0',
-    tags: ['communication', 'listener']
+    tags: ['communication', 'listener'],
+    createdBy: 'admin'
   },
   { 
     id: "email-template", 
@@ -61,7 +65,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-20'),
     isActive: true,
     version: '1.3.0',
-    tags: ['communication', 'template']
+    tags: ['communication', 'template'],
+    createdBy: 'admin'
   },
   
   // Database nodes
@@ -75,7 +80,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-18'),
     isActive: true,
     version: '2.0.0',
-    tags: ['database', 'sql', 'query']
+    tags: ['database', 'sql', 'query'],
+    createdBy: 'admin'
   },
   { 
     id: "db-insert", 
@@ -149,7 +155,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-21'),
     isActive: true,
     version: '2.1.0',
-    tags: ['api', 'http', 'integration']
+    tags: ['api', 'http', 'integration'],
+    createdBy: 'admin'
   },
   { 
     id: "webhook", 
@@ -223,7 +230,8 @@ export const mockNodes = [
     updatedAt: new Date('2024-01-25'),
     isActive: true,
     version: '1.4.0',
-    tags: ['logic', 'condition', 'branching']
+    tags: ['logic', 'condition', 'branching'],
+    createdBy: 'admin'
   },
   { 
     id: "switch", 

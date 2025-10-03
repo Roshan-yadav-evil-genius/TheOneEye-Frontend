@@ -10,7 +10,7 @@ src/stores/
 ├── user-store.ts         # User authentication and profile management
 ├── nodes-store.ts        # Workflow node management and CRUD operations
 ├── workflow-store.ts     # Workflow management and execution
-├── form-store.ts         # SurveyJS form configurations
+├── form-store.ts         # Form configurations
 ├── ui-store.ts          # UI state (sidebar, theme, notifications, modals)
 ├── projects-store.ts     # Project management and analytics
 ├── index.ts             # Centralized exports and utilities
@@ -68,7 +68,7 @@ const { workflows, activeWorkflow, createWorkflow, addNodeToWorkflow } = useWork
 ```
 
 ### 4. Form Store (`useFormStore`)
-Manages SurveyJS form configurations and templates.
+Manages form configurations and templates.
 
 **Key Features:**
 - Form configuration CRUD

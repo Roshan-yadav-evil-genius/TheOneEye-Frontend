@@ -17,7 +17,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconArrowLeft, IconDeviceFloppy, IconSettings, IconForms } from "@tabler/icons-react";
 import { Node, nodeTypes, nodeCategories } from "@/data/nodes";
-import { FormConfigurationManager } from "@/components/survey/form-configuration-manager";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 
 export function EditNodePage() {
@@ -357,13 +356,19 @@ export function EditNodePage() {
         </TabsContent>
 
         <TabsContent value="form" className="space-y-6">
-          <FormConfigurationManager
-            initialJson={formData.formConfiguration}
-            onJsonChanged={handleFormConfigurationChange}
-            onSave={handleFormConfigurationChange}
-            nodeName={formData.name}
-            nodeDescription={formData.description}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Form Configuration</CardTitle>
+              <CardDescription>
+                Form configuration functionality has been removed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                The form configuration feature is no longer available.
+              </p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
