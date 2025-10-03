@@ -13,6 +13,7 @@ export interface Node {
   createdBy: string; // Username of the creator
   formConfiguration: Record<string, unknown>; // Form configuration JSON
   tags: string[];
+  logo?: string; // URL to the node logo image
 }
 
 // Helper function to format date strings

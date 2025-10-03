@@ -62,6 +62,7 @@ class RealNodesApiClient {
       createdBy: backendNode.created_by || 'Unknown',
       formConfiguration: backendNode.form_configuration || {},
       tags: backendNode.tags || [],
+      logo: backendNode.logo, // Include logo URL from backend
     };
   }
 

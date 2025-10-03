@@ -158,6 +158,29 @@ export function NodesTable({
     return <IconComponent className="h-4 w-4" />;
   };
 
+  const renderNodeLogo = (node: Node) => {
+    if (node.logo) {
+      return (
+        <img 
+          src={node.logo} 
+          alt={`${node.name} logo`}
+          className="h-8 w-8 rounded-lg object-cover"
+          onError={(e) => {
+            // Fallback to icon if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const parent = target.parentElement;
+            if (parent) {
+              parent.innerHTML = '';
+              parent.appendChild(getNodeIcon(node.type));
+            }
+          }}
+        />
+      );
+    }
+    return getNodeIcon(node.type);
+  };
+
   const renderCategoryIcon = (category: string) => {
     const IconComponent = getCategoryIcon(category);
     return <IconComponent className="h-4 w-4" />;
@@ -294,11 +317,11 @@ export function NodesTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">
+              <TableHead className="w-12 min-w-[48px]">
                 <Checkbox
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
@@ -307,14 +330,14 @@ export function NodesTable({
                   }}
                 />
               </TableHead>
-              {columns.find(col => col.id === "name")?.visible && <TableHead>Name</TableHead>}
-              {columns.find(col => col.id === "type")?.visible && <TableHead>Type</TableHead>}
-              {columns.find(col => col.id === "category")?.visible && <TableHead>Category</TableHead>}
-              {columns.find(col => col.id === "description")?.visible && <TableHead>Description</TableHead>}
-              {columns.find(col => col.id === "version")?.visible && <TableHead>Version</TableHead>}
-              {columns.find(col => col.id === "updatedAt")?.visible && <TableHead>Updated</TableHead>}
-              {columns.find(col => col.id === "tags")?.visible && <TableHead>Tags</TableHead>}
-              <TableHead className="w-12"></TableHead>
+              {columns.find(col => col.id === "name")?.visible && <TableHead className="min-w-[200px]">Name</TableHead>}
+              {columns.find(col => col.id === "type")?.visible && <TableHead className="min-w-[100px]">Type</TableHead>}
+              {columns.find(col => col.id === "category")?.visible && <TableHead className="min-w-[120px]">Category</TableHead>}
+              {columns.find(col => col.id === "description")?.visible && <TableHead className="min-w-[200px]">Description</TableHead>}
+              {columns.find(col => col.id === "version")?.visible && <TableHead className="min-w-[80px]">Version</TableHead>}
+              {columns.find(col => col.id === "updatedAt")?.visible && <TableHead className="min-w-[100px]">Updated</TableHead>}
+              {columns.find(col => col.id === "tags")?.visible && <TableHead className="min-w-[150px]">Tags</TableHead>}
+              <TableHead className="w-12 min-w-[48px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -323,58 +346,58 @@ export function NodesTable({
               
               return (
                 <TableRow key={node.id}>
-                  <TableCell>
+                  <TableCell className="w-12 min-w-[48px]">
                     <Checkbox
                       checked={selectedRows.includes(node.id)}
                       onCheckedChange={(checked) => handleSelectRow(node.id, checked as boolean)}
                     />
                   </TableCell>
                   {columns.find(col => col.id === "name")?.visible && (
-                    <TableCell>
+                    <TableCell className="min-w-[200px]">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${colorClass}`}>
-                          {getNodeIcon(node.type)}
+                        <div className={`p-2 rounded-lg ${colorClass} flex items-center justify-center`}>
+                          {renderNodeLogo(node)}
                         </div>
-                        <div>
-                          <div className="font-medium">{node.name}</div>
-                          <div className="text-sm text-muted-foreground">ID: {node.id}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{node.name}</div>
+                          <div className="text-sm text-muted-foreground truncate">ID: {node.id}</div>
                         </div>
                       </div>
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "type")?.visible && (
-                    <TableCell>{getTypeBadge(node.type)}</TableCell>
+                    <TableCell className="min-w-[100px]">{getTypeBadge(node.type)}</TableCell>
                   )}
                   {columns.find(col => col.id === "category")?.visible && (
-                    <TableCell>
+                    <TableCell className="min-w-[120px]">
                       <div className="flex items-center gap-2">
                         {renderCategoryIcon(node.category)}
-                        <span className="capitalize">{node.category}</span>
+                        <span className="capitalize truncate">{node.category}</span>
                       </div>
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "description")?.visible && (
-                    <TableCell>
-                      <div className="max-w-[200px] truncate" title={node.description}>
+                    <TableCell className="min-w-[200px]">
+                      <div className="truncate" title={node.description}>
                         {node.description}
                       </div>
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "version")?.visible && (
-                    <TableCell>
+                    <TableCell className="min-w-[80px]">
                       <Badge variant="secondary" className="text-xs">
                         {node.version}
                       </Badge>
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "updatedAt")?.visible && (
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground min-w-[100px]">
                       {formatNodeDate(node.updatedAt)}
                     </TableCell>
                   )}
                   {columns.find(col => col.id === "tags")?.visible && (
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1 max-w-[150px]">
+                    <TableCell className="min-w-[150px]">
+                      <div className="flex flex-wrap gap-1">
                         {node.tags?.slice(0, 2).map((tag: string, index: number) => (
                           <Badge key={index} variant="secondary" className="text-xs">
                             <IconTag className="h-3 w-3 mr-1" />
@@ -389,7 +412,7 @@ export function NodesTable({
                       </div>
                     </TableCell>
                   )}
-                  <TableCell>
+                  <TableCell className="w-12 min-w-[48px]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
