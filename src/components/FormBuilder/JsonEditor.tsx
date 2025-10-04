@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { TTWidgetConfig } from './inputs';
+import { TWidgetConfig } from './inputs';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, CheckCircle } from 'lucide-react';
@@ -8,11 +8,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface JsonEditorProps {
-  widgets: TTWidgetConfig[];
-  onWidgetsChange: (widgets: TTWidgetConfig[]) => void;
+  widgets: TWidgetConfig[];
+  onWidgetsChange: (widgets: TWidgetConfig[]) => void;
+  disabled?: boolean;
 }
 
-const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => {
+const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange, disabled }) => {
   const [jsonString, setJsonString] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(true);
@@ -100,13 +101,14 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
               variant="outline"
               size="sm"
               className="border-slate-600 hover:border-blue-500"
+              disabled={disabled}
             >
               Reset
             </Button>
             <Button
               type="button"
               onClick={handleApplyJson}
-              disabled={!isValid || !!error}
+              disabled={!isValid || !!error || disabled}
               size="sm"
               className="bg-blue-600 hover:bg-blue-700"
             >
@@ -188,6 +190,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
                 whiteSpace: 'pre-wrap',
                 wordWrap: 'break-word'
               }}
+              disabled={disabled}
             />
           </div>
         </div>

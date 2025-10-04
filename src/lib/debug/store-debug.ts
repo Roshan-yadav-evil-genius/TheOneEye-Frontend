@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Store debugging utilities
 export const storeDebug = {
   // Log store state changes

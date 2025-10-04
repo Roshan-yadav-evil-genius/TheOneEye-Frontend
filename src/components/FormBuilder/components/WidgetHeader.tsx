@@ -1,5 +1,5 @@
 import React from 'react';
-import { WidgetConfig } from '../inputs';
+import { TWidgetConfig } from '../inputs';
 import { GripVertical } from 'lucide-react';
 import { 
   Type, 
@@ -28,7 +28,7 @@ const iconMap = {
 };
 
 interface WidgetHeaderProps {
-  widget: WidgetConfig;
+  widget: TWidgetConfig;
   dragHandleProps?: Record<string, unknown>;
 }
 

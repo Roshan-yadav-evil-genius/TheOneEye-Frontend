@@ -89,7 +89,7 @@ function CreateNodePageContent() {
         isActive: data.isActive !== undefined ? data.isActive : true,
         formConfiguration: data.formConfiguration || {},
         tags: data.tags || [],
-        logoFile: logoFile, // Include the logo file
+        logoFile: logoFile || undefined, // Include the logo file
       };
 
       console.log('Prepared node data:', nodeData);

@@ -7,15 +7,16 @@ import BuilderCanvas from './BuilderCanvas';
 import FieldsMenuBar from './FieldsMenuBar';
 import JsonEditor from './JsonEditor';
 import { useFormBuilder } from './useFormBuilder';
-import { WidgetConfig } from './inputs';
+import { TWidgetConfig } from './inputs';
 import { Card } from '../ui/card';
 
 interface FormBuilderProps {
-  onFormChange?: (widgets: WidgetConfig[]) => void;
-  initialWidgets?: WidgetConfig[];
+  onFormChange?: (widgets: TWidgetConfig[]) => void;
+  initialWidgets?: TWidgetConfig[];
+  disabled?: boolean;
 }
 
-const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets = [] }) => {
+const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets = [], disabled }) => {
   const {
     widgets,
     selectedWidget,
@@ -83,12 +84,14 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets 
           onAddWidget={addWidget}
           isJsonMode={isJsonMode}
           onToggleMode={toggleJsonMode}
+          disabled={disabled}
         />
         
         {isJsonMode ? (
           <JsonEditor
             widgets={widgets}
             onWidgetsChange={updateWidgetsFromJson}
+            disabled={disabled}
           />
         ) : (
           <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
@@ -99,7 +102,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormChange, initialWidgets 
               onUpdateWidget={updateWidget}
               onDeleteWidget={removeWidget}
               onDuplicateWidget={duplicateWidget}
-              onMoveWidget={moveWidget}
+              disabled={disabled}
             />
           </SortableContext>
         )}

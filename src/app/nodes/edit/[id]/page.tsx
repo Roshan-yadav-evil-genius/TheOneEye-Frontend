@@ -67,7 +67,7 @@ function EditNodePageContent() {
 
       try {
         // First try to find the node in the existing nodes array
-        let node = nodes.find(n => n.id === nodeId);
+        let node: TNode | null | undefined = nodes.find(n => n.id === nodeId);
         
         // If not found, try to load it individually
         if (!node) {

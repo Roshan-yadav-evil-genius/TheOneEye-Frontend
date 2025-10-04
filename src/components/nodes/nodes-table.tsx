@@ -50,6 +50,37 @@ import { TNode, nodeTypes } from "@/types";
 import { formatNodeDate } from "@/lib/dates";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
+const NodeLogo: React.FC<{ node: TNode }> = ({ node }) => {
+  const [imageError, setImageError] = useState(false);
+
+  const getNodeIcon = (type: string) => {
+    const nodeIcons = {
+      trigger: IconClock,
+      action: IconSettings,
+      logic: IconCheck,
+      system: IconDatabase,
+    };
+    const IconComponent = nodeIcons[type as keyof typeof nodeIcons] || IconSettings;
+    return <IconComponent className="h-4 w-4" />;
+  };
+
+  if (node.logo && !imageError) {
+    return (
+      <Image 
+        src={node.logo} 
+        alt={`${node.name} logo`}
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-lg object-cover"
+        onError={() => {
+          setImageError(true);
+        }}
+      />
+    );
+  }
+  return getNodeIcon(node.type);
+};
+
 interface ColumnConfig {
   id: string;
   label: string;
@@ -145,40 +176,8 @@ export function NodesTable({
     );
   };
 
-  const getNodeIcon = (type: string) => {
-    const nodeIcons = {
-      trigger: IconClock,
-      action: IconSettings,
-      logic: IconCheck,
-      system: IconDatabase,
-    };
-    const IconComponent = nodeIcons[type as keyof typeof nodeIcons] || IconSettings;
-    return <IconComponent className="h-4 w-4" />;
-  };
-
   const renderNodeLogo = (node: TNode) => {
-    if (node.logo) {
-      return (
-        <Image 
-          src={node.logo} 
-          alt={`${node.name} logo`}
-          width={32}
-          height={32}
-          className="h-8 w-8 rounded-lg object-cover"
-          onError={(e) => {
-            // Fallback to icon if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = '';
-              parent.appendChild(getNodeIcon(node.type));
-            }
-          }}
-        />
-      );
-    }
-    return getNodeIcon(node.type);
+    return <NodeLogo node={node} />;
   };
 
   const renderCategoryIcon = (category: string) => {

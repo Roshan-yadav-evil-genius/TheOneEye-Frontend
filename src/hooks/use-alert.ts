@@ -103,7 +103,8 @@ export const useAlert = () => {
     action: string,
     description?: string,
     onConfirm?: () => void | Promise<void>,
-    successMessage?: string
+    successMessage?: string,
+    errorMessage?: string
   ): Promise<boolean> => {
     return await confirmWithToast(
       {
@@ -114,7 +115,7 @@ export const useAlert = () => {
         onConfirm,
       },
       successMessage || `${action} completed successfully.`,
-      `Failed to ${action.toLowerCase()}. Please try again.`
+      errorMessage || `Failed to ${action.toLowerCase()}. Please try again.`
     );
   };
 

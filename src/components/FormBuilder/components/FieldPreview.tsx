@@ -1,5 +1,5 @@
 import React from 'react';
-import { WidgetConfig } from '../inputs';
+import { TWidgetConfig } from '../inputs';
 import { Input } from '../../ui/input';
 import { Textarea } from '../../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
@@ -8,7 +8,7 @@ import { Label } from '../../ui/label';
 import { Upload } from 'lucide-react';
 
 interface FieldPreviewProps {
-  widget: WidgetConfig;
+  widget: TWidgetConfig;
 }
 
 const FieldPreview: React.FC<FieldPreviewProps> = ({ widget }) => {

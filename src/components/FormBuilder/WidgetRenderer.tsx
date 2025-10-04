@@ -1,5 +1,5 @@
 import React from 'react';
-import { WidgetConfig } from './inputs';
+import { TWidgetConfig } from './inputs';
 import { Card } from '../ui/card';
 import WidgetHeader from './components/WidgetHeader';
 import WidgetConfiguration from './components/WidgetConfiguration';
@@ -7,13 +7,14 @@ import WidgetActions from './components/WidgetActions';
 import FieldPreview from './components/FieldPreview';
 
 interface WidgetRendererProps {
-  widget: WidgetConfig;
+  widget: TWidgetConfig;
   isSelected: boolean;
   onSelect: () => void;
-  onUpdate: (updates: Partial<WidgetConfig>) => void;
+  onUpdate: (updates: Partial<TWidgetConfig>) => void;
   onDelete: () => void;
   onDuplicate: () => void;
   dragHandleProps?: Record<string, unknown>;
+  disabled?: boolean;
 }
 
 const WidgetRenderer: React.FC<WidgetRendererProps> = ({
@@ -24,6 +25,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
   onDelete,
   onDuplicate,
   dragHandleProps,
+  disabled,
 }) => {
   return (
     <Card
@@ -33,8 +35,9 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
           ? 'ring-2 ring-blue-500 bg-slate-700/50' 
           : 'hover:bg-slate-800/50 border-slate-600'
         }
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
-      onClick={onSelect}
+      onClick={disabled ? undefined : onSelect}
     >
       <div className="space-y-3">
         {/* Widget Header */}
@@ -42,13 +45,13 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
           <WidgetHeader widget={widget} dragHandleProps={dragHandleProps} />
           
           {isSelected && (
-            <WidgetActions onDuplicate={onDuplicate} onDelete={onDelete} />
+            <WidgetActions onDuplicate={onDuplicate} onDelete={onDelete} disabled={disabled} />
           )}
         </div>
 
         {/* Widget Configuration */}
         {isSelected && (
-          <WidgetConfiguration widget={widget} onUpdate={onUpdate} />
+          <WidgetConfiguration widget={widget} onUpdate={onUpdate} disabled={disabled} />
         )}
 
         {/* Widget Preview */}

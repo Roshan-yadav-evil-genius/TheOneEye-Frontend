@@ -1,5 +1,5 @@
 import React from 'react';
-import { WIDGET_DEFINITIONS, WidgetType } from '../inputs';
+import { WIDGET_DEFINITIONS, TWidgetType } from '../inputs';
 import { Button } from '../../ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
 import { 
@@ -29,15 +29,17 @@ const iconMap = {
 };
 
 interface WidgetButtonProps {
-  widgetType: WidgetType;
+  widgetType: TWidgetType;
   definition: typeof WIDGET_DEFINITIONS[0];
-  onAddWidget: (type: WidgetType) => void;
+  onAddWidget: (type: TWidgetType) => void;
+  disabled?: boolean;
 }
 
 const WidgetButton: React.FC<WidgetButtonProps> = ({ 
   widgetType, 
   definition,
-  onAddWidget
+  onAddWidget,
+  disabled,
 }) => {
   const IconComponent = iconMap[definition.icon as keyof typeof iconMap];
 
@@ -55,6 +57,7 @@ const WidgetButton: React.FC<WidgetButtonProps> = ({
             size="sm"
             variant="outline"
             className="w-8 h-8 p-0 border-slate-600 hover:border-blue-500 hover:bg-slate-700/50 transition-all duration-200"
+            disabled={disabled}
           >
             <IconComponent className="w-4 h-4 text-slate-300" />
           </Button>

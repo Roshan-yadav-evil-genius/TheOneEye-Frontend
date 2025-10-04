@@ -1,16 +1,17 @@
 import React from 'react';
-import { WidgetConfig } from './inputs';
+import { TWidgetConfig } from './inputs';
 import CanvasHeader from './components/CanvasHeader';
 import EmptyState from './components/EmptyState';
 import WidgetsList from './components/WidgetsList';
 
 interface BuilderCanvasProps {
-  widgets: WidgetConfig[];
+  widgets: TWidgetConfig[];
   selectedWidget: string | null;
   onSelectWidget: (id: string | null) => void;
-  onUpdateWidget: (id: string, updates: Partial<WidgetConfig>) => void;
+  onUpdateWidget: (id: string, updates: Partial<TWidgetConfig>) => void;
   onDeleteWidget: (id: string) => void;
   onDuplicateWidget: (id: string) => void;
+  disabled?: boolean;
 }
 
 const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
@@ -20,6 +21,7 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
   onUpdateWidget,
   onDeleteWidget,
   onDuplicateWidget,
+  disabled,
 }) => {
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -41,6 +43,7 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
         <CanvasHeader 
           widgetCount={widgets.length} 
           onPreviewForm={widgets.length > 0 ? handlePreviewForm : undefined}
+          disabled={disabled}
         />
 
         {widgets.length === 0 ? (
@@ -53,6 +56,7 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
             onUpdateWidget={onUpdateWidget}
             onDeleteWidget={onDeleteWidget}
             onDuplicateWidget={onDuplicateWidget}
+            disabled={disabled}
           />
         )}
       </div>

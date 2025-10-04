@@ -5,9 +5,10 @@ import { FileText } from 'lucide-react';
 interface CanvasHeaderProps {
   widgetCount: number;
   onPreviewForm?: () => void;
+  disabled?: boolean;
 }
 
-const CanvasHeader: React.FC<CanvasHeaderProps> = ({ widgetCount, onPreviewForm }) => {
+const CanvasHeader: React.FC<CanvasHeaderProps> = ({ widgetCount, onPreviewForm, disabled }) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
@@ -24,6 +25,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({ widgetCount, onPreviewForm 
           size="sm"
           onClick={onPreviewForm}
           className="border-slate-600 text-slate-300 hover:bg-slate-800"
+          disabled={disabled}
         >
           <FileText className="w-4 h-4 mr-2" />
           Preview Form

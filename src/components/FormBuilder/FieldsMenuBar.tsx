@@ -1,17 +1,18 @@
 import React from 'react';
-import { WIDGET_DEFINITIONS, WidgetType } from './inputs';
+import { WIDGET_DEFINITIONS, TWidgetType } from './inputs';
 import WidgetButton from './components/WidgetButton';
 import { Toggle } from '../ui/toggle';
 import { Code, Palette } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface FieldsMenuBarProps {
-  onAddWidget: (type: WidgetType) => void;
+  onAddWidget: (type: TWidgetType) => void;
   isJsonMode: boolean;
   onToggleMode: (isJsonMode: boolean) => void;
+  disabled?: boolean;
 }
 
-const FieldsMenuBar: React.FC<FieldsMenuBarProps> = ({ onAddWidget, isJsonMode, onToggleMode }) => {
+const FieldsMenuBar: React.FC<FieldsMenuBarProps> = ({ onAddWidget, isJsonMode, onToggleMode, disabled }) => {
   return (
     <div className="p-3 bg-slate-800 border-b border-slate-700">
       <div className="flex items-center justify-between">
@@ -25,6 +26,7 @@ const FieldsMenuBar: React.FC<FieldsMenuBarProps> = ({ onAddWidget, isJsonMode, 
                   pressed={isJsonMode}
                   onPressedChange={onToggleMode}
                   className="border-slate-600 hover:border-blue-500 hover:bg-slate-700/50 data-[state=on]:bg-blue-600 data-[state=on]:border-blue-500"
+                  disabled={disabled}
                 >
                   {isJsonMode ? (
                     <Code className="w-4 h-4 text-slate-300" />
@@ -52,6 +54,7 @@ const FieldsMenuBar: React.FC<FieldsMenuBarProps> = ({ onAddWidget, isJsonMode, 
                 widgetType={definition.type}
                 definition={definition}
                 onAddWidget={onAddWidget}
+                disabled={disabled}
               />
             ))}
           </div>

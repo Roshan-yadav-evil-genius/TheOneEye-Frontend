@@ -1,5 +1,11 @@
 import React from 'react';
 
+interface MemoryInfo {
+  jsHeapSizeLimit: number;
+  totalJSHeapSize: number;
+  usedJSHeapSize: number;
+}
+
 // Performance monitoring utilities
 export const performanceMonitor = {
   // Measure component render time
@@ -70,7 +76,7 @@ export const performanceMonitor = {
   // Memory usage monitoring
   logMemoryUsage: (label: string) => {
     if (process.env.NODE_ENV === 'development' && 'memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory: MemoryInfo }).memory;
       console.log(`🧠 ${label} Memory Usage:`, {
         used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
         total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`,

@@ -47,8 +47,12 @@ interface CollapsibleTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonE
   asChild?: boolean
 }
 
+import { Slot } from "@radix-ui/react-slot"
+
+// ...
+
 const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
-  ({ children, asChild, className, onClick, ...props }, ref) => {
+  ({ children, asChild = false, className, onClick, ...props }, ref) => {
     const context = React.useContext(CollapsibleContext)
     if (!context) {
       throw new Error("CollapsibleTrigger must be used within a Collapsible")
@@ -59,25 +63,17 @@ const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTrigge
       onClick?.(event)
     }
 
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, {
-        ...props,
-        ref,
-        onClick: handleClick,
-        className: cn(className, children.props.className),
-      })
-    }
+    const Comp = asChild ? Slot : "button"
 
     return (
-      <button
+      <Comp
         ref={ref}
-        type="button"
         className={cn(className)}
         onClick={handleClick}
         {...props}
       >
         {children}
-      </button>
+      </Comp>
     )
   }
 )

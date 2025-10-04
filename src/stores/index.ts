@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Import stores for internal use
 import { useTUserStore } from './user-store';
 import { useNodesStore } from './nodes-store';
@@ -149,32 +150,32 @@ export const storeSelectors = {
   getOpenModals: () => {
     const { modals } = useUIStore.getState();
     return Object.entries(modals)
-      .filter(([_, isOpen]) => isOpen)
-      .map(([modalName, _]) => modalName);
+      .filter(([, isOpen]) => isOpen)
+      .map(([modalName]) => modalName);
   },
 };
 
 // Store actions for common operations
 export const storeActions = {
   // Create new entities with proper relationships
-  createNodeWithForm: async (nodeData: any, formData: any) => {
+  createNodeWithForm: async (nodeData: Partial<TNode>, formData: Partial<TFormConfiguration>) => {
     const { createNode } = useNodesStore.getState();
     const { createFormConfiguration } = useFormStore.getState();
     
-    const node = await createNode(nodeData);
+    const node = await createNode(nodeData as TNodeCreateData);
     const formConfig = await createFormConfiguration({
-      ...formData,
+      ...(formData as TFormConfiguration),
       nodeId: node.id,
     });
     
     return { node, formConfig };
   },
   
-  createWorkflowWithNodes: async (workflowData: any, nodeIds: string[]) => {
+  createWorkflowWithNodes: async (workflowData: Partial<TWorkflow>, nodeIds: string[]) => {
     const { createWorkflow } = useTWorkflowStore.getState();
     const { nodes } = useNodesStore.getState();
     
-    const workflow = await createWorkflow(workflowData);
+    const workflow = await createWorkflow(workflowData as TWorkflow);
     const workflowNodes = nodes.filter((node) => nodeIds.includes(node.id));
     
     // Add nodes to workflow
@@ -185,7 +186,7 @@ export const storeActions = {
     return { workflow, nodes: workflowNodes };
   },
   
-  createProjectWithWorkflows: async (projectData: any, workflowIds: string[]) => {
+  createProjectWithWorkflows: async (projectData: Partial<TProject>, workflowIds: string[]) => {
     const { createProject } = useTProjectsStore.getState();
     
     const project = await createProject(projectData);
@@ -235,9 +236,9 @@ export const storeActions = {
 // Store middleware for logging and debugging
 export const storeMiddleware = {
   logStateChanges: (storeName: string) => {
-    return (config: any) => (set: any, get: any, api: any) =>
+    return (config: (set: (...args: unknown[]) => void, get: () => unknown, api: unknown) => any) => (set: (...args: unknown[]) => void, get: () => unknown, api: unknown) =>
       config(
-        (...args: any[]) => {
+        (...args: unknown[]) => {
           console.log(`${storeName} state changed:`, get());
           set(...args);
         },
@@ -247,7 +248,7 @@ export const storeMiddleware = {
   },
   
   persistToLocalStorage: (storeName: string, keys: string[]) => {
-    return (config: any) => (set: any, get: any, api: any) => {
+    return (config: (set: (...args: unknown[]) => void, get: () => any, api: unknown) => any) => (set: (...args: unknown[]) => void, get: () => any, api: unknown) => {
       const store = config(set, get, api);
       
       // Load from localStorage on initialization
@@ -257,11 +258,11 @@ export const storeMiddleware = {
           try {
             const parsed = JSON.parse(saved);
             const partialState = keys.reduce((acc, key) => {
-              if (parsed[key] !== undefined) {
-                acc[key] = parsed[key];
+              if ((parsed as any)[key] !== undefined) {
+                (acc as any)[key] = (parsed as any)[key];
               }
               return acc;
-            }, {} as any);
+            }, {} as Record<string, unknown>);
             
             if (Object.keys(partialState).length > 0) {
               set(partialState);
@@ -274,15 +275,15 @@ export const storeMiddleware = {
       
       // Save to localStorage on changes
       const originalSet = set;
-      set = (...args: any[]) => {
+      set = (...args: unknown[]) => {
         originalSet(...args);
         
         if (typeof window !== 'undefined') {
           const state = get();
           const partialState = keys.reduce((acc, key) => {
-            acc[key] = state[key];
+            (acc as any)[key] = state[key];
             return acc;
-          }, {} as any);
+          }, {} as Record<string, unknown>);
           
           localStorage.setItem(`${storeName}-store`, JSON.stringify(partialState));
         }

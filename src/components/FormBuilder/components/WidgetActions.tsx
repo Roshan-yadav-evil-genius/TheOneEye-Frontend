@@ -5,9 +5,10 @@ import { Copy, Trash2 } from 'lucide-react';
 interface WidgetActionsProps {
   onDuplicate: () => void;
   onDelete: () => void;
+  disabled?: boolean;
 }
 
-const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete }) => {
+const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete, disabled }) => {
   return (
     <div className="flex items-center gap-1">
       <Button
@@ -19,6 +20,7 @@ const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete }) 
           onDuplicate();
         }}
         className="h-8 w-8 p-0 hover:bg-slate-600"
+        disabled={disabled}
       >
         <Copy className="w-3 h-3" />
       </Button>
@@ -31,6 +33,7 @@ const WidgetActions: React.FC<WidgetActionsProps> = ({ onDuplicate, onDelete }) 
           onDelete();
         }}
         className="h-8 w-8 p-0 hover:bg-red-600/20 text-red-400"
+        disabled={disabled}
       >
         <Trash2 className="w-3 h-3" />
       </Button>

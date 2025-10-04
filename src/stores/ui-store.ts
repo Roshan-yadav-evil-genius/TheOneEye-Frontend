@@ -221,12 +221,12 @@ export const useUIStore = create<UIStore>()(
         }),
         // Add version for future migrations
         version: 1,
-        migrate: (persistedState: any, version: number) => {
+        migrate: (persistedState: unknown, version: number) => {
           // Handle future migrations here
           if (version === 0) {
             // Example migration from v0 to v1
             return {
-              ...persistedState,
+              ...(persistedState as TUIStoreState),
               pageTitle: 'Documents', // Add default value for new field
             };
           }

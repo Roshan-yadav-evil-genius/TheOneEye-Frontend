@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { WidgetConfig } from '../inputs';
+import { TWidgetConfig } from '../inputs';
 import { Input } from '../../ui/input';
 import { Checkbox } from '../../ui/checkbox';
 import { Label } from '../../ui/label';
@@ -8,11 +8,12 @@ import { Button } from '../../ui/button';
 import { Plus, X } from 'lucide-react';
 
 interface WidgetConfigurationProps {
-  widget: WidgetConfig;
-  onUpdate: (updates: Partial<WidgetConfig>) => void;
+  widget: TWidgetConfig;
+  onUpdate: (updates: Partial<TWidgetConfig>) => void;
+  disabled?: boolean;
 }
 
-const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpdate }) => {
+const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpdate, disabled }) => {
   const [newOption, setNewOption] = useState('');
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +62,7 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
           onChange={handleLabelChange}
           className="bg-slate-700 border-slate-600 text-sm"
           placeholder="Field label"
+          disabled={disabled}
         />
       </div>
       
@@ -72,6 +74,7 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
             onChange={handlePlaceholderChange}
             className="bg-slate-700 border-slate-600 text-sm"
             placeholder="Placeholder text"
+            disabled={disabled}
           />
         </div>
       )}
@@ -81,6 +84,7 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
           id={`required-${widget.id}`}
           checked={widget.required || false}
           onCheckedChange={handleRequiredChange}
+          disabled={disabled}
         />
         <Label htmlFor={`required-${widget.id}`} className="text-xs text-slate-400">
           Required field
@@ -99,6 +103,7 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
                   onChange={(e) => handleOptionChange(index, e.target.value)}
                   className="bg-slate-700 border-slate-600 text-sm flex-1"
                   placeholder="Option text"
+                  disabled={disabled}
                 />
                 <Button
                   type="button"
@@ -106,6 +111,7 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
                   size="sm"
                   onClick={() => handleRemoveOption(index)}
                   className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                  disabled={disabled}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -124,13 +130,14 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
                     handleAddOption();
                   }
                 }}
+                disabled={disabled}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={handleAddOption}
-                disabled={!newOption.trim()}
+                disabled={!newOption.trim() || disabled}
                 className="h-8 w-8 p-0 text-green-400 hover:text-green-300 hover:bg-green-900/20"
               >
                 <Plus className="h-4 w-4" />

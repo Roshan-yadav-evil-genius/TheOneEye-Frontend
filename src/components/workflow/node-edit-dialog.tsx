@@ -12,7 +12,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
 import { NodeEditor } from "./node-editor";
-import { sampleInputData } from "@/data/sample-data";
+import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 
 interface Condition {

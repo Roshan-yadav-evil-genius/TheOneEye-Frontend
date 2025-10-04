@@ -34,7 +34,7 @@ interface WorkflowSidebarProps {
   onNodeSelect: (nodeId: string) => void;
 }
 
-import { mockNodes } from "@/data/nodes";
+import { mockNodes } from "@/data";
 
 const nodeIcons = {
   trigger: IconClock,

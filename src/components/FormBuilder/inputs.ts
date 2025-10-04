@@ -1,5 +1,6 @@
+import type { TWidgetDefinition } from '@/types/forms';
 // Re-export widget types from centralized types
-export { TWidgetConfig, TWidgetType, TWidgetDefinition } from '@/types/forms';
+export type { TWidgetConfig, TWidgetType, TWidgetDefinition } from '@/types/forms';
 
 export const WIDGET_DEFINITIONS: TWidgetDefinition[] = [
   {

@@ -1,26 +1,28 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { WidgetConfig } from '../inputs';
+import { TWidgetConfig } from '../inputs';
 import WidgetRenderer from '../WidgetRenderer';
 
 interface WidgetsListProps {
-  widgets: WidgetConfig[];
+  widgets: TWidgetConfig[];
   selectedWidget: string | null;
   onSelectWidget: (id: string) => void;
-  onUpdateWidget: (id: string, updates: Partial<WidgetConfig>) => void;
+  onUpdateWidget: (id: string, updates: Partial<TWidgetConfig>) => void;
   onDeleteWidget: (id: string) => void;
   onDuplicateWidget: (id: string) => void;
+  disabled?: boolean;
 }
 
 interface SortableWidgetProps {
-  widget: WidgetConfig;
+  widget: TWidgetConfig;
   index: number;
   isSelected: boolean;
   onSelect: () => void;
-  onUpdate: (updates: Partial<WidgetConfig>) => void;
+  onUpdate: (updates: Partial<TWidgetConfig>) => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  disabled?: boolean;
 }
 
 const SortableWidget: React.FC<SortableWidgetProps> = ({
@@ -31,6 +33,7 @@ const SortableWidget: React.FC<SortableWidgetProps> = ({
   onUpdate,
   onDelete,
   onDuplicate,
+  disabled,
 }) => {
   const {
     attributes,
@@ -46,6 +49,7 @@ const SortableWidget: React.FC<SortableWidgetProps> = ({
       widget,
       index,
     },
+    disabled,
   });
 
   const style = {
@@ -64,6 +68,7 @@ const SortableWidget: React.FC<SortableWidgetProps> = ({
         onDelete={onDelete}
         onDuplicate={onDuplicate}
         dragHandleProps={listeners}
+        disabled={disabled}
       />
     </div>
   );
@@ -76,6 +81,7 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
   onUpdateWidget,
   onDeleteWidget,
   onDuplicateWidget,
+  disabled,
 }) => {
   return (
     <div className="space-y-4">
@@ -89,6 +95,7 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
           onUpdate={(updates) => onUpdateWidget(widget.id, updates)}
           onDelete={() => onDeleteWidget(widget.id)}
           onDuplicate={() => onDuplicateWidget(widget.id)}
+          disabled={disabled}
         />
       ))}
     </div>

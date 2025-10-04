@@ -31,7 +31,16 @@ interface WorkflowCanvasProps {
 }
 
 // Wrapper component to pass delete callback to CustomNode
-const CustomNodeWrapper = memo((props: Record<string, unknown>) => {
+interface CustomNodeData {
+  onDeleteNode?: (nodeId: string) => void;
+  [key: string]: unknown;
+}
+
+import { NodeProps } from "reactflow";
+
+// ...
+
+const CustomNodeWrapper = memo((props: NodeProps) => {
   const { data, ...nodeProps } = props;
   const { onDeleteNode, ...nodeData } = data || {};
   return <CustomNode {...nodeProps} data={nodeData} onDelete={onDeleteNode} />;

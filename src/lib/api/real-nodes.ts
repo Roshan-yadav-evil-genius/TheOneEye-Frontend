@@ -222,8 +222,8 @@ class RealNodesApiClient {
       body: JSON.stringify(transformedData),
     });
     
-    const data = await this.handleResponse<Record<string, unknown>>(response);
-    return data.map((node: any) => this.transformNode(node));
+    const data = await this.handleResponse<Record<string, unknown>[]>(response);
+    return data.map((node: Record<string, unknown>) => this.transformNode(node));
   }
 
   async getNodeStats(): Promise<TNodeStats> {

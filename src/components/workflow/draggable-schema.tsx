@@ -155,7 +155,7 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
         </div>
         {field.type !== 'object' && field.type !== 'array' && field.value !== undefined && (
           <span className="text-gray-400 font-mono text-sm">
-            {typeof field.value === 'string' ? `"${field.value}"` : field.value}
+            {typeof field.value === 'string' ? `"${field.value}"` : JSON.stringify(field.value)}
           </span>
         )}
       </div>
