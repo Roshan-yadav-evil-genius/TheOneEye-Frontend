@@ -1,47 +1,31 @@
 "use client";
 
-import { useState } from "react";
 import { WorkflowSidebar } from "./workflow-sidebar";
 import { WorkflowStatsHeader } from "./workflow-stats-header";
 import { WorkflowCanvas } from "./workflow-canvas";
+import { useWorkflowLayout } from "@/hooks/useWorkflowLayout";
 
 interface WorkflowLayoutProps {
   workflowId?: string;
 }
 
 export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    category: "all",
-  });
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const [lineType, setLineType] = useState("step");
-  const [showMinimap, setShowMinimap] = useState(true);
-
-  // TODO: Load workflow data based on workflowId
-  // const { data: workflow } = useWorkflow(workflowId);
-
-  const handleRunStop = () => {
-    setIsRunning(!isRunning);
-  };
-
-  const handleNodeSelect = (nodeId: string) => {
-    setSelectedNodes(prev => 
-      prev.includes(nodeId) 
-        ? prev.filter(id => id !== nodeId)
-        : [...prev, nodeId]
-    );
-  };
-
-  const handleLineTypeChange = (type: string) => {
-    setLineType(type);
-  };
-
-  const handleMinimapToggle = () => {
-    setShowMinimap(!showMinimap);
-  };
+  const {
+    isRunning,
+    selectedNodes,
+    searchTerm,
+    filters,
+    isSidebarCollapsed,
+    lineType,
+    showMinimap,
+    setSearchTerm,
+    setFilters,
+    handleRunStop,
+    handleNodeSelect,
+    handleLineTypeChange,
+    handleMinimapToggle,
+    handleToggleSidebar,
+  } = useWorkflowLayout({ workflowId });
 
   return (
     <div className="flex h-[calc(100vh-var(--header-height))] bg-background">
@@ -67,7 +51,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             isRunning={isRunning}
             onRunStop={handleRunStop}
             isSidebarCollapsed={isSidebarCollapsed}
-            onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            onToggleSidebar={handleToggleSidebar}
             lineType={lineType}
             onLineTypeChange={handleLineTypeChange}
             showMinimap={showMinimap}

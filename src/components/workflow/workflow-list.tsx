@@ -1,98 +1,38 @@
 "use client";
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { WorkflowTable } from "@/components/workflow/workflow-table"
-import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog"
-import { EditWorkflowDialog } from "@/components/workflow/edit-workflow-dialog"
-import { DeleteWorkflowDialog } from "@/components/workflow/delete-workflow-dialog"
-import { Button } from "@/components/ui/button"
-import { IconPlus, IconSearch } from "@tabler/icons-react"
-import { TWorkflow } from "@/types"
-import { useUIStore, uiHelpers } from "@/stores/ui-store"
-import { useWorkflowStore } from "@/stores"
+import { WorkflowTable } from "@/components/workflow/workflow-table";
+import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog";
+import { EditWorkflowDialog } from "@/components/workflow/edit-workflow-dialog";
+import { DeleteWorkflowDialog } from "@/components/workflow/delete-workflow-dialog";
+import { Button } from "@/components/ui/button";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { TWorkflow } from "@/types";
+import { useWorkflowList } from "@/hooks/useWorkflowList";
+import { useUIStore } from "@/stores/ui-store";
 
 interface WorkflowListProps {
-  workflows: TWorkflow[]
+  workflows: TWorkflow[];
 }
 
 export function WorkflowList({
   workflows,
 }: WorkflowListProps) {
-  const router = useRouter()
-  const { modals } = useUIStore()
-  const { deleteTWorkflow } = useWorkflowStore()
-  
-  // Delete dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [workflowToDelete, setWorkflowToDelete] = useState<{ id: string; name: string } | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  
-  // Edit dialog state
-  const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [workflowToEdit, setWorkflowToEdit] = useState<TWorkflow | null>(null)
-
-  const handleRun = (id: string) => {
-    // TODO: Implement workflow execution
-    console.log('Run workflow:', id);
-  }
-
-  const handleStop = (id: string) => {
-    // TODO: Implement workflow stop
-    console.log('Stop workflow:', id);
-  }
-
-  const handleEditInfo = (workflow: TWorkflow) => {
-    setWorkflowToEdit(workflow)
-    setEditDialogOpen(true)
-  }
-
-  const handleEditWorkflow = (id: string) => {
-    router.push(`/workflow/${id}`)
-  }
-
-  const handleView = (id: string) => {
-    router.push(`/workflow/${id}/details`)
-  }
-
-  const handleDelete = (id: string) => {
-    const workflow = workflows.find(w => w.id === id);
-    if (workflow) {
-      setWorkflowToDelete({ id, name: workflow.name });
-      setDeleteDialogOpen(true);
-    }
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!workflowToDelete) return;
-    
-    setIsDeleting(true);
-    try {
-      await deleteTWorkflow(workflowToDelete.id);
-      uiHelpers.showSuccess(
-        "Workflow Deleted",
-        `Workflow "${workflowToDelete.name}" has been deleted successfully.`
-      );
-      setDeleteDialogOpen(false);
-      setWorkflowToDelete(null);
-    } catch (error) {
-      console.error("Failed to delete workflow:", error);
-      uiHelpers.showError(
-        "Deletion Failed",
-        "Failed to delete workflow. Please try again."
-      );
-    } finally {
-      setIsDeleting(false);
-    }
-  }
-
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false);
-    setWorkflowToDelete(null);
-  }
-
-  const handleCreate = () => {
-    uiHelpers.openCreateWorkflowModal()
-  }
+  const {
+    modals,
+    deleteDialogOpen,
+    workflowToDelete,
+    isDeleting,
+    editDialogOpen,
+    workflowToEdit,
+    handleRun,
+    handleStop,
+    handleEditInfo,
+    handleEditWorkflow,
+    handleView,
+    handleDelete,
+    handleConfirmDelete,
+    handleCancelDelete,
+    handleCreate,
+  } = useWorkflowList({ workflows });
 
   return (
     <div className="space-y-6">
@@ -150,5 +90,5 @@ export function WorkflowList({
         isDeleting={isDeleting}
       />
     </div>
-  )
+  );
 }

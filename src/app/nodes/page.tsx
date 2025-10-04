@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
-import { useRouter } from "next/navigation";
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,59 +10,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useNodesStore, useUIStore } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { useNodesPage } from "@/hooks/useNodesPage";
 
 const NodesPageContent = memo(function NodesPageContent() {
-  const router = useRouter();
-  
-  // Zustand store hooks - optimized selectors
-  const nodes = useNodesStore((state) => state.nodes);
-  const selectedNode = useNodesStore((state) => state.selectedNode);
-  
-  const loadNodes = useNodesStore((state) => state.loadNodes);
-  const deleteNode = useNodesStore((state) => state.deleteNode);
-  const selectNode = useNodesStore((state) => state.selectNode);
-  
-  const setActivePage = useUIStore((state) => state.setActivePage);
-
-  // Local state for UI
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  // Load nodes on component mount
-  useEffect(() => {
-    loadNodes();
-    setActivePage("Nodes");
-  }, [loadNodes, setActivePage]);
-
-
-
-  const handleDeleteNode = async () => {
-    if (!selectedNode) return;
-
-    try {
-      await deleteNode(selectedNode.id, true); // showToast = true
-      setIsDeleteDialogOpen(false);
-      selectNode(null);
-    } catch {
-      // Error toast is handled by the store
-      // Delete node error
-    }
-  };
-
-  const openEditDialog = (nodeId: string) => {
-    // Navigate to the edit page instead of opening a dialog
-    router.push(`/nodes/edit/${nodeId}`);
-  };
-
-  const openDeleteDialog = (nodeId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (node) {
-    selectNode(node);
-    setIsDeleteDialogOpen(true);
-    }
-  };
+  const {
+    nodes,
+    selectedNode,
+    isDeleteDialogOpen,
+    handleDeleteNode,
+    openEditDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+  } = useNodesPage();
 
   return (
     <div className="space-y-6">
@@ -77,9 +37,8 @@ const NodesPageContent = memo(function NodesPageContent() {
         onDelete={openDeleteDialog}
       />
 
-
       {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Node</DialogTitle>
@@ -88,7 +47,7 @@ const NodesPageContent = memo(function NodesPageContent() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button variant="outline" onClick={closeDeleteDialog}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDeleteNode}>
