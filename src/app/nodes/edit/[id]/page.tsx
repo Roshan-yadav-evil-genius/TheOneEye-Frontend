@@ -188,13 +188,19 @@ function EditNodePageContent() {
                   <div className="space-y-2">
                     {logoPreview ? (
                       <div className="flex items-center gap-2">
-                        <Image 
-                          src={logoPreview} 
-                          alt="Logo preview" 
-                          width={48}
-                          height={48}
-                          className="h-12 w-12 object-cover rounded border"
-                        />
+                        <div className="relative h-12 w-12">
+                          <Image 
+                            src={logoPreview} 
+                            alt="Logo preview" 
+                            width={48}
+                            height={48}
+                            className="h-12 w-12 object-cover rounded border"
+                            onError={() => {
+                              // Hide the broken image and show upload area instead
+                              setLogoPreview(null);
+                            }}
+                          />
+                        </div>
                         <Button
                           type="button"
                           variant="outline"
@@ -243,6 +249,16 @@ function EditNodePageContent() {
                 />
               </div>
 
+              {/* Form Configuration Component */}
+              <div className="space-y-2">
+                <Label>Form Configuration</Label>
+                <FormConfigurationEditor
+                  value={formData.formConfiguration || {}}
+                  onChange={handleFormConfigurationChange}
+                  disabled={isUpdating}
+                />
+              </div>
+
               {/* Submit Button */}
               <div className="flex justify-end space-x-2 pt-4">
                 <Button
@@ -275,13 +291,6 @@ function EditNodePageContent() {
             </form>
           </CardContent>
         </Card>
-
-        {/* Form Configuration Component */}
-        <FormConfigurationEditor
-          value={formData.formConfiguration || {}}
-          onChange={handleFormConfigurationChange}
-          disabled={isUpdating}
-        />
       </div>
     </div>
   );

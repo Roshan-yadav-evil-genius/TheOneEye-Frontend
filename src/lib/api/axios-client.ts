@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { TTApiError } from './types';
+import { TApiError } from '@/types';
 
 // Axios-based API client with better error handling and interceptors
 class AxiosApiClient {

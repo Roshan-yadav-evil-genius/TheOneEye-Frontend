@@ -7,6 +7,16 @@ import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-t
 
 // Enhanced state interface with additional features
 interface EnhancedNodesState extends TNodesState {
+  // Explicitly include base properties to ensure they're available
+  nodes: TNode[];
+  selectedNode: TNode | null;
+  isLoading: boolean;
+  error: string | null;
+  filters: {
+    type?: string;
+    category?: string;
+    search?: string;
+  };
   // Pagination state
   pagination: {
     currentPage: number;
@@ -62,7 +72,7 @@ interface EnhancedNodesActions {
   clearSelection: () => void;
   setMultiSelectMode: (enabled: boolean) => void;
   
-  setFilters: (filters: Partial<NodesState['filters']>) => void;
+  setFilters: (filters: Partial<TNodesState['filters']>) => void;
   clearFilters: () => void;
   setSearchQuery: (query: string) => void;
   setSorting: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
@@ -141,6 +151,10 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             };
             
             set((state) => {
+              // Ensure nodes array exists before calling unshift
+              if (!state.nodes) {
+                state.nodes = [];
+              }
               state.nodes.unshift(tempNode);
               state.pagination.totalCount += 1;
             });
@@ -157,11 +171,15 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             set((state) => {
               if (optimistic) {
                 // Replace temporary node with real one
-                const tempIndex = state.nodes.findIndex(n => n.id.startsWith('temp-'));
+                const tempIndex = state.nodes?.findIndex(n => n.id.startsWith('temp-')) ?? -1;
                 if (tempIndex !== -1) {
                   state.nodes[tempIndex] = newNode;
                 }
               } else {
+                // Ensure nodes array exists before calling unshift
+                if (!state.nodes) {
+                  state.nodes = [];
+                }
                 state.nodes.unshift(newNode);
                 state.pagination.totalCount += 1;
               }
@@ -188,7 +206,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             set((state) => {
               if (optimistic) {
                 // Remove temporary node on error
-                state.nodes = state.nodes.filter(n => !n.id.startsWith('temp-'));
+                state.nodes = state.nodes?.filter(n => !n.id.startsWith('temp-')) ?? [];
                 state.pagination.totalCount -= 1;
               }
               state.isLoading = false;
@@ -211,7 +229,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           if (optimistic) {
             // Optimistic update
             set((state) => {
-              const nodeIndex = state.nodes.findIndex(n => n.id === id);
+              const nodeIndex = state.nodes?.findIndex(n => n.id === id) ?? -1;
               if (nodeIndex !== -1) {
                 state.nodes[nodeIndex] = { ...state.nodes[nodeIndex], ...nodeData };
               }
@@ -230,7 +248,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             const updatedNode = await ApiService.updateNode(id, nodeData);
             
             set((state) => {
-              const nodeIndex = state.nodes.findIndex(n => n.id === id);
+              const nodeIndex = state.nodes?.findIndex(n => n.id === id) ?? -1;
               if (nodeIndex !== -1) {
                 state.nodes[nodeIndex] = updatedNode;
               }
@@ -281,7 +299,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           if (optimistic) {
             // Optimistic update
             set((state) => {
-              state.nodes = state.nodes.filter(n => n.id !== id);
+              state.nodes = state.nodes?.filter(n => n.id !== id) ?? [];
               state.selectedNodes = state.selectedNodes.filter(nId => nId !== id);
               if (state.selectedNode?.id === id) {
                 state.selectedNode = null;
@@ -300,7 +318,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             
             if (!optimistic) {
               set((state) => {
-                state.nodes = state.nodes.filter(n => n.id !== id);
+                state.nodes = state.nodes?.filter(n => n.id !== id) ?? [];
                 state.selectedNodes = state.selectedNodes.filter(nId => nId !== id);
                 if (state.selectedNode?.id === id) {
                   state.selectedNode = null;
@@ -368,10 +386,13 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             const fetchedNode = await ApiService.getNode(id);
             
             set((state) => {
-              const nodeIndex = state.nodes.findIndex(n => n.id === id);
+              const nodeIndex = state.nodes?.findIndex(n => n.id === id) ?? -1;
               if (nodeIndex !== -1) {
                 state.nodes[nodeIndex] = fetchedNode;
               } else {
+                if (!state.nodes) {
+                  state.nodes = [];
+                }
                 state.nodes.push(fetchedNode);
               }
               state.isLoading = false;
@@ -463,6 +484,10 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             }));
             
             set((state) => {
+              // Ensure nodes array exists before calling unshift
+              if (!state.nodes) {
+                state.nodes = [];
+              }
               state.nodes.unshift(...tempNodes);
               state.pagination.totalCount += nodes.length;
             });
@@ -479,7 +504,11 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             set((state) => {
               if (optimistic) {
                 // Replace temporary nodes with real ones
-                state.nodes = state.nodes.filter(n => !n.id.startsWith('temp-'));
+                state.nodes = state.nodes?.filter(n => !n.id.startsWith('temp-')) ?? [];
+              }
+              // Ensure nodes array exists before calling unshift
+              if (!state.nodes) {
+                state.nodes = [];
               }
               state.nodes.unshift(...newNodes);
               state.pagination.totalCount += newNodes.length;
@@ -506,7 +535,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             set((state) => {
               if (optimistic) {
                 // Remove temporary nodes on error
-                state.nodes = state.nodes.filter(n => !n.id.startsWith('temp-'));
+                state.nodes = state.nodes?.filter(n => !n.id.startsWith('temp-')) ?? [];
                 state.pagination.totalCount -= nodes.length;
               }
               state.isLoading = false;
@@ -529,7 +558,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           if (optimistic) {
             // Optimistic update
             set((state) => {
-              state.nodes = state.nodes.filter(n => !ids.includes(n.id));
+              state.nodes = state.nodes?.filter(n => !ids.includes(n.id)) ?? [];
               state.selectedNodes = state.selectedNodes.filter(nId => !ids.includes(nId));
               if (state.selectedNode && ids.includes(state.selectedNode.id)) {
                 state.selectedNode = null;
@@ -548,7 +577,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             
             if (!optimistic) {
               set((state) => {
-                state.nodes = state.nodes.filter(n => !ids.includes(n.id));
+                state.nodes = state.nodes?.filter(n => !ids.includes(n.id)) ?? [];
                 state.selectedNodes = state.selectedNodes.filter(nId => !ids.includes(nId));
                 if (state.selectedNode && ids.includes(state.selectedNode.id)) {
                   state.selectedNode = null;
@@ -607,7 +636,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           set((state) => {
             state.selectedNodes = nodeIds;
             state.selectedNode = nodeIds.length === 1 
-              ? state.nodes.find(n => n.id === nodeIds[0]) || null
+              ? state.nodes?.find(n => n.id === nodeIds[0]) || null
               : null;
           });
         },
@@ -623,7 +652,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             
             // Update selectedNode based on selection
             if (state.selectedNodes.length === 1) {
-              state.selectedNode = state.nodes.find(n => n.id === state.selectedNodes[0]) || null;
+              state.selectedNode = state.nodes?.find(n => n.id === state.selectedNodes[0]) || null;
             } else {
               state.selectedNode = null;
             }
@@ -646,7 +675,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           });
         },
 
-        setFilters: (filters: Partial<NodesState['filters']>) => {
+        setFilters: (filters: Partial<TNodesState['filters']>) => {
           set((state) => {
             state.filters = { ...state.filters, ...filters };
             state.cache.isStale = true; // Invalidate cache when filters change
@@ -785,7 +814,7 @@ export const nodesSelectors = {
   getFilteredNodes: (state: EnhancedNodesStore) => {
     const { nodes, filters, searchQuery, sortBy, sortOrder } = state;
     
-    const filtered = nodes.filter((node) => {
+    const filtered = (nodes || []).filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
       if (filters.category && node.category !== filters.category) return false;
       if (searchQuery && !node.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -806,22 +835,22 @@ export const nodesSelectors = {
   },
   
   getSelectedNodes: (state: EnhancedNodesStore) => {
-    return state.nodes.filter(node => state.selectedNodes.includes(node.id));
+    return (state.nodes || []).filter(node => state.selectedNodes.includes(node.id));
   },
   
   getNodesByType: (state: EnhancedNodesStore, type: string) => {
-    return state.nodes.filter(node => node.type === type);
+    return (state.nodes || []).filter(node => node.type === type);
   },
   
   getNodesByCategory: (state: EnhancedNodesStore, category: string) => {
-    return state.nodes.filter(node => node.category === category);
+    return (state.nodes || []).filter(node => node.category === category);
   },
   
   getActiveNodes: (state: EnhancedNodesStore) => {
-    return state.nodes.filter(node => node.isActive);
+    return (state.nodes || []).filter(node => node.isActive);
   },
   
   getInactiveNodes: (state: EnhancedNodesStore) => {
-    return state.nodes.filter(node => !node.isActive);
+    return (state.nodes || []).filter(node => !node.isActive);
   },
 };

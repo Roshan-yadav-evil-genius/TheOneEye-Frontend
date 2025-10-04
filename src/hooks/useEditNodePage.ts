@@ -197,15 +197,7 @@ export const useEditNodePage = () => {
         logoFile: logoFile || undefined, // Include the logo file if uploaded
       }, true); // showToast = true
 
-      // Create associated form configuration if it exists and is different
-      if (formData.formConfiguration && Object.keys(formData.formConfiguration).length > 0) {
-        await createFormConfiguration({
-          name: `${formData.name} Configuration`,
-          description: `Form configuration for ${formData.name}`,
-          json: formData.formConfiguration,
-          nodeId: nodeId,
-        });
-      }
+      // Form configuration is now stored as part of the node, no need for separate creation
 
       // Show success notification
       uiHelpers.showSuccess("Success!", "Node updated successfully");

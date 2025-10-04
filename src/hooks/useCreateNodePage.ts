@@ -49,11 +49,9 @@ export const useCreateNodePage = () => {
   };
 
   const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
-    console.log('Form configuration changed:', json);
     // Only update if the JSON is actually different to prevent unnecessary re-renders
     if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
       setValue("formConfiguration", json);
-      console.log('Form configuration updated in form state');
     }
   }, [formData.formConfiguration, setValue]);
 
@@ -63,8 +61,6 @@ export const useCreateNodePage = () => {
   }, [setActivePage]);
 
   const onSubmit = async (data: Partial<TNode>) => {
-    console.log('Form submitted with data:', data);
-    console.log('Form configuration in submitted data:', data.formConfiguration);
     try {
       // Prepare the node data for creation
       const nodeData = {
@@ -78,10 +74,6 @@ export const useCreateNodePage = () => {
         tags: data.tags || [],
         logoFile: logoFile || undefined, // Include the logo file
       };
-
-      console.log('Prepared node data:', nodeData);
-      console.log('Form configuration being sent to API:', nodeData.formConfiguration);
-      console.log('Logo file being sent to API:', logoFile);
 
       // Create the node using the store
       await createNode(nodeData);

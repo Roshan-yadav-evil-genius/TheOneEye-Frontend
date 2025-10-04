@@ -6,20 +6,77 @@ import {
   TNodeFilters, 
   TPaginatedResponse,
   TNodeStats,
-  TApiError 
+  TApiError,
+  TWorkflow,
+  TProject,
+  TUser
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
+  // Helper function to transform backend node data to frontend format
+  private static transformNodeData(backendNode: any): TNode {
+    return {
+      id: backendNode.id,
+      name: backendNode.name,
+      type: backendNode.type,
+      category: backendNode.category,
+      description: backendNode.description || '',
+      version: backendNode.version || '1.0.0',
+      isActive: backendNode.is_active,
+      createdAt: backendNode.created_at,
+      updatedAt: backendNode.updated_at,
+      createdBy: backendNode.created_by || 'Unknown',
+      formConfiguration: backendNode.form_configuration || {},
+      tags: backendNode.tags || [],
+      logo: backendNode.logo,
+    };
+  }
+
+  // Helper function to transform frontend node data to backend format
+  private static transformToBackendFormat(frontendNode: any): any {
+    return {
+      name: frontendNode.name,
+      type: frontendNode.type,
+      category: frontendNode.category,
+      description: frontendNode.description,
+      version: frontendNode.version,
+      is_active: frontendNode.isActive,
+      form_configuration: frontendNode.formConfiguration,
+      tags: frontendNode.tags,
+      logo: frontendNode.logo,
+    };
+  }
+
   // Node operations
   static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
-    return axiosApiClient.get<TPaginatedResponse<TNode>>('/nodes/', {
+    const response = await axiosApiClient.get<any>('/nodes/', {
       params: filters,
     });
+    
+    // Handle both array and paginated response formats
+    if (Array.isArray(response)) {
+      const transformedNodes = response.map(node => this.transformNodeData(node));
+      return {
+        count: transformedNodes.length,
+        next: null,
+        previous: null,
+        results: transformedNodes,
+      };
+    }
+    
+    // Handle paginated response
+    return {
+      count: response.count,
+      next: response.next,
+      previous: response.previous,
+      results: response.results.map((node: any) => this.transformNodeData(node)),
+    };
   }
 
   static async getNode(id: string): Promise<TNode> {
-    return axiosApiClient.get<TNode>(`/nodes/${id}/`);
+    const response = await axiosApiClient.get<any>(`/nodes/${id}/`);
+    return this.transformNodeData(response);
   }
 
   static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
@@ -39,14 +96,19 @@ export class ApiService {
         }
       });
       
-      return axiosApiClient.uploadFile<Node>('/nodes/', formData);
+      const response = await axiosApiClient.uploadFile<any>('/nodes/', formData);
+      return this.transformNodeData(response);
     } else {
-      return axiosApiClient.post<TNode>('/nodes/', nodeData);
+      const backendData = this.transformToBackendFormat(nodeData);
+      const response = await axiosApiClient.post<any>('/nodes/', backendData);
+      return this.transformNodeData(response);
     }
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
-    return axiosApiClient.put<TNode>(`/nodes/${id}/`, nodeData);
+    const backendData = this.transformToBackendFormat(nodeData);
+    const response = await axiosApiClient.put<any>(`/nodes/${id}/`, backendData);
+    return this.transformNodeData(response);
   }
 
   static async deleteNode(id: string): Promise<void> {
@@ -54,7 +116,8 @@ export class ApiService {
   }
 
   static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
-    return axiosApiClient.post<TNode[]>('/nodes/bulk_create/', nodesData);
+    const response = await axiosApiClient.post<any[]>('/nodes/bulk_create/', nodesData);
+    return response.map(node => this.transformNodeData(node));
   }
 
   static async bulkDeleteNodes(ids: string[]): Promise<void> {
@@ -126,7 +189,13 @@ export class ApiService {
 
   // Utility methods
   static async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    return axiosApiClient.get<{ status: string; timestamp: string }>('/health/');
+    try {
+      // Use the nodes endpoint as a health check since /health/ doesn't exist
+      await axiosApiClient.get('/nodes/');
+      return { status: 'ok', timestamp: new Date().toISOString() };
+    } catch (error) {
+      return { status: 'error', timestamp: new Date().toISOString() };
+    }
   }
 
   static async getApiVersion(): Promise<{ version: string; build: string }> {
