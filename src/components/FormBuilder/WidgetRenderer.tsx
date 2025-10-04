@@ -13,7 +13,7 @@ interface WidgetRendererProps {
   onUpdate: (updates: Partial<WidgetConfig>) => void;
   onDelete: () => void;
   onDuplicate: () => void;
-  dragHandleProps?: any;
+  dragHandleProps?: Record<string, unknown>;
 }
 
 const WidgetRenderer: React.FC<WidgetRendererProps> = ({

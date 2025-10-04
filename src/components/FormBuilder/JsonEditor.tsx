@@ -26,7 +26,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
       setJsonString(json);
       setError(null);
       setIsValid(true);
-    } catch (err) {
+    } catch {
       setError('Failed to serialize widgets to JSON');
       setIsValid(false);
     }
@@ -72,7 +72,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
     try {
       const parsed = JSON.parse(jsonString);
       onWidgetsChange(parsed.widgets);
-    } catch (err) {
+    } catch {
       setError('Failed to apply JSON changes');
     }
   };
@@ -83,7 +83,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
       setJsonString(json);
       setError(null);
       setIsValid(true);
-    } catch (err) {
+    } catch {
       setError('Failed to reset JSON');
     }
   };
@@ -193,7 +193,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({ widgets, onWidgetsChange }) => 
         </div>
 
         <div className="text-xs text-slate-500 space-y-1">
-          <p><strong>Structure:</strong> The JSON should contain a "widgets" array with widget objects.</p>
+          <p><strong>Structure:</strong> The JSON should contain a &quot;widgets&quot; array with widget objects.</p>
           <p><strong>Required fields:</strong> Each widget must have id, type, and label.</p>
           <p><strong>Example:</strong></p>
           <div className="bg-slate-900 p-2 rounded text-xs overflow-x-auto">

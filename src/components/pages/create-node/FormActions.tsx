@@ -6,11 +6,10 @@ import { IconEye, IconDeviceFloppy } from "@tabler/icons-react";
 interface FormActionsProps {
   isCreating: boolean;
   onPreview: () => void;
-  onSave: () => void;
-  formData: any;
+  formData: Record<string, unknown>;
 }
 
-export function FormActions({ isCreating, onPreview, onSave, formData }: FormActionsProps) {
+export function FormActions({ isCreating, onPreview, formData }: FormActionsProps) {
   return (
     <div className="flex justify-end gap-3 pt-6">
       <Button

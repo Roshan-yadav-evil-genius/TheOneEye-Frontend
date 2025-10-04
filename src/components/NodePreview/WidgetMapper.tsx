@@ -2,16 +2,17 @@
 
 import React from "react";
 import { FieldPreview } from "./FieldPreview";
+import { TWidgetConfig } from "@/types/forms/widgets";
 
 interface WidgetMapperProps {
-  widgets: any[];
+  widgets: TWidgetConfig[];
 }
 
 export function WidgetMapper({ widgets }: WidgetMapperProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {widgets.map((widget: any, index: number) => (
+        {widgets.map((widget: TWidgetConfig, index: number) => (
           <div key={widget.id || index} className="group">
             <div>
               {/* Field Header */}

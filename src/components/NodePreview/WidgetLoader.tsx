@@ -2,10 +2,11 @@
 
 import React from "react";
 import { TNode } from "@/types";
+import { TWidgetConfig } from "@/types/forms/widgets";
 
 interface WidgetLoaderProps {
   nodeData: Partial<TNode>;
-  children: (widgets: any[]) => React.ReactNode;
+  children: (widgets: TWidgetConfig[]) => React.ReactNode;
 }
 
 export function WidgetLoader({ nodeData, children }: WidgetLoaderProps) {
@@ -19,7 +20,7 @@ export function WidgetLoader({ nodeData, children }: WidgetLoaderProps) {
   }
 
   // Check if we have widgets in the form configuration
-  const widgets = (nodeData.formConfiguration as any)?.widgets;
+  const widgets = (nodeData.formConfiguration as { widgets?: TWidgetConfig[] })?.widgets;
   if (!widgets || !Array.isArray(widgets) || widgets.length === 0) {
     return (
       <div className="text-sm text-muted-foreground italic">

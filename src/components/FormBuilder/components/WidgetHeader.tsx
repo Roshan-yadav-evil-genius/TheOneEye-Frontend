@@ -29,7 +29,7 @@ const iconMap = {
 
 interface WidgetHeaderProps {
   widget: WidgetConfig;
-  dragHandleProps?: any;
+  dragHandleProps?: Record<string, unknown>;
 }
 
 const WidgetHeader: React.FC<WidgetHeaderProps> = ({ widget, dragHandleProps }) => {

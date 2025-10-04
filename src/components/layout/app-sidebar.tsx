@@ -56,7 +56,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Zustand store hooks
   const { user } = useUserStore();
-  const { sidebarOpen, setSidebarOpen } = useUIStore();
+  const { } = useUIStore();
 
   // Use store user data if available, fallback to static data
   const userData = user ? {

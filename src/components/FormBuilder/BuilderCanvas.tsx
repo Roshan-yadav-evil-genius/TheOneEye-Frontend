@@ -11,7 +11,6 @@ interface BuilderCanvasProps {
   onUpdateWidget: (id: string, updates: Partial<WidgetConfig>) => void;
   onDeleteWidget: (id: string) => void;
   onDuplicateWidget: (id: string) => void;
-  onMoveWidget: (fromIndex: number, toIndex: number) => void;
 }
 
 const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
@@ -21,7 +20,6 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({
   onUpdateWidget,
   onDeleteWidget,
   onDuplicateWidget,
-  onMoveWidget,
 }) => {
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {

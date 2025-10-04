@@ -323,7 +323,7 @@ export function NodesTable({
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
                   ref={(el) => {
-                    if (el) (el as any).indeterminate = isIndeterminate;
+                    if (el) (el as HTMLInputElement).indeterminate = isIndeterminate;
                   }}
                 />
               </TableHead>

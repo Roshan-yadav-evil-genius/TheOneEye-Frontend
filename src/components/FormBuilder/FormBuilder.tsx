@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
@@ -7,7 +7,7 @@ import BuilderCanvas from './BuilderCanvas';
 import FieldsMenuBar from './FieldsMenuBar';
 import JsonEditor from './JsonEditor';
 import { useFormBuilder } from './useFormBuilder';
-import { WidgetType, WidgetConfig } from './inputs';
+import { WidgetConfig } from './inputs';
 import { Card } from '../ui/card';
 
 interface FormBuilderProps {

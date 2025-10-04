@@ -4,7 +4,6 @@ import { useAlert } from "@/hooks/use-alert";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   IconBell, 
   IconAlertTriangle, 
@@ -192,7 +191,11 @@ export function DashboardControls() {
     const fetchData = () => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          Math.random() > 0.5 ? resolve("Data fetched!") : reject("Network error");
+          if (Math.random() > 0.5) {
+            resolve("Data fetched!");
+          } else {
+            reject("Network error");
+          }
         }, 2000);
       });
     };

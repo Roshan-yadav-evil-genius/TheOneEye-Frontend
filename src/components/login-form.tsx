@@ -42,7 +42,7 @@ export function LoginForm({
       await login(formData.email, formData.password)
       toast.success("Login successful!")
       router.push("/dashboard")
-    } catch (error) {
+    } catch {
       toast.error("Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)

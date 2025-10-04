@@ -40,7 +40,7 @@ export function CreateNodePage() {
 
   // Zustand store hooks
   const { createNode, isLoading: isCreatingNode } = useNodesStore();
-  const { createFormConfiguration, isLoading: isCreatingForm } = useFormStore();
+  const { isLoading: isCreatingForm } = useFormStore();
   const { setActivePage } = useUIStore();
 
   const handleVersionChange = (value: string) => {
@@ -106,7 +106,7 @@ export function CreateNodePage() {
     }
   };
 
-  const onError = (errors: any) => {
+  const onError = (errors: Record<string, unknown>) => {
     console.log("Form validation errors:", errors);
     uiHelpers.showError("Validation Error", "Please check the form for errors");
   };

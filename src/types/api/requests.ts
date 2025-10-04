@@ -13,7 +13,7 @@ export interface TNodeCreateData {
   logoFile?: File; // Optional logo file
 }
 
-export interface TNodeUpdateData extends Partial<TNodeCreateData> {}
+export type TNodeUpdateData = Partial<TNodeCreateData>
 
 export interface TNodeFilters {
   type?: string;

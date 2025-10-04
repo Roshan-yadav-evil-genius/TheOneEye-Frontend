@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TNode } from "@/types";
 import { useNodesStore, useUIStore } from "@/stores";
 import { NodesList } from "@/components/nodes/nodes-list";
 
@@ -46,7 +45,7 @@ export const NodesPage = memo(function NodesPage() {
       await deleteNode(selectedNode.id, true); // showToast = true
       setIsDeleteDialogOpen(false);
       selectNode(null);
-    } catch (error) {
+    } catch {
       // Error toast is handled by the store
       // Delete node error
     }
@@ -71,7 +70,7 @@ export const NodesPage = memo(function NodesPage() {
       <NodesList 
         nodes={nodes} 
         onEdit={openEditDialog}
-        onView={(id) => {
+        onView={() => {
           // TODO: Implement node view functionality
         }}
         onDelete={openDeleteDialog}
@@ -84,7 +83,7 @@ export const NodesPage = memo(function NodesPage() {
           <DialogHeader>
             <DialogTitle>Delete Node</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedNode?.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedNode?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
