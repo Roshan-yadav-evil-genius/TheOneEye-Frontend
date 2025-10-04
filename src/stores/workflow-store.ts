@@ -114,21 +114,42 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // TODO: Replace with actual API call
-          // const response = await workflowApi.updateTWorkflow(id, workflowData);
+          // Transform frontend data to backend format
+          const backendData = {
+            name: workflowData.name,
+            description: workflowData.description,
+            category: workflowData.category,
+            status: workflowData.status,
+            runs_count: workflowData.runsCount,
+            success_rate: workflowData.successRate,
+            tags: workflowData.tags,
+            created_by: workflowData.createdBy,
+          };
+
+          const response = await ApiService.updateWorkflow(id, backendData);
           
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          // Transform backend response to frontend format
           const updatedTWorkflow: TWorkflow = {
-            ...workflowData,
-            id,
-            updatedAt: new Date(),
-          } as TWorkflow;
+            id: response.id,
+            name: response.name,
+            description: response.description,
+            category: response.category,
+            nodes: workflowData.nodes || [],
+            connections: workflowData.connections || [],
+            status: response.status,
+            lastRun: response.last_run,
+            nextRun: response.next_run,
+            runsCount: response.runs_count,
+            successRate: response.success_rate,
+            tags: response.tags || [],
+            createdAt: new Date(response.created_at),
+            updatedAt: new Date(response.updated_at),
+            createdBy: response.created_by,
+          };
 
           set((state) => ({
             workflows: state.workflows.map((workflow) =>
-              workflow.id === id ? { ...workflow, ...updatedTWorkflow } : workflow
+              workflow.id === id ? updatedTWorkflow : workflow
             ),
             activeTWorkflow: state.activeTWorkflow?.id === id ? updatedTWorkflow : state.activeTWorkflow,
             isLoading: false,

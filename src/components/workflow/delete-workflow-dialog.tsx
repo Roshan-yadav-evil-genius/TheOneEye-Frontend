@@ -32,7 +32,7 @@ export function DeleteWorkflowDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Workflow</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <strong>"{workflowName}"</strong>? 
+            Are you sure you want to delete <strong>&quot;{workflowName}&quot;</strong>? 
             This action cannot be undone and will permanently remove the workflow 
             and all its associated data.
           </AlertDialogDescription>

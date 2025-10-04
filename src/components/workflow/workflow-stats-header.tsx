@@ -17,7 +17,6 @@ import {
   IconSquare, 
   IconClock, 
   IconActivity,
-  IconTrendingUp,
   IconRoute,
   IconRoute2,
   IconMinus,

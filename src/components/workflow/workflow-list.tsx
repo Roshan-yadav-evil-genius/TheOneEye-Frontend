@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { WorkflowTable } from "@/components/workflow/workflow-table"
 import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog"
+import { EditWorkflowDialog } from "@/components/workflow/edit-workflow-dialog"
 import { DeleteWorkflowDialog } from "@/components/workflow/delete-workflow-dialog"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
@@ -25,16 +26,27 @@ export function WorkflowList({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [workflowToDelete, setWorkflowToDelete] = useState<{ id: string; name: string } | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [workflowToEdit, setWorkflowToEdit] = useState<TWorkflow | null>(null)
 
   const handleRun = (id: string) => {
     // TODO: Implement workflow execution
+    console.log('Run workflow:', id);
   }
 
   const handleStop = (id: string) => {
     // TODO: Implement workflow stop
+    console.log('Stop workflow:', id);
   }
 
-  const handleEdit = (id: string) => {
+  const handleEditInfo = (workflow: TWorkflow) => {
+    setWorkflowToEdit(workflow)
+    setEditDialogOpen(true)
+  }
+
+  const handleEditWorkflow = (id: string) => {
     router.push(`/workflow/${id}`)
   }
 
@@ -90,7 +102,8 @@ export function WorkflowList({
           workflows={workflows}
           onRun={handleRun}
           onStop={handleStop}
-          onEdit={handleEdit}
+          onEditInfo={handleEditInfo}
+          onEditWorkflow={handleEditWorkflow}
           onView={handleView}
           onDelete={handleDelete}
           onCreate={handleCreate}
@@ -119,6 +132,13 @@ export function WorkflowList({
             useUIStore.getState().closeModal('createWorkflow');
           }
         }}
+      />
+
+      {/* Edit Workflow Dialog */}
+      <EditWorkflowDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        workflow={workflowToEdit}
       />
 
       {/* Delete Workflow Dialog */}

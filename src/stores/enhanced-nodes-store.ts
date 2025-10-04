@@ -785,7 +785,7 @@ export const nodesSelectors = {
   getFilteredNodes: (state: EnhancedNodesStore) => {
     const { nodes, filters, searchQuery, sortBy, sortOrder } = state;
     
-    let filtered = nodes.filter((node) => {
+    const filtered = nodes.filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
       if (filters.category && node.category !== filters.category) return false;
       if (searchQuery && !node.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;

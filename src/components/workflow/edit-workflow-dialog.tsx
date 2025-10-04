@@ -9,48 +9,47 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkflowStore } from "@/stores";
 import { uiHelpers } from "@/stores/ui-store";
+import { TWorkflow } from "@/types";
 import { WorkflowForm, WorkflowFormData } from "./workflow-form";
 
-interface CreateWorkflowDialogProps {
+interface EditWorkflowDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  workflow: TWorkflow | null;
 }
 
-export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialogProps) {
-  const { createTWorkflow } = useWorkflowStore();
+export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflowDialogProps) {
+  const { updateTWorkflow } = useWorkflowStore();
 
   const handleSubmit = async (formData: WorkflowFormData) => {
+    if (!workflow) {
+      return;
+    }
+
     try {
-      const workflowData = {
+      const updatedWorkflow = {
+        ...workflow,
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        nodes: [],
-        connections: [],
-        status: 'inactive' as const,
-        runsCount: 0,
-        successRate: 0,
-        tags: [],
-        createdAt: new Date(),
         updatedAt: new Date(),
-        createdBy: "current-user", // TODO: Get from auth context
       };
 
-      await createTWorkflow(workflowData);
+      await updateTWorkflow(workflow.id, updatedWorkflow);
       
       uiHelpers.showSuccess(
-        "Workflow Created",
-        `Workflow "${formData.name}" has been created successfully.`
+        "Workflow Updated",
+        `Workflow "${formData.name}" has been updated successfully.`
       );
 
       // Close dialog
       onOpenChange(false);
       
     } catch (error) {
-      console.error("Failed to create workflow:", error);
+      console.error("Failed to update workflow:", error);
       uiHelpers.showError(
-        "Creation Failed",
-        "Failed to create workflow. Please try again."
+        "Update Failed",
+        "Failed to update workflow. Please try again."
       );
     }
   };
@@ -59,19 +58,28 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
     onOpenChange(false);
   };
 
+  if (!workflow) {
+    return null;
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create New Workflow</DialogTitle>
+          <DialogTitle>Edit Workflow Information</DialogTitle>
           <DialogDescription>
-            Create a new workflow to automate your processes. Fill in the details below.
+            Update the workflow details below.
           </DialogDescription>
         </DialogHeader>
         
         <WorkflowForm
+          initialData={{
+            name: workflow.name,
+            description: workflow.description,
+            category: workflow.category || "",
+          }}
           onSubmit={handleSubmit}
-          submitButtonText="Create Workflow"
+          submitButtonText="Update Workflow"
           onCancel={handleClose}
         />
       </DialogContent>

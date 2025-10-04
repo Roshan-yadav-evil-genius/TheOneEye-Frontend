@@ -15,10 +15,7 @@ import {
   IconFilter, 
   IconPlus,
   IconDatabase,
-  IconApi,
   IconSettings,
-  IconMail,
-  IconFileText,
   IconClock,
   IconCheck,
   IconChevronDown,
@@ -95,10 +92,6 @@ export function WorkflowSidebar({
     setExpandedGroups(newExpanded);
   };
 
-  const getNodeIcon = (type: string) => {
-    const IconComponent = nodeIcons[type as keyof typeof nodeIcons] || IconSettings;
-    return <IconComponent className="h-4 w-4" />;
-  };
   
   const renderCategoryIcon = (category: string) => {
     const IconComponent = getCategoryIcon(category);

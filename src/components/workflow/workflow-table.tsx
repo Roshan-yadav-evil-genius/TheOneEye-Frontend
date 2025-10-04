@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,6 +31,7 @@ import {
   IconPlayerPlay,
   IconPlayerStop,
   IconEdit,
+  IconSettings,
   IconEye,
   IconTrash,
   IconChevronLeft,
@@ -55,7 +55,8 @@ interface WorkflowTableProps {
   workflows: TWorkflow[];
   onRun?: (id: string) => void;
   onStop?: (id: string) => void;
-  onEdit?: (id: string) => void;
+  onEditInfo?: (workflow: TWorkflow) => void;
+  onEditWorkflow?: (id: string) => void;
   onView?: (id: string) => void;
   onDelete?: (id: string) => void;
   onCreate?: () => void;
@@ -65,12 +66,12 @@ export function WorkflowTable({
   workflows,
   onRun,
   onStop,
-  onEdit,
+  onEditInfo,
+  onEditWorkflow,
   onView,
   onDelete,
   onCreate,
 }: WorkflowTableProps) {
-  const router = useRouter();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -387,9 +388,13 @@ export function WorkflowTable({
                         <IconEye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onEdit?.(workflow.id)}>
+                      <DropdownMenuItem onClick={() => onEditInfo?.(workflow)}>
+                        <IconSettings className="mr-2 h-4 w-4" />
+                        Edit Info
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEditWorkflow?.(workflow.id)}>
                         <IconEdit className="mr-2 h-4 w-4" />
-                        Edit
+                        Edit Workflow
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDelete?.(workflow.id)}
