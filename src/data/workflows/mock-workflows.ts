@@ -147,5 +147,17 @@ export const mockWorkflows: TWorkflow[] = [
     successRate: 15.4,
     category: "Content",
     tags: ["moderation", "ai", "content"]
+  },
+  {
+    id: "22d8a0c1-e438-47fd-9c6f-cc56611ac4a8",
+    name: "Sample Workflow Layout",
+    description: "A sample workflow to demonstrate the workflow layout interface",
+    status: "active",
+    lastRun: "1 hour ago",
+    nextRun: "Tomorrow at 10:00 AM",
+    runsCount: 42,
+    successRate: 95.2,
+    category: "Demo",
+    tags: ["sample", "demo", "layout"]
   }
 ]

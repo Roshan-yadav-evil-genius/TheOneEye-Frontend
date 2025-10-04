@@ -10,8 +10,8 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import { useWorkflowState } from "../../hooks/useWorkflowState";
-import { useWorkflowDragDrop } from "../../hooks/useWorkflowDragDrop";
+import { useWorkflowState } from "@/hooks/useWorkflowState";
+import { useWorkflowDragDrop } from "@/hooks/useWorkflowDragDrop";
 import { nodeTypes } from "./nodeTypes";
 import DragOverlay from "./DragOverlay";
 
