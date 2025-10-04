@@ -1,5 +1,5 @@
 import React from 'react';
-import { TWidgetConfig } from './inputs';
+import { TWidgetConfig } from '@/types/forms';
 import CanvasHeader from './components/CanvasHeader';
 import EmptyState from './components/EmptyState';
 import WidgetsList from './components/WidgetsList';

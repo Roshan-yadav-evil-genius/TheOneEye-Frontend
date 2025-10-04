@@ -1,9 +1,10 @@
 import React from 'react';
-import { WIDGET_DEFINITIONS, TWidgetType } from './inputs';
+import { TWidgetType } from '@/types/forms';
+import { WIDGET_DEFINITIONS } from './inputs';
 import WidgetButton from './components/WidgetButton';
-import { Toggle } from '../ui/toggle';
+import { Toggle } from '@/components/ui/toggle';
 import { Code, Palette } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FieldsMenuBarProps {
   onAddWidget: (type: TWidgetType) => void;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TWidgetConfig } from '../inputs';
+import { TWidgetConfig } from '@/types/forms';
 import { GripVertical } from 'lucide-react';
 import { 
   Type, 

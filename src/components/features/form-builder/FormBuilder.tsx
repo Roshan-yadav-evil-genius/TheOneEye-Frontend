@@ -5,7 +5,7 @@ import JsonEditor from './JsonEditor';
 import SortableBuilderCanvas from './SortableBuilderCanvas';
 import DraggableFormBuilder from './DraggableFormBuilder';
 import { useFormBuilder } from './useFormBuilder';
-import { TWidgetConfig } from './inputs';
+import { TWidgetConfig } from '@/types/forms';
 
 interface FormBuilderProps {
   onFormChange?: (widgets: TWidgetConfig[]) => void;

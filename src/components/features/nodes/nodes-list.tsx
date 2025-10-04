@@ -13,7 +13,7 @@ interface NodesListProps {
 }
 
 export function NodesList({
-  nodes,
+  nodes = [],
   onEdit,
   onView,
   onDelete,

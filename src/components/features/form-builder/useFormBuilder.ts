@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from 'react';
-import { TWidgetConfig, TWidgetType, generateWidgetId, WIDGET_DEFINITIONS } from './inputs';
+import { TWidgetConfig, TWidgetType } from '@/types/forms';
+import { generateWidgetId, WIDGET_DEFINITIONS } from './inputs';
 
 export interface FormBuilderState {
   widgets: TWidgetConfig[];

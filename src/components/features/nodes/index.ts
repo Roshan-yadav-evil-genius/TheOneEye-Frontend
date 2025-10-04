@@ -5,3 +5,7 @@ export { FormFieldsSection } from './FormFieldsSection';
 export { WidgetLoader } from './WidgetLoader';
 export { WidgetMapper } from './WidgetMapper';
 export { NodePreview } from './NodePreview';
+export { NodeForm } from './NodeForm';
+export { TagsInput } from './TagsInput';
+export { LogoUpload } from './LogoUpload';
+export { FormActions } from './FormActions';

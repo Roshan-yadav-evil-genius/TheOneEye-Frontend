@@ -92,6 +92,7 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     workflowToDelete,
     isDeleting,
     editDialogOpen,
+    setEditDialogOpen,
     workflowToEdit,
     
     // Actions

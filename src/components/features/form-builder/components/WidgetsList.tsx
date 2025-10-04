@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { TWidgetConfig } from '../inputs';
+import { TWidgetConfig } from '@/types/forms';
 import WidgetRenderer from '../WidgetRenderer';
 
 interface WidgetsListProps {

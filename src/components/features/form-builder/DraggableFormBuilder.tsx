@@ -3,8 +3,8 @@ import React from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { Card } from '../ui/card';
-import { TWidgetConfig } from './inputs';
+import { Card } from '@/components/ui/card';
+import { TWidgetConfig } from '@/types/forms';
 
 interface DraggableFormBuilderProps {
   widgets: TWidgetConfig[];

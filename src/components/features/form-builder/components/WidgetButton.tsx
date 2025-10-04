@@ -1,7 +1,6 @@
 import React from 'react';
-import { WIDGET_DEFINITIONS, TWidgetType } from '../inputs';
-import { Button } from '../../ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
+import { TWidgetType } from '@/types/forms';
+import { WIDGET_DEFINITIONS } from '../inputs';
 import { 
   Type, 
   Mail, 
@@ -14,6 +13,8 @@ import {
   Calendar, 
   Upload 
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const iconMap = {
   Type,

@@ -1,6 +1,6 @@
 import React from 'react';
-import { TWidgetConfig } from './inputs';
-import { Card } from '../ui/card';
+import { TWidgetConfig } from '@/types/forms';
+import { Card } from '@/components/ui/card';
 import WidgetHeader from './components/WidgetHeader';
 import WidgetConfiguration from './components/WidgetConfiguration';
 import WidgetActions from './components/WidgetActions';

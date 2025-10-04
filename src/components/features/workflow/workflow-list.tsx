@@ -22,6 +22,7 @@ export function WorkflowList({
     workflowToDelete,
     isDeleting,
     editDialogOpen,
+    setEditDialogOpen,
     workflowToEdit,
     handleRun,
     handleStop,

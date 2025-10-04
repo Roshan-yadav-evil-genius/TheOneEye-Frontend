@@ -1,7 +1,7 @@
 import React from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import BuilderCanvas from './BuilderCanvas';
-import { TWidgetConfig } from './inputs';
+import { TWidgetConfig } from '@/types/forms';
 
 interface SortableBuilderCanvasProps {
   widgets: TWidgetConfig[];
