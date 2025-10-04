@@ -68,16 +68,16 @@ export class ApiService {
   }
 
   // Workflow operations
-  static async getWorkflows(): Promise<any[]> {
-    return axiosApiClient.get<any[]>('/workflow/');
+  static async getWorkflows(): Promise<TWorkflow[]> {
+    return axiosApiClient.get<TWorkflow[]>('/workflow/');
   }
 
-  static async createWorkflow(workflowData: any): Promise<any> {
-    return axiosApiClient.post<any>('/workflow/', workflowData);
+  static async createWorkflow(workflowData: Partial<TWorkflow>): Promise<TWorkflow> {
+    return axiosApiClient.post<TWorkflow>('/workflow/', workflowData);
   }
 
-  static async updateWorkflow(id: string, workflowData: any): Promise<any> {
-    return axiosApiClient.put<any>(`/workflow/${id}/`, workflowData);
+  static async updateWorkflow(id: string, workflowData: Partial<TWorkflow>): Promise<TWorkflow> {
+    return axiosApiClient.put<TWorkflow>(`/workflow/${id}/`, workflowData);
   }
 
   static async deleteWorkflow(id: string): Promise<void> {
@@ -85,19 +85,19 @@ export class ApiService {
   }
 
   // Project operations (placeholder for future implementation)
-  static async getProjects(): Promise<any[]> {
+  static async getProjects(): Promise<TProject[]> {
     // TODO: Implement when backend is ready
     return Promise.resolve([]);
   }
 
-  static async createProject(projectData: any): Promise<any> {
+  static async createProject(projectData: Partial<TProject>): Promise<TProject> {
     // TODO: Implement when backend is ready
     return Promise.resolve(projectData);
   }
 
-  static async updateProject(id: string, projectData: any): Promise<any> {
+  static async updateProject(id: string, projectData: Partial<TProject>): Promise<TProject> {
     // TODO: Implement when backend is ready
-    return Promise.resolve(projectData);
+    return Promise.resolve(projectData as TProject);
   }
 
   static async deleteProject(id: string): Promise<void> {
@@ -106,14 +106,17 @@ export class ApiService {
   }
 
   // User operations (placeholder for future implementation)
-  static async getCurrentUser(): Promise<any> {
+  static async getCurrentUser(): Promise<TUser | null> {
     // TODO: Implement when backend is ready
     return Promise.resolve(null);
   }
 
-  static async login(credentials: any): Promise<any> {
+  static async login(credentials: { email: string; password: string }): Promise<{ user: TUser; token: string }> {
     // TODO: Implement when backend is ready
-    return Promise.resolve(credentials);
+    return Promise.resolve({
+      user: { id: '1', name: 'User', email: credentials.email },
+      token: 'mock-token'
+    });
   }
 
   static async logout(): Promise<void> {

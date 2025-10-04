@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Search, Play, RefreshCw, X } from "lucide-react";
+import { Copy, Download, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,7 @@ import { useState, useMemo } from 'react';
 interface JsonViewerProps {
   title: string;
   statusColor: string;
-  jsonData: any;
+  jsonData: Record<string, unknown> | unknown[] | string | null;
   activeTab: "schema" | "json";
   onTabChange: (value: "schema" | "json") => void;
   showExecuteButton?: boolean;
@@ -28,11 +28,8 @@ export function JsonViewer({
   jsonData,
   activeTab,
   onTabChange,
-  showExecuteButton = false,
-  onExecute,
   onCopy,
-  onDownload,
-  onRefresh
+  onDownload
 }: JsonViewerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -70,11 +67,6 @@ export function JsonViewer({
     }
   };
 
-  const handleExecute = () => {
-    if (onExecute) {
-      onExecute();
-    }
-  };
 
   const filteredJsonData = useMemo(() => {
     if (!searchTerm || activeTab !== "json") {

@@ -6,7 +6,7 @@ export interface TWorkflowNode {
     x: number;
     y: number;
   };
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }
 
 export interface TWorkflowEdge {

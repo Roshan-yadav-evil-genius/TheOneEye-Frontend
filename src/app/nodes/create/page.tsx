@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { NodeForm, TagsInput, LogoUpload, FormActions } from "@/components/pages/create-node";
+import { NodeForm, TagsInput, LogoUpload, FormActions } from "@/components/create-node";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 function CreateNodePageContent() {

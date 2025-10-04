@@ -54,7 +54,7 @@ class RealNodesApiClient {
   }
 
   // Transform backend node to frontend node format
-  private transformNode(backendNode: any): TNode {
+  private transformNode(backendNode: Record<string, unknown>): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
@@ -73,7 +73,7 @@ class RealNodesApiClient {
   }
 
   // Transform frontend node data to backend format
-  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): any {
+  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): Record<string, unknown> {
     return {
       name: nodeData.name,
       type: nodeData.type,
@@ -94,19 +94,19 @@ class RealNodesApiClient {
     const url = `${this.baseUrl}/nodes/${queryString ? `?${queryString}` : ''}`;
     
     const response = await fetch(url);
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<TPaginatedResponse<Record<string, unknown>>>(response);
     
     return {
       count: data.count || data.length,
       next: data.next,
       previous: data.previous,
-      results: data.results ? data.results.map((node: any) => this.transformNode(node)) : data.map((node: any) => this.transformNode(node))
+      results: data.results ? data.results.map((node: Record<string, unknown>) => this.transformNode(node)) : data.map((node: Record<string, unknown>) => this.transformNode(node))
     };
   }
 
   async getNode(id: string): Promise<TNode> {
     const response = await fetch(`${this.baseUrl}/nodes/${id}/`);
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<Record<string, unknown>>(response);
     return this.transformNode(data);
   }
 
@@ -149,7 +149,7 @@ class RealNodesApiClient {
       body: requestBody,
     });
     
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<Record<string, unknown>>(response);
     return this.transformNode(data);
   }
 
@@ -192,7 +192,7 @@ class RealNodesApiClient {
       body: requestBody,
     });
     
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<Record<string, unknown>>(response);
     return this.transformNode(data);
   }
 
@@ -222,13 +222,13 @@ class RealNodesApiClient {
       body: JSON.stringify(transformedData),
     });
     
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<Record<string, unknown>>(response);
     return data.map((node: any) => this.transformNode(node));
   }
 
   async getNodeStats(): Promise<TNodeStats> {
     const response = await fetch(`${this.baseUrl}/nodes/stats/`);
-    const data = await this.handleResponse<any>(response);
+    const data = await this.handleResponse<Record<string, unknown>>(response);
     
     return {
       total_nodes: data.total_nodes,

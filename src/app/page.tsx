@@ -54,7 +54,7 @@ const FeatureCards = () => {
         <CardContent className='flex justify-center'>
           <FaUsersGear size={80}/>
         </CardContent>
-        <CardHeader className='text-2xl text-center font-bold'>Fully Managed <br />"Automation-as-a-Service"</CardHeader>
+        <CardHeader className='text-2xl text-center font-bold'>Fully Managed <br />&quot;Automation-as-a-Service&quot;</CardHeader>
         <CardDescription className='px-5'>A complete, hands-off automation solution — we build, manage, and maintain your workflows so you focus only on results, not tools.</CardDescription>
       </Card>
       <Card className='hover:border-yellow-800 flex-1'>

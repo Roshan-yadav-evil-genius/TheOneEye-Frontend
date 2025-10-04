@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { IconInfoCircle, IconTag } from "@tabler/icons-react";
 import { TNode } from "@/types";
@@ -22,9 +23,11 @@ export function NodeHeader({ nodeData, logoPreview }: NodeHeaderProps) {
           {/* Logo */}
           <div className="flex-shrink-0">
             {logoPreview ? (
-              <img
+              <Image
                 src={logoPreview}
                 alt="Node logo"
+                width={40}
+                height={40}
                 className="h-10 w-10 object-cover rounded border-2 border-border shadow-sm"
               />
             ) : (

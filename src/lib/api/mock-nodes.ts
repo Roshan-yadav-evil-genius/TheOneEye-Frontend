@@ -1,5 +1,5 @@
 import { TNode } from '@/types';
-import { mockNodes } from '@/dummy/nodes/mock-nodes';
+import { mockNodes } from '@/data';
 import { 
   TTNodeCreateData, 
   TTNodeUpdateData, 
@@ -24,7 +24,7 @@ class MockNodesApiClient {
   }
 
   // Format dates properly
-  private formatNode(node: any): TNode {
+  private formatNode(node: Record<string, unknown>): TNode {
     return {
       ...node,
       createdAt: typeof node.createdAt === 'string' ? node.createdAt : node.createdAt.toISOString(),
@@ -71,8 +71,8 @@ class MockNodesApiClient {
         : [filters.ordering, 'asc'];
       
       filteredNodes.sort((a, b) => {
-        const aVal = (a as any)[field];
-        const bVal = (b as any)[field];
+        const aVal = (a as Record<string, unknown>)[field];
+        const bVal = (b as Record<string, unknown>)[field];
         
         if (aVal < bVal) return direction === 'asc' ? -1 : 1;
         if (aVal > bVal) return direction === 'asc' ? 1 : -1;

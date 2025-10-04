@@ -66,7 +66,7 @@ export interface TFormConfiguration {
   id: string;
   name: string;
   description: string;
-  json: Record<string, any>;
+  json: Record<string, unknown>;
   nodeId?: string;
   createdAt: Date;
   updatedAt: Date;

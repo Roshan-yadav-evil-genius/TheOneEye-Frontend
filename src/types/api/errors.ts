@@ -1,9 +1,9 @@
 // API Error Types
 export class TApiError extends Error {
   public status?: number;
-  public data?: any;
+  public data?: unknown;
 
-  constructor(message: string, status?: number, data?: any) {
+  constructor(message: string, status?: number, data?: unknown) {
     super(message);
     this.name = 'TApiError';
     this.status = status;

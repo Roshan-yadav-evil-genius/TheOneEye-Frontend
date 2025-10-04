@@ -22,7 +22,7 @@ interface FormActions {
   
   // Form validation and testing
   validateConfiguration: (config: TFormConfiguration) => Promise<{ isValid: boolean; errors: string[] }>;
-  testConfiguration: (config: TFormConfiguration, testData: Record<string, any>) => Promise<{ success: boolean; result: any; errors: string[] }>;
+  testConfiguration: (config: TFormConfiguration, testData: Record<string, unknown>) => Promise<{ success: boolean; result: unknown; errors: string[] }>;
   
   // Template management
   loadTemplates: () => Promise<TFormConfiguration[]>;
@@ -423,7 +423,7 @@ export const useFormStore = create<FormStore>()(
         }
       },
 
-      testConfiguration: async (config: TFormConfiguration, testData: Record<string, any>) => {
+      testConfiguration: async (config: TFormConfiguration, testData: Record<string, unknown>) => {
         try {
           // TODO: Implement actual form testing logic
           // This could include rendering the form and validating the test data

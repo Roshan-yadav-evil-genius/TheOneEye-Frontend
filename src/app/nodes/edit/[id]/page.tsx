@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -390,9 +391,11 @@ function EditNodePageContent() {
                   <div className="space-y-2">
                     {logoPreview ? (
                       <div className="flex items-center gap-2">
-                        <img 
+                        <Image 
                           src={logoPreview} 
                           alt="Logo preview" 
+                          width={48}
+                          height={48}
                           className="h-12 w-12 object-cover rounded border"
                         />
                         <Button

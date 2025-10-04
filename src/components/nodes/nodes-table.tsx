@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,7 +47,7 @@ import {
   IconTag,
 } from "@tabler/icons-react";
 import { TNode, nodeTypes } from "@/types";
-import { formatNodeDate } from "@/data/nodes";
+import { formatNodeDate } from "@/lib/dates";
 import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
 
 interface ColumnConfig {
@@ -158,9 +159,11 @@ export function NodesTable({
   const renderNodeLogo = (node: TNode) => {
     if (node.logo) {
       return (
-        <img 
+        <Image 
           src={node.logo} 
           alt={`${node.name} logo`}
+          width={32}
+          height={32}
           className="h-8 w-8 rounded-lg object-cover"
           onError={(e) => {
             // Fallback to icon if image fails to load

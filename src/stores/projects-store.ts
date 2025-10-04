@@ -193,11 +193,11 @@ export const useTProjectsStore = create<TProjectsStore>()(
           // Simulate API call with mock data
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          // Import mock data from dummy folder
-          const { mockTProjects } = await import('@/dummy');
+          // Import mock data from data folder
+          const { mockProjects } = await import('@/data');
 
           set({
-            projects: mockTProjects,
+            projects: mockProjects,
             isLoading: false,
             error: null,
           });

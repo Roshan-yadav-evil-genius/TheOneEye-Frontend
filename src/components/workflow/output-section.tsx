@@ -5,18 +5,10 @@ import { JsonViewer } from "./json-viewer";
 interface OutputSectionProps {
   activeOutputTab: "schema" | "json";
   onOutputTabChange: (value: "schema" | "json") => void;
-  jsonData: any;
+  jsonData: Record<string, unknown> | unknown[] | string | null;
 }
 
 export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: OutputSectionProps) {
-  const handleExecute = () => {
-    // This would trigger the node execution
-  };
-
-  const handleRefresh = () => {
-    // This would refresh the output data
-  };
-
   return (
     <JsonViewer
       title="OUTPUT"
@@ -24,9 +16,6 @@ export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: 
       jsonData={jsonData}
       activeTab={activeOutputTab}
       onTabChange={onOutputTabChange}
-      showExecuteButton={true}
-      onExecute={handleExecute}
-      onRefresh={handleRefresh}
     />
   );
 }

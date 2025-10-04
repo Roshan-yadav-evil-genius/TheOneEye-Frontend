@@ -25,8 +25,8 @@ class AxiosNodesApiClient {
   }
 
   // Helper method to build query parameters
-  private buildQueryParams(filters: TNodeFilters): Record<string, any> {
-    const params: Record<string, any> = {};
+  private buildQueryParams(filters: TNodeFilters): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
     
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -43,7 +43,7 @@ class AxiosNodesApiClient {
   }
 
   // Transform backend node to frontend node format
-  private transformNode(backendNode: any): TNode {
+  private transformNode(backendNode: Record<string, unknown>): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
@@ -62,7 +62,7 @@ class AxiosNodesApiClient {
   }
 
   // Transform frontend node data to backend format
-  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): any {
+  private transformNodeData(nodeData: TNodeCreateData | TNodeUpdateData): Record<string, unknown> {
     return {
       name: nodeData.name,
       type: nodeData.type,
@@ -80,7 +80,7 @@ class AxiosNodesApiClient {
   async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
     const queryParams = this.buildQueryParams(filters);
     
-    const data = await axiosApiClient.get<any>('/nodes/', {
+    const data = await axiosApiClient.get<TPaginatedResponse<Record<string, unknown>>>('/nodes/', {
       params: queryParams,
     });
     
@@ -88,12 +88,12 @@ class AxiosNodesApiClient {
       count: data.count || data.length,
       next: data.next,
       previous: data.previous,
-      results: data.results ? data.results.map((node: any) => this.transformNode(node)) : data.map((node: any) => this.transformNode(node))
+      results: data.results ? data.results.map((node: Record<string, unknown>) => this.transformNode(node)) : data.map((node: Record<string, unknown>) => this.transformNode(node))
     };
   }
 
   async getNode(id: string): Promise<TNode> {
-    const data = await axiosApiClient.get<any>(`/nodes/${id}/`);
+    const data = await axiosApiClient.get<Record<string, unknown>>(`/nodes/${id}/`);
     return this.transformNode(data);
   }
 
@@ -103,7 +103,7 @@ class AxiosNodesApiClient {
     // Check if there's a logo file to upload
     const hasLogoFile = transformedData.logo instanceof File;
     
-    let data: any;
+    let data: Record<string, unknown>;
     
     if (hasLogoFile) {
       // Use FormData for file upload
@@ -121,10 +121,10 @@ class AxiosNodesApiClient {
         }
       });
       
-      data = await axiosApiClient.uploadFile<any>('/nodes/', formData);
+      data = await axiosApiClient.uploadFile<Record<string, unknown>>('/nodes/', formData);
     } else {
       // Use JSON for regular data
-      data = await axiosApiClient.post<any>('/nodes/', transformedData);
+      data = await axiosApiClient.post<Record<string, unknown>>('/nodes/', transformedData);
     }
     
     return this.transformNode(data);
@@ -133,7 +133,7 @@ class AxiosNodesApiClient {
   async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
-    const data = await axiosApiClient.put<any>(`/nodes/${id}/`, transformedData);
+    const data = await axiosApiClient.put<Record<string, unknown>>(`/nodes/${id}/`, transformedData);
     return this.transformNode(data);
   }
 
@@ -144,12 +144,12 @@ class AxiosNodesApiClient {
   async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
     const transformedData = nodesData.map(nodeData => this.transformNodeData(nodeData));
     
-    const data = await axiosApiClient.post<any>('/nodes/bulk_create/', transformedData);
-    return data.map((node: any) => this.transformNode(node));
+    const data = await axiosApiClient.post<Record<string, unknown>[]>('/nodes/bulk_create/', transformedData);
+    return data.map((node: Record<string, unknown>) => this.transformNode(node));
   }
 
   async getNodeStats(): Promise<TNodeStats> {
-    const data = await axiosApiClient.get<any>('/nodes/stats/');
+    const data = await axiosApiClient.get<Record<string, unknown>>('/nodes/stats/');
     
     return {
       total_nodes: data.total_nodes,

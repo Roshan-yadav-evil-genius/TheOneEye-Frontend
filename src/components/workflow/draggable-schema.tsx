@@ -7,7 +7,7 @@ import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText } from 'lucide-
 interface SchemaField {
   key: string;
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
-  value?: any;
+  value?: unknown;
   children?: SchemaField[];
   path: string;
 }
@@ -164,14 +164,14 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
 }
 
 interface DraggableSchemaProps {
-  jsonData: any;
+  jsonData: unknown;
   title: string;
 }
 
 export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
 
-  const parseJsonToSchema = (data: any, key: string = '', path: string = ''): SchemaField[] => {
+  const parseJsonToSchema = (data: unknown, key: string = '', path: string = ''): SchemaField[] => {
     if (Array.isArray(data)) {
       return data.map((item, index) => {
         const arrayPath = path ? `${path}[${index}]` : `[${index}]`;
@@ -187,7 +187,7 @@ export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
         const currentPath = path ? `${path}.${k}` : k;
         const field: SchemaField = {
           key: k,
-          type: Array.isArray(v) ? 'array' : typeof v as any,
+          type: Array.isArray(v) ? 'array' : typeof v as 'string' | 'number' | 'boolean' | 'object',
           path: currentPath,
           value: v
         };
@@ -203,7 +203,7 @@ export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
     } else {
       return [{
         key,
-        type: typeof data as any,
+        type: typeof data as 'string' | 'number' | 'boolean' | 'object',
         value: data,
         path: path || key
       }];
