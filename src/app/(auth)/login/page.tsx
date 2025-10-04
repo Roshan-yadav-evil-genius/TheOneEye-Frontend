@@ -1,8 +1,9 @@
 import Image from "next/image"
-import Link from "next/link";
-import { SignupForm } from "@/components/signup-form";
+import Link from "next/link"
 
-export default function SignupPage() {
+import { LoginForm } from "@/components/features/auth/login-form"
+
+export default function LoginPage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -10,7 +11,7 @@ export default function SignupPage() {
           <Image src="/logo.png" width={60} height={24} alt='TheOneEye' />
           <span className="text-xl font-bold">TheOneEye</span>
         </Link>
-        <SignupForm />
+        <LoginForm />
       </div>
     </div>
   )

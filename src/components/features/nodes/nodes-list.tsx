@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation"
-import { NodesTable } from "@/components/nodes/nodes-table"
+import { NodesTable } from "@/components/features/nodes/nodes-table"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
 import { TNode } from "@/types"

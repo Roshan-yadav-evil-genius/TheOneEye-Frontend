@@ -2,14 +2,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
-import { NodePreview } from "@/components/NodePreview";
+import { NodePreview } from "@/components/features/nodes/NodePreview";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { NodeForm, TagsInput, LogoUpload, FormActions } from "@/components/create-node";
+import { NodeForm, TagsInput, LogoUpload, FormActions } from "@/components/features/nodes";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useCreateNodePage } from "@/hooks/useCreateNodePage";
 

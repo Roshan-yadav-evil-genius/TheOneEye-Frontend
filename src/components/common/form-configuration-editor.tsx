@@ -3,8 +3,8 @@
 import { useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconForms } from "@tabler/icons-react";
-import FormBuilder from "../FormBuilder/FormBuilder";
-import { TWidgetConfig } from "../FormBuilder/inputs";
+import FormBuilder from "../features/form-builder/FormBuilder";
+import { TWidgetConfig } from "../features/form-builder/inputs";
 
 interface FormConfigurationEditorProps {
   value: Record<string, unknown>;

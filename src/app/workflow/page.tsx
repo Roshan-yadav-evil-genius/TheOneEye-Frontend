@@ -1,6 +1,6 @@
 "use client";
 
-import { WorkflowPageContainer } from "@/components/workflow/WorkflowPageContainer";
+import { WorkflowPageContainer } from "@/components/features/workflow/WorkflowPageContainer";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default function Page() {

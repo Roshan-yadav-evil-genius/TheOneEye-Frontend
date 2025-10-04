@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormBuilder } from '../../components/FormBuilder';
+import { FormBuilder } from '../../components/form-builder';
 
 const FormBuilderPage: React.FC = () => {
   return (

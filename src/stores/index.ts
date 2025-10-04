@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Import stores for internal use
 import { useTUserStore } from './user-store';
-import { useNodesStore } from './nodes-store';
 import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
 import { useTWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
@@ -10,8 +9,7 @@ import { useTProjectsStore } from './projects-store';
 
 // Re-export stores for external use
 export { useTUserStore as useUserStore } from './user-store';
-export { useNodesStore } from './nodes-store';
-export { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
+export { useEnhancedNodesStore as useNodesStore, nodesSelectors } from './enhanced-nodes-store';
 export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
@@ -117,11 +115,11 @@ export const storeSelectors = {
   
   // Node selectors
   getNodesByType: (type: string) => 
-    useNodesStore.getState().nodes.filter((node) => node.type === type),
+    useEnhancedNodesStore.getState().nodes.filter((node) => node.type === type),
   getNodesByCategory: (category: string) => 
-    useNodesStore.getState().nodes.filter((node) => node.category === category),
+    useEnhancedNodesStore.getState().nodes.filter((node) => node.category === category),
   getFilteredNodes: () => {
-    const { nodes, filters } = useNodesStore.getState();
+    const { nodes, filters } = useEnhancedNodesStore.getState();
     return nodes.filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
       if (filters.category && node.category !== filters.category) return false;
@@ -159,7 +157,7 @@ export const storeSelectors = {
 export const storeActions = {
   // Create new entities with proper relationships
   createNodeWithForm: async (nodeData: Partial<TNode>, formData: Partial<TFormConfiguration>) => {
-    const { createNode } = useNodesStore.getState();
+    const { createNode } = useEnhancedNodesStore.getState();
     const { createFormConfiguration } = useFormStore.getState();
     
     const node = await createNode(nodeData as TNodeCreateData);
@@ -173,7 +171,7 @@ export const storeActions = {
   
   createWorkflowWithNodes: async (workflowData: Partial<TWorkflow>, nodeIds: string[]) => {
     const { createWorkflow } = useTWorkflowStore.getState();
-    const { nodes } = useNodesStore.getState();
+    const { nodes } = useEnhancedNodesStore.getState();
     
     const workflow = await createWorkflow(workflowData as TWorkflow);
     const workflowNodes = nodes.filter((node) => nodeIds.includes(node.id));
@@ -201,7 +199,7 @@ export const storeActions = {
   
   // Bulk operations
   deleteNodeAndForm: async (nodeId: string) => {
-    const { deleteNode } = useNodesStore.getState();
+    const { deleteNode } = useEnhancedNodesStore.getState();
     const { configurations } = useFormStore.getState();
     const { deleteFormConfiguration } = useFormStore.getState();
     
@@ -218,7 +216,7 @@ export const storeActions = {
   deleteWorkflowAndNodes: async (workflowId: string) => {
     const { workflows } = useTWorkflowStore.getState();
     const { deleteWorkflow } = useTWorkflowStore.getState();
-    const { deleteNode } = useNodesStore.getState();
+    const { deleteNode } = useEnhancedNodesStore.getState();
     
     const workflow = workflows.find((w) => w.id === workflowId);
     if (workflow) {

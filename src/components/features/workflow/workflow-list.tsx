@@ -1,8 +1,8 @@
 "use client";
-import { WorkflowTable } from "@/components/workflow/workflow-table";
-import { CreateWorkflowDialog } from "@/components/workflow/create-workflow-dialog";
-import { EditWorkflowDialog } from "@/components/workflow/edit-workflow-dialog";
-import { DeleteWorkflowDialog } from "@/components/workflow/delete-workflow-dialog";
+import { WorkflowTable } from "@/components/features/workflow/workflow-table";
+import { CreateWorkflowDialog } from "@/components/features/workflow/create-workflow-dialog";
+import { EditWorkflowDialog } from "@/components/features/workflow/edit-workflow-dialog";
+import { DeleteWorkflowDialog } from "@/components/features/workflow/delete-workflow-dialog";
 import { Button } from "@/components/ui/button";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";

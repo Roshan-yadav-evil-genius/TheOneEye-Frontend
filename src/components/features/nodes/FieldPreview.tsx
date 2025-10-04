@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { TWidgetConfig } from "@/components/FormBuilder/inputs";
+import { TWidgetConfig } from "@/components/features/form-builder/inputs";
 
 interface FieldPreviewProps {
   widget: TWidgetConfig;

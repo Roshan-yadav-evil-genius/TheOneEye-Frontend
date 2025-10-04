@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { NodesList } from "@/components/nodes/nodes-list";
+import { NodesList } from "@/components/features/nodes/nodes-list";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useNodesPage } from "@/hooks/useNodesPage";
 

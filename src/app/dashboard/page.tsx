@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { DashboardControls } from "@/components/dashboard/dashboard-controls"
+import { DashboardControls } from "@/components/features/dashboard/dashboard-controls"
 
 export default function Page() {
   return (
