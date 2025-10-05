@@ -53,5 +53,9 @@ export interface TWorkflowNodeCreateResponse {
     id: string;
     name: string;
     type: string;
+    description?: string;
+    logo?: string;
+    form_configuration: Record<string, unknown>;
+    tags: string[];
   } | null;
 }

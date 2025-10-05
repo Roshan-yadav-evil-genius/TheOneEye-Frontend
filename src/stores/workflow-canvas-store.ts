@@ -179,10 +179,10 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
                 id: response.node_template.id,
                 name: response.node_template.name,
                 type: response.node_template.type,
-                description: '',
-                logo: '',
-                form_configuration: {},
-                tags: [],
+                description: (response.node_template as any).description || '',
+                logo: (response.node_template as any).logo || '',
+                form_configuration: (response.node_template as any).form_configuration || {},
+                tags: (response.node_template as any).tags || [],
               } : null,
             };
 

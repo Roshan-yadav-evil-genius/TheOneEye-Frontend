@@ -138,7 +138,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
               id: id,
               name: data.label,
               type: data.type,
-              logo: data.logo,
+              logo: data.icon,
               nodeGroupIcon: data.nodeGroupIcon,
               nodeGroupName: data.nodeGroupName,
             } as any}
