@@ -11,7 +11,7 @@ export const useEditNodePage = () => {
   const [formData, setFormData] = useState<Partial<TNode>>({
     name: "",
     type: "action",
-    category: "system",
+    nodeGroup: "",
     description: "",
     version: "1.0.0",
     tags: [],
@@ -59,7 +59,7 @@ export const useEditNodePage = () => {
           setFormData({
             name: node.name,
             type: node.type,
-            category: node.category,
+            nodeGroup: node.nodeGroup,
             description: node.description || "",
             version: node.version || "1.0.0",
             tags: node.tags || [],
@@ -188,7 +188,7 @@ export const useEditNodePage = () => {
       await updateNode(nodeId, {
         name: formData.name || "Updated Node",
         type: (formData.type || "action") as TNode['type'],
-        category: formData.category || "system",
+        nodeGroup: formData.nodeGroup || "",
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],

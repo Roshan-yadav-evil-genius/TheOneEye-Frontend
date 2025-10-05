@@ -19,22 +19,22 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [nodeGroupFilter, setNodeGroupFilter] = useState<string>("all");
   
   // Column configuration state
   const [columns, setColumns] = useState<ColumnConfig[]>([
     { id: "name", label: "Name", visible: true },
     { id: "type", label: "Type", visible: true },
-    { id: "category", label: "Category", visible: true },
+    { id: "nodeGroup", label: "Group", visible: true },
     { id: "description", label: "Description", visible: true },
     { id: "version", label: "Version", visible: true },
     { id: "updatedAt", label: "Updated", visible: true },
     { id: "tags", label: "Tags", visible: true },
   ]);
 
-  // Get unique categories from nodes
-  const categories = Array.from(
-    new Set(nodes.map(n => n.category).filter((category): category is string => Boolean(category)))
+  // Get unique node groups from nodes
+  const nodeGroups = Array.from(
+    new Set(nodes.map(n => n.nodeGroupName).filter((nodeGroupName): nodeGroupName is string => Boolean(nodeGroupName)))
   );
 
   // Filter nodes based on search and filters
@@ -48,11 +48,11 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
           .includes(searchTerm.toLowerCase())
       
       const matchesType = typeFilter === "all" || node.type === typeFilter
-      const matchesCategory = categoryFilter === "all" || node.category === categoryFilter
+      const matchesNodeGroup = nodeGroupFilter === "all" || node.nodeGroupName === nodeGroupFilter
       
-      return matchesSearch && matchesType && matchesCategory
+      return matchesSearch && matchesType && matchesNodeGroup
     });
-  }, [nodes, searchTerm, typeFilter, categoryFilter]);
+  }, [nodes, searchTerm, typeFilter, nodeGroupFilter]);
 
   const totalPages = Math.ceil(filteredNodes.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -104,9 +104,9 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
     rowsPerPage,
     searchTerm,
     typeFilter,
-    categoryFilter,
+    nodeGroupFilter,
     columns,
-    categories,
+    nodeGroups,
     filteredNodes,
     currentNodes,
     totalPages,
@@ -116,7 +116,7 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
     // Actions
     setSearchTerm,
     setTypeFilter,
-    setCategoryFilter,
+    setNodeGroupFilter,
     handleSelectAll,
     handleSelectRow,
     handlePageChange,

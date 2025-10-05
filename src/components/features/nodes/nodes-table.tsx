@@ -35,9 +35,9 @@ export function NodesTable({
     rowsPerPage,
     searchTerm,
     typeFilter,
-    categoryFilter,
+    nodeGroupFilter,
     columns,
-    categories,
+    nodeGroups,
     filteredNodes,
     currentNodes,
     totalPages,
@@ -45,7 +45,7 @@ export function NodesTable({
     isIndeterminate,
     setSearchTerm,
     setTypeFilter,
-    setCategoryFilter,
+    setNodeGroupFilter,
     handleSelectAll,
     handleSelectRow,
     handlePageChange,
@@ -60,12 +60,12 @@ export function NodesTable({
         filteredNodes={filteredNodes}
         searchTerm={searchTerm}
         typeFilter={typeFilter}
-        categoryFilter={categoryFilter}
-        categories={categories}
+        nodeGroupFilter={nodeGroupFilter}
+        nodeGroups={nodeGroups}
         columns={columns}
         onSearchChange={setSearchTerm}
         onTypeFilterChange={setTypeFilter}
-        onCategoryFilterChange={setCategoryFilter}
+        onNodeGroupFilterChange={setNodeGroupFilter}
         onToggleColumnVisibility={toggleColumnVisibility}
         onCreate={onCreate}
       />
@@ -86,7 +86,7 @@ export function NodesTable({
               </TableHead>
               {columns.find(col => col.id === "name")?.visible && <TableHead className="min-w-[200px]">Name</TableHead>}
               {columns.find(col => col.id === "type")?.visible && <TableHead className="min-w-[100px]">Type</TableHead>}
-              {columns.find(col => col.id === "category")?.visible && <TableHead className="min-w-[120px]">Category</TableHead>}
+              {columns.find(col => col.id === "nodeGroup")?.visible && <TableHead className="min-w-[120px]">Group</TableHead>}
               {columns.find(col => col.id === "description")?.visible && <TableHead className="min-w-[200px]">Description</TableHead>}
               {columns.find(col => col.id === "version")?.visible && <TableHead className="min-w-[80px]">Version</TableHead>}
               {columns.find(col => col.id === "updatedAt")?.visible && <TableHead className="min-w-[100px]">Updated</TableHead>}

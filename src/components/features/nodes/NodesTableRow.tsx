@@ -26,7 +26,7 @@ import {
 } from "@tabler/icons-react";
 import { TNode } from "@/types";
 import { formatNodeDate } from "@/lib/dates";
-import { getNodeColors, getCategoryIcon } from "@/constants/node-styles";
+import { getNodeColors } from "@/constants/node-styles";
 
 interface NodeLogoProps {
   node: TNode;
@@ -98,9 +98,9 @@ export function NodesTableRow({
     return <NodeLogo node={node} />;
   };
 
-  const renderCategoryIcon = (category: string) => {
-    const IconComponent = getCategoryIcon(category);
-    return <IconComponent className="h-4 w-4" />;
+  const renderNodeGroupIcon = (nodeGroupName: string) => {
+    // For now, we'll use a default icon. In the future, we could add node group icons
+    return <IconDatabase className="h-4 w-4" />;
   };
 
   return (
@@ -127,11 +127,11 @@ export function NodesTableRow({
       {columns.find(col => col.id === "type")?.visible && (
         <TableCell className="min-w-[100px]">{getTypeBadge(node.type)}</TableCell>
       )}
-      {columns.find(col => col.id === "category")?.visible && (
+      {columns.find(col => col.id === "nodeGroup")?.visible && (
         <TableCell className="min-w-[120px]">
           <div className="flex items-center gap-2">
-            {renderCategoryIcon(node.category)}
-            <span className="capitalize truncate">{node.category}</span>
+            {renderNodeGroupIcon(node.nodeGroupName)}
+            <span className="truncate">{node.nodeGroupName}</span>
           </div>
         </TableCell>
       )}

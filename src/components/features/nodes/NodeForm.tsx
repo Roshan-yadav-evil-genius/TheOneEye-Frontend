@@ -9,7 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { TNode, nodeTypes, nodeCategories } from "@/types";
+import { TNode, nodeTypes } from "@/types";
+import { useNodeGroups } from "@/hooks/useNodeGroups";
 
 interface NodeFormProps {
   control: Control<Partial<TNode>>;
@@ -18,6 +19,8 @@ interface NodeFormProps {
 }
 
 export function NodeForm({ control, errors, onVersionChange }: NodeFormProps) {
+  const { nodeGroups, isLoading: isLoadingGroups } = useNodeGroups();
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -66,25 +69,27 @@ export function NodeForm({ control, errors, onVersionChange }: NodeFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
+          <Label htmlFor="nodeGroup">Group *</Label>
           <Controller
-            name="category"
+            name="nodeGroup"
             control={control}
+            rules={{ required: "Group is required" }}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGroups}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={isLoadingGroups ? "Loading groups..." : "Select group"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {nodeCategories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {nodeGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             )}
           />
+          {errors.nodeGroup && <p className="text-red-500 text-sm">{errors.nodeGroup.message}</p>}
         </div>
       </div>
       <div className="space-y-2">

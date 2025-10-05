@@ -12,7 +12,7 @@ export const useCreateNodePage = () => {
     defaultValues: {
       name: "",
       type: "action",
-      category: "system",
+      nodeGroup: "",
       description: "",
       version: "1.0.0",
       tags: [],
@@ -66,7 +66,7 @@ export const useCreateNodePage = () => {
       const nodeData = {
         name: data.name || '',
         type: data.type || 'action',
-        category: data.category || 'system',
+        nodeGroup: data.nodeGroup || '',
         description: data.description || '',
         version: data.version || '1.0.0',
         isActive: data.isActive !== undefined ? data.isActive : true,

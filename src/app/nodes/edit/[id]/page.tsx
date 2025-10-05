@@ -15,10 +15,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IconDeviceFloppy, IconUpload, IconX, IconX as IconClose, IconTag } from "@tabler/icons-react";
-import { nodeTypes, nodeCategories } from "@/types";
+import { nodeTypes } from "@/types";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useEditNodePage } from "@/hooks/useEditNodePage";
+import { useNodeGroups } from "@/hooks/useNodeGroups";
 
 function EditNodePageContent() {
   const {
@@ -39,6 +40,8 @@ function EditNodePageContent() {
     handleSubmit,
     handleCancel,
   } = useEditNodePage();
+  
+  const { nodeGroups, isLoading: isLoadingGroups } = useNodeGroups();
 
   // Show loading state while loading node data
   if (isLoadingNode) {
@@ -107,7 +110,7 @@ function EditNodePageContent() {
                 </div>
               </div>
 
-              {/* Type and Category dropdowns taking full width */}
+              {/* Type and Group dropdowns taking full width */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="type">Type *</Label>
@@ -128,18 +131,19 @@ function EditNodePageContent() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="nodeGroup">Group *</Label>
                   <Select 
-                    value={formData.category || "system"} 
-                    onValueChange={(value) => handleInputChange("category", value)}
+                    value={formData.nodeGroup || ""} 
+                    onValueChange={(value) => handleInputChange("nodeGroup", value)}
+                    disabled={isLoadingGroups}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={isLoadingGroups ? "Loading groups..." : "Select group"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {nodeCategories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                      {nodeGroups.map(group => (
+                        <SelectItem key={group.id} value={group.id}>
+                          {group.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

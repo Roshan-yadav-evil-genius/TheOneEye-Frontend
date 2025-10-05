@@ -2,7 +2,9 @@ export interface TBackendNode {
   id: string;
   name: string;
   type: string;
-  category: string;
+  node_group: string;
+  node_group_name: string;
+  node_group_icon?: string;
   description?: string;
   version?: string;
   is_active: boolean;

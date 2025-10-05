@@ -650,7 +650,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           set((state) => {
             state.filters = {
               type: undefined,
-              category: undefined,
+              nodeGroup: undefined,
               search: undefined,
             };
             state.searchQuery = '';

@@ -31,12 +31,12 @@ interface NodesTableHeaderProps {
   filteredNodes: TNode[];
   searchTerm: string;
   typeFilter: string;
-  categoryFilter: string;
-  categories: string[];
+  nodeGroupFilter: string;
+  nodeGroups: string[];
   columns: Array<{ id: string; label: string; visible: boolean }>;
   onSearchChange: (value: string) => void;
   onTypeFilterChange: (value: string) => void;
-  onCategoryFilterChange: (value: string) => void;
+  onNodeGroupFilterChange: (value: string) => void;
   onToggleColumnVisibility: (columnId: string) => void;
   onCreate?: () => void;
 }
@@ -46,12 +46,12 @@ export function NodesTableHeader({
   filteredNodes,
   searchTerm,
   typeFilter,
-  categoryFilter,
-  categories,
+  nodeGroupFilter,
+  nodeGroups,
   columns,
   onSearchChange,
   onTypeFilterChange,
-  onCategoryFilterChange,
+  onNodeGroupFilterChange,
   onToggleColumnVisibility,
   onCreate,
 }: NodesTableHeaderProps) {
@@ -108,18 +108,18 @@ export function NodesTableHeader({
                 </Select>
               </div>
               
-              {categories.length > 0 && (
+              {nodeGroups.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Category</label>
-                  <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                  <label className="text-sm font-medium mb-1 block">Group</label>
+                  <Select value={nodeGroupFilter} onValueChange={onNodeGroupFilterChange}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Category" />
+                      <SelectValue placeholder="Group" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                      <SelectItem value="all">All Groups</SelectItem>
+                      {nodeGroups.map(nodeGroup => (
+                        <SelectItem key={nodeGroup} value={nodeGroup}>
+                          {nodeGroup}
                         </SelectItem>
                       ))}
                     </SelectContent>
