@@ -26,12 +26,6 @@ interface EnhancedNodesState extends TNodesState {
     hasPreviousPage: boolean;
   };
   
-  // Cache management
-  cache: {
-    lastFetched: number;
-    cacheExpiry: number; // in milliseconds
-    isStale: boolean;
-  };
   
   // Selection state
   selectedNodes: string[]; // Array of selected node IDs
@@ -83,9 +77,6 @@ interface EnhancedNodesActions {
   nextPage: () => void;
   previousPage: () => void;
   
-  // Cache management
-  invalidateCache: () => void;
-  refreshData: () => Promise<void>;
   
   // Statistics
   loadStats: (forceRefresh?: boolean) => Promise<void>;
@@ -116,11 +107,6 @@ const initialState: EnhancedNodesState = {
     hasNextPage: false,
     hasPreviousPage: false,
   },
-  cache: {
-    lastFetched: 0,
-    cacheExpiry: 10 * 60 * 1000, // 10 minutes - increased for better performance
-    isStale: true,
-  },
   selectedNodes: [],
   isMultiSelectMode: false,
   searchQuery: '',
@@ -129,36 +115,12 @@ const initialState: EnhancedNodesState = {
   stats: null,
 };
 
-// Load initial state from localStorage if available
-const loadInitialState = (): Partial<EnhancedNodesState> => {
-  if (typeof window === 'undefined') return {};
-  
-  try {
-    const saved = localStorage.getItem('enhanced-nodes-store');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Only restore cache and nodes data, not UI state
-      return {
-        nodes: parsed.nodes || [],
-        cache: {
-          ...initialState.cache,
-          ...parsed.cache,
-        },
-      };
-    }
-  } catch (error) {
-    console.warn('Failed to load nodes store from localStorage:', error);
-  }
-  
-  return {};
-};
 
 export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
   devtools(
     subscribeWithSelector(
       immer((set, get) => ({
         ...initialState,
-        ...loadInitialState(),
 
         // CRUD operations with enhanced error handling
         createNode: async (nodeData: TNodeCreateData, options = {}) => {
@@ -210,8 +172,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               }
               state.isLoading = false;
               state.error = null;
-              state.cache.lastFetched = Date.now();
-              state.cache.isStale = false;
             });
 
             if (showToast) {
@@ -282,8 +242,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               }
               state.isLoading = false;
               state.error = null;
-              state.cache.lastFetched = Date.now();
-              state.cache.isStale = false;
             });
 
             if (showToast) {
@@ -351,15 +309,11 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
                 state.pagination.totalCount -= 1;
                 state.isLoading = false;
                 state.error = null;
-                state.cache.lastFetched = Date.now();
-                state.cache.isStale = false;
               });
             } else {
               set((state) => {
                 state.isLoading = false;
                 state.error = null;
-                state.cache.lastFetched = Date.now();
-                state.cache.isStale = false;
               });
             }
 
@@ -422,8 +376,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               }
               state.isLoading = false;
               state.error = null;
-              state.cache.lastFetched = Date.now();
-              state.cache.isStale = false;
             });
             
             return fetchedNode;
@@ -438,13 +390,8 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
 
         // Bulk operations
         loadNodes: async (filters: TNodeFilters = {}, options = {}) => {
-          const { showToast = false, forceRefresh = false } = options;
-          const { cache, pagination } = get();
-          
-          // Check cache
-          if (!forceRefresh && !cache.isStale && Date.now() - cache.lastFetched < cache.cacheExpiry) {
-            return;
-          }
+          const { showToast = false } = options;
+          const { pagination } = get();
           
           set((state) => {
             state.isLoading = true;
@@ -465,8 +412,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               state.pagination.hasPreviousPage = !!response.previous;
               state.isLoading = false;
               state.error = null;
-              state.cache.lastFetched = Date.now();
-              state.cache.isStale = false;
             });
 
             if (showToast && response.results.length > 0) {
@@ -539,8 +484,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
               state.pagination.totalCount += newNodes.length;
               state.isLoading = false;
               state.error = null;
-              state.cache.lastFetched = Date.now();
-              state.cache.isStale = false;
             });
 
             if (showToast) {
@@ -610,15 +553,11 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
                 state.pagination.totalCount -= ids.length;
                 state.isLoading = false;
                 state.error = null;
-                state.cache.lastFetched = Date.now();
-                state.cache.isStale = false;
               });
             } else {
               set((state) => {
                 state.isLoading = false;
                 state.error = null;
-                state.cache.lastFetched = Date.now();
-                state.cache.isStale = false;
               });
             }
 
@@ -765,18 +704,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
           }
         },
 
-        // Cache management
-        invalidateCache: () => {
-          set((state) => {
-            state.cache.isStale = true;
-            state.cache.lastFetched = 0;
-          });
-        },
-
-        refreshData: async () => {
-          const { loadNodes, filters } = get();
-          await loadNodes(filters, { forceRefresh: true });
-        },
 
         // Statistics
         loadStats: async (forceRefresh = false) => {
@@ -834,19 +761,6 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
   )
 );
 
-// Add localStorage persistence
-if (typeof window !== 'undefined') {
-  useEnhancedNodesStore.subscribe(
-    (state) => {
-      // Only persist nodes and cache data
-      const dataToPersist = {
-        nodes: state.nodes,
-        cache: state.cache,
-      };
-      localStorage.setItem('enhanced-nodes-store', JSON.stringify(dataToPersist));
-    }
-  );
-}
 
 // Selectors for common use cases
 export const nodesSelectors = {

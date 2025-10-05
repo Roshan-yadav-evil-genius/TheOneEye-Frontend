@@ -5,7 +5,6 @@ import { TNode, TNodeFilters } from '@/types';
 interface UseSharedNodesOptions {
   autoLoad?: boolean;
   showToast?: boolean;
-  forceRefresh?: boolean;
 }
 
 interface UseSharedNodesReturn {
@@ -16,7 +15,7 @@ interface UseSharedNodesReturn {
   error: string | null;
   
   // Actions
-  loadNodes: (filters?: TNodeFilters, options?: { showToast?: boolean; forceRefresh?: boolean }) => Promise<void>;
+  loadNodes: (filters?: TNodeFilters, options?: { showToast?: boolean }) => Promise<void>;
   refreshNodes: () => Promise<void>;
   clearError: () => void;
   
@@ -31,10 +30,6 @@ interface UseSharedNodesReturn {
   setFilters: (filters: Partial<TNodeFilters>) => void;
   clearFilters: () => void;
   
-  // Cache management
-  invalidateCache: () => void;
-  isCacheStale: boolean;
-  lastFetched: number;
 }
 
 /**
@@ -45,7 +40,6 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
   const {
     autoLoad = true,
     showToast = false,
-    forceRefresh = false,
   } = options;
 
   // Get store state and actions
@@ -58,24 +52,21 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
     setFilters,
     clearFilters: storeClearFilters,
     clearError,
-    invalidateCache,
-    cache,
   } = useNodesStore();
 
   // Memoized load function
   const loadNodes = useCallback(async (
     filters?: TNodeFilters, 
-    loadOptions?: { showToast?: boolean; forceRefresh?: boolean }
+    loadOptions?: { showToast?: boolean }
   ) => {
     await storeLoadNodes(filters, {
       showToast: loadOptions?.showToast ?? showToast,
-      forceRefresh: loadOptions?.forceRefresh ?? forceRefresh,
     });
-  }, [storeLoadNodes, showToast, forceRefresh]);
+  }, [storeLoadNodes, showToast]);
 
   // Memoized refresh function
   const refreshNodes = useCallback(async () => {
-    await loadNodes({}, { forceRefresh: true });
+    await loadNodes({});
   }, [loadNodes]);
 
   // Auto-load nodes on mount if enabled
@@ -127,11 +118,6 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
     setSearchQuery,
     setFilters,
     clearFilters: storeClearFilters,
-    
-    // Cache management
-    invalidateCache,
-    isCacheStale: cache.isStale,
-    lastFetched: cache.lastFetched,
   };
 };
 
