@@ -14,10 +14,6 @@ import {
   IconSearch, 
   IconFilter, 
   IconPlus,
-  IconDatabase,
-  IconSettings,
-  IconClock,
-  IconCheck,
   IconChevronDown,
   IconChevronRight,
   IconLoader2,
@@ -39,14 +35,6 @@ interface WorkflowSidebarProps {
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
 }
-
-const nodeIcons = {
-  trigger: IconClock,
-  action: IconSettings,
-  logic: IconCheck,
-  system: IconDatabase,
-};
-
 
 const nodeColors = {
   trigger: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -227,7 +215,6 @@ export function WorkflowSidebar({
                   <div className="ml-4 space-y-2">
                     {nodes.map((node) => {
                       const isSelected = selectedNodes.includes(node.id);
-                      const IconComponent = nodeIcons[node.type as keyof typeof nodeIcons] || IconSettings;
                       
                       return (
                         <div
@@ -251,7 +238,9 @@ export function WorkflowSidebar({
                               type: node.type,
                               nodeGroup: node.nodeGroup,
                               nodeGroupName: node.nodeGroupName,
-                              description: node.description
+                              nodeGroupIcon: node.nodeGroupIcon,
+                              description: node.description,
+                              logo: node.logo
                             }));
                             e.dataTransfer.effectAllowed = 'move';
                           }}

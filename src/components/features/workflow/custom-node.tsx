@@ -5,56 +5,42 @@ import { Handle, Position } from "reactflow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NodeEditDialog } from "./node-edit-dialog";
-import { nodeColors, iconColors } from "@/constants/node-styles";
+import { nodeColors } from "@/constants/node-styles";
+import { NodeIcon } from "./node-icon";
 import { 
-  IconClock, 
-  IconSettings, 
-  IconCheck, 
-  IconDatabase,
-  IconMail,
-  IconApi,
   IconPlayerPlay,
   IconTrash,
   IconPower,
   IconDots,
-  IconSwitch,
   IconEdit
 } from "@tabler/icons-react";
 
+export interface CustomNodeData {
+  label: string;
+  type: string;
+  status: string;
+  category: string;
+  description?: string;
+  formConfiguration?: Record<string, unknown>;
+  logo?: string;
+  nodeGroupIcon?: string;
+  nodeGroupName?: string;
+}
+
 interface CustomNodeProps {
   id: string;
-  data: {
-    label: string;
-    type: string;
-    status: string;
-    category: string;
-    description?: string;
-    formConfiguration?: Record<string, unknown>;
-  };
+  data: CustomNodeData;
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
 }
-
-const nodeIcons = {
-  trigger: IconClock,
-  action: IconSettings,
-  logic: IconSwitch,
-  system: IconDatabase,
-  communication: IconMail,
-  data: IconDatabase,
-  integration: IconApi,
-  control: IconCheck,
-};
-
 
 export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [userDescription, setUserDescription] = useState(data.description || "");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const IconComponent = nodeIcons[data.type as keyof typeof nodeIcons] || IconSettings;
+  
   const colorClass = nodeColors[data.type as keyof typeof nodeColors] || nodeColors.system;
-  const iconColorClass = iconColors[data.type as keyof typeof iconColors] || iconColors.system;
 
   const handlePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -192,7 +178,12 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
 
         {/* Node Content - Just Icon */}
         <div className="flex items-center justify-center h-full">
-          <IconComponent className={`h-8 w-8 ${iconColorClass}`} />
+          <NodeIcon
+            logo={data.logo}
+            nodeGroupIcon={data.nodeGroupIcon}
+            nodeGroupName={data.nodeGroupName}
+            size="md"
+          />
         </div>
 
         {/* Status Indicator */}

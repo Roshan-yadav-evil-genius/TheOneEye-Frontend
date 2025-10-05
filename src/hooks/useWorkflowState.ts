@@ -75,6 +75,9 @@ export const useWorkflowState = ({ lineType, selectedNodes, searchTerm, filters 
         category: nodeData.category,
         description: nodeData.description,
         formConfiguration: nodeData.formConfiguration || {},
+        logo: nodeData.logo,
+        nodeGroupIcon: nodeData.nodeGroupIcon,
+        nodeGroupName: nodeData.nodeGroupName,
       },
     };
 
