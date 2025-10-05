@@ -3,12 +3,15 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { 
   TWorkflowNode, 
-  TWorkflowConnection, 
-  TWorkflowCanvasData,
+  TWorkflowConnection
+} from '@/types/common/entities';
+import {
   TWorkflowNodeCreateRequest,
-  TWorkflowConnectionCreateRequest,
-  TApiError 
-} from '@/types';
+  TWorkflowConnectionCreateRequest
+} from '@/types/api/requests';
+import { 
+  TWorkflowCanvasData
+} from '@/types/api/responses';
 import { ApiService } from '@/lib/api/api-service';
 import { toastSuccess, toastError, toastInfo } from '@/hooks/use-toast';
 
@@ -95,6 +98,20 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
 
         // Data Loading
         loadWorkflowCanvas: async (workflowId: string) => {
+          const currentState = get();
+          
+          // Prevent loading if already loading the same workflow
+          if (currentState.isLoading && currentState.workflowId === workflowId) {
+            console.log('Workflow already loading, skipping duplicate request for:', workflowId);
+            return;
+          }
+          
+          // Prevent loading if workflow is already loaded and data exists
+          if (currentState.workflowId === workflowId && currentState.workflow && currentState.nodes.length > 0) {
+            console.log('Workflow already loaded, skipping duplicate request for:', workflowId);
+            return;
+          }
+
           set((state) => {
             state.isLoading = true;
             state.error = null;
@@ -105,8 +122,8 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             const canvasData = await ApiService.getWorkflowCanvasData(workflowId);
             
             set((state) => {
-              state.nodes = canvasData.nodes;
-              state.connections = canvasData.edges;
+              state.nodes = canvasData.nodes as any;
+              state.connections = canvasData.edges as any;
               state.workflow = canvasData.workflow;
               state.isLoading = false;
               state.error = null;
@@ -116,9 +133,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               description: `Found ${canvasData.nodes.length} nodes and ${canvasData.edges.length} connections.`,
             });
           } catch (error) {
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to load workflow canvas';
 
@@ -160,11 +175,19 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               id: response.id,
               position: response.position,
               data: response.data,
-              node_template: response.node_template,
+              node_template: response.node_template ? {
+                id: response.node_template.id,
+                name: response.node_template.name,
+                type: response.node_template.type,
+                description: '',
+                logo: '',
+                form_configuration: {},
+                tags: [],
+              } : null,
             };
 
             set((state) => {
-              state.nodes.push(newNode);
+              state.nodes.push(newNode as any);
               state.isSaving = false;
               state.error = null;
             });
@@ -175,9 +198,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
 
             return newNode;
           } catch (error) {
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to add node';
 
@@ -214,9 +235,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             // Revert optimistic update on error
             await get().refreshWorkflowCanvas();
             
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to update node position';
 
@@ -254,9 +273,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             // Revert optimistic update on error
             await get().refreshWorkflowCanvas();
             
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to remove node';
 
@@ -291,9 +308,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             toastSuccess('Connection added successfully!');
             return newConnection;
           } catch (error) {
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to add connection';
 
@@ -329,9 +344,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             // Revert optimistic update on error
             await get().refreshWorkflowCanvas();
             
-            const errorMessage = error instanceof TApiError 
-              ? error.message 
-              : error instanceof Error 
+            const errorMessage = error instanceof Error 
               ? error.message 
               : 'Failed to remove connection';
 

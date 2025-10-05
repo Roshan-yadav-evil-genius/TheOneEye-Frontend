@@ -22,6 +22,8 @@ import {
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
+  // Request deduplication map to prevent duplicate API calls
+  private static pendingRequests = new Map<string, Promise<any>>();
   // Helper function to transform backend node data to frontend format
   private static transformNodeData(backendNode: any): TNode {
     return {
@@ -228,6 +230,26 @@ export class ApiService {
 
   // Workflow Canvas Operations
   static async getWorkflowCanvasData(workflowId: string): Promise<TWorkflowCanvasData> {
+    const requestKey = `workflow-canvas-${workflowId}`;
+    
+    // Return existing promise if request is already in progress
+    if (this.pendingRequests.has(requestKey)) {
+      console.log('Request already in progress, returning existing promise for:', workflowId);
+      return this.pendingRequests.get(requestKey)!;
+    }
+    
+    const requestPromise = this.makeWorkflowCanvasRequest(workflowId);
+    this.pendingRequests.set(requestKey, requestPromise);
+    
+    try {
+      const result = await requestPromise;
+      return result;
+    } finally {
+      this.pendingRequests.delete(requestKey);
+    }
+  }
+
+  private static async makeWorkflowCanvasRequest(workflowId: string): Promise<TWorkflowCanvasData> {
     const response = await axiosApiClient.get<any>(`/workflow/${workflowId}/canvas_data/`);
     
     // Transform the response to match our types

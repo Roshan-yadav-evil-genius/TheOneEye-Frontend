@@ -86,6 +86,11 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
 
   // Load workflow data on mount
   useEffect(() => {
+    console.log('useWorkflowState useEffect triggered', { 
+      workflowId, 
+      timestamp: Date.now(),
+      hasWorkflowId: !!workflowId 
+    });
     if (workflowId) {
       loadWorkflowCanvas(workflowId);
     }
