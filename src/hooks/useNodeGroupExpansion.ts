@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function useNodeGroupExpansion() {
+export function useNodeGroupExpansion(availableGroups: string[] = []) {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const toggleGroup = (nodeGroup: string) => {
@@ -16,8 +16,7 @@ export function useNodeGroupExpansion() {
   const isExpanded = (nodeGroup: string) => expandedGroups.has(nodeGroup);
 
   const expandAll = () => {
-    // This could be enhanced to accept a list of all available groups
-    setExpandedGroups(new Set());
+    setExpandedGroups(new Set(availableGroups));
   };
 
   const collapseAll = () => {

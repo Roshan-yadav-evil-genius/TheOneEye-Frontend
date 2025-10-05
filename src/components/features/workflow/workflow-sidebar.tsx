@@ -71,7 +71,7 @@ export function WorkflowSidebar({
   const { draggedNodeId, handleDragStart, handleDragEnd } = useNodeDragDrop();
 
   // Use expansion hook for better separation of concerns
-  const { toggleGroup, isExpanded } = useNodeGroupExpansion();
+  const { toggleGroup, isExpanded } = useNodeGroupExpansion(nodeGroups);
 
   // Get the first node from each group to extract the nodeGroupIcon
   const getNodeGroupIcon = (nodeGroup: string) => {

@@ -9,9 +9,9 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    category: "all",
+    nodeGroup: "all",
   });
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [lineType, setLineType] = useState("step");
   const [showMinimap, setShowMinimap] = useState(true);
 
