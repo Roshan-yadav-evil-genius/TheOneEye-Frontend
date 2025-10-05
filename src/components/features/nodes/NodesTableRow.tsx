@@ -45,15 +45,55 @@ const NodeLogo: React.FC<NodeLogoProps> = ({ node }) => {
     return <IconComponent className="h-4 w-4" />;
   };
 
+  const getGroupIcon = () => {
+    if (node.nodeGroupIcon) {
+      return (
+        <ImageWithFallback
+          src={node.nodeGroupIcon}
+          alt={`${node.nodeGroupName} group icon`}
+          width={32}
+          height={32}
+          className="h-8 w-8 rounded-lg object-cover"
+          fallbackIcon={getNodeIcon(node.type)}
+        />
+      );
+    }
+    return getNodeIcon(node.type);
+  };
+
+  // Three-tier fallback: node logo → group icon → type icon
+  if (node.logo) {
+    return (
+      <ImageWithFallback
+        src={node.logo}
+        alt={`${node.name} logo`}
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-lg object-cover"
+        fallbackIcon={getGroupIcon()}
+      />
+    );
+  }
+
+  // If no node logo, try group icon
+  if (node.nodeGroupIcon) {
+    return (
+      <ImageWithFallback
+        src={node.nodeGroupIcon}
+        alt={`${node.nodeGroupName} group icon`}
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-lg object-cover"
+        fallbackIcon={getNodeIcon(node.type)}
+      />
+    );
+  }
+
+  // Final fallback: show type icon
   return (
-    <ImageWithFallback
-      src={node.logo}
-      alt={`${node.name} logo`}
-      width={32}
-      height={32}
-      className="h-8 w-8 rounded-lg object-cover"
-      fallbackIcon={getNodeIcon(node.type)}
-    />
+    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+      {getNodeIcon(node.type)}
+    </div>
   );
 };
 
