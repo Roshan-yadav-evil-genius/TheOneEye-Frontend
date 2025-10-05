@@ -3,11 +3,13 @@
 import React, { memo } from "react";
 import { IconPhotoOff } from "@tabler/icons-react";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
+import { iconColors } from "@/constants/node-styles";
 
 interface NodeIconProps {
   logo?: string;
   nodeGroupIcon?: string;
   nodeGroupName?: string;
+  type?: string;
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -24,15 +26,17 @@ export const NodeIcon = memo(function NodeIcon({
   logo, 
   nodeGroupIcon, 
   nodeGroupName, 
+  type,
   size = "md", 
   className = "" 
 }: NodeIconProps) {
   const config = SIZE_CONFIG[size as IconSize];
+  const typeColor = type ? iconColors[type as keyof typeof iconColors] || iconColors.system : iconColors.system;
   
   // Create fallback icon component
   const createFallbackIcon = () => (
     <div className={`${config.container} flex items-center justify-center`}>
-      <IconPhotoOff className={`${config.icon} text-muted-foreground`} />
+      <IconPhotoOff className={`${config.icon} ${typeColor}`} />
     </div>
   );
 
@@ -45,7 +49,16 @@ export const NodeIcon = memo(function NodeIcon({
       height={config.dimensions}
       className={`${config.container} object-cover rounded ${className}`}
       fallbackIcon={fallbackIcon}
+      fallbackIconColor={typeColor}
     />
+  );
+
+  // For testing: Force fallback to see type-colored IconPhotoOff
+  // TODO: Remove this after testing
+  return (
+    <div className={`${config.container} flex items-center justify-center ${className}`}>
+      <IconPhotoOff className={`${config.icon} ${typeColor}`} />
+    </div>
   );
 
   // Two-tier fallback: node logo → group icon → IconPhotoOff
@@ -75,7 +88,7 @@ export const NodeIcon = memo(function NodeIcon({
   // Final fallback: show IconPhotoOff
   return (
     <div className={`${config.container} flex items-center justify-center ${className}`}>
-      <IconPhotoOff className={`${config.icon} text-muted-foreground`} />
+      <IconPhotoOff className={`${config.icon} ${typeColor}`} />
     </div>
   );
 });

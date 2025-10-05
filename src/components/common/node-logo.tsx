@@ -46,9 +46,10 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
           width={size === "sm" ? 16 : size === "md" ? 32 : 40}
           height={size === "sm" ? 16 : size === "md" ? 32 : 40}
           className={`${sizeClasses[size]} object-cover rounded`}
+          fallbackIconColor={iconColorClass}
           fallbackIcon={
             <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-              <IconPhotoOff className={`${iconSizes[size]} text-muted-foreground`} />
+              <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
             </div>
           }
         />
@@ -56,7 +57,7 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
     }
     return (
       <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-        <IconPhotoOff className={`${iconSizes[size]} text-muted-foreground`} />
+        <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
       </div>
     );
   };
@@ -70,6 +71,7 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
         width={size === "sm" ? 16 : size === "md" ? 32 : 40}
         height={size === "sm" ? 16 : size === "md" ? 32 : 40}
         className={`${sizeClasses[size]} object-cover rounded ${className}`}
+        fallbackIconColor={iconColorClass}
         fallbackIcon={getGroupIcon()}
       />
     );
@@ -84,9 +86,10 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
         width={size === "sm" ? 16 : size === "md" ? 32 : 40}
         height={size === "sm" ? 16 : size === "md" ? 32 : 40}
         className={`${sizeClasses[size]} object-cover rounded ${className}`}
+        fallbackIconColor={iconColorClass}
         fallbackIcon={
           <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-            <IconPhotoOff className={`${iconSizes[size]} text-muted-foreground`} />
+            <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
           </div>
         }
       />
@@ -96,7 +99,7 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   // Final fallback: show photo off icon
   return (
     <div className={`${sizeClasses[size]} flex items-center justify-center ${className}`}>
-      <IconPhotoOff className={`${iconSizes[size]} text-muted-foreground`} />
+      <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
     </div>
   );
 }

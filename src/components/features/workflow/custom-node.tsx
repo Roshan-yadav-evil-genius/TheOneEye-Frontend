@@ -182,7 +182,8 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
             logo={data.logo}
             nodeGroupIcon={data.nodeGroupIcon}
             nodeGroupName={data.nodeGroupName}
-            size="md"
+            type={data.type}
+            size="lg"
           />
         </div>
 

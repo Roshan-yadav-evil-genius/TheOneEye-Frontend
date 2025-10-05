@@ -12,6 +12,7 @@ interface ImageWithFallbackProps {
   className?: string;
   fallbackIcon?: React.ReactNode;
   secondaryFallbackIcon?: React.ReactNode;
+  fallbackIconColor?: string;
   onError?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function ImageWithFallback({
   className = "",
   fallbackIcon,
   secondaryFallbackIcon,
+  fallbackIconColor = "text-muted-foreground",
   onError,
 }: ImageWithFallbackProps) {
   const [imageError, setImageError] = useState(false);
@@ -42,7 +44,7 @@ export function ImageWithFallback({
     // Show primary fallback or no icon
     return (
       <div className={`flex items-center justify-center ${className}`}>
-        {fallbackIcon || <IconPhotoOff className="h-5 w-5 text-muted-foreground" />}
+        {fallbackIcon || <IconPhotoOff className={`h-5 w-5 ${fallbackIconColor}`} />}
       </div>
     );
   }
