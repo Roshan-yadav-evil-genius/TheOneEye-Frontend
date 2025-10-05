@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { IconInfoCircle, IconTag } from "@tabler/icons-react";
+import { IconInfoCircle, IconTag, IconPhotoOff } from "@tabler/icons-react";
 import { TNode } from "@/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getNodeColors } from "@/constants/node-styles";
+import { ImageWithFallback } from "@/components/common/image-with-fallback";
 
 interface NodeHeaderProps {
   nodeData: Partial<TNode>;
@@ -22,21 +22,20 @@ export function NodeHeader({ nodeData, logoPreview }: NodeHeaderProps) {
         <div className="flex gap-2 items-center mb-1">
           {/* Logo */}
           <div className="flex-shrink-0">
-            {logoPreview ? (
-              <Image
-                src={logoPreview}
-                alt="Node logo"
-                width={40}
-                height={40}
-                className="h-10 w-10 object-cover rounded border-2 border-border shadow-sm"
-              />
-            ) : (
-              <div className={`h-20 w-20 rounded-xl border-2 flex items-center justify-center shadow-sm ${colorClass}`}>
-                <span className={`text-xl font-bold ${iconColorClass}`}>
-                  {nodeData.name?.charAt(0).toUpperCase() || "N"}
-                </span>
-              </div>
-            )}
+            <ImageWithFallback
+              src={logoPreview}
+              alt="Node logo"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-cover rounded border-2 border-border shadow-sm"
+              fallbackIcon={
+                <div className={`h-10 w-10 rounded border-2 flex items-center justify-center shadow-sm ${colorClass}`}>
+                  <span className={`text-lg font-bold ${iconColorClass}`}>
+                    {nodeData.name?.charAt(0).toUpperCase() || "N"}
+                  </span>
+                </div>
+              }
+            />
           </div>
           <div>
             {/* Title */}

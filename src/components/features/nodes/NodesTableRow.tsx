@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,18 +22,18 @@ import {
   IconClock,
   IconDatabase,
   IconTag,
+  IconPhotoOff,
 } from "@tabler/icons-react";
 import { TNode } from "@/types";
 import { formatNodeDate } from "@/lib/dates";
 import { getNodeColors } from "@/constants/node-styles";
+import { ImageWithFallback } from "@/components/common/image-with-fallback";
 
 interface NodeLogoProps {
   node: TNode;
 }
 
 const NodeLogo: React.FC<NodeLogoProps> = ({ node }) => {
-  const [imageError, setImageError] = useState(false);
-
   const getNodeIcon = (type: string) => {
     const nodeIcons = {
       trigger: IconClock,
@@ -46,21 +45,16 @@ const NodeLogo: React.FC<NodeLogoProps> = ({ node }) => {
     return <IconComponent className="h-4 w-4" />;
   };
 
-  if (node.logo && !imageError) {
-    return (
-      <Image 
-        src={node.logo} 
-        alt={`${node.name} logo`}
-        width={32}
-        height={32}
-        className="h-8 w-8 rounded-lg object-cover"
-        onError={() => {
-          setImageError(true);
-        }}
-      />
-    );
-  }
-  return getNodeIcon(node.type);
+  return (
+    <ImageWithFallback
+      src={node.logo}
+      alt={`${node.name} logo`}
+      width={32}
+      height={32}
+      className="h-8 w-8 rounded-lg object-cover"
+      fallbackIcon={getNodeIcon(node.type)}
+    />
+  );
 };
 
 interface NodesTableRowProps {
@@ -98,9 +92,17 @@ export function NodesTableRow({
     return <NodeLogo node={node} />;
   };
 
-  const renderNodeGroupIcon = (nodeGroupName: string) => {
-    // For now, we'll use a default icon. In the future, we could add node group icons
-    return <IconDatabase className="h-4 w-4" />;
+  const renderNodeGroupIcon = (node: TNode) => {
+    return (
+      <ImageWithFallback
+        src={node.nodeGroupIcon}
+        alt={node.nodeGroupName}
+        width={16}
+        height={16}
+        className="h-4 w-4 object-contain"
+        fallbackIcon={<IconPhotoOff className="h-4 w-4 text-muted-foreground" />}
+      />
+    );
   };
 
   return (
@@ -114,9 +116,7 @@ export function NodesTableRow({
       {columns.find(col => col.id === "name")?.visible && (
         <TableCell className="min-w-[200px]">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${colorClass} flex items-center justify-center`}>
-              {renderNodeLogo(node)}
-            </div>
+            {renderNodeLogo(node)}
             <div className="min-w-0 flex-1">
               <div className="font-medium truncate">{node.name}</div>
               <div className="text-sm text-muted-foreground truncate">ID: {node.id}</div>
@@ -130,7 +130,7 @@ export function NodesTableRow({
       {columns.find(col => col.id === "nodeGroup")?.visible && (
         <TableCell className="min-w-[120px]">
           <div className="flex items-center gap-2">
-            {renderNodeGroupIcon(node.nodeGroupName)}
+            {renderNodeGroupIcon(node)}
             <span className="truncate">{node.nodeGroupName}</span>
           </div>
         </TableCell>

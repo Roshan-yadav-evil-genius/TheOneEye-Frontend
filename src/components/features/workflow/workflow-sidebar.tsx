@@ -22,10 +22,11 @@ import {
   IconChevronRight,
   IconLoader2,
   IconAlertCircle,
-  IconPhoto
+  IconPhotoOff
 } from "@tabler/icons-react";
 import { useNodesByNodeGroup } from "@/hooks/useSharedNodes";
 import { TNode } from "@/types";
+import { ImageWithFallback } from "@/components/common/image-with-fallback";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -208,19 +209,14 @@ export function WorkflowSidebar({
                   ) : (
                     <IconChevronRight className="h-4 w-4 text-muted-foreground" />
                   )}
-                  {nodeGroupIcon ? (
-                    <img 
-                      src={nodeGroupIcon} 
-                      alt={nodeGroup}
-                      className="h-4 w-4 object-contain"
-                      onError={(e) => {
-                        // Fallback to default icon if image fails to load
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  <IconPhoto className={`h-4 w-4 text-muted-foreground ${nodeGroupIcon ? 'hidden' : ''}`} />
+                  <ImageWithFallback
+                    src={nodeGroupIcon}
+                    alt={nodeGroup}
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 object-contain"
+                    fallbackIcon={<IconPhotoOff className="h-4 w-4 text-muted-foreground" />}
+                  />
                   <span className="font-medium text-sm">{nodeGroup}</span>
                   <span className="text-xs text-muted-foreground ml-auto">({nodes.length})</span>
                 </div>
@@ -265,7 +261,14 @@ export function WorkflowSidebar({
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 mt-0.5">
-                              <IconComponent className="h-4 w-4 text-muted-foreground" />
+                              <ImageWithFallback
+                                src={node.logo}
+                                alt={`${node.name} logo`}
+                                width={16}
+                                height={16}
+                                className="h-4 w-4 object-cover rounded"
+                                fallbackIcon={<IconComponent className="h-4 w-4 text-muted-foreground" />}
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2 mb-1">
