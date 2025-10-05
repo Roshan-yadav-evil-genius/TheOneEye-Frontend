@@ -6,6 +6,7 @@ import { useTWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
 import { useTProjectsStore } from './projects-store';
+import { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
 
 // Re-export stores for external use
 export { useTUserStore as useUserStore } from './user-store';
@@ -14,6 +15,7 @@ export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
 export { useTProjectsStore as useProjectsStore } from './projects-store';
+export { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
 
 // Export all types
 export type {

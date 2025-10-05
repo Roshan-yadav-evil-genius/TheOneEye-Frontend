@@ -18,7 +18,7 @@ function convertElementsToWidgets(value: Record<string, unknown>): TWidgetConfig
     return [];
   }
   
-  return (value.elements as any[]).map((element, index) => ({
+  return (value.elements as Record<string, unknown>[]).map((element, index) => ({
     id: `widget-${index}`,
     type: element.type,
     name: element.name,

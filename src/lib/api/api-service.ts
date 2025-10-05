@@ -10,7 +10,14 @@ import {
   TApiError,
   TWorkflow,
   TProject,
-  TUser
+  TUser,
+  TWorkflowNode,
+  TWorkflowConnection,
+  TWorkflowCanvasData,
+  TWorkflowNodeCreateRequest,
+  TWorkflowConnectionCreateRequest,
+  TWorkflowNodePositionUpdateRequest,
+  TWorkflowNodeCreateResponse
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
@@ -219,6 +226,104 @@ export class ApiService {
     return axiosApiClient.delete<void>(`/workflow/${id}/`);
   }
 
+  // Workflow Canvas Operations
+  static async getWorkflowCanvasData(workflowId: string): Promise<TWorkflowCanvasData> {
+    const response = await axiosApiClient.get<any>(`/workflow/${workflowId}/canvas_data/`);
+    
+    // Transform the response to match our types
+    return {
+      nodes: response.nodes.map((node: any) => ({
+        id: node.id,
+        position: node.position,
+        data: node.data,
+        node_template: node.node_template
+      })),
+      edges: response.edges.map((edge: any) => ({
+        id: edge.id,
+        sourceNodeId: edge.source,
+        targetNodeId: edge.target,
+        sourceHandle: undefined,
+        targetHandle: undefined,
+      })),
+      workflow: response.workflow
+    };
+  }
+
+  static async getAvailableNodeTemplates(workflowId: string): Promise<TNode[]> {
+    const response = await axiosApiClient.get<any[]>(`/workflow/${workflowId}/available_nodes/`);
+    
+    // Transform to TNode format (these are StandaloneNode templates)
+    return response.map((template: any) => ({
+      id: template.id,
+      name: template.name,
+      type: template.category as TNode['type'],
+      nodeGroup: '', // Not provided in this endpoint
+      nodeGroupName: '', // Not provided in this endpoint
+      nodeGroupIcon: undefined,
+      description: template.description || '',
+      version: '1.0.0', // Default version
+      isActive: true, // Only active templates are returned
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'System',
+      formConfiguration: {},
+      tags: [],
+      logo: template.icon,
+    }));
+  }
+
+  static async addNodeToWorkflow(
+    workflowId: string, 
+    nodeData: TWorkflowNodeCreateRequest
+  ): Promise<TWorkflowNodeCreateResponse> {
+    const response = await axiosApiClient.post<any>(`/workflow/${workflowId}/add_node/`, nodeData);
+    
+    return {
+      id: response.id,
+      position: response.position,
+      data: response.data,
+      node_template: response.node_template
+    };
+  }
+
+  static async updateNodePosition(
+    workflowId: string, 
+    nodeId: string, 
+    position: { x: number; y: number }
+  ): Promise<void> {
+    await axiosApiClient.put(`/workflow/${workflowId}/update_node_position/`, {
+      nodeId,
+      position
+    });
+  }
+
+  static async removeNodeFromWorkflow(workflowId: string, nodeId: string): Promise<void> {
+    await axiosApiClient.delete(`/workflow/${workflowId}/remove_node/`, {
+      data: { nodeId }
+    });
+  }
+
+  static async addConnectionToWorkflow(
+    workflowId: string, 
+    connectionData: TWorkflowConnectionCreateRequest
+  ): Promise<TWorkflowConnection> {
+    const response = await axiosApiClient.post<any>(`/workflow/${workflowId}/add_connection/`, connectionData);
+    
+    return {
+      id: response.id,
+      sourceNodeId: response.source_node,
+      targetNodeId: response.target_node,
+      sourceHandle: undefined,
+      targetHandle: undefined,
+    };
+  }
+
+  static async removeConnectionFromWorkflow(workflowId: string, connectionId: string): Promise<void> {
+    await axiosApiClient.delete(`/workflow/${workflowId}/remove_connection/`, {
+      data: { connectionId }
+    });
+  }
+
   // Project operations (placeholder for future implementation)
   static async getProjects(): Promise<TProject[]> {
     // TODO: Implement when backend is ready
@@ -227,7 +332,7 @@ export class ApiService {
 
   static async createProject(projectData: Partial<TProject>): Promise<TProject> {
     // TODO: Implement when backend is ready
-    return Promise.resolve(projectData);
+    return Promise.resolve(projectData as TProject);
   }
 
   static async updateProject(id: string, projectData: Partial<TProject>): Promise<TProject> {
@@ -294,6 +399,13 @@ export const {
   createWorkflow,
   updateWorkflow,
   deleteWorkflow,
+  getWorkflowCanvasData,
+  getAvailableNodeTemplates,
+  addNodeToWorkflow,
+  updateNodePosition,
+  removeNodeFromWorkflow,
+  addConnectionToWorkflow,
+  removeConnectionFromWorkflow,
   getProjects,
   createProject,
   updateProject,

@@ -62,13 +62,16 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
 
         {/* Center Canvas */}
         <div className="flex-1">
-          <WorkflowCanvas
-            selectedNodes={selectedNodes}
-            searchTerm={searchTerm}
-            filters={filters}
-            lineType={lineType}
-            showMinimap={showMinimap}
-          />
+          {workflowId && (
+            <WorkflowCanvas
+              workflowId={workflowId}
+              selectedNodes={selectedNodes}
+              searchTerm={searchTerm}
+              filters={filters}
+              lineType={lineType}
+              showMinimap={showMinimap}
+            />
+          )}
         </div>
       </div>
     </div>

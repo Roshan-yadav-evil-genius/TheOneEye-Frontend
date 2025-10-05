@@ -60,7 +60,7 @@ export function SignupForm({
       
       toast.success("Account created successfully!")
       router.push("/dashboard")
-    } catch (error) {
+    } catch {
       toast.error("Failed to create account. Please try again.")
     } finally {
       setIsLoading(false)

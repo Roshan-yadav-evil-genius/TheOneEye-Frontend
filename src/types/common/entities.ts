@@ -18,6 +18,7 @@ export interface TNodeGroup {
   updatedAt: string; // ISO string format from backend
 }
 
+// StandaloneNode - Template nodes that can be used in workflows
 export interface TNode {
   id: string;
   name: string;
@@ -36,12 +37,38 @@ export interface TNode {
   logo?: string; // URL to the node logo image
 }
 
+// WorkflowNode - Instance of a node in a specific workflow
+export interface TWorkflowNode {
+  id: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  data: {
+    label: string;
+    description: string;
+    icon?: string;
+    category: string;
+    type: string;
+    template_id?: string;
+  };
+  node_template?: {
+    id: string;
+    name: string;
+    type: string;
+    description?: string;
+    logo?: string;
+    form_configuration: Record<string, unknown>;
+    tags: string[];
+  } | null;
+}
+
 export interface TWorkflow {
   id: string;
   name: string;
   description: string;
   category?: string;
-  nodes: TNode[];
+  nodes: TWorkflowNode[]; // Changed from TNode[] to TWorkflowNode[]
   connections: TWorkflowConnection[];
   status: 'active' | 'inactive' | 'error';
   lastRun?: string;

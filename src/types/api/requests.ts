@@ -25,3 +25,31 @@ export interface TNodeFilters {
   page?: number;
   page_size?: number;
 }
+
+// Workflow-specific request types
+export interface TWorkflowNodeCreateRequest {
+  nodeTemplate: string; // StandaloneNode ID
+  position: {
+    x: number;
+    y: number;
+  };
+  data?: {
+    name?: string;
+    description?: string;
+    icon?: string;
+    category?: string;
+  };
+}
+
+export interface TWorkflowConnectionCreateRequest {
+  source: string; // Source node ID
+  target: string; // Target node ID
+}
+
+export interface TWorkflowNodePositionUpdateRequest {
+  nodeId: string;
+  position: {
+    x: number;
+    y: number;
+  };
+}

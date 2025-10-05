@@ -1,8 +1,11 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import { Node, Edge, addEdge, Connection, useNodesState, useEdgesState } from "reactflow";
-import { initialNodes, initialEdges } from "../data/workflow-initial-data";
+import { useWorkflowCanvasStore } from "@/stores";
+import { TWorkflowNodeCreateRequest } from "@/types";
+import { TWorkflowNode } from "@/types/common/entities";
 
 interface WorkflowStateProps {
+  workflowId: string;
   lineType: string;
   selectedNodes: string[];
   searchTerm: string;
@@ -11,10 +14,82 @@ interface WorkflowStateProps {
   };
 }
 
-export const useWorkflowState = ({ lineType, selectedNodes, searchTerm, filters }: WorkflowStateProps) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [isDragOver, setIsDragOver] = useState(false);
+export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTerm, filters }: WorkflowStateProps) => {
+  // Get workflow canvas store state and actions
+  const {
+    nodes: workflowNodes,
+    connections: workflowConnections,
+    isLoading,
+    isSaving,
+    error,
+    isDragOver,
+    loadWorkflowCanvas,
+    addNode,
+    updateNodePosition,
+    removeNode,
+    addConnection,
+    removeConnection,
+    setDragOver,
+    selectNode,
+    clearSelection,
+  } = useWorkflowCanvasStore();
+
+  // Convert workflow nodes to ReactFlow format
+  const reactFlowNodes = useMemo(() => {
+    return workflowNodes.map((workflowNode): Node => {
+      const nodeTemplate = (workflowNode as any).node_template;
+      
+      return {
+        id: workflowNode.id,
+        type: 'custom',
+        position: workflowNode.position,
+        data: {
+          // Use node template information if available, fallback to data field
+          label: nodeTemplate?.name || workflowNode.data.label,
+          type: nodeTemplate?.type || workflowNode.data.type,
+          status: 'active',
+          category: nodeTemplate?.type || workflowNode.data.category,
+          description: nodeTemplate?.description || workflowNode.data.description,
+          icon: nodeTemplate?.logo || workflowNode.data.icon,
+          template_id: workflowNode.data.template_id,
+          node_template: nodeTemplate,
+          onDeleteNode: (nodeId: string) => removeNode(nodeId),
+        },
+      };
+    });
+  }, [workflowNodes, removeNode]);
+
+  // Convert workflow connections to ReactFlow format
+  const reactFlowEdges = useMemo(() => {
+    return workflowConnections.map((connection): Edge => ({
+      id: connection.id,
+      source: connection.sourceNodeId,
+      target: connection.targetNodeId,
+      type: lineType,
+      animated: true,
+      style: { stroke: '#3b82f6', strokeWidth: 2 },
+    }));
+  }, [workflowConnections, lineType]);
+
+  // ReactFlow state management
+  const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(reactFlowEdges);
+
+  // Sync ReactFlow state with workflow store
+  useEffect(() => {
+    setNodes(reactFlowNodes);
+  }, [reactFlowNodes, setNodes]);
+
+  useEffect(() => {
+    setEdges(reactFlowEdges);
+  }, [reactFlowEdges, setEdges]);
+
+  // Load workflow data on mount
+  useEffect(() => {
+    if (workflowId) {
+      loadWorkflowCanvas(workflowId);
+    }
+  }, [workflowId, loadWorkflowCanvas]);
 
   // Update existing edges when lineType changes
   useEffect(() => {
@@ -27,7 +102,7 @@ export const useWorkflowState = ({ lineType, selectedNodes, searchTerm, filters 
   }, [lineType, setEdges]);
 
   const onConnect = useCallback(
-    (params: Connection) => {
+    async (params: Connection) => {
       // Prevent self-connections
       if (params.source === params.target) {
         return;
@@ -42,47 +117,35 @@ export const useWorkflowState = ({ lineType, selectedNodes, searchTerm, filters 
         return;
       }
       
-      // Create a new edge with a unique ID
-      const newEdge = {
-        ...params,
-        id: `edge-${params.source}-${params.target}-${Date.now()}`,
-        animated: true,
-        type: lineType,
-        style: { stroke: '#3b82f6', strokeWidth: 2 },
-      };
-      setEdges((eds) => addEdge(newEdge, eds));
+      // Add connection to workflow store
+      if (params.source && params.target) {
+        await addConnection({
+          source: params.source,
+          target: params.target,
+        });
+      }
     },
-    [setEdges, edges, lineType]
+    [edges, addConnection]
   );
 
   const handleDeleteNode = useCallback((nodeId: string) => {
-    // Remove the node
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-    
-    // Remove all edges connected to this node
-    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
-  }, [setNodes, setEdges]);
+    removeNode(nodeId);
+  }, [removeNode]);
 
-  const addNodeFromDrag = useCallback((nodeData: any, position: { x: number; y: number }) => {
-    const newNode: Node = {
-      id: `${nodeData.id}-${Date.now()}`, // Ensure unique ID
-      type: 'custom',
+  const addNodeFromDrag = useCallback(async (nodeData: any, position: { x: number; y: number }) => {
+    const nodeRequest: TWorkflowNodeCreateRequest = {
+      nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
       position,
       data: {
-        label: nodeData.name,
-        type: nodeData.type,
-        status: 'active',
-        category: nodeData.category,
+        name: nodeData.name,
         description: nodeData.description,
-        formConfiguration: nodeData.formConfiguration || {},
-        logo: nodeData.logo,
-        nodeGroupIcon: nodeData.nodeGroupIcon,
-        nodeGroupName: nodeData.nodeGroupName,
+        icon: nodeData.logo,
+        category: nodeData.type,
       },
     };
 
-    setNodes((nds) => nds.concat(newNode));
-  }, [setNodes]);
+    await addNode(nodeRequest);
+  }, [addNode]);
 
   // Filter nodes based on search and filters
   const filteredNodes = useMemo(() => {
@@ -111,10 +174,13 @@ export const useWorkflowState = ({ lineType, selectedNodes, searchTerm, filters 
     edges,
     filteredNodes,
     isDragOver,
-    setIsDragOver,
+    setIsDragOver: setDragOver,
     onNodesChange,
     onEdgesChange,
     onConnect,
     addNodeFromDrag,
+    isLoading,
+    isSaving,
+    error,
   };
 };
