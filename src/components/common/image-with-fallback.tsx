@@ -11,7 +11,6 @@ interface ImageWithFallbackProps {
   height?: number;
   className?: string;
   fallbackIcon?: React.ReactNode;
-  secondaryFallbackIcon?: React.ReactNode;
   fallbackIconColor?: string;
   onError?: () => void;
 }
@@ -23,25 +22,13 @@ export function ImageWithFallback({
   height = 32,
   className = "",
   fallbackIcon,
-  secondaryFallbackIcon,
   fallbackIconColor = "text-muted-foreground",
   onError,
 }: ImageWithFallbackProps) {
   const [imageError, setImageError] = useState(false);
-  const [fallbackError, setFallbackError] = useState(false);
 
   // If no src or image failed to load, show fallback
   if (!src || imageError) {
-    // If fallback icon also failed to load, show secondary fallback or no icon
-    if (fallbackError && secondaryFallbackIcon) {
-      return (
-        <div className={`flex items-center justify-center ${className}`}>
-          {secondaryFallbackIcon}
-        </div>
-      );
-    }
-    
-    // Show primary fallback or no icon
     return (
       <div className={`flex items-center justify-center ${className}`}>
         {fallbackIcon || <IconPhotoOff className={`h-5 w-5 ${fallbackIconColor}`} />}

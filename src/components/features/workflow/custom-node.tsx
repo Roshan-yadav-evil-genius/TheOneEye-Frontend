@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NodeEditDialog } from "./node-edit-dialog";
 import { nodeColors } from "@/constants/node-styles";
-import { NodeIcon } from "./node-icon";
+import { NodeLogo } from "@/components/common/node-logo";
 import { 
   IconPlayerPlay,
   IconTrash,
@@ -178,11 +178,15 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
 
         {/* Node Content - Just Icon */}
         <div className="flex items-center justify-center h-full">
-          <NodeIcon
-            logo={data.logo}
-            nodeGroupIcon={data.nodeGroupIcon}
-            nodeGroupName={data.nodeGroupName}
-            type={data.type}
+          <NodeLogo
+            node={{
+              id: id,
+              name: data.label,
+              type: data.type,
+              logo: data.logo,
+              nodeGroupIcon: data.nodeGroupIcon,
+              nodeGroupName: data.nodeGroupName,
+            } as any}
             size="lg"
           />
         </div>

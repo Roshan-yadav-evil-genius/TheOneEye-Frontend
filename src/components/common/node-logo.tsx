@@ -27,15 +27,6 @@ const iconSizes = {
 export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   const { iconColorClass } = getNodeColors(node.type);
   
-  const getNodeIcon = (type: string) => {
-    const nodeIcons = {
-      trigger: "🕐", // IconClock equivalent
-      action: "⚙️",  // IconSettings equivalent  
-      logic: "✅",   // IconCheck equivalent
-      system: "🗄️", // IconDatabase equivalent
-    };
-    return nodeIcons[type as keyof typeof nodeIcons] || "⚙️";
-  };
 
   const getGroupIcon = () => {
     if (node.nodeGroupIcon) {

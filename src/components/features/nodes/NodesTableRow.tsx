@@ -17,10 +17,6 @@ import {
   IconEdit,
   IconEye,
   IconTrash,
-  IconCheck,
-  IconSettings,
-  IconClock,
-  IconDatabase,
   IconTag,
   IconPhotoOff,
 } from "@tabler/icons-react";
