@@ -53,14 +53,6 @@ export const NodeIcon = memo(function NodeIcon({
     />
   );
 
-  // For testing: Force fallback to see type-colored IconPhotoOff
-  // TODO: Remove this after testing
-  return (
-    <div className={`${config.container} flex items-center justify-center ${className}`}>
-      <IconPhotoOff className={`${config.icon} ${typeColor}`} />
-    </div>
-  );
-
   // Two-tier fallback: node logo → group icon → IconPhotoOff
   if (logo) {
     return createImageComponent(
