@@ -27,6 +27,7 @@ import {
 import { useNodesByNodeGroup } from "@/hooks/useSharedNodes";
 import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
+import { NodeLogo } from "@/components/common/node-logo";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -261,42 +262,7 @@ export function WorkflowSidebar({
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 mt-0.5">
-                              {node.logo ? (
-                                <ImageWithFallback
-                                  src={node.logo}
-                                  alt={`${node.name} logo`}
-                                  width={16}
-                                  height={16}
-                                  className="h-4 w-4 object-cover rounded"
-                                  fallbackIcon={
-                                    node.nodeGroupIcon ? (
-                                      <ImageWithFallback
-                                        src={node.nodeGroupIcon}
-                                        alt={`${node.nodeGroupName} group icon`}
-                                        width={16}
-                                        height={16}
-                                        className="h-4 w-4 object-cover rounded"
-                                        fallbackIcon={<IconComponent className="h-4 w-4 text-muted-foreground" />}
-                                      />
-                                    ) : (
-                                      <IconComponent className="h-4 w-4 text-muted-foreground" />
-                                    )
-                                  }
-                                />
-                              ) : node.nodeGroupIcon ? (
-                                <ImageWithFallback
-                                  src={node.nodeGroupIcon}
-                                  alt={`${node.nodeGroupName} group icon`}
-                                  width={16}
-                                  height={16}
-                                  className="h-4 w-4 object-cover rounded"
-                                  fallbackIcon={<IconComponent className="h-4 w-4 text-muted-foreground" />}
-                                />
-                              ) : (
-                                <div className="h-4 w-4 rounded bg-muted flex items-center justify-center">
-                                  <IconComponent className="h-3 w-3 text-muted-foreground" />
-                                </div>
-                              )}
+                              <NodeLogo node={node} size="sm" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2 mb-1">

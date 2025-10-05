@@ -27,75 +27,8 @@ import {
 import { TNode } from "@/types";
 import { formatNodeDate } from "@/lib/dates";
 import { getNodeColors } from "@/constants/node-styles";
+import { NodeLogo } from "@/components/common/node-logo";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
-
-interface NodeLogoProps {
-  node: TNode;
-}
-
-const NodeLogo: React.FC<NodeLogoProps> = ({ node }) => {
-  const getNodeIcon = (type: string) => {
-    const nodeIcons = {
-      trigger: IconClock,
-      action: IconSettings,
-      logic: IconCheck,
-      system: IconDatabase,
-    };
-    const IconComponent = nodeIcons[type as keyof typeof nodeIcons] || IconSettings;
-    return <IconComponent className="h-4 w-4" />;
-  };
-
-  const getGroupIcon = () => {
-    if (node.nodeGroupIcon) {
-      return (
-        <ImageWithFallback
-          src={node.nodeGroupIcon}
-          alt={`${node.nodeGroupName} group icon`}
-          width={32}
-          height={32}
-          className="h-8 w-8 rounded-lg object-cover"
-          fallbackIcon={getNodeIcon(node.type)}
-        />
-      );
-    }
-    return getNodeIcon(node.type);
-  };
-
-  // Three-tier fallback: node logo → group icon → type icon
-  if (node.logo) {
-    return (
-      <ImageWithFallback
-        src={node.logo}
-        alt={`${node.name} logo`}
-        width={32}
-        height={32}
-        className="h-8 w-8 rounded-lg object-cover"
-        fallbackIcon={getGroupIcon()}
-      />
-    );
-  }
-
-  // If no node logo, try group icon
-  if (node.nodeGroupIcon) {
-    return (
-      <ImageWithFallback
-        src={node.nodeGroupIcon}
-        alt={`${node.nodeGroupName} group icon`}
-        width={32}
-        height={32}
-        className="h-8 w-8 rounded-lg object-cover"
-        fallbackIcon={getNodeIcon(node.type)}
-      />
-    );
-  }
-
-  // Final fallback: show type icon
-  return (
-    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-      {getNodeIcon(node.type)}
-    </div>
-  );
-};
 
 interface NodesTableRowProps {
   node: TNode;
@@ -129,7 +62,7 @@ export function NodesTableRow({
   };
 
   const renderNodeLogo = (node: TNode) => {
-    return <NodeLogo node={node} />;
+    return <NodeLogo node={node} size="md" />;
   };
 
   const renderNodeGroupIcon = (node: TNode) => {
