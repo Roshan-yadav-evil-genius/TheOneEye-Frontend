@@ -5,28 +5,17 @@ import { IconPhotoOff } from "@tabler/icons-react";
 import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { getNodeColors } from "@/constants/node-styles";
+import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
 
 interface NodeLogoProps {
   node: TNode;
-  size?: "sm" | "md" | "lg";
+  size?: SizeVariant;
   className?: string;
 }
 
-const sizeClasses = {
-  sm: "h-4 w-4",
-  md: "h-8 w-8", 
-  lg: "h-10 w-10"
-};
-
-const iconSizes = {
-  sm: "h-3 w-3",
-  md: "h-4 w-4",
-  lg: "h-5 w-5"
-};
-
 export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   const { iconColorClass } = getNodeColors(node.type);
-  
+  const { container, icon, dimensions } = getSizeConfig(size);
 
   const getGroupIcon = () => {
     if (node.nodeGroupIcon) {
@@ -34,21 +23,21 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
         <ImageWithFallback
           src={node.nodeGroupIcon}
           alt={`${node.nodeGroupName} group icon`}
-          width={size === "sm" ? 16 : size === "md" ? 32 : 40}
-          height={size === "sm" ? 16 : size === "md" ? 32 : 40}
-          className={`${sizeClasses[size]} object-cover rounded`}
+          width={dimensions}
+          height={dimensions}
+          className={`${container} object-cover rounded`}
           fallbackIconColor={iconColorClass}
           fallbackIcon={
-            <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-              <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
+            <div className={`${container} flex items-center justify-center`}>
+              <IconPhotoOff className={`${icon} ${iconColorClass}`} />
             </div>
           }
         />
       );
     }
     return (
-      <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-        <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
+      <div className={`${container} flex items-center justify-center`}>
+        <IconPhotoOff className={`${icon} ${iconColorClass}`} />
       </div>
     );
   };
@@ -59,9 +48,9 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
       <ImageWithFallback
         src={node.logo}
         alt={`${node.name} logo`}
-        width={size === "sm" ? 16 : size === "md" ? 32 : 40}
-        height={size === "sm" ? 16 : size === "md" ? 32 : 40}
-        className={`${sizeClasses[size]} object-cover rounded ${className}`}
+        width={dimensions}
+        height={dimensions}
+        className={`${container} object-cover rounded ${className}`}
         fallbackIconColor={iconColorClass}
         fallbackIcon={getGroupIcon()}
       />
@@ -74,13 +63,13 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
       <ImageWithFallback
         src={node.nodeGroupIcon}
         alt={`${node.nodeGroupName} group icon`}
-        width={size === "sm" ? 16 : size === "md" ? 32 : 40}
-        height={size === "sm" ? 16 : size === "md" ? 32 : 40}
-        className={`${sizeClasses[size]} object-cover rounded ${className}`}
+        width={dimensions}
+        height={dimensions}
+        className={`${container} object-cover rounded ${className}`}
         fallbackIconColor={iconColorClass}
         fallbackIcon={
-          <div className={`${sizeClasses[size]} flex items-center justify-center`}>
-            <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
+          <div className={`${container} flex items-center justify-center`}>
+            <IconPhotoOff className={`${icon} ${iconColorClass}`} />
           </div>
         }
       />
@@ -89,8 +78,8 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
 
   // Final fallback: show photo off icon
   return (
-    <div className={`${sizeClasses[size]} flex items-center justify-center ${className}`}>
-      <IconPhotoOff className={`${iconSizes[size]} ${iconColorClass}`} />
+    <div className={`${container} flex items-center justify-center ${className}`}>
+      <IconPhotoOff className={`${icon} ${iconColorClass}`} />
     </div>
   );
 }

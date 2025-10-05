@@ -21,9 +21,13 @@ import {
   IconPhotoOff
 } from "@tabler/icons-react";
 import { useNodesByNodeGroup } from "@/hooks/useSharedNodes";
+import { useNodeFiltering } from "@/hooks/useNodeFiltering";
+import { useNodeDragDrop } from "@/hooks/useNodeDragDrop";
+import { useNodeGroupExpansion } from "@/hooks/useNodeGroupExpansion";
 import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { NodeLogo } from "@/components/common/node-logo";
+import { badgeColors } from "@/constants/node-styles";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -36,12 +40,6 @@ interface WorkflowSidebarProps {
   onNodeSelect: (nodeId: string) => void;
 }
 
-const nodeColors = {
-  trigger: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  action: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  logic: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
-  system: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-};
 
 export function WorkflowSidebar({
   searchTerm,
@@ -51,8 +49,6 @@ export function WorkflowSidebar({
   selectedNodes,
   onNodeSelect,
 }: WorkflowSidebarProps) {
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
 
   // Use the shared nodes hook for better performance
   const { 
@@ -64,31 +60,18 @@ export function WorkflowSidebar({
     clearError 
   } = useNodesByNodeGroup();
 
-  // Filter nodes based on search and nodeGroup filters
-  const filteredNodesByNodeGroup = Object.entries(nodesByNodeGroup).reduce((acc, [nodeGroup, nodes]) => {
-    const filteredNodes = nodes.filter(node => {
-      const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           node.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesNodeGroup = filters.nodeGroup === "all" || node.nodeGroupName === filters.nodeGroup;
-      
-      return matchesSearch && matchesNodeGroup;
-    });
-    
-    if (filteredNodes.length > 0) {
-      acc[nodeGroup] = filteredNodes;
-    }
-    return acc;
-  }, {} as Record<string, TNode[]>);
-  
-  const toggleGroup = (nodeGroup: string) => {
-    const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(nodeGroup)) {
-      newExpanded.delete(nodeGroup);
-    } else {
-      newExpanded.add(nodeGroup);
-    }
-    setExpandedGroups(newExpanded);
-  };
+  // Use filtering hook for better separation of concerns
+  const { filteredNodesByNodeGroup } = useNodeFiltering({
+    nodesByNodeGroup,
+    searchTerm,
+    nodeGroupFilter: filters.nodeGroup
+  });
+
+  // Use drag and drop hook for better separation of concerns
+  const { draggedNodeId, handleDragStart, handleDragEnd } = useNodeDragDrop();
+
+  // Use expansion hook for better separation of concerns
+  const { toggleGroup, isExpanded } = useNodeGroupExpansion();
 
   // Get the first node from each group to extract the nodeGroupIcon
   const getNodeGroupIcon = (nodeGroup: string) => {
@@ -183,7 +166,7 @@ export function WorkflowSidebar({
         {!isLoading && !error && (
           <div className="space-y-3">
           {Object.entries(filteredNodesByNodeGroup).map(([nodeGroup, nodes]) => {
-            const isExpanded = expandedGroups.has(nodeGroup);
+            const nodeGroupExpanded = isExpanded(nodeGroup);
             const nodeGroupIcon = getNodeGroupIcon(nodeGroup);
             
             return (
@@ -193,7 +176,7 @@ export function WorkflowSidebar({
                   className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => toggleGroup(nodeGroup)}
                 >
-                  {isExpanded ? (
+                  {nodeGroupExpanded ? (
                     <IconChevronDown className="h-4 w-4 text-muted-foreground" />
                   ) : (
                     <IconChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -211,7 +194,7 @@ export function WorkflowSidebar({
                 </div>
                 
                 {/* NodeGroup Nodes */}
-                {isExpanded && (
+                {nodeGroupExpanded && (
                   <div className="ml-4 space-y-2">
                     {nodes.map((node) => {
                       const isSelected = selectedNodes.includes(node.id);
@@ -230,24 +213,8 @@ export function WorkflowSidebar({
                           }`}
                           onClick={() => onNodeSelect(node.id)}
                           draggable
-                          onDragStart={(e) => {
-                            setDraggedNodeId(node.id);
-                            e.dataTransfer.setData('application/reactflow', JSON.stringify({
-                              id: node.id,
-                              name: node.name,
-                              type: node.type,
-                              nodeGroup: node.nodeGroup,
-                              nodeGroupName: node.nodeGroupName,
-                              nodeGroupIcon: node.nodeGroupIcon,
-                              description: node.description,
-                              logo: node.logo
-                            }));
-                            e.dataTransfer.effectAllowed = 'move';
-                          }}
-                          onDragEnd={(e) => {
-                            setDraggedNodeId(null);
-                            e.dataTransfer.clearData();
-                          }}
+                          onDragStart={(e) => handleDragStart(e, node)}
+                          onDragEnd={handleDragEnd}
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 mt-0.5">
@@ -258,7 +225,7 @@ export function WorkflowSidebar({
                                 <span className="font-medium text-sm truncate">{node.name}</span>
                                 <Badge 
                                   variant="outline" 
-                                  className={`text-xs flex-shrink-0 ${nodeColors[node.type as keyof typeof nodeColors]}`}
+                                  className={`text-xs flex-shrink-0 ${badgeColors[node.type as keyof typeof badgeColors]}`}
                                 >
                                   {node.type}
                                 </Badge>

@@ -5,15 +5,10 @@ import { Handle, Position } from "reactflow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NodeEditDialog } from "./node-edit-dialog";
+import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
-import { 
-  IconPlayerPlay,
-  IconTrash,
-  IconPower,
-  IconDots,
-  IconEdit
-} from "@tabler/icons-react";
+import { useDescriptionEditing } from "@/hooks/useDescriptionEditing";
 
 export interface CustomNodeData {
   label: string;
@@ -36,9 +31,23 @@ interface CustomNodeProps {
 
 export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [userDescription, setUserDescription] = useState(data.description || "");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  
+  // Use description editing hook for better separation of concerns
+  const {
+    isEditing: isEditingDescription,
+    userDescription,
+    startEditing: startDescriptionEditing,
+    stopEditing: stopDescriptionEditing,
+    handleDescriptionChange,
+    handleKeyDown: handleDescriptionKeyDown
+  } = useDescriptionEditing({
+    initialDescription: data.description || "",
+    onSave: (description) => {
+      // Here you could save the description to your state management or API
+      console.log('Description saved:', description);
+    }
+  });
   
   const colorClass = nodeColors[data.type as keyof typeof nodeColors] || nodeColors.system;
 
@@ -82,26 +91,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
 
   const handleDescriptionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsEditingDescription(true);
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserDescription(e.target.value);
-  };
-
-  const handleDescriptionBlur = () => {
-    setIsEditingDescription(false);
-    // Here you could save the description to your state management or API
-  };
-
-  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setIsEditingDescription(false);
-    }
-    if (e.key === 'Escape') {
-      setUserDescription(data.description || "");
-      setIsEditingDescription(false);
-    }
+    startDescriptionEditing();
   };
 
   return (
@@ -132,48 +122,13 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
 
       {/* Hover Actions */}
       {isHovered && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background border border-border rounded-md shadow-lg p-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/20"
-            onClick={handleEdit}
-          >
-            <IconEdit className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/20"
-            onClick={handlePlay}
-          >
-            <IconPlayerPlay className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20"
-            onClick={handleDelete}
-          >
-            <IconTrash className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-900/20"
-            onClick={handleShutdown}
-          >
-            <IconPower className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-900/20"
-            onClick={handleMore}
-          >
-            <IconDots className="h-3 w-3" />
-          </Button>
-        </div>
+        <NodeHoverActions
+          onEdit={handleEdit}
+          onPlay={handlePlay}
+          onDelete={handleDelete}
+          onShutdown={handleShutdown}
+          onMore={handleMore}
+        />
       )}
 
         {/* Node Content - Just Icon */}
@@ -207,7 +162,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
             <Input
               value={userDescription}
               onChange={handleDescriptionChange}
-              onBlur={handleDescriptionBlur}
+              onBlur={stopDescriptionEditing}
               onKeyDown={handleDescriptionKeyDown}
               placeholder="Add a comment..."
               className="text-xs h-6 px-2 py-1 text-center"

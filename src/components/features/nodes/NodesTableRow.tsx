@@ -22,9 +22,8 @@ import {
 } from "@tabler/icons-react";
 import { TNode } from "@/types";
 import { formatNodeDate } from "@/lib/dates";
-import { getNodeColors } from "@/constants/node-styles";
-import { NodeLogo } from "@/components/common/node-logo";
-import { ImageWithFallback } from "@/components/common/image-with-fallback";
+import { NodeTypeBadge } from "@/components/common/NodeTypeBadge";
+import { renderNodeLogo, renderNodeGroupIcon } from "@/lib/node-render-utils";
 
 interface NodesTableRowProps {
   node: TNode;
@@ -45,34 +44,7 @@ export function NodesTableRow({
   onView,
   onDelete,
 }: NodesTableRowProps) {
-  const { colorClass } = getNodeColors(node.type);
 
-  const getTypeBadge = (type: string) => {
-    const { colorClass, iconColorClass } = getNodeColors(type);
-    
-    return (
-      <Badge variant="outline" className={`${colorClass} ${iconColorClass}`}>
-        {type}
-      </Badge>
-    );
-  };
-
-  const renderNodeLogo = (node: TNode) => {
-    return <NodeLogo node={node} size="md" />;
-  };
-
-  const renderNodeGroupIcon = (node: TNode) => {
-    return (
-      <ImageWithFallback
-        src={node.nodeGroupIcon}
-        alt={node.nodeGroupName}
-        width={16}
-        height={16}
-        className="h-4 w-4 object-contain"
-        fallbackIcon={<IconPhotoOff className="h-4 w-4 text-muted-foreground" />}
-      />
-    );
-  };
 
   return (
     <TableRow>
@@ -94,7 +66,9 @@ export function NodesTableRow({
         </TableCell>
       )}
       {columns.find(col => col.id === "type")?.visible && (
-        <TableCell className="min-w-[100px]">{getTypeBadge(node.type)}</TableCell>
+        <TableCell className="min-w-[100px]">
+          <NodeTypeBadge type={node.type} />
+        </TableCell>
       )}
       {columns.find(col => col.id === "nodeGroup")?.visible && (
         <TableCell className="min-w-[120px]">
