@@ -22,9 +22,8 @@ export interface TNode {
   id: string;
   name: string;
   type: 'trigger' | 'action' | 'logic' | 'system';
-  category: string; // Keep temporarily for backward compatibility
-  nodeGroup?: string; // NodeGroup ID
-  nodeGroupName?: string; // NodeGroup name for display
+  nodeGroup: string; // NodeGroup ID
+  nodeGroupName: string; // NodeGroup name for display
   nodeGroupIcon?: string; // NodeGroup icon URL for display
   description: string;
   version: string;

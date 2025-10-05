@@ -21,7 +21,6 @@ interface UseSharedNodesReturn {
   clearError: () => void;
   
   // Selectors
-  getNodesByCategory: (category: string) => TNode[];
   getNodesByNodeGroup: (nodeGroup: string) => TNode[];
   getNodesByType: (type: string) => TNode[];
   getActiveNodes: () => TNode[];
@@ -87,10 +86,6 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
   }, [autoLoad, loadNodes]);
 
   // Memoized selectors
-  const getNodesByCategory = useCallback((category: string) => {
-    return nodes.filter(node => node.category === category);
-  }, [nodes]);
-
   const getNodesByNodeGroup = useCallback((nodeGroup: string) => {
     return nodes.filter(node => node.nodeGroup === nodeGroup);
   }, [nodes]);
@@ -123,7 +118,6 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
     clearError,
     
     // Selectors
-    getNodesByCategory,
     getNodesByNodeGroup,
     getNodesByType,
     getActiveNodes,
@@ -145,7 +139,7 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
  * Hook for accessing nodes data with automatic filtering
  * Useful for components that need filtered nodes based on search/filters
  */
-export const useFilteredNodes = (searchQuery?: string, categoryFilter?: string) => {
+export const useFilteredNodes = (searchQuery?: string, nodeGroupFilter?: string) => {
   const {
     nodes,
     isLoading,
@@ -163,12 +157,12 @@ export const useFilteredNodes = (searchQuery?: string, categoryFilter?: string) 
   }, [searchQuery, setSearchQuery]);
 
   useEffect(() => {
-    if (categoryFilter !== undefined) {
+    if (nodeGroupFilter !== undefined) {
       setFilters({ 
-        category: categoryFilter === "all" ? undefined : categoryFilter 
+        nodeGroup: nodeGroupFilter === "all" ? undefined : nodeGroupFilter 
       });
     }
-  }, [categoryFilter, setFilters]);
+  }, [nodeGroupFilter, setFilters]);
 
   // Get filtered nodes
   const filteredNodes = nodesSelectors.getFilteredNodes(useNodesStore.getState());
@@ -220,7 +214,7 @@ export const useNodesByNodeGroup = () => {
 
   // Group nodes by nodeGroup
   const nodesByNodeGroup = nodes.reduce((acc, node) => {
-    const groupName = node.nodeGroupName || node.category || 'Uncategorized';
+    const groupName = node.nodeGroupName || 'Uncategorized';
     if (!acc[groupName]) {
       acc[groupName] = [];
     }
@@ -257,12 +251,8 @@ export const useNodeStats = () => {
       acc[node.type] = (acc[node.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
-    byCategory: nodes.reduce((acc, node) => {
-      acc[node.category] = (acc[node.category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>),
     byNodeGroup: nodes.reduce((acc, node) => {
-      const groupName = node.nodeGroupName || node.category || 'Uncategorized';
+      const groupName = node.nodeGroupName || 'Uncategorized';
       acc[groupName] = (acc[groupName] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),

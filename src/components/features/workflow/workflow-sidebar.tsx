@@ -21,19 +21,19 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconLoader2,
-  IconAlertCircle
+  IconAlertCircle,
+  IconPhoto
 } from "@tabler/icons-react";
-import { getCategoryIcon } from "@/constants/node-styles";
-import { useNodesByCategory } from "@/hooks/useSharedNodes";
+import { useNodesByNodeGroup } from "@/hooks/useSharedNodes";
 import { TNode } from "@/types";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
   filters: {
-    category: string;
+    nodeGroup: string;
   };
-  onFiltersChange: (filters: { category: string }) => void;
+  onFiltersChange: (filters: { nodeGroup: string }) => void;
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
 }
@@ -61,49 +61,50 @@ export function WorkflowSidebar({
   selectedNodes,
   onNodeSelect,
 }: WorkflowSidebarProps) {
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['system', 'email', 'database', 'api', 'logic', 'control', 'file']));
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
 
   // Use the shared nodes hook for better performance
   const { 
-    nodesByCategory,
-    categories,
+    nodesByNodeGroup,
+    nodeGroups,
     totalNodes,
     isLoading, 
     error, 
     clearError 
-  } = useNodesByCategory();
+  } = useNodesByNodeGroup();
 
-  // Filter nodes based on search and category filters
-  const filteredNodesByCategory = Object.entries(nodesByCategory).reduce((acc, [category, nodes]) => {
+  // Filter nodes based on search and nodeGroup filters
+  const filteredNodesByNodeGroup = Object.entries(nodesByNodeGroup).reduce((acc, [nodeGroup, nodes]) => {
     const filteredNodes = nodes.filter(node => {
       const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            node.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = filters.category === "all" || node.category === filters.category;
+      const matchesNodeGroup = filters.nodeGroup === "all" || node.nodeGroupName === filters.nodeGroup;
       
-      return matchesSearch && matchesCategory;
+      return matchesSearch && matchesNodeGroup;
     });
     
     if (filteredNodes.length > 0) {
-      acc[category] = filteredNodes;
+      acc[nodeGroup] = filteredNodes;
     }
     return acc;
   }, {} as Record<string, TNode[]>);
   
-  const toggleGroup = (category: string) => {
+  const toggleGroup = (nodeGroup: string) => {
     const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(category)) {
-      newExpanded.delete(category);
+    if (newExpanded.has(nodeGroup)) {
+      newExpanded.delete(nodeGroup);
     } else {
-      newExpanded.add(category);
+      newExpanded.add(nodeGroup);
     }
     setExpandedGroups(newExpanded);
   };
 
-  
-  const renderCategoryIcon = (category: string) => {
-    const IconComponent = getCategoryIcon(category);
-    return IconComponent;
+  // Get the first node from each group to extract the nodeGroupIcon
+  const getNodeGroupIcon = (nodeGroup: string) => {
+    const nodes = nodesByNodeGroup[nodeGroup] || [];
+    const firstNode = nodes[0];
+    return firstNode?.nodeGroupIcon;
   };
 
   // Handle retry on error
@@ -142,18 +143,18 @@ export function WorkflowSidebar({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem 
-                onClick={() => onFiltersChange({ ...filters, category: "all" })}
-                className={filters.category === "all" ? "bg-accent" : ""}
+                onClick={() => onFiltersChange({ ...filters, nodeGroup: "all" })}
+                className={filters.nodeGroup === "all" ? "bg-accent" : ""}
               >
-                All Categories
+                All Groups
               </DropdownMenuItem>
-              {categories.map(category => (
+              {nodeGroups.map(nodeGroup => (
                 <DropdownMenuItem 
-                  key={category}
-                  onClick={() => onFiltersChange({ ...filters, category })}
-                  className={filters.category === category ? "bg-accent" : ""}
+                  key={nodeGroup}
+                  onClick={() => onFiltersChange({ ...filters, nodeGroup })}
+                  className={filters.nodeGroup === nodeGroup ? "bg-accent" : ""}
                 >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {nodeGroup}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -191,28 +192,40 @@ export function WorkflowSidebar({
         {/* Nodes List */}
         {!isLoading && !error && (
           <div className="space-y-3">
-          {Object.entries(filteredNodesByCategory).map(([category, nodes]) => {
-            const isExpanded = expandedGroups.has(category);
-            const CategoryIconComponent = renderCategoryIcon(category);
+          {Object.entries(filteredNodesByNodeGroup).map(([nodeGroup, nodes]) => {
+            const isExpanded = expandedGroups.has(nodeGroup);
+            const nodeGroupIcon = getNodeGroupIcon(nodeGroup);
             
             return (
-              <div key={category} className="space-y-2">
-                {/* Category Header */}
+              <div key={nodeGroup} className="space-y-2">
+                {/* NodeGroup Header */}
                 <div 
                   className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => toggleGroup(category)}
+                  onClick={() => toggleGroup(nodeGroup)}
                 >
                   {isExpanded ? (
                     <IconChevronDown className="h-4 w-4 text-muted-foreground" />
                   ) : (
                     <IconChevronRight className="h-4 w-4 text-muted-foreground" />
                   )}
-                  <CategoryIconComponent className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium text-sm capitalize">{category}</span>
+                  {nodeGroupIcon ? (
+                    <img 
+                      src={nodeGroupIcon} 
+                      alt={nodeGroup}
+                      className="h-4 w-4 object-contain"
+                      onError={(e) => {
+                        // Fallback to default icon if image fails to load
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <IconPhoto className={`h-4 w-4 text-muted-foreground ${nodeGroupIcon ? 'hidden' : ''}`} />
+                  <span className="font-medium text-sm">{nodeGroup}</span>
                   <span className="text-xs text-muted-foreground ml-auto">({nodes.length})</span>
                 </div>
                 
-                {/* Category Nodes */}
+                {/* NodeGroup Nodes */}
                 {isExpanded && (
                   <div className="ml-4 space-y-2">
                     {nodes.map((node) => {
@@ -239,7 +252,8 @@ export function WorkflowSidebar({
                               id: node.id,
                               name: node.name,
                               type: node.type,
-                              category: node.category,
+                              nodeGroup: node.nodeGroup,
+                              nodeGroupName: node.nodeGroupName,
                               description: node.description
                             }));
                             e.dataTransfer.effectAllowed = 'move';
@@ -277,7 +291,7 @@ export function WorkflowSidebar({
             );
           })}
           
-          {Object.keys(filteredNodesByCategory).length === 0 && (
+          {Object.keys(filteredNodesByNodeGroup).length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <IconSearch className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No nodes found</p>

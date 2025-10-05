@@ -21,7 +21,6 @@ export class ApiService {
       id: backendNode.id,
       name: backendNode.name,
       type: backendNode.type,
-      category: backendNode.category, // Keep for backward compatibility
       nodeGroup: backendNode.node_group,
       nodeGroupName: backendNode.node_group_name,
       nodeGroupIcon: backendNode.node_group_icon,
@@ -42,7 +41,6 @@ export class ApiService {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
-      category: frontendNode.category, // Keep for backward compatibility
       node_group: frontendNode.nodeGroup,
       description: frontendNode.description,
       version: frontendNode.version,
