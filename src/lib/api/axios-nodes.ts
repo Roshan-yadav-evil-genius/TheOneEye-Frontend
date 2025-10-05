@@ -45,19 +45,21 @@ class AxiosNodesApiClient {
   // Transform backend node to frontend node format
   private transformNode(backendNode: Record<string, unknown>): TNode {
     return {
-      id: backendNode.id,
-      name: backendNode.name,
-      type: backendNode.type,
-      category: backendNode.category,
-      description: backendNode.description || '',
-      version: backendNode.version || '1.0.0',
-      isActive: backendNode.is_active,
-      createdAt: backendNode.created_at,
-      updatedAt: backendNode.updated_at,
-      createdBy: backendNode.created_by || 'Unknown',
-      formConfiguration: backendNode.form_configuration || {},
-      tags: backendNode.tags || [],
-      logo: backendNode.logo ? this.constructLogoUrl(backendNode.logo) : undefined, // Include logo URL from backend
+      id: backendNode.id as string,
+      name: backendNode.name as string,
+      type: backendNode.type as 'trigger' | 'action' | 'logic' | 'system',
+      nodeGroup: backendNode.node_group as string,
+      nodeGroupName: backendNode.node_group_name as string,
+      nodeGroupIcon: backendNode.node_group_icon ? this.constructLogoUrl(backendNode.node_group_icon as string) : undefined,
+      description: (backendNode.description as string) || '',
+      version: (backendNode.version as string) || '1.0.0',
+      isActive: backendNode.is_active as boolean,
+      createdAt: backendNode.created_at as string,
+      updatedAt: backendNode.updated_at as string,
+      createdBy: (backendNode.created_by as string) || 'Unknown',
+      formConfiguration: (backendNode.form_configuration as Record<string, unknown>) || {},
+      tags: (backendNode.tags as string[]) || [],
+      logo: backendNode.logo ? this.constructLogoUrl(backendNode.logo as string) : undefined, // Include logo URL from backend
     };
   }
 
@@ -66,7 +68,7 @@ class AxiosNodesApiClient {
     return {
       name: nodeData.name,
       type: nodeData.type,
-      category: nodeData.category,
+      node_group: nodeData.nodeGroup, // Map nodeGroup to node_group for backend
       description: nodeData.description,
       version: nodeData.version,
       is_active: nodeData.isActive,
@@ -85,10 +87,10 @@ class AxiosNodesApiClient {
     });
     
     return {
-      count: data.count || data.length,
+      count: data.count || (Array.isArray(data) ? data.length : 0),
       next: data.next,
       previous: data.previous,
-      results: data.results ? data.results.map((node: Record<string, unknown>) => this.transformNode(node)) : data.map((node: Record<string, unknown>) => this.transformNode(node))
+      results: data.results ? data.results.map((node: Record<string, unknown>) => this.transformNode(node)) : (Array.isArray(data) ? data.map((node: Record<string, unknown>) => this.transformNode(node)) : [])
     };
   }
 
@@ -100,8 +102,12 @@ class AxiosNodesApiClient {
   async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const transformedData = this.transformNodeData(nodeData);
     
+    // Debug: Log the transformed data being sent to backend
+    console.log('Transformed data for backend:', transformedData);
+    
     // Check if there's a logo file to upload
     const hasLogoFile = transformedData.logo instanceof File;
+    console.log('Has logo file:', hasLogoFile, 'Logo type:', typeof transformedData.logo, 'Logo value:', transformedData.logo);
     
     let data: Record<string, unknown>;
     
@@ -109,17 +115,31 @@ class AxiosNodesApiClient {
       // Use FormData for file upload
       const formData = new FormData();
       
+      // Debug: Log the transformed data before FormData construction
+      console.log('Creating FormData with transformedData:', transformedData);
+      
       // Add all fields to FormData
       Object.entries(transformedData).forEach(([key, value]) => {
+        console.log(`Processing field: ${key}, value:`, value, 'type:', typeof value);
+        
         if (key === 'logo' && value instanceof File) {
+          console.log('Adding logo file to FormData');
           formData.append('logo', value);
         } else if (key === 'form_configuration' || key === 'tags') {
           // Convert objects/arrays to JSON strings
+          console.log(`Converting ${key} to JSON:`, JSON.stringify(value));
           formData.append(key, JSON.stringify(value));
         } else if (value !== null && value !== undefined) {
+          console.log(`Adding ${key} as string:`, value.toString());
           formData.append(key, value.toString());
         }
       });
+      
+      // Debug: Log FormData contents
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
       
       data = await axiosApiClient.uploadFile<Record<string, unknown>>('/nodes/', formData);
     } else {
@@ -152,12 +172,12 @@ class AxiosNodesApiClient {
     const data = await axiosApiClient.get<Record<string, unknown>>('/nodes/stats/');
     
     return {
-      total_nodes: data.total_nodes,
-      active_nodes: data.active_nodes,
-      inactive_nodes: data.inactive_nodes,
-      by_type: data.by_type,
-      by_category: data.by_category,
-      recent_created: data.recent_created,
+      total_nodes: data.total_nodes as number,
+      active_nodes: data.active_nodes as number,
+      inactive_nodes: data.inactive_nodes as number,
+      by_type: data.by_type as Record<string, number>,
+      by_category: data.by_node_group as Record<string, number>, // Backend returns by_node_group, not by_category
+      recent_created: data.recent_created as number,
     };
   }
 

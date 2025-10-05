@@ -4,7 +4,7 @@ import { TNode } from '../common';
 export interface TNodeCreateData {
   name: string;
   type: TNode['type'];
-  category: string;
+  nodeGroup: string; // NodeGroup ID - changed from category to nodeGroup
   description?: string;
   version?: string;
   isActive?: boolean; // Optional for creation, defaults to true

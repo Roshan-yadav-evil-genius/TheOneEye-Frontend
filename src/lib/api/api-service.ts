@@ -94,24 +94,40 @@ export class ApiService {
   static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const hasLogoFile = nodeData.logoFile instanceof File;
     
+    console.log('🔧 Creating node with data:', {
+      ...nodeData,
+      logoFile: hasLogoFile ? `File: ${nodeData.logoFile?.name}` : 'No file'
+    });
+    
     if (hasLogoFile) {
       const formData = new FormData();
       
-      // Add all fields to FormData
-      Object.entries(nodeData).forEach(([key, value]) => {
-        if (key === 'logoFile' && value instanceof File) {
-          formData.append('logo', value);
-        } else if (key === 'formConfiguration' || key === 'tags') {
+      // Transform to backend format first, then add to FormData
+      const backendData = this.transformToBackendFormat(nodeData);
+      console.log('🔄 Transformed to backend format:', backendData);
+      
+      // Add all fields to FormData with correct backend field names
+      Object.entries(backendData).forEach(([key, value]) => {
+        if (key === 'form_configuration' || key === 'tags') {
           formData.append(key, JSON.stringify(value));
         } else if (value !== null && value !== undefined) {
           formData.append(key, value.toString());
         }
       });
       
+      // Add the logo file with the correct field name
+      if (nodeData.logoFile instanceof File) {
+        formData.append('logo', nodeData.logoFile);
+      }
+      
+      console.log('📤 Sending FormData with fields:', Array.from(formData.keys()));
+      
       const response = await axiosApiClient.uploadFile<any>('/nodes/', formData);
       return this.transformNodeData(response);
     } else {
       const backendData = this.transformToBackendFormat(nodeData);
+      console.log('🔄 Transformed to backend format (no file):', backendData);
+      
       const response = await axiosApiClient.post<any>('/nodes/', backendData);
       return this.transformNodeData(response);
     }

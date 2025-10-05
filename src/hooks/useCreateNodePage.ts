@@ -3,16 +3,20 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { TNode } from "@/types";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
+import { useNodeGroups } from "@/hooks/useNodeGroups";
 
 export const useCreateNodePage = () => {
   const router = useRouter();
+  
+  // Get node groups to set default
+  const { nodeGroups } = useNodeGroups();
   
   // React Hook Form setup
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Partial<TNode>>({
     defaultValues: {
       name: "",
       type: "action",
-      nodeGroup: "",
+      nodeGroup: "", // Will be set when nodeGroups are loaded
       description: "",
       version: "1.0.0",
       tags: [],
@@ -60,13 +64,35 @@ export const useCreateNodePage = () => {
     setActivePage("Create Node");
   }, [setActivePage]);
 
+  // Set default nodeGroup when nodeGroups are loaded
+  useEffect(() => {
+    if (nodeGroups.length > 0 && !formData.nodeGroup) {
+      console.log('Setting default nodeGroup to:', nodeGroups[0].id);
+      setValue('nodeGroup', nodeGroups[0].id);
+    }
+  }, [nodeGroups, setValue, formData.nodeGroup]);
+
+  // Debug: Log form data changes
+  useEffect(() => {
+    console.log('Form data changed:', formData);
+  }, [formData]);
+
   const onSubmit = async (data: Partial<TNode>) => {
     try {
+      // Ensure we have a valid nodeGroup
+      const selectedNodeGroup = data.nodeGroup || (nodeGroups.length > 0 ? nodeGroups[0].id : '');
+      
+      if (!selectedNodeGroup) {
+        console.error('No nodeGroup selected and no default available');
+        uiHelpers.showError('Validation Error', 'Please select a node group');
+        return;
+      }
+
       // Prepare the node data for creation
       const nodeData = {
         name: data.name || '',
         type: data.type || 'action',
-        nodeGroup: data.nodeGroup || '',
+        nodeGroup: selectedNodeGroup,
         description: data.description || '',
         version: data.version || '1.0.0',
         isActive: data.isActive !== undefined ? data.isActive : true,
@@ -74,6 +100,10 @@ export const useCreateNodePage = () => {
         tags: data.tags || [],
         logoFile: logoFile || undefined, // Include the logo file
       };
+
+      // Debug: Log the data being sent
+      console.log('Creating node with data:', nodeData);
+      console.log('Available nodeGroups:', nodeGroups);
 
       // Create the node using the store
       await createNode(nodeData);
