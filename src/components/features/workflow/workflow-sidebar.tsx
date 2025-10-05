@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -19,9 +19,13 @@ import {
   IconClock,
   IconCheck,
   IconChevronDown,
-  IconChevronRight
+  IconChevronRight,
+  IconLoader2,
+  IconAlertCircle
 } from "@tabler/icons-react";
 import { getCategoryIcon } from "@/constants/node-styles";
+import { useNodesByCategory } from "@/hooks/useSharedNodes";
+import { TNode } from "@/types";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -33,8 +37,6 @@ interface WorkflowSidebarProps {
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
 }
-
-import { mockNodes } from "@/data";
 
 const nodeIcons = {
   trigger: IconClock,
@@ -62,25 +64,31 @@ export function WorkflowSidebar({
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['system', 'email', 'database', 'api', 'logic', 'control', 'file']));
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
 
-  // Filter nodes based on search and filters
-  const filteredNodes = mockNodes.filter(node => {
-    const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         node.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filters.category === "all" || node.category === filters.category;
-    
-    return matchesSearch && matchesCategory;
-  });
+  // Use the shared nodes hook for better performance
+  const { 
+    nodesByCategory,
+    categories,
+    totalNodes,
+    isLoading, 
+    error, 
+    clearError 
+  } = useNodesByCategory();
 
-  const categories = Array.from(new Set(mockNodes.map(node => node.category)));
-  
-  // Group nodes by category
-  const groupedNodes = categories.reduce((acc, category) => {
-    const categoryNodes = filteredNodes.filter(node => node.category === category);
-    if (categoryNodes.length > 0) {
-      acc[category] = categoryNodes;
+  // Filter nodes based on search and category filters
+  const filteredNodesByCategory = Object.entries(nodesByCategory).reduce((acc, [category, nodes]) => {
+    const filteredNodes = nodes.filter(node => {
+      const matchesSearch = node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           node.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filters.category === "all" || node.category === filters.category;
+      
+      return matchesSearch && matchesCategory;
+    });
+    
+    if (filteredNodes.length > 0) {
+      acc[category] = filteredNodes;
     }
     return acc;
-  }, {} as Record<string, typeof mockNodes>);
+  }, {} as Record<string, TNode[]>);
   
   const toggleGroup = (category: string) => {
     const newExpanded = new Set(expandedGroups);
@@ -96,6 +104,12 @@ export function WorkflowSidebar({
   const renderCategoryIcon = (category: string) => {
     const IconComponent = getCategoryIcon(category);
     return IconComponent;
+  };
+
+  // Handle retry on error
+  const handleRetry = () => {
+    clearError();
+    // The hook will automatically reload when error is cleared
   };
 
 
@@ -149,8 +163,35 @@ export function WorkflowSidebar({
 
       {/* Node List - Scrollable */}
       <div className="flex-1 overflow-y-auto p-1 min-h-0 sidebar-scrollbar">
-        <div className="space-y-3">
-          {Object.entries(groupedNodes).map(([category, nodes]) => {
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <IconLoader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Loading nodes...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <IconAlertCircle className="h-8 w-8 text-destructive mb-2" />
+            <p className="text-sm text-destructive mb-2">Failed to load nodes</p>
+            <p className="text-xs text-muted-foreground mb-4">{error}</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRetry}
+              className="text-xs"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {/* Nodes List */}
+        {!isLoading && !error && (
+          <div className="space-y-3">
+          {Object.entries(filteredNodesByCategory).map(([category, nodes]) => {
             const isExpanded = expandedGroups.has(category);
             const CategoryIconComponent = renderCategoryIcon(category);
             
@@ -235,14 +276,15 @@ export function WorkflowSidebar({
               </div>
             );
           })}
+          
+          {Object.keys(filteredNodesByCategory).length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <IconSearch className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No nodes found</p>
+              <p className="text-xs">Try adjusting your search or filters</p>
+            </div>
+          )}
         </div>
-
-        {Object.keys(groupedNodes).length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <IconSearch className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No nodes found</p>
-            <p className="text-xs">Try adjusting your search or filters</p>
-          </div>
         )}
       </div>
 
