@@ -8,11 +8,24 @@ export interface TUser {
   permissions?: string[];
 }
 
+export interface TNodeGroup {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string; // URL to the node group icon image
+  isActive: boolean;
+  createdAt: string; // ISO string format from backend
+  updatedAt: string; // ISO string format from backend
+}
+
 export interface TNode {
   id: string;
   name: string;
   type: 'trigger' | 'action' | 'logic' | 'system';
-  category: string;
+  category: string; // Keep temporarily for backward compatibility
+  nodeGroup?: string; // NodeGroup ID
+  nodeGroupName?: string; // NodeGroup name for display
+  nodeGroupIcon?: string; // NodeGroup icon URL for display
   description: string;
   version: string;
   isActive: boolean;

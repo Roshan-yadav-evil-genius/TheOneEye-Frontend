@@ -22,6 +22,7 @@ interface UseSharedNodesReturn {
   
   // Selectors
   getNodesByCategory: (category: string) => TNode[];
+  getNodesByNodeGroup: (nodeGroup: string) => TNode[];
   getNodesByType: (type: string) => TNode[];
   getActiveNodes: () => TNode[];
   getInactiveNodes: () => TNode[];
@@ -90,6 +91,10 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
     return nodes.filter(node => node.category === category);
   }, [nodes]);
 
+  const getNodesByNodeGroup = useCallback((nodeGroup: string) => {
+    return nodes.filter(node => node.nodeGroup === nodeGroup);
+  }, [nodes]);
+
   const getNodesByType = useCallback((type: string) => {
     return nodes.filter(node => node.type === type);
   }, [nodes]);
@@ -119,6 +124,7 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
     
     // Selectors
     getNodesByCategory,
+    getNodesByNodeGroup,
     getNodesByType,
     getActiveNodes,
     getInactiveNodes,
@@ -206,6 +212,36 @@ export const useNodesByCategory = () => {
 };
 
 /**
+ * Hook for accessing nodes grouped by nodeGroup
+ * Useful for sidebar components that display nodes by nodeGroup
+ */
+export const useNodesByNodeGroup = () => {
+  const { nodes, isLoading, error, clearError } = useSharedNodes({ autoLoad: true });
+
+  // Group nodes by nodeGroup
+  const nodesByNodeGroup = nodes.reduce((acc, node) => {
+    const groupName = node.nodeGroupName || node.category || 'Uncategorized';
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push(node);
+    return acc;
+  }, {} as Record<string, TNode[]>);
+
+  // Get unique nodeGroups
+  const nodeGroups = Object.keys(nodesByNodeGroup).sort();
+
+  return {
+    nodesByNodeGroup,
+    nodeGroups,
+    totalNodes: nodes.length,
+    isLoading,
+    error,
+    clearError,
+  };
+};
+
+/**
  * Hook for accessing node statistics
  * Useful for dashboard components
  */
@@ -223,6 +259,11 @@ export const useNodeStats = () => {
     }, {} as Record<string, number>),
     byCategory: nodes.reduce((acc, node) => {
       acc[node.category] = (acc[node.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    byNodeGroup: nodes.reduce((acc, node) => {
+      const groupName = node.nodeGroupName || node.category || 'Uncategorized';
+      acc[groupName] = (acc[groupName] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
   };

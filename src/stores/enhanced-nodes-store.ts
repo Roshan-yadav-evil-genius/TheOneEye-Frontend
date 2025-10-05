@@ -14,7 +14,8 @@ interface EnhancedNodesState extends TNodesState {
   error: string | null;
   filters: {
     type?: string;
-    category?: string;
+    category?: string; // Keep for backward compatibility
+    nodeGroup?: string;
     search?: string;
   };
   // Pagination state
@@ -48,7 +49,8 @@ interface EnhancedNodesState extends TNodesState {
     active: number;
     inactive: number;
     byType: Record<string, number>;
-    byCategory: Record<string, number>;
+    byCategory: Record<string, number>; // Keep for backward compatibility
+    byNodeGroup: Record<string, number>;
     lastUpdated: number;
   } | null;
 }
@@ -106,7 +108,8 @@ const initialState: EnhancedNodesState = {
   error: null,
   filters: {
     type: undefined,
-    category: undefined,
+    category: undefined, // Keep for backward compatibility
+    nodeGroup: undefined,
     search: undefined,
   },
   pagination: {
@@ -795,7 +798,8 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
                 active: statsData.active_nodes,
                 inactive: statsData.inactive_nodes,
                 byType: statsData.by_type,
-                byCategory: statsData.by_category,
+                byCategory: statsData.by_category, // Keep for backward compatibility
+                byNodeGroup: statsData.by_node_group || {},
                 lastUpdated: Date.now(),
               };
             });
@@ -855,7 +859,8 @@ export const nodesSelectors = {
     
     const filtered = (nodes || []).filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
-      if (filters.category && node.category !== filters.category) return false;
+      if (filters.category && node.category !== filters.category) return false; // Keep for backward compatibility
+      if (filters.nodeGroup && node.nodeGroup !== filters.nodeGroup) return false;
       if (searchQuery && !node.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
@@ -883,6 +888,10 @@ export const nodesSelectors = {
   
   getNodesByCategory: (state: EnhancedNodesStore, category: string) => {
     return (state.nodes || []).filter(node => node.category === category);
+  },
+  
+  getNodesByNodeGroup: (state: EnhancedNodesStore, nodeGroup: string) => {
+    return (state.nodes || []).filter(node => node.nodeGroup === nodeGroup);
   },
   
   getActiveNodes: (state: EnhancedNodesStore) => {

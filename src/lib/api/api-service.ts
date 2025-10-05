@@ -1,6 +1,7 @@
 import { axiosApiClient } from './axios-client';
 import { 
   TNode,
+  TNodeGroup,
   TNodeCreateData, 
   TNodeUpdateData, 
   TNodeFilters, 
@@ -20,7 +21,10 @@ export class ApiService {
       id: backendNode.id,
       name: backendNode.name,
       type: backendNode.type,
-      category: backendNode.category,
+      category: backendNode.category, // Keep for backward compatibility
+      nodeGroup: backendNode.node_group,
+      nodeGroupName: backendNode.node_group_name,
+      nodeGroupIcon: backendNode.node_group_icon,
       description: backendNode.description || '',
       version: backendNode.version || '1.0.0',
       isActive: backendNode.is_active,
@@ -38,7 +42,8 @@ export class ApiService {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
-      category: frontendNode.category,
+      category: frontendNode.category, // Keep for backward compatibility
+      node_group: frontendNode.nodeGroup,
       description: frontendNode.description,
       version: frontendNode.version,
       is_active: frontendNode.isActive,
@@ -130,6 +135,75 @@ export class ApiService {
     return axiosApiClient.get<TNodeStats>('/nodes/stats/');
   }
 
+  // NodeGroup operations
+  static async getNodeGroups(): Promise<TNodeGroup[]> {
+    const response = await axiosApiClient.get<any[]>('/node-groups/');
+    return response.map((group: any) => ({
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      icon: group.icon,
+      isActive: group.is_active,
+      createdAt: group.created_at,
+      updatedAt: group.updated_at,
+    }));
+  }
+
+  static async getNodeGroup(id: string): Promise<TNodeGroup> {
+    const response = await axiosApiClient.get<any>(`/node-groups/${id}/`);
+    return {
+      id: response.id,
+      name: response.name,
+      description: response.description,
+      icon: response.icon,
+      isActive: response.is_active,
+      createdAt: response.created_at,
+      updatedAt: response.updated_at,
+    };
+  }
+
+  static async createNodeGroup(groupData: Partial<TNodeGroup>): Promise<TNodeGroup> {
+    const backendData = {
+      name: groupData.name,
+      description: groupData.description,
+      icon: groupData.icon,
+      is_active: groupData.isActive,
+    };
+    const response = await axiosApiClient.post<any>('/node-groups/', backendData);
+    return {
+      id: response.id,
+      name: response.name,
+      description: response.description,
+      icon: response.icon,
+      isActive: response.is_active,
+      createdAt: response.created_at,
+      updatedAt: response.updated_at,
+    };
+  }
+
+  static async updateNodeGroup(id: string, groupData: Partial<TNodeGroup>): Promise<TNodeGroup> {
+    const backendData = {
+      name: groupData.name,
+      description: groupData.description,
+      icon: groupData.icon,
+      is_active: groupData.isActive,
+    };
+    const response = await axiosApiClient.put<any>(`/node-groups/${id}/`, backendData);
+    return {
+      id: response.id,
+      name: response.name,
+      description: response.description,
+      icon: response.icon,
+      isActive: response.is_active,
+      createdAt: response.created_at,
+      updatedAt: response.updated_at,
+    };
+  }
+
+  static async deleteNodeGroup(id: string): Promise<void> {
+    return axiosApiClient.delete(`/node-groups/${id}/`);
+  }
+
   // Workflow operations
   static async getWorkflows(): Promise<TWorkflow[]> {
     return axiosApiClient.get<TWorkflow[]>('/workflow/');
@@ -213,6 +287,11 @@ export const {
   bulkCreateNodes,
   bulkDeleteNodes,
   getNodeStats,
+  getNodeGroups,
+  getNodeGroup,
+  createNodeGroup,
+  updateNodeGroup,
+  deleteNodeGroup,
   getWorkflows,
   createWorkflow,
   updateWorkflow,
