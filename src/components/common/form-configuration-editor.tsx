@@ -17,7 +17,7 @@ function convertElementsToWidgets(value: Record<string, unknown>): TWidgetConfig
   if (!value || !value.elements || !Array.isArray(value.elements)) {
     return [];
   }
-  
+
   return (value.elements as Record<string, unknown>[]).map((element, index) => ({
     id: `widget-${index}`,
     type: element.type,
@@ -53,23 +53,11 @@ export function FormConfigurationEditor({ value, onChange, disabled }: FormConfi
   }, [onChange]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <IconForms className="h-5 w-5" />
-          Form Configuration
-        </CardTitle>
-        <CardDescription>
-          Define the form structure and validation rules for this node
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <FormBuilder 
-          onFormChange={handleFormBuilderChange} 
-          initialWidgets={convertElementsToWidgets(value)} 
-          disabled={disabled}
-        />
-      </CardContent>
-    </Card>
+    <FormBuilder
+      onFormChange={handleFormBuilderChange}
+      initialWidgets={convertElementsToWidgets(value)}
+      disabled={disabled}
+    />
+
   );
 }
