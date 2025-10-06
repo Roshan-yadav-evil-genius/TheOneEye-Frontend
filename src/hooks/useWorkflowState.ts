@@ -60,8 +60,8 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   const reactFlowEdges = useMemo(() => {
     return workflowConnections.map((connection): Edge => ({
       id: connection.id,
-      source: connection.sourceNodeId,
-      target: connection.targetNodeId,
+      source: connection.source,
+      target: connection.target,
       type: lineType,
       animated: true,
       style: { stroke: '#3b82f6', strokeWidth: 2 },

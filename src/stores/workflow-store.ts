@@ -313,7 +313,7 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
                     ...workflow, 
                     nodes: workflow.nodes.filter((node) => node.id !== nodeId),
                     connections: workflow.connections.filter(
-                      (conn) => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
+                      (conn) => conn.source !== nodeId && conn.target !== nodeId
                     ),
                     updatedAt: new Date()
                   }
@@ -324,7 +324,7 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
                   ...state.activeTWorkflow, 
                   nodes: state.activeTWorkflow.nodes.filter((node) => node.id !== nodeId),
                   connections: state.activeTWorkflow.connections.filter(
-                    (conn) => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
+                    (conn) => conn.source !== nodeId && conn.target !== nodeId
                   ),
                   updatedAt: new Date()
                 }

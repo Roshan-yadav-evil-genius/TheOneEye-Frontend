@@ -244,7 +244,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
           set((state) => {
             state.nodes = state.nodes.filter(n => n.id !== nodeId);
             state.connections = state.connections.filter(
-              c => c.sourceNodeId !== nodeId && c.targetNodeId !== nodeId
+              c => c.source !== nodeId && c.target !== nodeId
             );
             state.selectedNodes = state.selectedNodes.filter(id => id !== nodeId);
           });
@@ -447,15 +447,15 @@ export const workflowCanvasSelectors = {
   
   getConnectionsForNode: (state: WorkflowCanvasStore, nodeId: string) => {
     return state.connections.filter(
-      connection => connection.sourceNodeId === nodeId || connection.targetNodeId === nodeId
+      connection => connection.source === nodeId || connection.target === nodeId
     );
   },
   
   getIncomingConnections: (state: WorkflowCanvasStore, nodeId: string) => {
-    return state.connections.filter(connection => connection.targetNodeId === nodeId);
+    return state.connections.filter(connection => connection.target === nodeId);
   },
   
   getOutgoingConnections: (state: WorkflowCanvasStore, nodeId: string) => {
-    return state.connections.filter(connection => connection.sourceNodeId === nodeId);
+    return state.connections.filter(connection => connection.source === nodeId);
   },
 };

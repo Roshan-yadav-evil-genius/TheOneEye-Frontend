@@ -314,8 +314,8 @@ export class ApiService {
     
     return {
       id: response.id,
-      sourceNodeId: response.source_node,
-      targetNodeId: response.target_node,
+      source: response.source_node,
+      target: response.target_node,
       sourceHandle: undefined,
       targetHandle: undefined,
     };

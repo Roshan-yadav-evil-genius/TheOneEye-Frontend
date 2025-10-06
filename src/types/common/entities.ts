@@ -83,8 +83,8 @@ export interface TWorkflow {
 
 export interface TWorkflowConnection {
   id: string;
-  sourceNodeId: string;
-  targetNodeId: string;
+  source: string;
+  target: string;
   sourceHandle?: string;
   targetHandle?: string;
 }
