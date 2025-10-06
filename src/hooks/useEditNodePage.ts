@@ -22,6 +22,7 @@ export const useEditNodePage = () => {
   const [currentTagInput, setCurrentTagInput] = useState<string>("");
   const [isLoadingNode, setIsLoadingNode] = useState(true);
   const [nodeLoadError, setNodeLoadError] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Zustand store hooks
   const { 
@@ -224,6 +225,7 @@ export const useEditNodePage = () => {
     isLoadingNode,
     nodeLoadError,
     isUpdating,
+    isPreviewOpen,
     
     // Handlers
     handleInputChange,
@@ -236,5 +238,6 @@ export const useEditNodePage = () => {
     handleFormConfigurationChange,
     handleSubmit,
     handleCancel,
+    setIsPreviewOpen,
   };
 };

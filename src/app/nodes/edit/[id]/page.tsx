@@ -20,6 +20,7 @@ import { FormConfigurationEditor } from "@/components/common/form-configuration-
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useEditNodePage } from "@/hooks/useEditNodePage";
 import { useNodeGroups } from "@/hooks/useNodeGroups";
+import { NodePreviewDialog, FormActions } from "@/components/features/nodes";
 
 function EditNodePageContent() {
   const {
@@ -29,6 +30,7 @@ function EditNodePageContent() {
     isLoadingNode,
     nodeLoadError,
     isUpdating,
+    isPreviewOpen,
     handleInputChange,
     handleVersionChange,
     handleTagInputChange,
@@ -39,6 +41,7 @@ function EditNodePageContent() {
     handleFormConfigurationChange,
     handleSubmit,
     handleCancel,
+    setIsPreviewOpen,
   } = useEditNodePage();
   
   const { nodeGroups, isLoading: isLoadingGroups } = useNodeGroups();
@@ -263,39 +266,29 @@ function EditNodePageContent() {
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isUpdating}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="flex items-center gap-2"
-                >
-                  {isUpdating ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
-                      Updating...
-                    </>
-                  ) : (
-                    <>
-                      <IconDeviceFloppy className="h-4 w-4" />
-                      Update Node
-                    </>
-                  )}
-                </Button>
-              </div>
+              {/* Action Buttons */}
+              <FormActions
+                isCreating={false}
+                onPreview={() => setIsPreviewOpen(true)}
+                onSave={() => {}} // This will be handled by form submission
+                formData={formData}
+                buttonText="Update Node"
+                isUpdating={isUpdating}
+                onCancel={handleCancel}
+              />
 
             </form>
           </CardContent>
         </Card>
       </div>
+
+      {/* Preview Dialog */}
+      <NodePreviewDialog
+        isOpen={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        nodeData={formData}
+        logoPreview={logoPreview}
+      />
     </div>
   );
 }

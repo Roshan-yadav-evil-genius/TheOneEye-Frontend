@@ -2,14 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
-import { NodePreview } from "@/components/features/nodes/NodePreview";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { NodeForm, TagsInput, LogoUpload, FormActions } from "@/components/features/nodes";
+import { NodeForm, TagsInput, LogoUpload, FormActions, NodePreviewDialog } from "@/components/features/nodes";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useCreateNodePage } from "@/hooks/useCreateNodePage";
 
@@ -76,17 +69,12 @@ function CreateNodePageContent() {
       </div>
 
       {/* Preview Dialog */}
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Node Preview</DialogTitle>
-          </DialogHeader>
-          <NodePreview 
-            nodeData={formData} 
-            logoPreview={logoPreview}
-          />
-        </DialogContent>
-      </Dialog>
+      <NodePreviewDialog
+        isOpen={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        nodeData={formData}
+        logoPreview={logoPreview}
+      />
     </div>
   );
 }
