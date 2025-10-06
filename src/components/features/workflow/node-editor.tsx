@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NodeHeader } from "./node-header";
 import { ParametersTab } from "./parameters-tab";
 import { FormFieldsSection } from "@/components/features/nodes/FormFieldsSection";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 interface Condition {
   id: string;
@@ -38,7 +38,7 @@ interface NodeEditorProps {
   onGroupsChange: (groups: GroupWithOperator[]) => void;
   onConvertTypesChange: (value: boolean) => void;
   // Form tab props
-  standaloneNodeData?: TNode | null;
+  standaloneNodeData?: BackendNodeType | null;
   nodeDataError?: string | null;
   // Header actions
   onTestStep?: () => void;

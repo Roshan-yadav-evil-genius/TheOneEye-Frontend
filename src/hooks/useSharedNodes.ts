@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useNodesStore, nodesSelectors } from '@/stores';
-import { TNode, TNodeFilters } from '@/types';
+import { TNodeFilters } from '@/types';
 import { BackendNodeType } from '@/types/api/backend';
 
 interface UseSharedNodesOptions {
@@ -10,8 +10,8 @@ interface UseSharedNodesOptions {
 
 interface UseSharedNodesReturn {
   // Data
-  nodes: TNode[];
-  filteredNodes: TNode[];
+  nodes: BackendNodeType[];
+  filteredNodes: BackendNodeType[];
   isLoading: boolean;
   error: string | null;
   
@@ -201,17 +201,14 @@ export const useNodesByNodeGroup = () => {
 
   // Group nodes by nodeGroup
   const nodesByNodeGroup = nodes.reduce((acc, node) => {
-    // Handle both TNode and BackendNodeType structures
-    const groupName = ('node_group' in node && node.node_group?.name) 
-      ? node.node_group.name 
-      : ('nodeGroupName' in node ? node.nodeGroupName : 'Uncategorized') || 'Uncategorized';
+    const groupName = node.node_group?.name || 'Uncategorized';
     
     if (!acc[groupName]) {
       acc[groupName] = [];
     }
     acc[groupName].push(node);
     return acc;
-  }, {} as Record<string, (TNode | BackendNodeType)[]>);
+  }, {} as Record<string, BackendNodeType[]>);
 
   // Get unique nodeGroups
   const nodeGroups = Object.keys(nodesByNodeGroup).sort();

@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { TNode } from "@/types";
 import { BackendNodeType } from "@/types/api/backend";
 
 export function useNodeDragDrop() {
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
 
-  const handleDragStart = (e: React.DragEvent, node: TNode | BackendNodeType) => {
+  const handleDragStart = (e: React.DragEvent, node: BackendNodeType) => {
     setDraggedNodeId(node.id);
     e.dataTransfer.setData('application/reactflow', JSON.stringify({
       id: node.id,

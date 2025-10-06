@@ -2,13 +2,13 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { NodeHeader } from "./NodeHeader";
 import { NodeMetadata } from "./NodeMetadata";
 import { FormFieldsSection } from "./FormFieldsSection";
 
 interface NodePreviewProps {
-  nodeData: Partial<TNode>;
+  nodeData: Partial<BackendNodeType>;
   logoPreview?: string | null;
 }
 

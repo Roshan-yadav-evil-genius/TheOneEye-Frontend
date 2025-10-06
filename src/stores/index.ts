@@ -7,6 +7,7 @@ import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
 import { useTProjectsStore } from './projects-store';
 import { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
+import { BackendNodeType } from '@/types/api/backend';
 
 // Re-export stores for external use
 export { useTUserStore as useUserStore } from './user-store';
@@ -20,7 +21,6 @@ export { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canv
 // Export all types
 export type {
   TUser,
-  TNode,
   TWorkflow,
   TWorkflowConnection,
   TProject,
@@ -158,7 +158,7 @@ export const storeSelectors = {
 // Store actions for common operations
 export const storeActions = {
   // Create new entities with proper relationships
-  createNodeWithForm: async (nodeData: Partial<TNode>, formData: Partial<TFormConfiguration>) => {
+  createNodeWithForm: async (nodeData: Partial<BackendNodeType>, formData: Partial<TFormConfiguration>) => {
     const { createNode } = useEnhancedNodesStore.getState();
     const { createFormConfiguration } = useFormStore.getState();
     

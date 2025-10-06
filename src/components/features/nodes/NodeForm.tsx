@@ -9,12 +9,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { TNode, nodeTypes } from "@/types";
+import { nodeTypes } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { useNodeGroups } from "@/hooks/useNodeGroups";
 
 interface NodeFormProps {
-  control: Control<Partial<TNode>>;
-  errors: FieldErrors<Partial<TNode>>;
+  control: Control<Partial<BackendNodeType>>;
+  errors: FieldErrors<Partial<BackendNodeType>>;
   onVersionChange: (value: string) => void;
 }
 
@@ -71,7 +72,7 @@ export function NodeForm({ control, errors, onVersionChange }: NodeFormProps) {
         <div className="space-y-2">
           <Label htmlFor="nodeGroup">Group *</Label>
           <Controller
-            name="nodeGroup"
+            name="node_group.id"
             control={control}
             rules={{ required: "Group is required" }}
             render={({ field }) => (
@@ -89,7 +90,7 @@ export function NodeForm({ control, errors, onVersionChange }: NodeFormProps) {
               </Select>
             )}
           />
-          {errors.nodeGroup && <p className="text-red-500 text-sm">{errors.nodeGroup.message}</p>}
+          {errors.node_group?.id && <p className="text-red-500 text-sm">{errors.node_group.id.message}</p>}
         </div>
       </div>
       <div className="space-y-2">

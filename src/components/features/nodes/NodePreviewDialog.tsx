@@ -8,12 +8,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NodePreview } from "./NodePreview";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 interface NodePreviewDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  nodeData: Partial<TNode>;
+  nodeData: Partial<BackendNodeType>;
   logoPreview?: string | null;
 }
 

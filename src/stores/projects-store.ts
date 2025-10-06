@@ -190,14 +190,9 @@ export const useTProjectsStore = create<TProjectsStore>()(
           // TODO: Replace with actual API call
           // const response = await projectsApi.getTProjects();
           
-          // Simulate API call with mock data
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Import mock data from data folder
-          const { mockProjects } = await import('@/data');
-
+          // For now, return empty array until real API is implemented
           set({
-            projects: mockProjects,
+            projects: [],
             isLoading: false,
             error: null,
           });

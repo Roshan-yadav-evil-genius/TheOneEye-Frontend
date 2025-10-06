@@ -3,13 +3,13 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { IconInfoCircle, IconTag, IconPhotoOff } from "@tabler/icons-react";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getNodeColors } from "@/constants/node-styles";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 
 interface NodeHeaderProps {
-  nodeData: Partial<TNode>;
+  nodeData: Partial<BackendNodeType>;
   logoPreview?: string | null;
 }
 

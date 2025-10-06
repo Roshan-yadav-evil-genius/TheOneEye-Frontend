@@ -24,7 +24,6 @@ import { useNodesByNodeGroup } from "@/hooks/useSharedNodes";
 import { useNodeFiltering } from "@/hooks/useNodeFiltering";
 import { useNodeDragDrop } from "@/hooks/useNodeDragDrop";
 import { useNodeGroupExpansion } from "@/hooks/useNodeGroupExpansion";
-import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { NodeLogo } from "@/components/common/node-logo";
 import { badgeColors } from "@/constants/node-styles";
@@ -80,15 +79,7 @@ export function WorkflowSidebar({
     
     if (!firstNode) return null;
     
-    // Handle both TNode and BackendNodeType structures
-    if ('node_group' in firstNode && firstNode.node_group?.icon) {
-      return firstNode.node_group.icon;
-    }
-    if ('nodeGroupIcon' in firstNode && firstNode.nodeGroupIcon) {
-      return firstNode.nodeGroupIcon;
-    }
-    
-    return null;
+    return firstNode.node_group?.icon || null;
   };
 
   // Handle retry on error

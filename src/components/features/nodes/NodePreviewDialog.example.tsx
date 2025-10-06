@@ -6,20 +6,20 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NodePreviewDialog } from "./NodePreviewDialog";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 // Example: Using NodePreviewDialog in a custom component
 export function ExampleNodePreviewButton() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   
   // Example node data - this could come from props, API, or state
-  const exampleNodeData: Partial<TNode> = {
+  const exampleNodeData: Partial<BackendNodeType> = {
     name: "Example Node",
     type: "action",
     description: "This is an example node for demonstration",
     version: "1.0.0",
     tags: ["example", "demo"],
-    formConfiguration: {
+    form_configuration: {
       fields: [
         {
           id: "example-field",

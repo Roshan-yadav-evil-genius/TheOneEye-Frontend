@@ -1,3 +1,5 @@
+import { BackendNodeType } from "../api";
+
 // Core entity types
 export interface TUser {
   id: string;
@@ -18,24 +20,6 @@ export interface TNodeGroup {
   updatedAt: string; // ISO string format from backend
 }
 
-// StandaloneNode - Template nodes that can be used in workflows
-export interface TNode {
-  id: string;
-  name: string;
-  type: 'trigger' | 'action' | 'logic' | 'system';
-  nodeGroup: string; // NodeGroup ID
-  nodeGroupName: string; // NodeGroup name for display
-  nodeGroupIcon?: string; // NodeGroup icon URL for display
-  description: string;
-  version: string;
-  isActive: boolean;
-  createdAt: string; // ISO string format from backend
-  updatedAt: string; // ISO string format from backend
-  createdBy: string; // Username of the creator
-  formConfiguration: Record<string, unknown>; // Form configuration JSON
-  tags: string[];
-  logo?: string; // URL to the node logo image
-}
 
 // Node Template - Standalone node template data
 export interface TNodeTemplate {
@@ -60,7 +44,7 @@ export interface TWorkflowNode {
     formValues?: Record<string, unknown>;
     customSettings?: Record<string, unknown>;
   };
-  node_type?: TNode | null; // Updated to use node_type instead of node_template
+  node_type?: BackendNodeType | null; // Updated to use node_type instead of node_template
 }
 
 export interface TWorkflow {

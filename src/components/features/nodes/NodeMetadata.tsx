@@ -3,11 +3,11 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { IconPhotoOff } from "@tabler/icons-react";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { getNodeColors } from "@/constants/node-styles";
 
 interface NodeMetadataProps {
-  nodeData: Partial<TNode>;
+  nodeData: Partial<BackendNodeType>;
 }
 
 export function NodeMetadata({ nodeData }: NodeMetadataProps) {

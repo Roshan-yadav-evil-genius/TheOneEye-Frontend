@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 interface FormActionsProps {
   isCreating: boolean;
   onPreview: () => void;
   onSave: () => void;
-  formData: Partial<TNode>;
+  formData: Partial<BackendNodeType>;
   buttonText?: string;
   isUpdating?: boolean;
   onCancel?: () => void;

@@ -3,13 +3,12 @@
 import React from "react";
 import { IconPhotoOff } from "@tabler/icons-react";
 import { BackendNodeType } from "@/types/api/backend";
-import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { getNodeColors } from "@/constants/node-styles";
 import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
 
 interface NodeLogoProps {
-  node: BackendNodeType | TNode;
+  node: BackendNodeType;
   size?: SizeVariant;
   className?: string;
 }
@@ -20,27 +19,11 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
 
   // Helper functions to safely access node group information
   const getNodeGroupIcon = () => {
-    // Check if it's BackendNodeType with node_group
-    if ('node_group' in node && node.node_group?.icon) {
-      return node.node_group.icon;
-    }
-    // Check if it's TNode with nodeGroupIcon
-    if ('nodeGroupIcon' in node && node.nodeGroupIcon) {
-      return node.nodeGroupIcon;
-    }
-    return null;
+    return node.node_group?.icon || null;
   };
 
   const getNodeGroupName = () => {
-    // Check if it's BackendNodeType with node_group
-    if ('node_group' in node && node.node_group?.name) {
-      return node.node_group.name;
-    }
-    // Check if it's TNode with nodeGroupName
-    if ('nodeGroupName' in node && node.nodeGroupName) {
-      return node.nodeGroupName;
-    }
-    return 'Group';
+    return node.node_group?.name || 'Group';
   };
 
   const getGroupIcon = () => {

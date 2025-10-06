@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { WidgetLoader } from "./WidgetLoader";
 import { WidgetMapper } from "./WidgetMapper";
 
 interface FormFieldsSectionProps {
-  nodeData: Partial<TNode>;
+  nodeData: Partial<BackendNodeType>;
 }
 
 export function FormFieldsSection({ nodeData }: FormFieldsSectionProps) {
