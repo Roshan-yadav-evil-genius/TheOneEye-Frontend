@@ -34,10 +34,9 @@ export interface TWorkflowNodeCreateRequest {
     y: number;
   };
   data?: {
-    name?: string;
-    description?: string;
-    icon?: string;
-    category?: string;
+    // Only node-specific configuration data, no redundant fields
+    formValues?: Record<string, unknown>;
+    customSettings?: Record<string, unknown>;
   };
 }
 

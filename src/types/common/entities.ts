@@ -56,14 +56,11 @@ export interface TWorkflowNode {
     y: number;
   };
   data: {
-    label: string;
-    description: string;
-    icon?: string;
-    category: string;
-    type: string;
-    template_id?: string;
+    // Only node-specific configuration data
+    formValues?: Record<string, unknown>;
+    customSettings?: Record<string, unknown>;
   };
-  node_template?: TNodeTemplate | null;
+  node_type?: TNode | null; // Updated to use node_type instead of node_template
 }
 
 export interface TWorkflow {

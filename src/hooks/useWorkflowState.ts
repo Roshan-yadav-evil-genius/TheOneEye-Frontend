@@ -37,22 +37,21 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Convert workflow nodes to ReactFlow format
   const reactFlowNodes = useMemo(() => {
     return workflowNodes.map((workflowNode): Node => {
-      const nodeTemplate = workflowNode.node_template;
+      const nodeType = workflowNode.node_type; // Updated to use node_type instead of node_template
       
       return {
         id: workflowNode.id,
         type: 'custom',
         position: workflowNode.position,
         data: {
-          // Use node template information if available, fallback to data field
-          label: nodeTemplate?.name || workflowNode.data.label,
-          type: nodeTemplate?.type || workflowNode.data.type,
+          // Use node_type information (no more fallback to data field for redundant data)
+          label: nodeType?.name || `Node ${workflowNode.id.slice(0, 8)}`,
+          type: nodeType?.type || 'custom',
           status: 'active',
-          category: nodeTemplate?.type || workflowNode.data.category,
-          description: nodeTemplate?.description || workflowNode.data.description,
-          icon: nodeTemplate?.logo || workflowNode.data.icon,
-          template_id: workflowNode.data.template_id,
-          node_template: nodeTemplate,
+          category: nodeType?.type || 'custom',
+          description: nodeType?.description || '',
+          icon: nodeType?.logo || null,
+          node_type: nodeType, // Store the full node_type object
           onDeleteNode: (nodeId: string) => removeNode(nodeId),
         },
       };
@@ -137,10 +136,9 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
       nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
       position,
       data: {
-        name: nodeData.name,
-        description: nodeData.description,
-        icon: nodeData.logo,
-        category: nodeData.type,
+        // Only send node-specific configuration data, no redundant fields
+        formValues: {},
+        customSettings: {},
       },
     };
 
@@ -150,7 +148,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Filter nodes based on search and filters
   const filteredNodes = useMemo(() => {
     return nodes.filter(node => {
-      const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = node.data.label?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       const matchesCategory = filters.category === "all" || node.data.category === filters.category;
       
       return matchesSearch && matchesCategory;
