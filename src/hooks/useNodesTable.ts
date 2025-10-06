@@ -49,7 +49,7 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
           .includes(searchTerm.toLowerCase())
       
       const matchesType = typeFilter === "all" || node.type === typeFilter
-      const matchesNodeGroup = nodeGroupFilter === "all" || node.node_group.name === nodeGroupFilter
+      const matchesNodeGroup = nodeGroupFilter === "all" || node.node_group?.name === nodeGroupFilter
       
       return matchesSearch && matchesType && matchesNodeGroup
     });

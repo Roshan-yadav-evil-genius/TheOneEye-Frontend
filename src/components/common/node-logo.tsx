@@ -18,11 +18,11 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   const { container, icon, dimensions } = getSizeConfig(size);
 
   const getGroupIcon = () => {
-    if (node.node_group.icon) {
+    if (node.node_group?.icon) {
       return (
         <ImageWithFallback
           src={node.node_group.icon}
-          alt={`${node.node_group.name} group icon`}
+          alt={`${node.node_group.name || 'Group'} group icon`}
           width={dimensions}
           height={dimensions}
           className={`${container} object-cover rounded`}
@@ -58,11 +58,11 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   }
 
   // If no node logo, try group icon
-  if (node.node_group.icon) {
+  if (node.node_group?.icon) {
     return (
       <ImageWithFallback
         src={node.node_group.icon}
-        alt={`${node.node_group.name} group icon`}
+        alt={`${node.node_group.name || 'Group'} group icon`}
         width={dimensions}
         height={dimensions}
         className={`${container} object-cover rounded ${className}`}

@@ -74,7 +74,7 @@ export function NodesTableRow({
         <TableCell className="min-w-[120px]">
           <div className="flex items-center gap-2">
             {renderNodeGroupIcon(node)}
-            <span className="truncate">{node.node_group.name}</span>
+            <span className="truncate">{node.node_group?.name || 'Unknown Group'}</span>
           </div>
         </TableCell>
       )}

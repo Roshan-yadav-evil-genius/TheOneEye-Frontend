@@ -13,8 +13,8 @@ export const renderNodeLogo = (node: BackendNodeType) => {
 export const renderNodeGroupIcon = (node: BackendNodeType) => {
   return (
     <ImageWithFallback
-      src={node.node_group.icon}
-      alt={node.node_group.name}
+      src={node.node_group?.icon}
+      alt={node.node_group?.name || 'Group'}
       width={16}
       height={16}
       className="h-4 w-4 object-contain"
