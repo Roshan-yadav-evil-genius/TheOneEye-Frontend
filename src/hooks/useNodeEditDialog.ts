@@ -63,7 +63,7 @@ export const useNodeEditDialog = ({ nodeData }: UseNodeEditDialogProps) => {
   const [convertTypes, setConvertTypes] = useState(false);
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("json");
-  const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings" | "form">("parameters");
+  const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "settings" | "form">("form");
 
   // Update editData when nodeData changes
   useEffect(() => {

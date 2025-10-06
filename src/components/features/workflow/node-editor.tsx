@@ -130,6 +130,7 @@ export function NodeEditor({
               Form configuration not available for this node type
             </div>
           )}
+          
         </TabsContent>
       </Tabs>
     </div>
