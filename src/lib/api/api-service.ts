@@ -319,7 +319,7 @@ export class ApiService {
       id: response.id,
       position: response.position,
       data: response.data,
-      node_template: response.node_template
+      node_type: response.node_type // Updated to use node_type instead of node_template
     };
   }
 
