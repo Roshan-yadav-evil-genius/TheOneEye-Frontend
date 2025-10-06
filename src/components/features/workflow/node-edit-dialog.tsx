@@ -23,7 +23,6 @@ interface NodeEditDialogProps {
     label: string;
     type: string;
     status: string;
-    category: string;
     description?: string;
     formConfiguration?: Record<string, unknown>;
   };

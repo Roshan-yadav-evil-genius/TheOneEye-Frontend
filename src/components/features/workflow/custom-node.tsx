@@ -15,13 +15,34 @@ export interface CustomNodeData {
   label: string;
   type: string;
   status: string;
-  category: string;
   description?: string;
   formConfiguration?: Record<string, unknown>;
   logo?: string;
   nodeGroupIcon?: string;
   nodeGroupName?: string;
-  template_id?: string;
+  node_type?: {
+    id: string;
+    name: string;
+    type: string;
+    description?: string;
+    logo?: string;
+    form_configuration: Record<string, unknown>;
+    tags: string[];
+    node_group: {
+      id: string;
+      name: string;
+      description?: string;
+      icon?: string;
+      is_active: boolean;
+      created_at: string;
+      updated_at: string;
+    };
+    version: string;
+    is_active: boolean;
+    created_by?: string;
+    created_at: string;
+    updated_at: string;
+  };
   node_template?: TNodeTemplate | null;
 }
 
@@ -141,7 +162,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
               id: id,
               name: data.label,
               type: data.type,
-              logo: data.icon,
+              logo: data.node_type?.logo,
               nodeGroupIcon: data.nodeGroupIcon,
               nodeGroupName: data.nodeGroupName,
             } as any}

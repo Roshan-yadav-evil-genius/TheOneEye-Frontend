@@ -5,6 +5,7 @@ import {
   TWorkflowNode, 
   TWorkflowConnection
 } from '@/types/common/entities';
+import { BackendWorkflowNode, BackendWorkflowConnection } from '@/types/api/backend';
 import {
   TWorkflowNodeCreateRequest,
   TWorkflowConnectionCreateRequest
@@ -19,8 +20,8 @@ import { toastSuccess, toastError, toastInfo } from '@/hooks/use-toast';
 interface WorkflowCanvasState {
   // Data
   workflowId: string | null;
-  nodes: TWorkflowNode[];
-  connections: TWorkflowConnection[];
+  nodes: BackendWorkflowNode[];
+  connections: BackendWorkflowConnection[];
   workflow: {
     id: string;
     name: string;
@@ -48,7 +49,7 @@ interface WorkflowCanvasActions {
   refreshWorkflowCanvas: () => Promise<void>;
   
   // Node Operations
-  addNode: (nodeData: TWorkflowNodeCreateRequest) => Promise<TWorkflowNode | null>;
+  addNode: (nodeData: TWorkflowNodeCreateRequest) => Promise<BackendWorkflowNode | null>;
   updateNodePosition: (nodeId: string, position: { x: number; y: number }) => Promise<void>;
   removeNode: (nodeId: string) => Promise<void>;
   
@@ -169,28 +170,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
           try {
             const response = await ApiService.addNodeToWorkflow(workflowId, nodeData);
             
-            const newNode: TWorkflowNode = {
-              id: response.id,
-              position: response.position,
-              data: response.data,
-              node_type: response.node_type ? {
-                id: response.node_type.id,
-                name: response.node_type.name,
-                type: response.node_type.type,
-                nodeGroup: response.node_type.node_group.id,
-                nodeGroupName: response.node_type.node_group.name,
-                nodeGroupIcon: response.node_type.node_group.icon,
-                description: response.node_type.description || '',
-                version: response.node_type.version,
-                isActive: response.node_type.is_active,
-                createdAt: response.node_type.created_at,
-                updatedAt: response.node_type.updated_at,
-                createdBy: response.node_type.created_by || 'System',
-                formConfiguration: response.node_type.form_configuration || {},
-                tags: response.node_type.tags || [],
-                logo: response.node_type.logo || '',
-              } : null,
-            };
+            const newNode: BackendWorkflowNode = response;
 
             set((state) => {
               state.nodes.push(newNode);

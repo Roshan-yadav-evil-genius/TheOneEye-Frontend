@@ -21,7 +21,6 @@ import {
   BackendNode,
   BackendNodeGroup,
   BackendWorkflowCanvasResponse,
-  BackendNodeTemplate,
   BackendProject,
   BackendUser,
   BackendAuthResponse
@@ -269,45 +268,12 @@ export class ApiService {
     
     // Transform the response to match our types
     return {
-      nodes: response.nodes.map((node) => ({
-        id: node.id,
-        position: node.position,
-        data: node.data,
-        node_type: node.node_type // Updated to use node_type instead of node_template
-      })),
-      edges: response.edges.map((edge) => ({
-        id: edge.id,
-        sourceNodeId: edge.source,
-        targetNodeId: edge.target,
-        sourceHandle: undefined,
-        targetHandle: undefined,
-      })),
+      nodes: response.nodes,
+      edges: response.edges,
       workflow: response.workflow
     };
   }
 
-  static async getAvailableNodeTemplates(workflowId: string): Promise<TNode[]> {
-    const response = await axiosApiClient.get<BackendNodeTemplate[]>(`/workflow/${workflowId}/available_nodes/`);
-    
-    // Transform to TNode format (these are StandaloneNode templates)
-    return response.map((template) => ({
-      id: template.id,
-      name: template.name,
-      type: template.category as TNode['type'],
-      nodeGroup: '', // Not provided in this endpoint
-      nodeGroupName: '', // Not provided in this endpoint
-      nodeGroupIcon: undefined,
-      description: template.description || '',
-      version: '1.0.0', // Default version
-      isActive: true, // Only active templates are returned
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: 'System',
-      formConfiguration: {},
-      tags: [],
-      logo: template.icon,
-    }));
-  }
 
   static async addNodeToWorkflow(
     workflowId: string, 
@@ -501,7 +467,6 @@ export const {
   updateWorkflow,
   deleteWorkflow,
   getWorkflowCanvasData,
-  getAvailableNodeTemplates,
   addNodeToWorkflow,
   updateNodePosition,
   removeNodeFromWorkflow,

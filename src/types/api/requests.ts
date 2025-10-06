@@ -17,7 +17,6 @@ export type TNodeUpdateData = Partial<TNodeCreateData>
 
 export interface TNodeFilters {
   type?: string;
-  category?: string;
   is_active?: boolean;
   tags?: string[];
   search?: string;

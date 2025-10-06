@@ -20,7 +20,7 @@ export function NodeMetadata({ nodeData }: NodeMetadataProps) {
       </Badge>
       <Badge variant="outline" className="px-2 py-1 flex items-center gap-1">
         <IconPhotoOff className="h-3 w-3" />
-        {nodeData.category ? nodeData.category.charAt(0).toUpperCase() + nodeData.category.slice(1) : "System"}
+        {nodeData.type ? nodeData.type.charAt(0).toUpperCase() + nodeData.type.slice(1) : "System"}
       </Badge>
     </div>
   );

@@ -20,7 +20,7 @@ interface WorkflowCanvasProps {
   selectedNodes: string[];
   searchTerm: string;
   filters: {
-    category: string;
+    nodeGroup: string;
   };
   lineType: string;
   showMinimap: boolean;

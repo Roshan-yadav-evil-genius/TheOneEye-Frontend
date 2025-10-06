@@ -10,7 +10,7 @@ interface WorkflowStateProps {
   selectedNodes: string[];
   searchTerm: string;
   filters: {
-    category: string;
+    nodeGroup: string;
   };
 }
 
@@ -37,21 +37,19 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Convert workflow nodes to ReactFlow format
   const reactFlowNodes = useMemo(() => {
     return workflowNodes.map((workflowNode): Node => {
-      const nodeType = workflowNode.node_type; // Updated to use node_type instead of node_template
+      const nodeType = workflowNode.node_type;
       
       return {
         id: workflowNode.id,
         type: 'custom',
         position: workflowNode.position,
         data: {
-          // Use node_type information (no more fallback to data field for redundant data)
           label: nodeType?.name || `Node ${workflowNode.id.slice(0, 8)}`,
           type: nodeType?.type || 'custom',
           status: 'active',
-          category: nodeType?.type || 'custom',
           description: nodeType?.description || '',
-          icon: nodeType?.logo || null,
-          node_type: nodeType, // Store the full node_type object
+          logo: nodeType?.logo || null,
+          node_type: nodeType,
           onDeleteNode: (nodeId: string) => removeNode(nodeId),
         },
       };
@@ -149,7 +147,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   const filteredNodes = useMemo(() => {
     return nodes.filter(node => {
       const matchesSearch = node.data.label?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-      const matchesCategory = filters.category === "all" || node.data.category === filters.category;
+      const matchesCategory = filters.nodeGroup === "all";
       
       return matchesSearch && matchesCategory;
     });
