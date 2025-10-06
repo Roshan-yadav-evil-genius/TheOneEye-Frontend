@@ -294,10 +294,17 @@ export class ApiService {
     nodeId: string, 
     position: { x: number; y: number }
   ): Promise<void> {
-    await axiosApiClient.put(`/workflow/${workflowId}/update_node_position/`, {
-      nodeId,
-      position
-    });
+    console.log('API: Updating node position', { workflowId, nodeId, position });
+    try {
+      await axiosApiClient.patch(`/workflow/${workflowId}/update_node_position/`, {
+        nodeId,
+        position
+      });
+      console.log('API: Node position updated successfully');
+    } catch (error) {
+      console.error('API: Failed to update node position:', error);
+      throw error;
+    }
   }
 
   static async removeNodeFromWorkflow(workflowId: string, nodeId: string): Promise<void> {

@@ -35,6 +35,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     onNodesChange,
     onEdgesChange,
     onConnect,
+    onNodeDragStop,
     addNodeFromDrag,
     isLoading,
     isSaving,
@@ -101,6 +102,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
         onInit={setReactFlowInstance}
         onDrop={onDrop}
         onDragOver={onDragOver}
