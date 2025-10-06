@@ -37,6 +37,17 @@ export interface TNode {
   logo?: string; // URL to the node logo image
 }
 
+// Node Template - Standalone node template data
+export interface TNodeTemplate {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+  logo?: string;
+  form_configuration: Record<string, unknown>;
+  tags: string[];
+}
+
 // WorkflowNode - Instance of a node in a specific workflow
 export interface TWorkflowNode {
   id: string;
@@ -52,15 +63,7 @@ export interface TWorkflowNode {
     type: string;
     template_id?: string;
   };
-  node_template?: {
-    id: string;
-    name: string;
-    type: string;
-    description?: string;
-    logo?: string;
-    form_configuration: Record<string, unknown>;
-    tags: string[];
-  } | null;
+  node_template?: TNodeTemplate | null;
 }
 
 export interface TWorkflow {

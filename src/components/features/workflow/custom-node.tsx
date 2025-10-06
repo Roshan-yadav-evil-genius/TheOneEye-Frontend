@@ -9,6 +9,7 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { useDescriptionEditing } from "@/hooks/useDescriptionEditing";
+import { TNodeTemplate } from "@/types";
 
 export interface CustomNodeData {
   label: string;
@@ -21,15 +22,7 @@ export interface CustomNodeData {
   nodeGroupIcon?: string;
   nodeGroupName?: string;
   template_id?: string;
-  node_template?: {
-    id: string;
-    name: string;
-    type: string;
-    description?: string;
-    logo?: string;
-    form_configuration: Record<string, unknown>;
-    tags: string[];
-  } | null;
+  node_template?: TNodeTemplate | null;
 }
 
 interface CustomNodeProps {

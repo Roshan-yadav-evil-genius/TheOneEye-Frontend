@@ -52,7 +52,6 @@ export function NodeEditDialog({
     activeOutputTab,
     activeNodeTab,
     standaloneNodeData,
-    isLoadingNodeData,
     nodeDataError,
     setGroups,
     setConvertTypes,
@@ -60,7 +59,6 @@ export function NodeEditDialog({
     setActiveOutputTab,
     setActiveNodeTab,
     handleEditDataChange,
-    handleFormConfigurationChange,
   } = useNodeEditDialog({ nodeData });
 
   return (
@@ -69,7 +67,7 @@ export function NodeEditDialog({
         <VisuallyHidden>
           <DialogTitle>Edit Node: {nodeData.label} (ID: {nodeData.id})</DialogTitle>
           <DialogDescription>
-            Configure the parameters and settings for the {nodeData.type} node &quot;{nodeData.label}&quot;.
+            Configure the parameters for the {nodeData.type} node &quot;{nodeData.label}&quot;.
           </DialogDescription>
         </VisuallyHidden>
         <DndContext>
@@ -94,17 +92,12 @@ export function NodeEditDialog({
                 nodeLabel={editData.label}
                 nodeId={editData.id}
                 activeTab={activeNodeTab}
-                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "settings" | "form")}
+                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
                 groups={groups}
                 convertTypes={convertTypes}
                 onGroupsChange={setGroups}
                 onConvertTypesChange={setConvertTypes}
-                label={editData.label}
-                description={editData.description}
-                onLabelChange={(value) => handleEditDataChange('label', value)}
-                onDescriptionChange={(value) => handleEditDataChange('description', value)}
                 standaloneNodeData={standaloneNodeData}
-                isLoadingNodeData={isLoadingNodeData}
                 nodeDataError={nodeDataError}
               />
             </div>
