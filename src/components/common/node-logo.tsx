@@ -3,12 +3,13 @@
 import React from "react";
 import { IconPhotoOff } from "@tabler/icons-react";
 import { BackendNodeType } from "@/types/api/backend";
+import { TNode } from "@/types";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { getNodeColors } from "@/constants/node-styles";
 import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
 
 interface NodeLogoProps {
-  node: BackendNodeType;
+  node: BackendNodeType | TNode;
   size?: SizeVariant;
   className?: string;
 }
@@ -17,12 +18,38 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   const { iconColorClass } = getNodeColors(node.type);
   const { container, icon, dimensions } = getSizeConfig(size);
 
+  // Helper functions to safely access node group information
+  const getNodeGroupIcon = () => {
+    // Check if it's BackendNodeType with node_group
+    if ('node_group' in node && node.node_group?.icon) {
+      return node.node_group.icon;
+    }
+    // Check if it's TNode with nodeGroupIcon
+    if ('nodeGroupIcon' in node && node.nodeGroupIcon) {
+      return node.nodeGroupIcon;
+    }
+    return null;
+  };
+
+  const getNodeGroupName = () => {
+    // Check if it's BackendNodeType with node_group
+    if ('node_group' in node && node.node_group?.name) {
+      return node.node_group.name;
+    }
+    // Check if it's TNode with nodeGroupName
+    if ('nodeGroupName' in node && node.nodeGroupName) {
+      return node.nodeGroupName;
+    }
+    return 'Group';
+  };
+
   const getGroupIcon = () => {
-    if (node.node_group?.icon) {
+    const groupIcon = getNodeGroupIcon();
+    if (groupIcon) {
       return (
         <ImageWithFallback
-          src={node.node_group.icon}
-          alt={`${node.node_group.name || 'Group'} group icon`}
+          src={groupIcon}
+          alt={`${getNodeGroupName()} group icon`}
           width={dimensions}
           height={dimensions}
           className={`${container} object-cover rounded`}
@@ -58,11 +85,12 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   }
 
   // If no node logo, try group icon
-  if (node.node_group?.icon) {
+  const groupIcon = getNodeGroupIcon();
+  if (groupIcon) {
     return (
       <ImageWithFallback
-        src={node.node_group.icon}
-        alt={`${node.node_group.name || 'Group'} group icon`}
+        src={groupIcon}
+        alt={`${getNodeGroupName()} group icon`}
         width={dimensions}
         height={dimensions}
         className={`${container} object-cover rounded ${className}`}

@@ -77,7 +77,18 @@ export function WorkflowSidebar({
   const getNodeGroupIcon = (nodeGroup: string) => {
     const nodes = nodesByNodeGroup[nodeGroup] || [];
     const firstNode = nodes[0];
-    return firstNode?.nodeGroupIcon;
+    
+    if (!firstNode) return null;
+    
+    // Handle both TNode and BackendNodeType structures
+    if ('node_group' in firstNode && firstNode.node_group?.icon) {
+      return firstNode.node_group.icon;
+    }
+    if ('nodeGroupIcon' in firstNode && firstNode.nodeGroupIcon) {
+      return firstNode.nodeGroupIcon;
+    }
+    
+    return null;
   };
 
   // Handle retry on error
