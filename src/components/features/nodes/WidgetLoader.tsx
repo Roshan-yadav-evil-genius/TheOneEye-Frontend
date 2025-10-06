@@ -19,9 +19,9 @@ export function WidgetLoader({ nodeData, children }: WidgetLoaderProps) {
     );
   }
 
-  // Check if we have widgets in the form configuration
-  const widgets = (nodeData.formConfiguration as { widgets?: TWidgetConfig[] })?.widgets;
-  if (!widgets || !Array.isArray(widgets) || widgets.length === 0) {
+  // Check if we have elements in the form configuration
+  const elements = (nodeData.formConfiguration as { elements?: any[] })?.elements;
+  if (!elements || !Array.isArray(elements) || elements.length === 0) {
     return (
       <div className="text-sm text-muted-foreground italic">
         No form fields configured
@@ -29,6 +29,18 @@ export function WidgetLoader({ nodeData, children }: WidgetLoaderProps) {
     );
   }
 
-  // Pass the loaded widgets to the children function
+  // Convert elements to widgets format for compatibility
+  const widgets: TWidgetConfig[] = elements.map((element, index) => ({
+    id: element.name || `widget-${index}`,
+    type: element.type,
+    name: element.name,
+    label: element.title || element.name,
+    required: element.isRequired || false,
+    placeholder: element.placeholder || "",
+    ...(element.choices && { options: element.choices }),
+    ...(element.defaultValue && { defaultValue: element.defaultValue }),
+  }));
+
+  // Pass the converted widgets to the children function
   return <>{children(widgets)}</>;
 }
