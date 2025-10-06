@@ -33,11 +33,6 @@ export function DashboardMetrics() {
       change: "+5 from last week"
     },
     {
-      title: "Projects",
-      value: "8",
-      change: "+1 new project"
-    },
-    {
       title: "Success Rate",
       value: "94.2%",
       change: "+0.5% from last month"

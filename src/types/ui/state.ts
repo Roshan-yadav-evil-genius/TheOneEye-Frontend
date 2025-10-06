@@ -1,4 +1,4 @@
-import { TUser, TNode, TWorkflow, TProject, TFormConfiguration } from '../common';
+import { TUser, TNode, TWorkflow, TFormConfiguration } from '../common';
 
 // UI State Types
 export interface TUIState {
@@ -53,12 +53,6 @@ export interface TWorkflowState {
   selectedConnections: string[];
 }
 
-export interface TProjectsState {
-  projects: TProject[];
-  activeProject: TProject | null;
-  isLoading: boolean;
-  error: string | null;
-}
 
 export interface TFormState {
   configurations: TFormConfiguration[];
@@ -79,7 +73,5 @@ export interface TUIStoreState {
     editNode: boolean;
     createWorkflow: boolean;
     editWorkflow: boolean;
-    createProject: boolean;
-    editProject: boolean;
   };
 }

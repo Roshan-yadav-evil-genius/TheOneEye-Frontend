@@ -5,9 +5,9 @@ import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
 import { useTWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
-import { useTProjectsStore } from './projects-store';
 import { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
 import { BackendNodeType } from '@/types/api/backend';
+import { TFormConfiguration, TNodeCreateData } from '@/types';
 
 // Re-export stores for external use
 export { useTUserStore as useUserStore } from './user-store';
@@ -15,7 +15,6 @@ export { useEnhancedNodesStore as useNodesStore, nodesSelectors } from './enhanc
 export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
-export { useTProjectsStore as useProjectsStore } from './projects-store';
 export { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
 
 // Export all types
@@ -23,7 +22,6 @@ export type {
   TUser,
   TWorkflow,
   TWorkflowConnection,
-  TProject,
   TFormConfiguration,
   TUIState,
   TBreadcrumb,
@@ -31,7 +29,6 @@ export type {
   TUserState,
   TNodesState,
   TWorkflowState,
-  TProjectsState,
   TFormState,
   TUIStoreState,
 } from './types';
@@ -42,7 +39,6 @@ export const initializeStores = async () => {
   const { loadNodes } = useEnhancedNodesStore.getState();
   const { loadTWorkflows } = useTWorkflowStore.getState();
   const { loadTFormConfigurations } = useFormStore.getState();
-  const { loadTProjects } = useTProjectsStore.getState();
 
   try {
     // Load initial data in parallel
@@ -50,7 +46,6 @@ export const initializeStores = async () => {
       loadNodes({}, { showToast: false }), // Don't show toast on initial load
       loadTWorkflows(),
       loadTFormConfigurations(),
-      loadTProjects(),
     ]);
   } catch (error) {
     console.error('Failed to initialize stores:', error);
@@ -76,38 +71,11 @@ export const resetAllStores = () => {
     isLoading: false,
     error: null,
   });
-  useTProjectsStore.setState({
-    projects: [],
-    activeProject: null,
-    isLoading: false,
-    error: null,
-  });
+
   useUIStore.getState().resetUI();
 };
 
-// Store synchronization utilities
-export const syncStores = () => {
-  // Sync related data between stores
-  const { workflows } = useTWorkflowStore.getState();
-  const { projects } = useTProjectsStore.getState();
-  
-  // Update project workflows if needed
-  projects.forEach((project) => {
-    const projectWorkflows = workflows.filter((workflow) => 
-      project.workflows.includes(workflow.id)
-    );
-    
-    // If project has workflows that no longer exist, remove them
-    const validWorkflowIds = projectWorkflows.map((w) => w.id);
-    const invalidWorkflowIds = project.workflows.filter((id) => !validWorkflowIds.includes(id));
-    
-    if (invalidWorkflowIds.length > 0) {
-      invalidWorkflowIds.forEach((workflowId) => {
-        useTProjectsStore.getState().removeWorkflowFromProject(project.id, workflowId);
-      });
-    }
-  });
-};
+
 
 // Store selectors for common use cases
 export const storeSelectors = {
@@ -124,7 +92,6 @@ export const storeSelectors = {
     const { nodes, filters } = useEnhancedNodesStore.getState();
     return nodes.filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
-      if (filters.category && node.category !== filters.category) return false;
       if (filters.search && !node.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
       return true;
     });
@@ -134,11 +101,6 @@ export const storeSelectors = {
   getActiveWorkflow: () => useTWorkflowStore.getState().activeWorkflow,
   getWorkflowsByStatus: (status: string) => 
     useTWorkflowStore.getState().workflows.filter((workflow) => workflow.status === status),
-  
-  // Project selectors
-  getActiveProject: () => useTProjectsStore.getState().activeProject,
-  getProjectsByStatus: (status: string) => 
-    useTProjectsStore.getState().projects.filter((project) => project.status === status),
   
   // Form selectors
   getFormConfigurationsByNode: (nodeId: string) => 
@@ -184,19 +146,6 @@ export const storeActions = {
     }
     
     return { workflow, nodes: workflowNodes };
-  },
-  
-  createProjectWithWorkflows: async (projectData: Partial<TProject>, workflowIds: string[]) => {
-    const { createProject } = useTProjectsStore.getState();
-    
-    const project = await createProject(projectData);
-    
-    // Add workflows to project
-    for (const workflowId of workflowIds) {
-      await useTProjectsStore.getState().addWorkflowToProject(project.id, workflowId);
-    }
-    
-    return project;
   },
   
   // Bulk operations

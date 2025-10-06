@@ -41,11 +41,6 @@ const data = {
       icon: IconListDetails,
     },
     {
-      title: "Projects",
-      url: "/projects",
-      icon: IconFolder,
-    },
-    {
       title: "Nodes",
       url: "/nodes",
       icon: IconNetwork,

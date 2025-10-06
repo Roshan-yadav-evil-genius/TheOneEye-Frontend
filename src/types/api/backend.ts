@@ -66,17 +66,6 @@ export interface BackendWorkflowConnection {
 }
 
 
-export interface BackendProject {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  workflows: string[];
-  team: string[];
-  created_at: string;
-  updated_at: string;
-  created_by: string;
-}
 
 export interface BackendUser {
   id: string;

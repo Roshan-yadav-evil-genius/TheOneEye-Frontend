@@ -8,7 +8,6 @@ import {
   TNodeStats,
   TApiError,
   TWorkflow,
-  TProject,
   TUser,
   TWorkflowNode,
   TWorkflowConnection,
@@ -19,7 +18,6 @@ import {
   TWorkflowNodeCreateResponse,
   BackendNodeGroup,
   BackendWorkflowCanvasResponse,
-  BackendProject,
   BackendUser,
   BackendAuthResponse,
   BackendNodeType
@@ -305,69 +303,6 @@ export class ApiService {
     });
   }
 
-  // Project operations
-  static async getProjects(): Promise<TProject[]> {
-    const response = await axiosApiClient.get<BackendProject[]>('/projects/');
-    return response.map((project) => ({
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      status: project.status as TProject['status'],
-      workflows: project.workflows,
-      team: project.team,
-      createdAt: new Date(project.created_at),
-      updatedAt: new Date(project.updated_at),
-      createdBy: project.created_by,
-    }));
-  }
-
-  static async createProject(projectData: Partial<TProject>): Promise<TProject> {
-    const backendData = {
-      name: projectData.name,
-      description: projectData.description,
-      status: projectData.status,
-      workflows: projectData.workflows || [],
-      team: projectData.team || [],
-    };
-    const response = await axiosApiClient.post<BackendProject>('/projects/', backendData);
-    return {
-      id: response.id,
-      name: response.name,
-      description: response.description,
-      status: response.status as TProject['status'],
-      workflows: response.workflows,
-      team: response.team,
-      createdAt: new Date(response.created_at),
-      updatedAt: new Date(response.updated_at),
-      createdBy: response.created_by,
-    };
-  }
-
-  static async updateProject(id: string, projectData: Partial<TProject>): Promise<TProject> {
-    const backendData = {
-      name: projectData.name,
-      description: projectData.description,
-      status: projectData.status,
-      workflows: projectData.workflows,
-      team: projectData.team,
-    };
-    const response = await axiosApiClient.put<BackendProject>(`/projects/${id}/`, backendData);
-    return {
-      id: response.id,
-      name: response.name,
-      description: response.description,
-      status: response.status as TProject['status'],
-      workflows: response.workflows,
-      team: response.team,
-      createdAt: new Date(response.created_at),
-      updatedAt: new Date(response.updated_at),
-      createdBy: response.created_by,
-    };
-  }
-
-  static async deleteProject(id: string): Promise<void> {
-    return axiosApiClient.delete(`/projects/${id}/`);
-  }
 
   // User operations
   static async getCurrentUser(): Promise<TUser | null> {

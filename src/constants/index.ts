@@ -26,7 +26,6 @@ export const ROUTES = {
   'nodes.edit': '/nodes/edit',
   workflow: '/workflow',
   'form-builder': '/form-builder',
-  projects: '/projects',
   'test-api': '/test-api',
 } as const;
 

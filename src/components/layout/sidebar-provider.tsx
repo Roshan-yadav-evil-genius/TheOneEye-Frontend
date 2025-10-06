@@ -19,7 +19,6 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
   const isWorkflowEditor = pathname.match(/^\/workflow\/[^\/]+$/)
   const isDashboardPage = pathname.startsWith('/dashboard') || 
                          pathname.startsWith('/workflow') || 
-                         pathname.startsWith('/projects') || 
                          pathname.startsWith('/nodes')
 
   if (!isDashboardPage) {

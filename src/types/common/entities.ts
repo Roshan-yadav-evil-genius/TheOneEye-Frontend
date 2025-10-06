@@ -73,17 +73,6 @@ export interface TWorkflowConnection {
   targetHandle?: string;
 }
 
-export interface TProject {
-  id: string;
-  name: string;
-  description: string;
-  status: 'planning' | 'active' | 'completed' | 'on-hold';
-  workflows: string[]; // Workflow IDs
-  team: string[]; // User IDs
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
-}
 
 export interface TFormConfiguration {
   id: string;

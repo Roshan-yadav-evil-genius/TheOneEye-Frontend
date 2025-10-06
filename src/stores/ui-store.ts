@@ -49,8 +49,6 @@ const initialState: TUIStoreState = {
     editNode: false,
     createWorkflow: false,
     editWorkflow: false,
-    createProject: false,
-    editProject: false,
   },
 };
 
@@ -195,8 +193,6 @@ export const useUIStore = create<UIStore>()(
               editNode: false,
               createWorkflow: false,
               editWorkflow: false,
-              createProject: false,
-              editProject: false,
             },
           });
         },
@@ -337,11 +333,4 @@ export const uiHelpers = {
     useUIStore.getState().openModal('editWorkflow');
   },
 
-  openCreateProjectModal: () => {
-    useUIStore.getState().openModal('createProject');
-  },
-
-  openEditProjectModal: () => {
-    useUIStore.getState().openModal('editProject');
-  },
 };
