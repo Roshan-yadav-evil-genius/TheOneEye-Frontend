@@ -76,7 +76,7 @@ export const useNodeEditDialog = ({ nodeData }: UseNodeEditDialogProps) => {
         id: "1",
         conditions: [
           {
-            condition: { id: "1_condition", field: "{{ $json[0].Age }}", operator: "is greater than", value: "50" },
+            condition: { id: "1_condition", field: "", operator: "is greater than", value: "50" },
             operator: "AND"
           }
         ]
