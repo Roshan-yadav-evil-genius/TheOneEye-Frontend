@@ -273,7 +273,7 @@ export class ApiService {
         id: node.id,
         position: node.position,
         data: node.data,
-        node_template: node.node_template
+        node_type: node.node_type // Updated to use node_type instead of node_template
       })),
       edges: response.edges.map((edge) => ({
         id: edge.id,

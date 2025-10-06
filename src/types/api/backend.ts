@@ -45,14 +45,11 @@ export interface BackendWorkflowNode {
     y: number;
   };
   data: {
-    label: string;
-    description: string;
-    icon?: string;
-    category: string;
-    type: string;
-    template_id?: string;
+    // Only node-specific configuration data
+    formValues?: Record<string, unknown>;
+    customSettings?: Record<string, unknown>;
   };
-  node_template?: {
+  node_type?: {
     id: string;
     name: string;
     type: string;
@@ -60,6 +57,20 @@ export interface BackendWorkflowNode {
     logo?: string;
     form_configuration: Record<string, unknown>;
     tags: string[];
+    node_group: {
+      id: string;
+      name: string;
+      description?: string;
+      icon?: string;
+      is_active: boolean;
+      created_at: string;
+      updated_at: string;
+    };
+    version: string;
+    is_active: boolean;
+    created_by?: string;
+    created_at: string;
+    updated_at: string;
   } | null;
 }
 
