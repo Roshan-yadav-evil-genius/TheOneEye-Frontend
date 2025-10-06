@@ -20,13 +20,13 @@ import {
   IconTag,
   IconPhotoOff,
 } from "@tabler/icons-react";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { formatNodeDate } from "@/lib/dates";
 import { NodeTypeBadge } from "@/components/common/NodeTypeBadge";
 import { renderNodeLogo, renderNodeGroupIcon } from "@/lib/node-render-utils";
 
 interface NodesTableRowProps {
-  node: TNode;
+  node: BackendNodeType;
   columns: Array<{ id: string; label: string; visible: boolean }>;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
@@ -74,7 +74,7 @@ export function NodesTableRow({
         <TableCell className="min-w-[120px]">
           <div className="flex items-center gap-2">
             {renderNodeGroupIcon(node)}
-            <span className="truncate">{node.nodeGroupName}</span>
+            <span className="truncate">{node.node_group.name}</span>
           </div>
         </TableCell>
       )}
@@ -94,7 +94,7 @@ export function NodesTableRow({
       )}
       {columns.find(col => col.id === "updatedAt")?.visible && (
         <TableCell className="text-sm text-muted-foreground min-w-[100px]">
-          {formatNodeDate(node.updatedAt)}
+          {formatNodeDate(node.updated_at)}
         </TableCell>
       )}
       {columns.find(col => col.id === "tags")?.visible && (

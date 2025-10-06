@@ -2,13 +2,13 @@
 
 import React from "react";
 import { IconPhotoOff } from "@tabler/icons-react";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { ImageWithFallback } from "@/components/common/image-with-fallback";
 import { getNodeColors } from "@/constants/node-styles";
 import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
 
 interface NodeLogoProps {
-  node: TNode;
+  node: BackendNodeType;
   size?: SizeVariant;
   className?: string;
 }
@@ -18,11 +18,11 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   const { container, icon, dimensions } = getSizeConfig(size);
 
   const getGroupIcon = () => {
-    if (node.nodeGroupIcon) {
+    if (node.node_group.icon) {
       return (
         <ImageWithFallback
-          src={node.nodeGroupIcon}
-          alt={`${node.nodeGroupName} group icon`}
+          src={node.node_group.icon}
+          alt={`${node.node_group.name} group icon`}
           width={dimensions}
           height={dimensions}
           className={`${container} object-cover rounded`}
@@ -58,11 +58,11 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   }
 
   // If no node logo, try group icon
-  if (node.nodeGroupIcon) {
+  if (node.node_group.icon) {
     return (
       <ImageWithFallback
-        src={node.nodeGroupIcon}
-        alt={`${node.nodeGroupName} group icon`}
+        src={node.node_group.icon}
+        alt={`${node.node_group.name} group icon`}
         width={dimensions}
         height={dimensions}
         className={`${container} object-cover rounded ${className}`}

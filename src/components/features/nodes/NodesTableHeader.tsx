@@ -24,11 +24,12 @@ import {
   IconFilter,
   IconPlus,
 } from "@tabler/icons-react";
-import { TNode, nodeTypes } from "@/types";
+import { nodeTypes } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 interface NodesTableHeaderProps {
-  nodes: TNode[];
-  filteredNodes: TNode[];
+  nodes: BackendNodeType[];
+  filteredNodes: BackendNodeType[];
   searchTerm: string;
   typeFilter: string;
   nodeGroupFilter: string;

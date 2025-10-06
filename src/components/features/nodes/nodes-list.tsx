@@ -3,10 +3,10 @@ import { useRouter } from "next/navigation"
 import { NodesTable } from "@/components/features/nodes/nodes-table"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
-import { TNode } from "@/types"
+import { BackendNodeType } from "@/types/api/backend"
 
 interface NodesListProps {
-  nodes: TNode[]
+  nodes: BackendNodeType[]
   onEdit?: (id: string) => void
   onView?: (id: string) => void
   onDelete?: (id: string) => void

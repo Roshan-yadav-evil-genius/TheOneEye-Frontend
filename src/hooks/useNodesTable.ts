@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { TNode, nodeTypes } from "@/types";
+import { nodeTypes } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 
 interface ColumnConfig {
   id: string;
@@ -8,7 +9,7 @@ interface ColumnConfig {
 }
 
 interface UseNodesTableProps {
-  nodes: TNode[];
+  nodes: BackendNodeType[];
 }
 
 export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
@@ -48,7 +49,7 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
           .includes(searchTerm.toLowerCase())
       
       const matchesType = typeFilter === "all" || node.type === typeFilter
-      const matchesNodeGroup = nodeGroupFilter === "all" || node.nodeGroupName === nodeGroupFilter
+      const matchesNodeGroup = nodeGroupFilter === "all" || node.node_group.name === nodeGroupFilter
       
       return matchesSearch && matchesType && matchesNodeGroup
     });

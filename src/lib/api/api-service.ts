@@ -31,29 +31,9 @@ export class ApiService {
   // Request deduplication map to prevent duplicate API calls
   private static pendingRequests = new Map<string, Promise<unknown>>();
 
-  // Helper function to transform BackendNode to TNode using existing types
-  private static transformBackendNodeToTNode(backendNode: BackendNodeType): TNode {
-    return {
-      id: backendNode.id,
-      name: backendNode.name,
-      type: backendNode.type as 'trigger' | 'action' | 'logic' | 'system',
-      nodeGroup: backendNode.node_group.id,
-      nodeGroupName: backendNode.node_group.name,
-      nodeGroupIcon: backendNode.node_group.icon,
-      description: backendNode.description || '',
-      version: backendNode.version || '1.0.0',
-      isActive: backendNode.is_active,
-      createdAt: backendNode.created_at,
-      updatedAt: backendNode.updated_at,
-      createdBy: backendNode.created_by || 'System',
-      formConfiguration: backendNode.form_configuration || {},
-      tags: backendNode.tags || [],
-      logo: backendNode.logo || '',
-    };
-  }
 
   // Helper function to transform frontend node data to backend format
-  private static transformToBackendFormat(frontendNode: TNodeCreateData): Partial<BackendNode> {
+  private static transformToBackendFormat(frontendNode: TNodeCreateData): Partial<BackendNodeType> {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
@@ -68,37 +48,31 @@ export class ApiService {
   }
 
   // Node operations
-  static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
-    const response = await axiosApiClient.get<TPaginatedResponse<BackendNode> | BackendNode[]>('/nodes/', {
+  static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<BackendNodeType>> {
+    const response = await axiosApiClient.get<TPaginatedResponse<BackendNodeType> | BackendNodeType[]>('/nodes/', {
       params: filters,
     });
     
     // Handle both array and paginated response formats
     if (Array.isArray(response)) {
-      const transformedNodes = response.map(node => this.transformBackendNodeToTNode(node));
       return {
-        count: transformedNodes.length,
+        count: response.length,
         next: null,
         previous: null,
-        results: transformedNodes,
+        results: response,
       };
     }
     
     // Handle paginated response
-    return {
-      count: response.count,
-      next: response.next,
-      previous: response.previous,
-      results: response.results.map((node) => this.transformBackendNodeToTNode(node)),
-    };
+    return response;
   }
 
-  static async getNode(id: string): Promise<TNode> {
-    const response = await axiosApiClient.get<BackendNode>(`/nodes/${id}/`);
-    return this.transformBackendNodeToTNode(response);
+  static async getNode(id: string): Promise<BackendNodeType> {
+    const response = await axiosApiClient.get<BackendNodeType>(`/nodes/${id}/`);
+    return response;
   }
 
-  static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
+  static async createNode(nodeData: TNodeCreateData): Promise<BackendNodeType> {
     const hasLogoFile = nodeData.logoFile instanceof File;
     
     
@@ -123,26 +97,26 @@ export class ApiService {
       }
       
       
-      const response = await axiosApiClient.uploadFile<BackendNode>('/nodes/', formData);
-      return this.transformBackendNodeToTNode(response);
+      const response = await axiosApiClient.uploadFile<BackendNodeType>('/nodes/', formData);
+      return response;
     } else {
-      const response = await axiosApiClient.post<BackendNode>('/nodes/', nodeData);
-      return this.transformBackendNodeToTNode(response);
+      const response = await axiosApiClient.post<BackendNodeType>('/nodes/', nodeData);
+      return response;
     }
   }
 
-  static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
-    const response = await axiosApiClient.put<BackendNode>(`/nodes/${id}/`, nodeData);
-    return this.transformBackendNodeToTNode(response);
+  static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
+    const response = await axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, nodeData);
+    return response;
   }
 
   static async deleteNode(id: string): Promise<void> {
     return axiosApiClient.delete(`/nodes/${id}/`);
   }
 
-  static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
-    const response = await axiosApiClient.post<BackendNode[]>('/nodes/bulk_create/', nodesData);
-    return response.map(node => this.transformBackendNodeToTNode(node));
+  static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<BackendNodeType[]> {
+    const response = await axiosApiClient.post<BackendNodeType[]>('/nodes/bulk_create/', nodesData);
+    return response;
   }
 
   static async bulkDeleteNodes(ids: string[]): Promise<void> {

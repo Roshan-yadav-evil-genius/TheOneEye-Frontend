@@ -2,14 +2,15 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { TNode, TNodesState, TNodeCreateData, TNodeUpdateData, TNodeFilters, TApiError } from '@/types';
+import { BackendNodeType } from '@/types/api/backend';
 import { ApiService } from '@/lib/api/api-service';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/hooks/use-toast';
 
 // Enhanced state interface with additional features
 interface EnhancedNodesState extends TNodesState {
   // Explicitly include base properties to ensure they're available
-  nodes: TNode[];
-  selectedNode: TNode | null;
+  nodes: BackendNodeType[];
+  selectedNode: BackendNodeType | null;
   isLoading: boolean;
   error: string | null;
   filters: {

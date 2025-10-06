@@ -8,14 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TNode } from "@/types";
+import { BackendNodeType } from "@/types/api/backend";
 import { useNodesTable } from "@/hooks/useNodesTable";
 import { NodesTableHeader } from "./NodesTableHeader";
 import { NodesTableRow } from "./NodesTableRow";
 import { NodesTablePagination } from "./NodesTablePagination";
 
 interface NodesTableProps {
-  nodes: TNode[];
+  nodes: BackendNodeType[];
   onEdit?: (id: string) => void;
   onView?: (id: string) => void;
   onDelete?: (id: string) => void;
