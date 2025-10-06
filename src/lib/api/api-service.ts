@@ -321,8 +321,8 @@ export class ApiService {
     
     return {
       id: response.id,
-      source: response.source_node,
-      target: response.target_node,
+      source: response.source,
+      target: response.target,
       sourceHandle: undefined,
       targetHandle: undefined,
     };
