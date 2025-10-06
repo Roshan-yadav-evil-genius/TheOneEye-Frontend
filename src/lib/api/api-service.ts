@@ -18,36 +18,37 @@ import {
   TWorkflowConnectionCreateRequest,
   TWorkflowNodePositionUpdateRequest,
   TWorkflowNodeCreateResponse,
-  BackendNode,
   BackendNodeGroup,
   BackendWorkflowCanvasResponse,
   BackendProject,
   BackendUser,
-  BackendAuthResponse
+  BackendAuthResponse,
+  BackendNodeType
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
   // Request deduplication map to prevent duplicate API calls
   private static pendingRequests = new Map<string, Promise<unknown>>();
-  // Helper function to transform backend node data to frontend format
-  private static transformNodeData(backendNode: BackendNode): TNode {
+
+  // Helper function to transform BackendNode to TNode using existing types
+  private static transformBackendNodeToTNode(backendNode: BackendNodeType): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
-      type: backendNode.type,
-      nodeGroup: backendNode.node_group,
-      nodeGroupName: backendNode.node_group_name,
-      nodeGroupIcon: backendNode.node_group_icon,
+      type: backendNode.type as 'trigger' | 'action' | 'logic' | 'system',
+      nodeGroup: backendNode.node_group.id,
+      nodeGroupName: backendNode.node_group.name,
+      nodeGroupIcon: backendNode.node_group.icon,
       description: backendNode.description || '',
       version: backendNode.version || '1.0.0',
       isActive: backendNode.is_active,
       createdAt: backendNode.created_at,
       updatedAt: backendNode.updated_at,
-      createdBy: backendNode.created_by || 'Unknown',
+      createdBy: backendNode.created_by || 'System',
       formConfiguration: backendNode.form_configuration || {},
       tags: backendNode.tags || [],
-      logo: backendNode.logo,
+      logo: backendNode.logo || '',
     };
   }
 
@@ -74,7 +75,7 @@ export class ApiService {
     
     // Handle both array and paginated response formats
     if (Array.isArray(response)) {
-      const transformedNodes = response.map(node => this.transformNodeData(node));
+      const transformedNodes = response.map(node => this.transformBackendNodeToTNode(node));
       return {
         count: transformedNodes.length,
         next: null,
@@ -88,13 +89,13 @@ export class ApiService {
       count: response.count,
       next: response.next,
       previous: response.previous,
-      results: response.results.map((node) => this.transformNodeData(node)),
+      results: response.results.map((node) => this.transformBackendNodeToTNode(node)),
     };
   }
 
   static async getNode(id: string): Promise<TNode> {
     const response = await axiosApiClient.get<BackendNode>(`/nodes/${id}/`);
-    return this.transformNodeData(response);
+    return this.transformBackendNodeToTNode(response);
   }
 
   static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
@@ -123,19 +124,16 @@ export class ApiService {
       
       
       const response = await axiosApiClient.uploadFile<BackendNode>('/nodes/', formData);
-      return this.transformNodeData(response);
+      return this.transformBackendNodeToTNode(response);
     } else {
-      const backendData = this.transformToBackendFormat(nodeData);
-      
-      const response = await axiosApiClient.post<BackendNode>('/nodes/', backendData);
-      return this.transformNodeData(response);
+      const response = await axiosApiClient.post<BackendNode>('/nodes/', nodeData);
+      return this.transformBackendNodeToTNode(response);
     }
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
-    const backendData = this.transformToBackendFormat(nodeData);
-    const response = await axiosApiClient.put<BackendNode>(`/nodes/${id}/`, backendData);
-    return this.transformNodeData(response);
+    const response = await axiosApiClient.put<BackendNode>(`/nodes/${id}/`, nodeData);
+    return this.transformBackendNodeToTNode(response);
   }
 
   static async deleteNode(id: string): Promise<void> {
@@ -143,8 +141,8 @@ export class ApiService {
   }
 
   static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<TNode[]> {
-    const response = await axiosApiClient.post<any[]>('/nodes/bulk_create/', nodesData);
-    return response.map(node => this.transformNodeData(node));
+    const response = await axiosApiClient.post<BackendNode[]>('/nodes/bulk_create/', nodesData);
+    return response.map(node => this.transformBackendNodeToTNode(node));
   }
 
   static async bulkDeleteNodes(ids: string[]): Promise<void> {

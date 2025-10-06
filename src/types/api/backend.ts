@@ -1,11 +1,13 @@
 // Backend API response types (as they come from the server)
-export interface BackendNode {
+// These interfaces represent the exact structure returned by the Django backend
+
+// Shared interface for node type structure (used in both BackendNode and BackendWorkflowNode.node_type)
+// This represents a StandaloneNode from the backend
+export interface BackendNodeType {
   id: string;
   name: string;
   type: string;
-  node_group: string;
-  node_group_name: string;
-  node_group_icon?: string;
+  node_group: BackendNodeGroup;
   description?: string;
   version?: string;
   is_active: boolean;
@@ -17,6 +19,7 @@ export interface BackendNode {
   logo?: string;
 }
 
+// Represents NodeGroup from the backend
 export interface BackendNodeGroup {
   id: string;
   name: string;
@@ -27,6 +30,7 @@ export interface BackendNodeGroup {
   updated_at: string;
 }
 
+// Response from /workflow/{id}/canvas_data/ endpoint
 export interface BackendWorkflowCanvasResponse {
   nodes: BackendWorkflowNode[];
   edges: BackendWorkflowConnection[];
@@ -38,6 +42,7 @@ export interface BackendWorkflowCanvasResponse {
   };
 }
 
+// Represents a Node instance within a workflow (from canvas_data response)
 export interface BackendWorkflowNode {
   id: string;
   position: {
@@ -49,44 +54,17 @@ export interface BackendWorkflowNode {
     formValues?: Record<string, unknown>;
     customSettings?: Record<string, unknown>;
   };
-  node_type?: {
-    id: string;
-    name: string;
-    type: string;
-    description?: string;
-    logo?: string;
-    form_configuration: Record<string, unknown>;
-    tags: string[];
-    node_group: {
-      id: string;
-      name: string;
-      description?: string;
-      icon?: string;
-      is_active: boolean;
-      created_at: string;
-      updated_at: string;
-    };
-    version: string;
-    is_active: boolean;
-    created_by?: string;
-    created_at: string;
-    updated_at: string;
-  } | null;
+  node_type?: BackendNodeType | null;
 }
 
+// Represents a Connection between nodes in a workflow
 export interface BackendWorkflowConnection {
   id: string;
   source: string;
   target: string;
+  created_at?: string; // Optional field that might be returned by backend
 }
 
-export interface BackendNodeTemplate {
-  id: string;
-  name: string;
-  category: string;
-  description?: string;
-  icon?: string;
-}
 
 export interface BackendProject {
   id: string;
