@@ -17,15 +17,22 @@ import {
   TWorkflowNodeCreateRequest,
   TWorkflowConnectionCreateRequest,
   TWorkflowNodePositionUpdateRequest,
-  TWorkflowNodeCreateResponse
+  TWorkflowNodeCreateResponse,
+  BackendNode,
+  BackendNodeGroup,
+  BackendWorkflowCanvasResponse,
+  BackendNodeTemplate,
+  BackendProject,
+  BackendUser,
+  BackendAuthResponse
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
 export class ApiService {
   // Request deduplication map to prevent duplicate API calls
-  private static pendingRequests = new Map<string, Promise<any>>();
+  private static pendingRequests = new Map<string, Promise<unknown>>();
   // Helper function to transform backend node data to frontend format
-  private static transformNodeData(backendNode: any): TNode {
+  private static transformNodeData(backendNode: BackendNode): TNode {
     return {
       id: backendNode.id,
       name: backendNode.name,
@@ -46,7 +53,7 @@ export class ApiService {
   }
 
   // Helper function to transform frontend node data to backend format
-  private static transformToBackendFormat(frontendNode: any): any {
+  private static transformToBackendFormat(frontendNode: TNodeCreateData): Partial<BackendNode> {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
@@ -62,7 +69,7 @@ export class ApiService {
 
   // Node operations
   static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<TNode>> {
-    const response = await axiosApiClient.get<any>('/nodes/', {
+    const response = await axiosApiClient.get<TPaginatedResponse<BackendNode> | BackendNode[]>('/nodes/', {
       params: filters,
     });
     
@@ -82,29 +89,24 @@ export class ApiService {
       count: response.count,
       next: response.next,
       previous: response.previous,
-      results: response.results.map((node: any) => this.transformNodeData(node)),
+      results: response.results.map((node) => this.transformNodeData(node)),
     };
   }
 
   static async getNode(id: string): Promise<TNode> {
-    const response = await axiosApiClient.get<any>(`/nodes/${id}/`);
+    const response = await axiosApiClient.get<BackendNode>(`/nodes/${id}/`);
     return this.transformNodeData(response);
   }
 
   static async createNode(nodeData: TNodeCreateData): Promise<TNode> {
     const hasLogoFile = nodeData.logoFile instanceof File;
     
-    console.log('🔧 Creating node with data:', {
-      ...nodeData,
-      logoFile: hasLogoFile ? `File: ${nodeData.logoFile?.name}` : 'No file'
-    });
     
     if (hasLogoFile) {
       const formData = new FormData();
       
       // Transform to backend format first, then add to FormData
       const backendData = this.transformToBackendFormat(nodeData);
-      console.log('🔄 Transformed to backend format:', backendData);
       
       // Add all fields to FormData with correct backend field names
       Object.entries(backendData).forEach(([key, value]) => {
@@ -120,22 +122,20 @@ export class ApiService {
         formData.append('logo', nodeData.logoFile);
       }
       
-      console.log('📤 Sending FormData with fields:', Array.from(formData.keys()));
       
-      const response = await axiosApiClient.uploadFile<any>('/nodes/', formData);
+      const response = await axiosApiClient.uploadFile<BackendNode>('/nodes/', formData);
       return this.transformNodeData(response);
     } else {
       const backendData = this.transformToBackendFormat(nodeData);
-      console.log('🔄 Transformed to backend format (no file):', backendData);
       
-      const response = await axiosApiClient.post<any>('/nodes/', backendData);
+      const response = await axiosApiClient.post<BackendNode>('/nodes/', backendData);
       return this.transformNodeData(response);
     }
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<TNode> {
     const backendData = this.transformToBackendFormat(nodeData);
-    const response = await axiosApiClient.put<any>(`/nodes/${id}/`, backendData);
+    const response = await axiosApiClient.put<BackendNode>(`/nodes/${id}/`, backendData);
     return this.transformNodeData(response);
   }
 
@@ -160,8 +160,8 @@ export class ApiService {
 
   // NodeGroup operations
   static async getNodeGroups(): Promise<TNodeGroup[]> {
-    const response = await axiosApiClient.get<any[]>('/node-groups/');
-    return response.map((group: any) => ({
+    const response = await axiosApiClient.get<BackendNodeGroup[]>('/node-groups/');
+    return response.map((group) => ({
       id: group.id,
       name: group.name,
       description: group.description,
@@ -173,7 +173,7 @@ export class ApiService {
   }
 
   static async getNodeGroup(id: string): Promise<TNodeGroup> {
-    const response = await axiosApiClient.get<any>(`/node-groups/${id}/`);
+    const response = await axiosApiClient.get<BackendNodeGroup>(`/node-groups/${id}/`);
     return {
       id: response.id,
       name: response.name,
@@ -192,7 +192,7 @@ export class ApiService {
       icon: groupData.icon,
       is_active: groupData.isActive,
     };
-    const response = await axiosApiClient.post<any>('/node-groups/', backendData);
+    const response = await axiosApiClient.post<BackendNodeGroup>('/node-groups/', backendData);
     return {
       id: response.id,
       name: response.name,
@@ -211,7 +211,7 @@ export class ApiService {
       icon: groupData.icon,
       is_active: groupData.isActive,
     };
-    const response = await axiosApiClient.put<any>(`/node-groups/${id}/`, backendData);
+    const response = await axiosApiClient.put<BackendNodeGroup>(`/node-groups/${id}/`, backendData);
     return {
       id: response.id,
       name: response.name,
@@ -250,8 +250,7 @@ export class ApiService {
     
     // Return existing promise if request is already in progress
     if (this.pendingRequests.has(requestKey)) {
-      console.log('Request already in progress, returning existing promise for:', workflowId);
-      return this.pendingRequests.get(requestKey)!;
+      return this.pendingRequests.get(requestKey)! as Promise<TWorkflowCanvasData>;
     }
     
     const requestPromise = this.makeWorkflowCanvasRequest(workflowId);
@@ -266,17 +265,17 @@ export class ApiService {
   }
 
   private static async makeWorkflowCanvasRequest(workflowId: string): Promise<TWorkflowCanvasData> {
-    const response = await axiosApiClient.get<any>(`/workflow/${workflowId}/canvas_data/`);
+    const response = await axiosApiClient.get<BackendWorkflowCanvasResponse>(`/workflow/${workflowId}/canvas_data/`);
     
     // Transform the response to match our types
     return {
-      nodes: response.nodes.map((node: any) => ({
+      nodes: response.nodes.map((node) => ({
         id: node.id,
         position: node.position,
         data: node.data,
         node_template: node.node_template
       })),
-      edges: response.edges.map((edge: any) => ({
+      edges: response.edges.map((edge) => ({
         id: edge.id,
         sourceNodeId: edge.source,
         targetNodeId: edge.target,
@@ -288,10 +287,10 @@ export class ApiService {
   }
 
   static async getAvailableNodeTemplates(workflowId: string): Promise<TNode[]> {
-    const response = await axiosApiClient.get<any[]>(`/workflow/${workflowId}/available_nodes/`);
+    const response = await axiosApiClient.get<BackendNodeTemplate[]>(`/workflow/${workflowId}/available_nodes/`);
     
     // Transform to TNode format (these are StandaloneNode templates)
-    return response.map((template: any) => ({
+    return response.map((template) => ({
       id: template.id,
       name: template.name,
       type: template.category as TNode['type'],
@@ -314,7 +313,7 @@ export class ApiService {
     workflowId: string, 
     nodeData: TWorkflowNodeCreateRequest
   ): Promise<TWorkflowNodeCreateResponse> {
-    const response = await axiosApiClient.post<any>(`/workflow/${workflowId}/add_node/`, nodeData);
+    const response = await axiosApiClient.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/add_node/`, nodeData);
     
     return {
       id: response.id,
@@ -345,7 +344,7 @@ export class ApiService {
     workflowId: string, 
     connectionData: TWorkflowConnectionCreateRequest
   ): Promise<TWorkflowConnection> {
-    const response = await axiosApiClient.post<any>(`/workflow/${workflowId}/add_connection/`, connectionData);
+    const response = await axiosApiClient.post<TWorkflowConnection>(`/workflow/${workflowId}/add_connection/`, connectionData);
     
     return {
       id: response.id,
@@ -362,44 +361,108 @@ export class ApiService {
     });
   }
 
-  // Project operations (placeholder for future implementation)
+  // Project operations
   static async getProjects(): Promise<TProject[]> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve([]);
+    const response = await axiosApiClient.get<BackendProject[]>('/projects/');
+    return response.map((project) => ({
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      status: project.status as TProject['status'],
+      workflows: project.workflows,
+      team: project.team,
+      createdAt: new Date(project.created_at),
+      updatedAt: new Date(project.updated_at),
+      createdBy: project.created_by,
+    }));
   }
 
   static async createProject(projectData: Partial<TProject>): Promise<TProject> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve(projectData as TProject);
+    const backendData = {
+      name: projectData.name,
+      description: projectData.description,
+      status: projectData.status,
+      workflows: projectData.workflows || [],
+      team: projectData.team || [],
+    };
+    const response = await axiosApiClient.post<BackendProject>('/projects/', backendData);
+    return {
+      id: response.id,
+      name: response.name,
+      description: response.description,
+      status: response.status as TProject['status'],
+      workflows: response.workflows,
+      team: response.team,
+      createdAt: new Date(response.created_at),
+      updatedAt: new Date(response.updated_at),
+      createdBy: response.created_by,
+    };
   }
 
   static async updateProject(id: string, projectData: Partial<TProject>): Promise<TProject> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve(projectData as TProject);
+    const backendData = {
+      name: projectData.name,
+      description: projectData.description,
+      status: projectData.status,
+      workflows: projectData.workflows,
+      team: projectData.team,
+    };
+    const response = await axiosApiClient.put<BackendProject>(`/projects/${id}/`, backendData);
+    return {
+      id: response.id,
+      name: response.name,
+      description: response.description,
+      status: response.status as TProject['status'],
+      workflows: response.workflows,
+      team: response.team,
+      createdAt: new Date(response.created_at),
+      updatedAt: new Date(response.updated_at),
+      createdBy: response.created_by,
+    };
   }
 
   static async deleteProject(id: string): Promise<void> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve();
+    return axiosApiClient.delete(`/projects/${id}/`);
   }
 
-  // User operations (placeholder for future implementation)
+  // User operations
   static async getCurrentUser(): Promise<TUser | null> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve(null);
+    try {
+      const response = await axiosApiClient.get<BackendUser>('/auth/me/');
+      return {
+        id: response.id,
+        name: response.name,
+        email: response.email,
+        avatar: response.avatar,
+        role: response.role,
+        permissions: response.permissions,
+      };
+    } catch (error) {
+      return null;
+    }
   }
 
   static async login(credentials: { email: string; password: string }): Promise<{ user: TUser; token: string }> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve({
-      user: { id: '1', name: 'User', email: credentials.email },
-      token: 'mock-token'
-    });
+    const response = await axiosApiClient.post<BackendAuthResponse>('/auth/login/', credentials);
+    return {
+      user: {
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email,
+        avatar: response.user.avatar,
+        role: response.user.role,
+        permissions: response.user.permissions,
+      },
+      token: response.token,
+    };
   }
 
   static async logout(): Promise<void> {
-    // TODO: Implement when backend is ready
-    return Promise.resolve();
+    try {
+      await axiosApiClient.post('/auth/logout/');
+    } catch (error) {
+      // Ignore logout errors - user is logged out regardless
+    }
   }
 
   // Utility methods

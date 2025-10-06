@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // Store debugging utilities
 export const storeDebug = {
   // Log store state changes
-  logStateChange: (storeName: string, prevState: any, nextState: any) => {
+  logStateChange: (storeName: string, prevState: unknown, nextState: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.group(`🔄 ${storeName} State Change`);
       console.log('Previous:', prevState);
@@ -13,15 +12,15 @@ export const storeDebug = {
   },
 
   // Log store actions
-  logAction: (storeName: string, actionName: string, payload?: any) => {
+  logAction: (storeName: string, actionName: string, payload?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`🎯 ${storeName}.${actionName}`, payload || '');
     }
   },
 
   // Get state differences
-  getStateDiff: (prevState: any, nextState: any) => {
-    const diff: any = {};
+  getStateDiff: (prevState: unknown, nextState: unknown) => {
+    const diff: Record<string, unknown> = {};
     
     for (const key in nextState) {
       if (prevState[key] !== nextState[key]) {
@@ -36,7 +35,7 @@ export const storeDebug = {
   },
 
   // Performance monitoring
-  measureAction: async (actionName: string, action: () => Promise<any>) => {
+  measureAction: async (actionName: string, action: () => Promise<unknown>) => {
     const start = performance.now();
     try {
       const result = await action();
@@ -59,7 +58,7 @@ export const storeDebug = {
   },
 
   // Store state inspector
-  inspectStore: (storeName: string, store: any) => {
+  inspectStore: (storeName: string, store: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
       console.group(`🔍 ${storeName} Store Inspector`);
       console.log('Current State:', store.getState());
@@ -70,14 +69,14 @@ export const storeDebug = {
 };
 
 // Helper function for state diff
-function getStateDiff(prevState: any, nextState: any) {
+function getStateDiff(prevState: unknown, nextState: unknown) {
   return storeDebug.getStateDiff(prevState, nextState);
 }
 
 // Store middleware for debugging
-export const debugMiddleware = (storeName: string) => (config: any) => (set: any, get: any, api: any) => {
+export const debugMiddleware = (storeName: string) => <T>(config: (set: (...args: unknown[]) => void, get: () => T, api: unknown) => T) => (set: (...args: unknown[]) => void, get: () => T, api: unknown) => {
   const store = config(
-    (...args: any[]) => {
+    (...args: unknown[]) => {
       const prevState = get();
       set(...args);
       const nextState = get();
@@ -90,7 +89,7 @@ export const debugMiddleware = (storeName: string) => (config: any) => (set: any
 
   // Add debugging methods to store
   if (process.env.NODE_ENV === 'development') {
-    (store as any).__debug = {
+    (store as Record<string, unknown>).__debug = {
       inspect: () => storeDebug.inspectStore(storeName, store),
       getState: () => get(),
       reset: () => set(store.getInitialState?.() || {}),

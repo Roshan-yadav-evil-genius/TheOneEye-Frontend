@@ -102,13 +102,11 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
           
           // Prevent loading if already loading the same workflow
           if (currentState.isLoading && currentState.workflowId === workflowId) {
-            console.log('Workflow already loading, skipping duplicate request for:', workflowId);
             return;
           }
           
           // Prevent loading if workflow is already loaded and data exists
           if (currentState.workflowId === workflowId && currentState.workflow && currentState.nodes.length > 0) {
-            console.log('Workflow already loaded, skipping duplicate request for:', workflowId);
             return;
           }
 
@@ -122,8 +120,8 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             const canvasData = await ApiService.getWorkflowCanvasData(workflowId);
             
             set((state) => {
-              state.nodes = canvasData.nodes as any;
-              state.connections = canvasData.edges as any;
+              state.nodes = canvasData.nodes;
+              state.connections = canvasData.edges;
               state.workflow = canvasData.workflow;
               state.isLoading = false;
               state.error = null;
@@ -179,15 +177,15 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
                 id: response.node_template.id,
                 name: response.node_template.name,
                 type: response.node_template.type,
-                description: (response.node_template as any).description || '',
-                logo: (response.node_template as any).logo || '',
-                form_configuration: (response.node_template as any).form_configuration || {},
-                tags: (response.node_template as any).tags || [],
+                description: response.node_template.description || '',
+                logo: response.node_template.logo || '',
+                form_configuration: response.node_template.form_configuration || {},
+                tags: response.node_template.tags || [],
               } : null,
             };
 
             set((state) => {
-              state.nodes.push(newNode as any);
+              state.nodes.push(newNode);
               state.isSaving = false;
               state.error = null;
             });

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// Store management utilities and middleware
 // Import stores for internal use
 import { useTUserStore } from './user-store';
 import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
@@ -236,7 +236,7 @@ export const storeActions = {
 // Store middleware for logging and debugging
 export const storeMiddleware = {
   logStateChanges: (storeName: string) => {
-    return (config: (set: (...args: unknown[]) => void, get: () => unknown, api: unknown) => any) => (set: (...args: unknown[]) => void, get: () => unknown, api: unknown) =>
+    return <T>(config: (set: (...args: unknown[]) => void, get: () => T, api: unknown) => T) => (set: (...args: unknown[]) => void, get: () => T, api: unknown) =>
       config(
         (...args: unknown[]) => {
           console.log(`${storeName} state changed:`, get());
@@ -248,7 +248,7 @@ export const storeMiddleware = {
   },
   
   persistToLocalStorage: (storeName: string, keys: string[]) => {
-    return (config: (set: (...args: unknown[]) => void, get: () => any, api: unknown) => any) => (set: (...args: unknown[]) => void, get: () => any, api: unknown) => {
+    return <T>(config: (set: (...args: unknown[]) => void, get: () => T, api: unknown) => T) => (set: (...args: unknown[]) => void, get: () => T, api: unknown) => {
       const store = config(set, get, api);
       
       // Load from localStorage on initialization
@@ -258,8 +258,8 @@ export const storeMiddleware = {
           try {
             const parsed = JSON.parse(saved);
             const partialState = keys.reduce((acc, key) => {
-              if ((parsed as any)[key] !== undefined) {
-                (acc as any)[key] = (parsed as any)[key];
+              if (key in parsed && parsed[key] !== undefined) {
+                acc[key] = parsed[key];
               }
               return acc;
             }, {} as Record<string, unknown>);
@@ -281,7 +281,9 @@ export const storeMiddleware = {
         if (typeof window !== 'undefined') {
           const state = get();
           const partialState = keys.reduce((acc, key) => {
-            (acc as any)[key] = state[key];
+            if (key in state) {
+              acc[key] = (state as Record<string, unknown>)[key];
+            }
             return acc;
           }, {} as Record<string, unknown>);
           

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// Workflow store with proper TypeScript types
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { TWorkflow, TWorkflowState, TWorkflowConnection, TNode } from './types';
@@ -229,7 +229,7 @@ export const useTWorkflowStore = create<TWorkflowStore>()(
           const response = await ApiService.getWorkflows();
           
           // Transform backend response to frontend format
-          const workflows: TWorkflow[] = response.map((workflow: Record<string, any>) => ({
+          const workflows: TWorkflow[] = response.map((workflow: Record<string, unknown>) => ({
             id: workflow.id,
             name: workflow.name,
             description: workflow.description,
