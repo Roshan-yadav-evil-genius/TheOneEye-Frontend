@@ -20,6 +20,16 @@ export interface CustomNodeData {
   logo?: string;
   nodeGroupIcon?: string;
   nodeGroupName?: string;
+  template_id?: string;
+  node_template?: {
+    id: string;
+    name: string;
+    type: string;
+    description?: string;
+    logo?: string;
+    form_configuration: Record<string, unknown>;
+    tags: string[];
+  } | null;
 }
 
 interface CustomNodeProps {

@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NodeHeader } from "./node-header";
 import { ParametersTab } from "./parameters-tab";
 import { SettingsTab } from "./settings-tab";
-import { FormConfigurationEditor } from "@/components/common/form-configuration-editor";
+import { FormFieldsSection } from "@/components/features/nodes/FormFieldsSection";
+import { TNode } from "@/types";
 
 interface Condition {
   id: string;
@@ -43,8 +44,9 @@ interface NodeEditorProps {
   onLabelChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   // Form tab props
-  formConfiguration?: Record<string, unknown>;
-  onFormConfigurationChange?: (value: Record<string, unknown>) => void;
+  standaloneNodeData?: TNode | null;
+  isLoadingNodeData?: boolean;
+  nodeDataError?: string | null;
   // Header actions
   onTestStep?: () => void;
   onViewDocs?: () => void;
@@ -64,8 +66,9 @@ export function NodeEditor({
   description,
   onLabelChange,
   onDescriptionChange,
-  formConfiguration,
-  onFormConfigurationChange,
+  standaloneNodeData,
+  isLoadingNodeData,
+  nodeDataError,
   onTestStep,
   onViewDocs
 }: NodeEditorProps) {
@@ -120,17 +123,21 @@ export function NodeEditor({
         </TabsContent>
 
         <TabsContent value="form" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0 sidebar-scrollbar">
-          {onFormConfigurationChange ? (
-            <FormConfigurationEditor
-              value={formConfiguration || {}}
-              onChange={onFormConfigurationChange}
-            />
+          {isLoadingNodeData ? (
+            <div className="text-gray-400 text-center py-8">
+              Loading node information...
+            </div>
+          ) : nodeDataError ? (
+            <div className="text-red-400 text-center py-8">
+              Error loading node data: {nodeDataError}
+            </div>
+          ) : standaloneNodeData ? (
+            <FormFieldsSection nodeData={standaloneNodeData} />
           ) : (
             <div className="text-gray-400 text-center py-8">
-              Form configuration not available for this node type
+              No node data available
             </div>
           )}
-          
         </TabsContent>
       </Tabs>
     </div>

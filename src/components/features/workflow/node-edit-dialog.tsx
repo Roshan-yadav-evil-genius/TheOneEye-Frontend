@@ -51,6 +51,9 @@ export function NodeEditDialog({
     activeInputTab,
     activeOutputTab,
     activeNodeTab,
+    standaloneNodeData,
+    isLoadingNodeData,
+    nodeDataError,
     setGroups,
     setConvertTypes,
     setActiveInputTab,
@@ -100,8 +103,9 @@ export function NodeEditDialog({
                 description={editData.description}
                 onLabelChange={(value) => handleEditDataChange('label', value)}
                 onDescriptionChange={(value) => handleEditDataChange('description', value)}
-                formConfiguration={editData.formConfiguration}
-                onFormConfigurationChange={handleFormConfigurationChange}
+                standaloneNodeData={standaloneNodeData}
+                isLoadingNodeData={isLoadingNodeData}
+                nodeDataError={nodeDataError}
               />
             </div>
 
