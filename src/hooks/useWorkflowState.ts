@@ -104,6 +104,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   const onConnect = useCallback(
     async (params: Connection) => {
       // Prevent self-connections
+      console.log(params)
       if (params.source === params.target) {
         return;
       }

@@ -20,7 +20,8 @@ import {
   BackendWorkflowCanvasResponse,
   BackendUser,
   BackendAuthResponse,
-  BackendNodeType
+  BackendNodeType,
+  BackendWorkflowConnection
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
@@ -286,14 +287,11 @@ export class ApiService {
     workflowId: string, 
     connectionData: TWorkflowConnectionCreateRequest
   ): Promise<TWorkflowConnection> {
-    const response = await axiosApiClient.post<TWorkflowConnection>(`/workflow/${workflowId}/add_connection/`, connectionData);
-    
+    const response = await axiosApiClient.post<BackendWorkflowConnection>(`/workflow/${workflowId}/add_connection/`, connectionData);
     return {
-      id: response.id,
-      source: response.source,
-      target: response.target,
-      sourceHandle: undefined,
-      targetHandle: undefined,
+      id:response.id,
+      source:response.source_node,
+      target:response.target_node
     };
   }
 
@@ -385,10 +383,6 @@ export const {
   removeNodeFromWorkflow,
   addConnectionToWorkflow,
   removeConnectionFromWorkflow,
-  getProjects,
-  createProject,
-  updateProject,
-  deleteProject,
   getCurrentUser,
   login,
   logout,

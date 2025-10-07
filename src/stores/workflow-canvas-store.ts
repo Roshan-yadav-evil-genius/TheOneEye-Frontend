@@ -21,7 +21,7 @@ interface WorkflowCanvasState {
   // Data
   workflowId: string | null;
   nodes: BackendWorkflowNode[];
-  connections: BackendWorkflowConnection[];
+  connections: TWorkflowConnection[];
   workflow: {
     id: string;
     name: string;
@@ -284,7 +284,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
 
           try {
             const newConnection = await ApiService.addConnectionToWorkflow(workflowId, connectionData);
-            
+            console.log(newConnection)
             set((state) => {
               state.connections.push(newConnection);
               state.isSaving = false;

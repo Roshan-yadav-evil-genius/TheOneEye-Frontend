@@ -68,9 +68,8 @@ export interface BackendWorkflowNode {
 // Represents a Connection between nodes in a workflow
 export interface BackendWorkflowConnection {
   id: string;
-  source: string;
-  target: string;
-  created_at?: string; // Optional field that might be returned by backend
+  source_node: string;
+  target_node: string;
 }
 
 
