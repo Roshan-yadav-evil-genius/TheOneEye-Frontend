@@ -42,13 +42,10 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         id: workflowNode.id,
         type: 'custom',
         position: workflowNode.position,
-        data: {
-          backendWorkflowNode:workflowNode,
-          onDeleteNode: (nodeId: string) => removeNode(nodeId),
-        },
+        data: workflowNode,
       };
     });
-  }, [workflowNodes, removeNode]);
+  }, [workflowNodes]);
 
   // Convert workflow connections to ReactFlow format
   const reactFlowEdges = useMemo(() => {
@@ -131,10 +128,6 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     [edges, addConnection]
   );
 
-  const handleDeleteNode = useCallback((nodeId: string) => {
-    removeNode(nodeId);
-  }, [removeNode]);
-
   const addNodeFromDrag = useCallback(async (nodeData: any, position: { x: number; y: number }) => {
     const nodeRequest: TWorkflowNodeCreateRequest = {
       nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
@@ -152,24 +145,20 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Filter nodes based on search and filters
   const filteredNodes = useMemo(() => {
     return nodes.filter(node => {
-      const matchesSearch = node.data.backendWorkflowNode?.node_type?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const matchesSearch = node.data?.node_type?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       const matchesCategory = filters.nodeGroup === "all";
       
       return matchesSearch && matchesCategory;
     });
   }, [nodes, searchTerm, filters]);
 
-  // Update node selection and add delete callback
+  // Update node selection
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
       ...node,
       selected: selectedNodes.includes(node.id),
-      data: {
-        ...node.data,
-        onDeleteNode: handleDeleteNode,
-      },
     }));
-  }, [nodes, selectedNodes, handleDeleteNode]);
+  }, [nodes, selectedNodes]);
 
   return {
     nodes: updatedNodes,

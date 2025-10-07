@@ -26,7 +26,7 @@ export function NodePreview({ nodeData, logoPreview }: NodePreviewProps) {
         </CardHeader>
 
         <CardContent className="">
-          <FormFieldsSection nodeData={nodeData} />
+          <FormFieldsSection node_type={nodeData} />
         </CardContent>
       </Card>
     </div>

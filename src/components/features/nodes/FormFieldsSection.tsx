@@ -5,14 +5,16 @@ import { BackendNodeType } from "@/types/api/backend";
 import { WidgetLoader } from "./WidgetLoader";
 import { WidgetMapper } from "./WidgetMapper";
 
+
+
 interface FormFieldsSectionProps {
-  nodeData: Partial<BackendNodeType>;
+  node_type: BackendNodeType;
 }
 
-export function FormFieldsSection({ nodeData }: FormFieldsSectionProps) {
+export function FormFieldsSection({ node_type }: FormFieldsSectionProps) {
   return (
     <div>
-      <WidgetLoader nodeData={nodeData}>
+      <WidgetLoader node_type={node_type}>
         {(widgets) => <WidgetMapper widgets={widgets} />}
       </WidgetLoader>
     </div>

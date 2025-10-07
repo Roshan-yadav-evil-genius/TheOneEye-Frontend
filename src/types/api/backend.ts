@@ -14,9 +14,17 @@ export interface BackendNodeType {
   created_at: string;
   updated_at: string;
   created_by?: string;
-  form_configuration?: Record<string, unknown>;
+  form_configuration: TFormConfiguration;
   tags?: string[];
   logo?: string;
+}
+
+
+
+export interface TFormConfiguration {
+  title: string;
+  description?: string;
+  elements: Record<string, unknown>[];
 }
 
 // Represents NodeGroup from the backend
@@ -54,7 +62,7 @@ export interface BackendWorkflowNode {
     formValues?: Record<string, unknown>;
     customSettings?: Record<string, unknown>;
   };
-  node_type?: BackendNodeType | null;
+  node_type: BackendNodeType;
 }
 
 // Represents a Connection between nodes in a workflow

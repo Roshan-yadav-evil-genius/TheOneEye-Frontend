@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Handle, Position } from "reactflow";
-import { Input } from "@/components/ui/input";
 import { NodeEditDialog } from "./node-edit-dialog";
 import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
@@ -11,7 +10,7 @@ import { BackendWorkflowNode } from "@/types";
 
 interface CustomNodeProps {
   id: string;
-  data: {backendWorkflowNode:BackendWorkflowNode};
+  data: BackendWorkflowNode;
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
 }
@@ -20,8 +19,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
-  console.log(data.backendWorkflowNode)
-  const colorClass = nodeColors[data.backendWorkflowNode.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
+  const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
   const handlePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -90,11 +88,11 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
           <NodeLogo
             node={{
               id: id,
-              name: data.backendWorkflowNode.node_type?.name || 'Unknown',
-              type: data.backendWorkflowNode.node_type?.type || 'unknown',
-              logo: data.backendWorkflowNode.node_type?.logo,
-              nodeGroupIcon: data.backendWorkflowNode.node_type?.node_group?.icon,
-              nodeGroupName: data.backendWorkflowNode.node_type?.node_group?.name,
+              name: data.node_type?.name || 'Unknown',
+              type: data.node_type?.type || 'unknown',
+              logo: data.node_type?.logo,
+              nodeGroupIcon: data.node_type?.node_group?.icon,
+              nodeGroupName: data.node_type?.node_group?.name,
             } as any}
             size="lg"
           />
@@ -106,7 +104,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
       {/* External Title and Description */}
       <div className="mt-2 text-center max-w-40">
         <h3 className="font-semibold text-sm text-foreground leading-tight">
-          {data.backendWorkflowNode.node_type?.name || 'Unknown Node'}
+          {data.node_type?.name || 'Unknown Node'}
         </h3>
 
       </div>
@@ -115,7 +113,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
       <NodeEditDialog
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        nodeData={data.backendWorkflowNode}
+        data={data}
       />
     </div>
   );

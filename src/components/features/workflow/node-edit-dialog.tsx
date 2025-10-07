@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { 
   Dialog,
@@ -13,45 +14,28 @@ import { OutputSection } from "./output-section";
 import { NodeEditor } from "./node-editor";
 import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
-import { useNodeEditDialog } from "@/hooks/useNodeEditDialog";
-import { BackendNodeType } from "@/types";
+import { BackendWorkflowNode } from "@/types";
 
 interface NodeEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  nodeData: BackendNodeType;
+  data: BackendWorkflowNode;
 }
 
 export function NodeEditDialog({ 
   isOpen, 
   onOpenChange, 
-  nodeData, 
+  data, 
 }: NodeEditDialogProps) {
-  const {
-    editData,
-    groups,
-    convertTypes,
-    activeInputTab,
-    activeOutputTab,
-    activeNodeTab,
-    standaloneNodeData,
-    nodeDataError,
-    setGroups,
-    setConvertTypes,
-    setActiveInputTab,
-    setActiveOutputTab,
-    setActiveNodeTab,
-    handleEditDataChange,
-  } = useNodeEditDialog({ nodeData });
-
+  // Tab state management
+  const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
+  const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
+  const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "form">("parameters");
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
         <VisuallyHidden>
-          <DialogTitle>Edit Node: {nodeData.label} (ID: {nodeData.id})</DialogTitle>
-          <DialogDescription>
-            Configure the parameters for the {nodeData.type} node &quot;{nodeData.label}&quot;.
-          </DialogDescription>
+          <DialogTitle>Edit Node: {data.node_type?.name} (ID: {data.id})</DialogTitle>
         </VisuallyHidden>
         <DndContext>
           <div className="flex flex-col h-full overflow-hidden">
@@ -71,17 +55,9 @@ export function NodeEditDialog({
             {/* Node Editor Column */}
             <div className="h-full overflow-hidden">
               <NodeEditor
-                nodeType={editData.type}
-                nodeLabel={editData.label}
-                nodeId={editData.id}
                 activeTab={activeNodeTab}
+                data={data}
                 onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
-                groups={groups}
-                convertTypes={convertTypes}
-                onGroupsChange={setGroups}
-                onConvertTypesChange={setConvertTypes}
-                standaloneNodeData={standaloneNodeData}
-                nodeDataError={nodeDataError}
               />
             </div>
 
