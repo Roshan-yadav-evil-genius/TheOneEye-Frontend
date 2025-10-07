@@ -14,34 +14,18 @@ import { NodeEditor } from "./node-editor";
 import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { useNodeEditDialog } from "@/hooks/useNodeEditDialog";
+import { BackendNodeType } from "@/types";
 
 interface NodeEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  nodeData: {
-    id: string;
-    label: string;
-    type: string;
-    status: string;
-    description?: string;
-    formConfiguration?: Record<string, unknown>;
-  };
-  onSave?: (updatedData: {
-    id: string;
-    label: string;
-    type: string;
-    status: string;
-    category: string;
-    description?: string;
-    formConfiguration?: Record<string, unknown>;
-  }) => void;
+  nodeData: BackendNodeType;
 }
 
 export function NodeEditDialog({ 
   isOpen, 
   onOpenChange, 
   nodeData, 
-  onSave 
 }: NodeEditDialogProps) {
   const {
     editData,

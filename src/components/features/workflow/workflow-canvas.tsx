@@ -125,7 +125,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
         {showMinimap && (
           <MiniMap 
             nodeColor={(node) => {
-              switch (node.data?.type) {
+              switch (node.data?.backendWorkflowNode?.node_type?.type) {
                 case "trigger": return "#3b82f6";
                 case "action": return "#10b981";
                 case "logic": return "#8b5cf6";

@@ -179,7 +179,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             });
 
             toastSuccess('Node added successfully!', {
-              description: `"${response.data.label}" has been added to the workflow.`,
+              description: `"${response.node_type?.name || 'Node'}" has been added to the workflow.`,
             });
 
             return newNode;
@@ -238,7 +238,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
           }
 
           const nodeToRemove = get().nodes.find(n => n.id === nodeId);
-          const nodeName = nodeToRemove?.data.label || 'Node';
+          const nodeName = nodeToRemove?.node_type?.name || 'Node';
 
           // Optimistic update
           set((state) => {

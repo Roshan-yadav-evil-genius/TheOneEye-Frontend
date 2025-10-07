@@ -152,7 +152,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Filter nodes based on search and filters
   const filteredNodes = useMemo(() => {
     return nodes.filter(node => {
-      const matchesSearch = node.data.label?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const matchesSearch = node.data.backendWorkflowNode?.node_type?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       const matchesCategory = filters.nodeGroup === "all";
       
       return matchesSearch && matchesCategory;
