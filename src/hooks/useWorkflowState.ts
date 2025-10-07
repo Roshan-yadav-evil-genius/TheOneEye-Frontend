@@ -38,19 +38,12 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   // Convert workflow nodes to ReactFlow format
   const reactFlowNodes = useMemo(() => {
     return workflowNodes.map((workflowNode): Node => {
-      const nodeType = workflowNode.node_type;
-      
       return {
         id: workflowNode.id,
         type: 'custom',
         position: workflowNode.position,
         data: {
-          label: nodeType?.name || `Node ${workflowNode.id.slice(0, 8)}`,
-          type: nodeType?.type || 'custom',
-          status: 'active',
-          description: nodeType?.description || '',
-          logo: nodeType?.logo || null,
-          node_type: nodeType,
+          backendWorkflowNode:workflowNode,
           onDeleteNode: (nodeId: string) => removeNode(nodeId),
         },
       };
