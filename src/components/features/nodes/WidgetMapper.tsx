@@ -8,9 +8,10 @@ interface WidgetMapperProps {
   widgets: TWidgetConfig[];
   formValues?: Record<string, unknown>;
   onFormValueChange?: (fieldName: string, value: unknown) => void;
+  validationErrors?: Record<string, string>;
 }
 
-export function WidgetMapper({ widgets, formValues = {}, onFormValueChange }: WidgetMapperProps) {
+export function WidgetMapper({ widgets, formValues = {}, onFormValueChange, validationErrors = {} }: WidgetMapperProps) {
   const handleFieldChange = (fieldName: string, value: unknown) => {
     if (onFormValueChange) {
       onFormValueChange(fieldName, value);
@@ -46,6 +47,7 @@ export function WidgetMapper({ widgets, formValues = {}, onFormValueChange }: Wi
                     widget={widget} 
                     value={fieldValue as string | boolean | number | undefined}
                     onChange={(value) => handleFieldChange(fieldName, value)}
+                    error={validationErrors[fieldName]}
                   />
                 </div>
               </div>
