@@ -136,8 +136,11 @@ function EditNodePageContent() {
                 <div className="space-y-2">
                   <Label htmlFor="nodeGroup">Group *</Label>
                   <Select 
-                    value={formData.nodeGroup || ""} 
-                    onValueChange={(value) => handleInputChange("nodeGroup", value)}
+                    value={formData.node_group?.id || ""} 
+                    onValueChange={(value) => {
+                      const selectedGroup = nodeGroups.find(group => group.id === value);
+                      handleInputChange("node_group", selectedGroup || null);
+                    }}
                     disabled={isLoadingGroups}
                   >
                     <SelectTrigger className="w-full">
@@ -260,7 +263,7 @@ function EditNodePageContent() {
               <div className="space-y-2">
                 <Label>Form Configuration</Label>
                 <FormConfigurationEditor
-                  value={formData.formConfiguration || {}}
+                  value={formData.form_configuration || {}}
                   onChange={handleFormConfigurationChange}
                   disabled={isUpdating}
                 />

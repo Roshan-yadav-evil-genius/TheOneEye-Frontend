@@ -1,10 +1,11 @@
 import { TNode } from '../common';
+import { BackendNodeGroup } from './backend';
 
 // API Request Types
 export interface TNodeCreateData {
   name: string;
   type: TNode['type'];
-  nodeGroup: string; // NodeGroup ID - changed from category to nodeGroup
+  nodeGroup: string | BackendNodeGroup; // NodeGroup ID or full object
   description?: string;
   version?: string;
   isActive?: boolean; // Optional for creation, defaults to true

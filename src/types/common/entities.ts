@@ -1,6 +1,7 @@
 import { BackendNodeType } from "../api";
 
 // Core entity types
+export type TNode = BackendNodeType;
 export interface TUser {
   id: string;
   name: string;

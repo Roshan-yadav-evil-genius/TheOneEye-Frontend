@@ -11,11 +11,11 @@ export const useEditNodePage = () => {
   const [formData, setFormData] = useState<Partial<TNode>>({
     name: "",
     type: "action",
-    nodeGroup: "",
+    node_group: null,
     description: "",
     version: "1.0.0",
     tags: [],
-    formConfiguration: {},
+    form_configuration: {},
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -60,11 +60,11 @@ export const useEditNodePage = () => {
           setFormData({
             name: node.name,
             type: node.type,
-            nodeGroup: node.nodeGroup,
+            node_group: node.node_group,
             description: node.description || "",
             version: node.version || "1.0.0",
             tags: node.tags || [],
-            formConfiguration: node.formConfiguration || {},
+            form_configuration: node.form_configuration || {},
           });
           
           // Set existing logo if available
@@ -171,10 +171,10 @@ export const useEditNodePage = () => {
 
   const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
     // Only update if the JSON is actually different to prevent unnecessary re-renders
-    if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
-      setFormData(prev => ({ ...prev, formConfiguration: json }));
+    if (JSON.stringify(formData.form_configuration) !== JSON.stringify(json)) {
+      setFormData(prev => ({ ...prev, form_configuration: json }));
     }
-  }, [formData.formConfiguration]);
+  }, [formData.form_configuration]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,11 +189,11 @@ export const useEditNodePage = () => {
       await updateNode(nodeId, {
         name: formData.name || "Updated Node",
         type: (formData.type || "action") as TNode['type'],
-        nodeGroup: formData.nodeGroup || "",
+        nodeGroup: formData.node_group || "",
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],
-        formConfiguration: formData.formConfiguration || {},
+        formConfiguration: formData.form_configuration || {},
         isActive: true,
         logoFile: logoFile || undefined, // Include the logo file if uploaded
       }, true); // showToast = true
@@ -208,7 +208,7 @@ export const useEditNodePage = () => {
     } catch (error) {
       uiHelpers.showError("Error", "Failed to update node. Please try again.");
     }
-  }, [nodeId, formData, logoFile, updateNode, createFormConfiguration, router]);
+  }, [nodeId, formData, logoFile, updateNode, router]);
 
   const handleCancel = useCallback(() => {
     router.push("/nodes");

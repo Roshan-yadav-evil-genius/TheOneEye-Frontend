@@ -31,11 +31,11 @@ export class ApiService {
 
 
   // Helper function to transform frontend node data to backend format
-  private static transformToBackendFormat(frontendNode: TNodeCreateData): Partial<BackendNodeType> {
+  private static transformToBackendFormat(frontendNode: TNodeCreateData): any {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
-      node_group: frontendNode.nodeGroup as any, // Will be handled by the backend
+      node_group: typeof frontendNode.nodeGroup === 'string' ? frontendNode.nodeGroup : frontendNode.nodeGroup.id,
       description: frontendNode.description,
       version: frontendNode.version,
       is_active: frontendNode.isActive,
@@ -103,7 +103,12 @@ export class ApiService {
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
-    const response = await axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, nodeData);
+    // Transform nodeGroup to ID if it's an object
+    const transformedData = {
+      ...nodeData,
+      nodeGroup: typeof nodeData.nodeGroup === 'object' && nodeData.nodeGroup ? nodeData.nodeGroup.id : nodeData.nodeGroup
+    };
+    const response = await axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, transformedData);
     return response;
   }
 
