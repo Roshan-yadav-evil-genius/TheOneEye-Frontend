@@ -7,22 +7,55 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode } from "@/types";
+import { ApiService } from "@/lib/api/api-service";
+import { toast } from "sonner";
 
 interface CustomNodeProps {
   id: string;
   data: BackendWorkflowNode;
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
+  workflowId?: string;
 }
 
-export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
+export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
   
   const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
-  const handlePlay = (e: React.MouseEvent) => {
+  const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    if (!workflowId) {
+      toast.error("Workflow ID not available");
+      return;
+    }
+    
+    if (isExecuting) {
+      return; // Prevent multiple executions
+    }
+    
+    try {
+      setIsExecuting(true);
+      const nodeName = data.node_type?.name || 'Unknown Node';
+      
+      toast.info(`Starting execution of ${nodeName}...`);
+      
+      const result = await ApiService.executeSingleNode(workflowId, id);
+      
+      toast.success(`Execution started for ${nodeName}. Task ID: ${result.task_id}`);
+      
+      // You could also poll for task status here if needed
+      console.log('Execution result:', result);
+      
+    } catch (error) {
+      console.error('Failed to execute node:', error);
+      toast.error(`Failed to execute ${data.node_type?.name || 'node'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -80,6 +113,7 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
           onDelete={handleDelete}
           onShutdown={handleShutdown}
           onMore={handleMore}
+          isExecuting={isExecuting}
         />
       )}
 

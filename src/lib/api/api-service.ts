@@ -315,6 +315,13 @@ export class ApiService {
     });
   }
 
+  static async executeSingleNode(workflowId: string, nodeId: string): Promise<{ task_id: string; status: string; message: string }> {
+    const response = await axiosApiClient.post<{ task_id: string; status: string; message: string }>(`/workflow/${workflowId}/execute_single_node/`, {
+      node_id: nodeId
+    });
+    return response;
+  }
+
 
   // User operations
   static async getCurrentUser(): Promise<TUser | null> {
@@ -397,6 +404,7 @@ export const {
   removeNodeFromWorkflow,
   addConnectionToWorkflow,
   removeConnectionFromWorkflow,
+  executeSingleNode,
   getCurrentUser,
   login,
   logout,

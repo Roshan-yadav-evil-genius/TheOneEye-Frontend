@@ -14,6 +14,7 @@ interface NodeHoverActionsProps {
   onDelete: (e: React.MouseEvent) => void;
   onShutdown: (e: React.MouseEvent) => void;
   onMore: (e: React.MouseEvent) => void;
+  isExecuting?: boolean;
 }
 
 export function NodeHoverActions({
@@ -21,7 +22,8 @@ export function NodeHoverActions({
   onPlay,
   onDelete,
   onShutdown,
-  onMore
+  onMore,
+  isExecuting = false
 }: NodeHoverActionsProps) {
   return (
     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background border border-border rounded-md shadow-lg p-1">
@@ -38,8 +40,13 @@ export function NodeHoverActions({
         variant="ghost"
         className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/20"
         onClick={onPlay}
+        disabled={isExecuting}
       >
-        <IconPlayerPlay className="h-3 w-3" />
+        {isExecuting ? (
+          <div className="h-3 w-3 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+        ) : (
+          <IconPlayerPlay className="h-3 w-3" />
+        )}
       </Button>
       <Button
         size="sm"
