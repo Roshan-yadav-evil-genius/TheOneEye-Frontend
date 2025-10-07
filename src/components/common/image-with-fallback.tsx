@@ -43,6 +43,7 @@ export function ImageWithFallback({
       width={width}
       height={height}
       className={className}
+      draggable={false}
       onError={() => {
         setImageError(true);
         onError?.();

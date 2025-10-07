@@ -119,6 +119,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Prevent image dragging to avoid interference with custom drag operations */
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }
 
 /* Custom scrollbar styling for sidebar */

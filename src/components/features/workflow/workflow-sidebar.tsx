@@ -188,7 +188,7 @@ export function WorkflowSidebar({
                     alt={nodeGroup}
                     width={16}
                     height={16}
-                    className="h-4 w-4 object-contain"
+                    className="h-4 w-4 object-contain pointer-events-none select-none"
                     fallbackIcon={<IconPhotoOff className="h-4 w-4 text-muted-foreground" />}
                   />
                   <span className="font-medium text-sm">{nodeGroup}</span>
@@ -220,7 +220,7 @@ export function WorkflowSidebar({
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 mt-0.5">
-                              <NodeLogo node={node} size="md" />
+                              <NodeLogo node={node} size="md" className="pointer-events-none select-none" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2 mb-1">
