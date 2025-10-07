@@ -9,6 +9,7 @@ import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode } from "@/types";
 import { ApiService } from "@/lib/api/api-service";
 import { toast } from "sonner";
+import { IconGripVertical } from "@tabler/icons-react";
 
 interface CustomNodeProps {
   id: string;
@@ -89,6 +90,14 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+      {/* Drag Handle */}
+      <div 
+        className="drag-handle absolute top-1 left-1 w-4 h-4 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-60 hover:opacity-100 transition-opacity z-10"
+        title="Drag to move node"
+      >
+        <IconGripVertical className="w-3 h-3 text-muted-foreground" />
+      </div>
+
       {/* Connection Handles */}
       <Handle
         type="target"

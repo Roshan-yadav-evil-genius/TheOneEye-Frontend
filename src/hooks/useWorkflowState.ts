@@ -43,6 +43,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         type: 'custom',
         position: workflowNode.position,
         data: workflowNode,
+        dragHandle: '.drag-handle',
       };
     });
   }, [workflowNodes]);
