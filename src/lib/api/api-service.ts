@@ -35,13 +35,12 @@ export class ApiService {
     return {
       name: frontendNode.name,
       type: frontendNode.type,
-      node_group: frontendNode.nodeGroup,
+      node_group: frontendNode.nodeGroup as any, // Will be handled by the backend
       description: frontendNode.description,
       version: frontendNode.version,
       is_active: frontendNode.isActive,
-      form_configuration: frontendNode.formConfiguration,
+      form_configuration: frontendNode.formConfiguration as any, // Will be handled by the backend
       tags: frontendNode.tags,
-      logo: frontendNode.logo,
     };
   }
 
@@ -298,6 +297,16 @@ export class ApiService {
   static async removeConnectionFromWorkflow(workflowId: string, connectionId: string): Promise<void> {
     await axiosApiClient.delete(`/workflow/${workflowId}/remove_connection/`, {
       data: { connectionId }
+    });
+  }
+
+  static async updateNodeFormValues(
+    workflowId: string, 
+    nodeId: string, 
+    formValues: Record<string, unknown>
+  ): Promise<void> {
+    await axiosApiClient.patch(`/workflow/${workflowId}/nodes/${nodeId}/`, {
+      form_values: formValues
     });
   }
 

@@ -62,6 +62,7 @@ export interface BackendWorkflowNode {
     formValues?: Record<string, unknown>;
     customSettings?: Record<string, unknown>;
   };
+  form_values?: Record<string, unknown>;
   node_type: BackendNodeType;
 }
 

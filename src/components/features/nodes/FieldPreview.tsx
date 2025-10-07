@@ -5,13 +5,54 @@ import { TWidgetConfig } from "@/components/features/form-builder/inputs";
 
 interface FieldPreviewProps {
   widget: TWidgetConfig;
+  value?: string | boolean | number;
+  onChange?: (value: string | boolean | number) => void;
 }
 
-export function FieldPreview({ widget }: FieldPreviewProps) {
-  const [value, setValue] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
-  const [isChecked, setIsChecked] = useState(false);
-  const [radioValue, setRadioValue] = useState("");
+export function FieldPreview({ widget, value, onChange }: FieldPreviewProps) {
+  // Use controlled values if provided, otherwise fall back to local state
+  const [localValue, setLocalValue] = useState("");
+  const [localSelectedOption, setLocalSelectedOption] = useState("");
+  const [localIsChecked, setLocalIsChecked] = useState(false);
+  const [localRadioValue, setLocalRadioValue] = useState("");
+
+  // Use controlled values if provided, otherwise use local state
+  const currentValue = value !== undefined ? String(value) : localValue;
+  const currentSelectedOption = value !== undefined ? String(value) : localSelectedOption;
+  const currentIsChecked = value !== undefined ? Boolean(value) : localIsChecked;
+  const currentRadioValue = value !== undefined ? String(value) : localRadioValue;
+
+  const handleValueChange = (newValue: string | boolean | number) => {
+    if (onChange) {
+      onChange(newValue);
+    } else {
+      setLocalValue(String(newValue));
+    }
+  };
+
+  const handleSelectChange = (newValue: string) => {
+    if (onChange) {
+      onChange(newValue);
+    } else {
+      setLocalSelectedOption(newValue);
+    }
+  };
+
+  const handleCheckboxChange = (newValue: boolean) => {
+    if (onChange) {
+      onChange(newValue);
+    } else {
+      setLocalIsChecked(newValue);
+    }
+  };
+
+  const handleRadioChange = (newValue: string) => {
+    if (onChange) {
+      onChange(newValue);
+    } else {
+      setLocalRadioValue(newValue);
+    }
+  };
   switch (widget.type) {
     case 'text':
     case 'email':
@@ -20,8 +61,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
         <input
           type={widget.type}
           placeholder={widget.placeholder || `Enter ${widget.type}...`}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={currentValue}
+          onChange={(e) => handleValueChange(e.target.value)}
           className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
         />
       );
@@ -30,8 +71,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
         <input
           type="number"
           placeholder={widget.placeholder || "Enter number..."}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={currentValue}
+          onChange={(e) => handleValueChange(e.target.value)}
           className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
         />
       );
@@ -39,8 +80,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
       return (
         <textarea
           placeholder={widget.placeholder || "Enter text..."}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={currentValue}
+          onChange={(e) => handleValueChange(e.target.value)}
           rows={3}
           className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 resize-none"
         />
@@ -49,8 +90,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
       return (
         <div className="relative">
           <select
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value)}
+            value={currentSelectedOption}
+            onChange={(e) => handleSelectChange(e.target.value)}
             className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 appearance-none"
           >
             <option value="">{widget.placeholder || "Select an option..."}</option>
@@ -70,8 +111,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
         <div className="flex items-center gap-3">
           <input
             type="checkbox"
-            checked={isChecked}
-            onChange={(e) => setIsChecked(e.target.checked)}
+            checked={currentIsChecked}
+            onChange={(e) => handleCheckboxChange(e.target.checked)}
             className="w-4 h-4 text-primary bg-background border border-input rounded focus:ring-primary/20 focus:ring-2"
           />
           <span className="text-sm text-foreground">Checkbox option</span>
@@ -86,8 +127,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
                 type="radio"
                 name={`radio-${widget.id}`}
                 value={option}
-                checked={radioValue === option}
-                onChange={(e) => setRadioValue(e.target.value)}
+                checked={currentRadioValue === option}
+                onChange={(e) => handleRadioChange(e.target.value)}
                 className="w-4 h-4 text-primary bg-background border border-input focus:ring-primary/20 focus:ring-2"
               />
               <span className="text-sm text-foreground">{option}</span>
@@ -104,8 +145,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
       return (
         <input
           type="date"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={currentValue}
+          onChange={(e) => handleValueChange(e.target.value)}
           className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
         />
       );
@@ -118,14 +159,14 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
-                setValue(file.name);
+                handleValueChange(file.name);
               }
             }}
           />
           <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
-          <span className="text-sm">{value || "Choose file..."}</span>
+          <span className="text-sm">{currentValue || "Choose file..."}</span>
         </div>
       );
     default:
@@ -133,8 +174,8 @@ export function FieldPreview({ widget }: FieldPreviewProps) {
         <input
           type="text"
           placeholder={`${widget.type} field`}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={currentValue}
+          onChange={(e) => handleValueChange(e.target.value)}
           className="w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
         />
       );

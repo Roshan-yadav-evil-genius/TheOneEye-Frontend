@@ -51,6 +51,7 @@ interface WorkflowCanvasActions {
   // Node Operations
   addNode: (nodeData: TWorkflowNodeCreateRequest) => Promise<BackendWorkflowNode | null>;
   updateNodePosition: (nodeId: string, position: { x: number; y: number }) => Promise<void>;
+  updateNodeFormValues: (nodeId: string, formValues: Record<string, unknown>) => Promise<void>;
   removeNode: (nodeId: string) => Promise<void>;
   
   // Connection Operations
@@ -122,7 +123,11 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
             
             set((state) => {
               state.nodes = canvasData.nodes;
-              state.connections = canvasData.edges;
+              state.connections = canvasData.edges.map(edge => ({
+                id: edge.id,
+                source: edge.source_node,
+                target: edge.target_node
+              }));
               state.workflow = canvasData.workflow;
               state.isLoading = false;
               state.error = null;
@@ -226,6 +231,38 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               : 'Failed to update node position';
 
             toastError('Failed to update node position', {
+              description: errorMessage,
+            });
+          }
+        },
+
+        updateNodeFormValues: async (nodeId: string, formValues: Record<string, unknown>) => {
+          const { workflowId } = get();
+          if (!workflowId) {
+            toastError('No workflow selected');
+            return;
+          }
+
+          // Optimistic update
+          set((state) => {
+            const node = state.nodes.find(n => n.id === nodeId);
+            if (node) {
+              node.form_values = formValues;
+            }
+          });
+
+          try {
+            await ApiService.updateNodeFormValues(workflowId, nodeId, formValues);
+            toastSuccess('Form values saved successfully!');
+          } catch (error) {
+            // Revert optimistic update on error
+            await get().refreshWorkflowCanvas();
+            
+            const errorMessage = error instanceof Error 
+              ? error.message 
+              : 'Failed to save form values';
+
+            toastError('Failed to save form values', {
               description: errorMessage,
             });
           }

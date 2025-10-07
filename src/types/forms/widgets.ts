@@ -2,6 +2,7 @@
 export interface TWidgetConfig {
   id: string;
   type: TWidgetType;
+  name?: string;
   label: string;
   placeholder?: string;
   required?: boolean;
