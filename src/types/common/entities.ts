@@ -40,11 +40,7 @@ export interface TWorkflowNode {
     x: number;
     y: number;
   };
-  data: {
-    // Only node-specific configuration data
-    formValues?: Record<string, unknown>;
-    customSettings?: Record<string, unknown>;
-  };
+  form_values?: Record<string, unknown>;
   node_type?: BackendNodeType | null; // Updated to use node_type instead of node_template
 }
 

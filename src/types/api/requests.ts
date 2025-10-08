@@ -33,11 +33,7 @@ export interface TWorkflowNodeCreateRequest {
     x: number;
     y: number;
   };
-  data?: {
-    // Only node-specific configuration data, no redundant fields
-    formValues?: Record<string, unknown>;
-    customSettings?: Record<string, unknown>;
-  };
+  form_values?: Record<string, unknown>;
 }
 
 export interface TWorkflowConnectionCreateRequest {

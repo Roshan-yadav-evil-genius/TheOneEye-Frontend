@@ -134,11 +134,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     const nodeRequest: TWorkflowNodeCreateRequest = {
       nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
       position,
-      data: {
-        // Only send node-specific configuration data, no redundant fields
-        formValues: {},
-        customSettings: {},
-      },
+      form_values: {},
     };
 
     await addNode(nodeRequest);
