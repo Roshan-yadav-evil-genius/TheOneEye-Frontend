@@ -8,6 +8,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { DraggableSchema } from './draggable-schema';
 import { useState, useMemo } from 'react';
+import React from 'react';
+import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText } from 'lucide-react';
 
 interface JsonViewerProps {
   title: string;
@@ -20,6 +22,7 @@ interface JsonViewerProps {
   onCopy?: () => void;
   onDownload?: () => void;
   onRefresh?: () => void;
+  enableDragDrop?: boolean;
 }
 
 export function JsonViewer({
@@ -29,7 +32,8 @@ export function JsonViewer({
   activeTab,
   onTabChange,
   onCopy,
-  onDownload
+  onDownload,
+  enableDragDrop = true
 }: JsonViewerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -188,9 +192,219 @@ export function JsonViewer({
         </TabsContent>
         
         <TabsContent value="schema" className="flex-1 m-0 overflow-hidden">
-          <DraggableSchema jsonData={jsonData} title={title} />
+          {enableDragDrop ? (
+            <DraggableSchema jsonData={jsonData} title={title} />
+          ) : (
+            <NonDraggableSchema jsonData={jsonData} title={title} />
+          )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// Non-draggable schema component for output viewer
+interface SchemaField {
+  key: string;
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  value?: unknown;
+  children?: SchemaField[];
+  path: string;
+}
+
+interface NonDraggableFieldProps {
+  field: SchemaField;
+  level: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableFieldProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    // If clicking on expand button, let it handle the click
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+
+    // Toggle expand/collapse for objects and arrays
+    if (field.children && field.children.length > 0) {
+      onToggle();
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'number':
+        return <Hash className="w-3 h-3 text-blue-400" />;
+      case 'string':
+        return <Type className="w-3 h-3 text-green-400" />;
+      case 'boolean':
+        return <Hash className="w-3 h-3 text-blue-400" />;
+      case 'object':
+        return <Folder className="w-3 h-3 text-purple-400" />;
+      case 'array':
+        return <FileText className="w-3 h-3 text-purple-400" />;
+      default:
+        return <Type className="w-3 h-3 text-gray-400" />;
+    }
+  };
+
+  const hasChildren = field.children && field.children.length > 0;
+  const isExpandable = hasChildren && (field.type === 'object' || field.type === 'array');
+
+  return (
+    <div
+      style={{ marginLeft: `${level * 16}px` }}
+      onClick={handleClick}
+      className="group flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors"
+    >
+      {isExpandable && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onToggle();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="flex items-center justify-center w-4 h-4 hover:bg-gray-600 rounded"
+        >
+          {isExpanded ? (
+            <ChevronDown className="w-3 h-3 text-gray-300" />
+          ) : (
+            <ChevronRight className="w-3 h-3 text-gray-300" />
+          )}
+        </button>
+      )}
+      
+      {!isExpandable && <div className="w-4" />}
+      
+      {getTypeIcon(field.type)}
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-1 rounded text-xs font-mono bg-gray-600/20 text-gray-300 border border-gray-500/30">
+            {field.key}
+          </span>
+        </div>
+        {field.type !== 'object' && field.type !== 'array' && field.value !== undefined && (
+          <span className="text-gray-400 font-mono text-sm">
+            {typeof field.value === 'string' ? `"${field.value}"` : JSON.stringify(field.value)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface NonDraggableSchemaProps {
+  jsonData: unknown;
+  title: string;
+}
+
+function NonDraggableSchema({ jsonData, title }: NonDraggableSchemaProps) {
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
+
+  const parseJsonToSchema = (data: unknown, key: string = '', path: string = ''): SchemaField[] => {
+    if (Array.isArray(data)) {
+      return data.map((item, index) => {
+        const arrayPath = path ? `${path}[${index}]` : `[${index}]`;
+        return {
+          key: `[${index}]`,
+          type: 'object',
+          path: arrayPath,
+          children: parseJsonToSchema(item, `[${index}]`, arrayPath)
+        };
+      });
+    } else if (data && typeof data === 'object') {
+      return Object.entries(data).map(([k, v]) => {
+        const currentPath = path ? `${path}.${k}` : k;
+        const field: SchemaField = {
+          key: k,
+          type: Array.isArray(v) ? 'array' : typeof v as 'string' | 'number' | 'boolean' | 'object',
+          path: currentPath,
+          value: v
+        };
+
+        if (v && typeof v === 'object' && !Array.isArray(v)) {
+          field.children = parseJsonToSchema(v, k, currentPath);
+        } else if (Array.isArray(v)) {
+          field.children = parseJsonToSchema(v, k, currentPath);
+        }
+
+        return field;
+      });
+    } else {
+      return [{
+        key,
+        type: typeof data as 'string' | 'number' | 'boolean' | 'object',
+        value: data,
+        path: path || key
+      }];
+    }
+  };
+
+  const toggleExpanded = (path: string) => {
+    const newExpanded = new Set(expandedPaths);
+    if (newExpanded.has(path)) {
+      newExpanded.delete(path);
+    } else {
+      newExpanded.add(path);
+    }
+    setExpandedPaths(newExpanded);
+  };
+
+  const renderFields = (fields: SchemaField[], level: number = 0): React.ReactNode => {
+    return fields.map((field) => {
+      const isExpanded = expandedPaths.has(field.path);
+      const hasChildren = field.children && field.children.length > 0;
+
+      return (
+        <div key={field.path} className="mb-1">
+          <NonDraggableField
+            field={field}
+            level={level}
+            isExpanded={isExpanded}
+            onToggle={() => toggleExpanded(field.path)}
+          />
+          {hasChildren && isExpanded && (
+            <div className="mt-1">
+              {renderFields(field.children!, level + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  const schemaFields = parseJsonToSchema(jsonData, title, '');
+
+  const getTotalItems = (fields: SchemaField[]): number => {
+    let count = 0;
+    const countRecursive = (fieldList: SchemaField[]) => {
+      fieldList.forEach(field => {
+        count++;
+        if (field.children) {
+          countRecursive(field.children);
+        }
+      });
+    };
+    countRecursive(fields);
+    return count;
+  };
+
+  const totalItems = getTotalItems(schemaFields);
+
+  return (
+    <div className="h-full overflow-auto p-4 sidebar-scrollbar">
+      <div className="mb-3 text-gray-400 text-sm">
+        {totalItems} items
+      </div>
+      <div className="space-y-0">
+        {schemaFields.length > 0 ? (
+          renderFields(schemaFields)
+        ) : (
+          <div className="text-gray-500 text-sm">No data available</div>
+        )}
+      </div>
     </div>
   );
 }

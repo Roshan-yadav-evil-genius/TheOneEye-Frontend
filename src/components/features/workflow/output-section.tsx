@@ -16,6 +16,7 @@ export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: 
       jsonData={jsonData}
       activeTab={activeOutputTab}
       onTabChange={onOutputTabChange}
+      enableDragDrop={false}
     />
   );
 }
