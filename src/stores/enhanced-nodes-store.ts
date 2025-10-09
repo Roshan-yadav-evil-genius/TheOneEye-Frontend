@@ -132,7 +132,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             const tempNode: TNode = {
               id: `temp-${Date.now()}`,
               ...nodeData,
-              isActive: nodeData.isActive ?? true,
+              is_active: nodeData.is_active ?? true,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               createdBy: 'Current User', // TODO: Get from user store
@@ -448,7 +448,7 @@ export const useEnhancedNodesStore = create<EnhancedNodesStore>()(
             const tempNodes: TNode[] = nodes.map((nodeData, index) => ({
               id: `temp-${Date.now()}-${index}`,
               ...nodeData,
-              isActive: nodeData.isActive ?? true,
+              is_active: nodeData.is_active ?? true,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               createdBy: 'Current User',
@@ -770,7 +770,7 @@ export const nodesSelectors = {
     
     const filtered = (nodes || []).filter((node) => {
       if (filters.type && node.type !== filters.type) return false;
-      if (filters.nodeGroup && node.nodeGroup !== filters.nodeGroup) return false;
+      if (filters.nodeGroup && node.node_group?.id !== filters.nodeGroup) return false;
       if (searchQuery && !node.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
@@ -797,14 +797,14 @@ export const nodesSelectors = {
   },
   
   getNodesByNodeGroup: (state: EnhancedNodesStore, nodeGroup: string) => {
-    return (state.nodes || []).filter(node => node.nodeGroup === nodeGroup);
+    return (state.nodes || []).filter(node => node.node_group?.id === nodeGroup);
   },
   
   getActiveNodes: (state: EnhancedNodesStore) => {
-    return (state.nodes || []).filter(node => node.isActive);
+    return (state.nodes || []).filter(node => node.is_active);
   },
   
   getInactiveNodes: (state: EnhancedNodesStore) => {
-    return (state.nodes || []).filter(node => !node.isActive);
+    return (state.nodes || []).filter(node => !node.is_active);
   },
 };

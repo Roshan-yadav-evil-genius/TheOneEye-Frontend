@@ -35,7 +35,7 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
 
   // Get unique node groups from nodes
   const nodeGroups = Array.from(
-    new Set(nodes.map(n => n.nodeGroupName).filter((nodeGroupName): nodeGroupName is string => Boolean(nodeGroupName)))
+    new Set(nodes.map(n => n.node_group?.name).filter((nodeGroupName): nodeGroupName is string => Boolean(nodeGroupName)))
   );
 
   // Filter nodes based on search and filters

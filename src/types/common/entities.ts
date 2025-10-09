@@ -1,7 +1,9 @@
-import { BackendNodeType } from "../api";
+import { BackendNodeType, BackendNodeGroup } from "../api";
 
 // Core entity types
 export type TNode = BackendNodeType;
+export type TNodeGroup = BackendNodeGroup;
+
 export interface TUser {
   id: string;
   name: string;
@@ -9,16 +11,6 @@ export interface TUser {
   avatar?: string;
   role?: string;
   permissions?: string[];
-}
-
-export interface TNodeGroup {
-  id: string;
-  name: string;
-  description?: string;
-  icon?: string; // URL to the node group icon image
-  isActive: boolean;
-  createdAt: string; // ISO string format from backend
-  updatedAt: string; // ISO string format from backend
 }
 
 
@@ -52,14 +44,15 @@ export interface TWorkflow {
   nodes: TWorkflowNode[]; // Changed from TNode[] to TWorkflowNode[]
   connections: TWorkflowConnection[];
   status: 'active' | 'inactive' | 'error';
-  lastRun?: string;
-  nextRun?: string;
-  runsCount: number;
-  successRate: number;
+  last_run?: string;  // ✅ Match backend
+  next_run?: string;  // ✅ Match backend
+  runs_count: number;  // ✅ Match backend
+  success_rate: number;  // ✅ Match backend
   tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
+  created_by?: string;  // ✅ Match backend
+  created_at: string;  // ✅ Match backend
+  updated_at: string;  // ✅ Match backend
+  task_id?: string;  // ✅ Match backend
 }
 
 export interface TWorkflowConnection {

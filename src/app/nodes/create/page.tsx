@@ -50,7 +50,7 @@ function CreateNodePageContent() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Form Configuration</label>
                 <FormConfigurationEditor
-                  value={formData.formConfiguration || {}}
+                  value={formData.form_configuration || { title: "", elements: [] }}
                   onChange={handleFormConfigurationChange}
                   disabled={isCreating}
                 />

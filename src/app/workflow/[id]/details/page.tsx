@@ -271,9 +271,9 @@ export default function WorkflowDetailsPage() {
             <IconUsers className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{workflowData.createdBy}</div>
+            <div className="text-2xl font-bold">{workflowData.created_by}</div>
             <p className="text-xs text-muted-foreground">
-              {workflowData.createdAt}
+              {workflowData.created_at}
             </p>
           </CardContent>
         </Card>

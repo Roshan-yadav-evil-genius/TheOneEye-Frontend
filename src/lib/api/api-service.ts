@@ -30,19 +30,6 @@ export class ApiService {
   private static pendingRequests = new Map<string, Promise<unknown>>();
 
 
-  // Helper function to transform frontend node data to backend format
-  private static transformToBackendFormat(frontendNode: TNodeCreateData): any {
-    return {
-      name: frontendNode.name,
-      type: frontendNode.type,
-      node_group: typeof frontendNode.nodeGroup === 'string' ? frontendNode.nodeGroup : frontendNode.nodeGroup.id,
-      description: frontendNode.description,
-      version: frontendNode.version,
-      is_active: frontendNode.isActive,
-      form_configuration: frontendNode.formConfiguration as any, // Will be handled by the backend
-      tags: frontendNode.tags,
-    };
-  }
 
   // Node operations
   static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<BackendNodeType>> {
@@ -70,52 +57,46 @@ export class ApiService {
   }
 
   static async createNode(nodeData: TNodeCreateData): Promise<BackendNodeType> {
-    const hasLogoFile = nodeData.logoFile instanceof File;
-    
+    const hasLogoFile = nodeData.logo instanceof File;
     
     if (hasLogoFile) {
       const formData = new FormData();
       
-      // Transform to backend format first, then add to FormData
-      const backendData = this.transformToBackendFormat(nodeData);
-      
-      // Add all fields to FormData with correct backend field names
-      Object.entries(backendData).forEach(([key, value]) => {
+      // Keys already match backend - no transformation needed!
+      Object.entries(nodeData).forEach(([key, value]) => {
         if (key === 'form_configuration' || key === 'tags') {
           formData.append(key, JSON.stringify(value));
+        } else if (key === 'logo' && value instanceof File) {
+          formData.append('logo', value);
+        } else if (key === 'node_group') {
+          // Handle node_group - extract ID if it's an object
+          const groupId = typeof value === 'string' ? value : (value as BackendNodeGroup)?.id;
+          if (groupId) formData.append('node_group', groupId);
         } else if (value !== null && value !== undefined) {
           formData.append(key, value.toString());
         }
       });
       
-      // Add the logo file with the correct field name
-      if (nodeData.logoFile instanceof File) {
-        formData.append('logo', nodeData.logoFile);
-      }
-      
-      
-      const response = await axiosApiClient.uploadFile<BackendNodeType>('/nodes/', formData);
-      return response;
+      return axiosApiClient.uploadFile<BackendNodeType>('/nodes/', formData);
     } else {
-      const response = await axiosApiClient.post<BackendNodeType>('/nodes/', nodeData);
-      return response;
+      // Ensure node_group is an ID string
+      const dataToSend = {
+        ...nodeData,
+        node_group: typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup)?.id
+      };
+      return axiosApiClient.post<BackendNodeType>('/nodes/', dataToSend);
     }
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
-    // Transform frontend format to backend format
-    const transformedData = {
+    // Ensure node_group is an ID string if present
+    const dataToSend = {
       ...nodeData,
-      node_group: typeof nodeData.nodeGroup === 'object' && nodeData.nodeGroup ? nodeData.nodeGroup.id : nodeData.nodeGroup,
-      form_configuration: nodeData.formConfiguration,
-      is_active: nodeData.isActive
+      node_group: nodeData.node_group 
+        ? (typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup).id)
+        : undefined
     };
-    // Remove the camelCase fields since we're using snake_case equivalents
-    delete transformedData.nodeGroup;
-    delete transformedData.formConfiguration;
-    delete transformedData.isActive;
-    const response = await axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, transformedData);
-    return response;
+    return axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, dataToSend);
   }
 
   static async deleteNode(id: string): Promise<void> {
@@ -138,68 +119,21 @@ export class ApiService {
   }
 
   // NodeGroup operations
-  static async getNodeGroups(): Promise<TNodeGroup[]> {
-    const response = await axiosApiClient.get<BackendNodeGroup[]>('/node-groups/');
-    return response.map((group) => ({
-      id: group.id,
-      name: group.name,
-      description: group.description,
-      icon: group.icon,
-      isActive: group.is_active,
-      createdAt: group.created_at,
-      updatedAt: group.updated_at,
-    }));
+  static async getNodeGroups(): Promise<BackendNodeGroup[]> {
+    // Return backend type directly!
+    return axiosApiClient.get<BackendNodeGroup[]>('/node-groups/');
   }
 
-  static async getNodeGroup(id: string): Promise<TNodeGroup> {
-    const response = await axiosApiClient.get<BackendNodeGroup>(`/node-groups/${id}/`);
-    return {
-      id: response.id,
-      name: response.name,
-      description: response.description,
-      icon: response.icon,
-      isActive: response.is_active,
-      createdAt: response.created_at,
-      updatedAt: response.updated_at,
-    };
+  static async getNodeGroup(id: string): Promise<BackendNodeGroup> {
+    return axiosApiClient.get<BackendNodeGroup>(`/node-groups/${id}/`);
   }
 
-  static async createNodeGroup(groupData: Partial<TNodeGroup>): Promise<TNodeGroup> {
-    const backendData = {
-      name: groupData.name,
-      description: groupData.description,
-      icon: groupData.icon,
-      is_active: groupData.isActive,
-    };
-    const response = await axiosApiClient.post<BackendNodeGroup>('/node-groups/', backendData);
-    return {
-      id: response.id,
-      name: response.name,
-      description: response.description,
-      icon: response.icon,
-      isActive: response.is_active,
-      createdAt: response.created_at,
-      updatedAt: response.updated_at,
-    };
+  static async createNodeGroup(groupData: Partial<BackendNodeGroup>): Promise<BackendNodeGroup> {
+    return axiosApiClient.post<BackendNodeGroup>('/node-groups/', groupData);
   }
 
-  static async updateNodeGroup(id: string, groupData: Partial<TNodeGroup>): Promise<TNodeGroup> {
-    const backendData = {
-      name: groupData.name,
-      description: groupData.description,
-      icon: groupData.icon,
-      is_active: groupData.isActive,
-    };
-    const response = await axiosApiClient.put<BackendNodeGroup>(`/node-groups/${id}/`, backendData);
-    return {
-      id: response.id,
-      name: response.name,
-      description: response.description,
-      icon: response.icon,
-      isActive: response.is_active,
-      createdAt: response.created_at,
-      updatedAt: response.updated_at,
-    };
+  static async updateNodeGroup(id: string, groupData: Partial<BackendNodeGroup>): Promise<BackendNodeGroup> {
+    return axiosApiClient.put<BackendNodeGroup>(`/node-groups/${id}/`, groupData);
   }
 
   static async deleteNodeGroup(id: string): Promise<void> {

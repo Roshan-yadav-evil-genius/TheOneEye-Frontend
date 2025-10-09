@@ -79,7 +79,7 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
 
   // Memoized selectors
   const getNodesByNodeGroup = useCallback((nodeGroup: string) => {
-    return nodes.filter(node => node.nodeGroup === nodeGroup);
+    return nodes.filter(node => node.node_group?.id === nodeGroup);
   }, [nodes]);
 
   const getNodesByType = useCallback((type: string) => {
@@ -87,11 +87,11 @@ export const useSharedNodes = (options: UseSharedNodesOptions = {}): UseSharedNo
   }, [nodes]);
 
   const getActiveNodes = useCallback(() => {
-    return nodes.filter(node => node.isActive);
+    return nodes.filter(node => node.is_active);
   }, [nodes]);
 
   const getInactiveNodes = useCallback(() => {
-    return nodes.filter(node => !node.isActive);
+    return nodes.filter(node => !node.is_active);
   }, [nodes]);
 
   // Get filtered nodes using store selector
@@ -233,14 +233,14 @@ export const useNodeStats = () => {
   // Calculate stats
   const stats = {
     total: nodes.length,
-    active: nodes.filter(node => node.isActive).length,
-    inactive: nodes.filter(node => !node.isActive).length,
+    active: nodes.filter(node => node.is_active).length,
+    inactive: nodes.filter(node => !node.is_active).length,
     byType: nodes.reduce((acc, node) => {
       acc[node.type] = (acc[node.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
     byNodeGroup: nodes.reduce((acc, node) => {
-      const groupName = node.nodeGroupName || 'Uncategorized';
+      const groupName = node.node_group?.name || 'Uncategorized';
       acc[groupName] = (acc[groupName] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),

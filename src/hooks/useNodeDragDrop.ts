@@ -10,9 +10,9 @@ export function useNodeDragDrop() {
       id: node.id,
       name: node.name,
       type: node.type,
-      nodeGroup: node.nodeGroup,
-      nodeGroupName: node.nodeGroupName,
-      nodeGroupIcon: node.nodeGroupIcon,
+      nodeGroup: node.node_group?.id,
+      nodeGroupName: node.node_group?.name,
+      nodeGroupIcon: node.node_group?.icon,
       description: node.description,
       logo: node.logo
     }));

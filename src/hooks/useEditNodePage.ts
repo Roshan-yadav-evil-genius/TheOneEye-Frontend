@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { TNode } from "@/types";
+import { BackendNodeType, TFormConfiguration } from "@/types/api/backend";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 
 export const useEditNodePage = () => {
@@ -8,14 +8,14 @@ export const useEditNodePage = () => {
   const params = useParams();
   const nodeId = params.id as string;
   
-  const [formData, setFormData] = useState<Partial<TNode>>({
+  const [formData, setFormData] = useState<Partial<BackendNodeType>>({
     name: "",
     type: "action",
-    node_group: null,
+    node_group: undefined,
     description: "",
     version: "1.0.0",
     tags: [],
-    form_configuration: {},
+    form_configuration: { title: "", elements: [] },
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export const useEditNodePage = () => {
 
       try {
         // First try to find the node in the existing nodes array
-        let node: TNode | null | undefined = nodes.find(n => n.id === nodeId);
+        let node: BackendNodeType | null | undefined = nodes.find(n => n.id === nodeId);
         
         // If not found, try to load it individually
         if (!node) {
@@ -91,7 +91,7 @@ export const useEditNodePage = () => {
     setActivePage("Edit Node");
   }, [setActivePage]);
 
-  const handleInputChange = useCallback((field: keyof TNode, value: string) => {
+  const handleInputChange = useCallback((field: keyof BackendNodeType, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
 
@@ -169,7 +169,7 @@ export const useEditNodePage = () => {
     setLogoPreview(null);
   }, []);
 
-  const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
+  const handleFormConfigurationChange = useCallback((json: TFormConfiguration) => {
     // Only update if the JSON is actually different to prevent unnecessary re-renders
     if (JSON.stringify(formData.form_configuration) !== JSON.stringify(json)) {
       setFormData(prev => ({ ...prev, form_configuration: json }));
@@ -188,15 +188,15 @@ export const useEditNodePage = () => {
       // Update the node using Zustand store
       await updateNode(nodeId, {
         name: formData.name || "Updated Node",
-        type: (formData.type || "action") as TNode['type'],
-        nodeGroup: formData.node_group, // Pass the actual node_group object/ID
+        type: formData.type || "action",
+        node_group: formData.node_group, // Already correct structure
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],
-        formConfiguration: formData.form_configuration || {},
-        isActive: true,
-        logoFile: logoFile || undefined, // Include the logo file if uploaded
-      }, true); // showToast = true
+        form_configuration: formData.form_configuration || { title: "", elements: [] },
+        is_active: true,
+        logo: logoFile || undefined, // Include the logo file if uploaded
+      }, { showToast: true }); // showToast = true
 
       // Form configuration is now stored as part of the node, no need for separate creation
 

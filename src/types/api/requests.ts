@@ -1,20 +1,17 @@
-import { TNode } from '../common';
-import { BackendNodeGroup } from './backend';
+import { BackendNodeType, BackendNodeGroup } from './backend';
 
 // API Request Types
-export interface TNodeCreateData {
-  name: string;
-  type: TNode['type'];
-  nodeGroup: string | BackendNodeGroup; // NodeGroup ID or full object
-  description?: string;
-  version?: string;
-  isActive?: boolean; // Optional for creation, defaults to true
-  formConfiguration?: Record<string, unknown>;
-  tags?: string[];
-  logoFile?: File; // Optional logo file
-}
+// For CREATE: omit auto-generated fields, allow logo as File
+export type TNodeCreateData = Omit<BackendNodeType, 'id' | 'created_at' | 'updated_at' | 'logo'> & {
+  logo?: File;  // Allow File upload
+  node_group: string | BackendNodeGroup;  // Allow ID string or full object
+};
 
-export type TNodeUpdateData = Partial<TNodeCreateData>
+// For UPDATE: all fields optional, allow logo as File
+export type TNodeUpdateData = Partial<Omit<BackendNodeType, 'id' | 'created_at' | 'updated_at' | 'logo'>> & {
+  logo?: File;
+  node_group?: string | BackendNodeGroup;
+};
 
 export interface TNodeFilters {
   type?: string;

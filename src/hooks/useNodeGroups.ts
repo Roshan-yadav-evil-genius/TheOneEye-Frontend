@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { TNodeGroup } from '@/types';
+import { BackendNodeGroup } from '@/types/api/backend';
 import { ApiService } from '@/lib/api/api-service';
 
 export const useNodeGroups = () => {
-  const [nodeGroups, setNodeGroups] = useState<TNodeGroup[]>([]);
+  const [nodeGroups, setNodeGroups] = useState<BackendNodeGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

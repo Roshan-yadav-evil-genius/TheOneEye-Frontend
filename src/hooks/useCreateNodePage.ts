@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { TNode } from "@/types";
+import { TFormConfiguration } from "@/types/api/backend";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
 import { useNodeGroups } from "@/hooks/useNodeGroups";
 
@@ -52,12 +53,12 @@ export const useCreateNodePage = () => {
     setLogoPreview(preview);
   };
 
-  const handleFormConfigurationChange = useCallback((json: Record<string, unknown>) => {
+  const handleFormConfigurationChange = useCallback((json: TFormConfiguration) => {
     // Only update if the JSON is actually different to prevent unnecessary re-renders
-    if (JSON.stringify(formData.formConfiguration) !== JSON.stringify(json)) {
-      setValue("formConfiguration", json);
+    if (JSON.stringify(formData.form_configuration) !== JSON.stringify(json)) {
+      setValue("form_configuration", json);
     }
-  }, [formData.formConfiguration, setValue]);
+  }, [formData.form_configuration, setValue]);
 
   // Set active page on mount
   useEffect(() => {
@@ -66,11 +67,11 @@ export const useCreateNodePage = () => {
 
   // Set default nodeGroup when nodeGroups are loaded
   useEffect(() => {
-    if (nodeGroups.length > 0 && !formData.nodeGroup) {
+    if (nodeGroups.length > 0 && !formData.node_group) {
       console.log('Setting default nodeGroup to:', nodeGroups[0].id);
-      setValue('nodeGroup', nodeGroups[0].id);
+      setValue('node_group', nodeGroups[0].id);
     }
-  }, [nodeGroups, setValue, formData.nodeGroup]);
+  }, [nodeGroups, setValue, formData.node_group]);
 
   // Debug: Log form data changes
   useEffect(() => {
@@ -80,7 +81,7 @@ export const useCreateNodePage = () => {
   const onSubmit = async (data: Partial<TNode>) => {
     try {
       // Ensure we have a valid nodeGroup
-      const selectedNodeGroup = data.nodeGroup || (nodeGroups.length > 0 ? nodeGroups[0].id : '');
+      const selectedNodeGroup = data.node_group || (nodeGroups.length > 0 ? nodeGroups[0].id : '');
       
       if (!selectedNodeGroup) {
         console.error('No nodeGroup selected and no default available');
@@ -92,13 +93,13 @@ export const useCreateNodePage = () => {
       const nodeData = {
         name: data.name || '',
         type: data.type || 'action',
-        nodeGroup: selectedNodeGroup,
+        node_group: selectedNodeGroup,
         description: data.description || '',
         version: data.version || '1.0.0',
-        isActive: data.isActive !== undefined ? data.isActive : true,
-        formConfiguration: data.formConfiguration || {},
+        is_active: data.is_active !== undefined ? data.is_active : true,
+        form_configuration: data.form_configuration || {},
         tags: data.tags || [],
-        logoFile: logoFile || undefined, // Include the logo file
+        logo: logoFile || undefined, // Include the logo file
       };
 
       // Debug: Log the data being sent
