@@ -11,13 +11,22 @@ interface WidgetConfigurationProps {
   widget: TWidgetConfig;
   onUpdate: (updates: Partial<TWidgetConfig>) => void;
   disabled?: boolean;
+  existingNames?: string[];
 }
 
-const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpdate, disabled }) => {
+const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpdate, disabled, existingNames = [] }) => {
   const [newOption, setNewOption] = useState('');
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ label: e.target.value });
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow lowercase letters and digits
+    if (/^[a-z0-9]*$/.test(value)) {
+      onUpdate({ name: value });
+    }
   };
 
   const handleRequiredChange = (checked: boolean) => {
@@ -52,18 +61,58 @@ const WidgetConfiguration: React.FC<WidgetConfigurationProps> = ({ widget, onUpd
   };
 
   const needsOptions = ['select', 'radio', 'checkbox'].includes(widget.type);
+  
+  // Check for duplicate names
+  const isDuplicate = existingNames.filter(n => n !== widget.name).includes(widget.name || '');
+  
+  // Check for missing required fields
+  const isNameEmpty = !widget.name || widget.name.trim() === '';
+  const isLabelEmpty = !widget.label || widget.label.trim() === '';
 
   return (
     <div className="space-y-3 pt-2 border-t border-slate-600">
       <div>
-        <Label className="text-xs text-slate-400 mb-1 block">Label</Label>
+        <Label className="text-xs text-slate-400 mb-1 block">Label *</Label>
         <Input
-          value={widget.label}
+          value={widget.label || ''}
           onChange={handleLabelChange}
-          className="bg-slate-700 border-slate-600 text-sm"
+          className={`bg-slate-700 text-sm ${
+            isLabelEmpty ? 'border-red-500' : 'border-slate-600'
+          }`}
           placeholder="Field label"
           disabled={disabled}
         />
+        {isLabelEmpty && (
+          <p className="text-xs text-red-400 mt-1">
+            Label is required
+          </p>
+        )}
+      </div>
+      
+      <div>
+        <Label className="text-xs text-slate-400 mb-1 block">Field Name *</Label>
+        <Input
+          value={widget.name || ''}
+          onChange={handleNameChange}
+          className={`bg-slate-700 text-sm font-mono ${
+            isNameEmpty ? 'border-red-500' : 'border-slate-600'
+          }`}
+          placeholder="e.g., user_email"
+          disabled={disabled}
+        />
+        <p className="text-xs text-slate-500 mt-1">
+          Only lowercase letters (a-z) and digits (0-9) allowed. Used to reference this field.
+        </p>
+        {isNameEmpty && (
+          <p className="text-xs text-red-400 mt-1">
+            Field name is required
+          </p>
+        )}
+        {isDuplicate && (
+          <p className="text-xs text-red-400 mt-1">
+            This name is already used by another field
+          </p>
+        )}
       </div>
       
       {widget.placeholder !== undefined && (

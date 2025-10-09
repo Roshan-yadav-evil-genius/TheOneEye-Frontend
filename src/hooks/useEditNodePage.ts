@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { BackendNodeType, TFormConfiguration } from "@/types/api/backend";
 import { useNodesStore, useFormStore, useUIStore, uiHelpers } from "@/stores";
@@ -23,6 +23,7 @@ export const useEditNodePage = () => {
   const [isLoadingNode, setIsLoadingNode] = useState(true);
   const [nodeLoadError, setNodeLoadError] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [formConfigHasErrors, setFormConfigHasErrors] = useState(false);
 
   // Zustand store hooks
   const { 
@@ -176,11 +177,29 @@ export const useEditNodePage = () => {
     }
   }, [formData.form_configuration]);
 
+  const handleFormConfigValidationError = useCallback((hasErrors: boolean, errorMessage?: string) => {
+    setFormConfigHasErrors(hasErrors);
+    if (hasErrors) {
+      console.warn('Form configuration validation error:', errorMessage);
+    }
+  }, []);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!nodeId) {
       uiHelpers.showError("Error", "Node ID not found");
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.name || formData.name.trim() === "") {
+      uiHelpers.showError("Validation Error", "Node name is required");
+      return;
+    }
+
+    if (!formData.node_group) {
+      uiHelpers.showError("Validation Error", "Node group is required");
       return;
     }
 
@@ -216,9 +235,19 @@ export const useEditNodePage = () => {
 
   const isUpdating = isUpdatingNode || isCreatingForm;
 
+  // Check if all required fields are filled
+  const isFormValid = useMemo(() => {
+    const hasName = Boolean(formData.name && formData.name.trim() !== '');
+    const hasNodeGroup = Boolean(formData.node_group);
+    const hasValidFormConfig = !formConfigHasErrors;
+    
+    return hasName && hasNodeGroup && hasValidFormConfig;
+  }, [formData.name, formData.node_group, formConfigHasErrors]);
+
   return {
     // State
     formData,
+    setFormData,
     logoFile,
     logoPreview,
     setLogoPreview,
@@ -227,6 +256,7 @@ export const useEditNodePage = () => {
     nodeLoadError,
     isUpdating,
     isPreviewOpen,
+    isFormValid,
     
     // Handlers
     handleInputChange,
@@ -237,6 +267,7 @@ export const useEditNodePage = () => {
     handleLogoUpload,
     handleRemoveLogo,
     handleFormConfigurationChange,
+    handleFormConfigValidationError,
     handleSubmit,
     handleCancel,
     setIsPreviewOpen,

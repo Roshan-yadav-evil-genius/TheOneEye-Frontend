@@ -15,6 +15,7 @@ interface WidgetRendererProps {
   onDuplicate: () => void;
   dragHandleProps?: Record<string, unknown>;
   disabled?: boolean;
+  existingNames?: string[];
 }
 
 const WidgetRenderer: React.FC<WidgetRendererProps> = ({
@@ -26,6 +27,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
   onDuplicate,
   dragHandleProps,
   disabled,
+  existingNames = [],
 }) => {
   return (
     <Card
@@ -51,7 +53,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
 
         {/* Widget Configuration */}
         {isSelected && (
-          <WidgetConfiguration widget={widget} onUpdate={onUpdate} disabled={disabled} />
+          <WidgetConfiguration widget={widget} onUpdate={onUpdate} disabled={disabled} existingNames={existingNames} />
         )}
 
         {/* Widget Preview */}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { TNode } from "@/types";
@@ -30,6 +30,7 @@ export const useCreateNodePage = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const [formConfigHasErrors, setFormConfigHasErrors] = useState(false);
 
   // Zustand store hooks
   const { createNode, isLoading: isCreatingNode } = useNodesStore();
@@ -60,6 +61,13 @@ export const useCreateNodePage = () => {
     }
   }, [formData.form_configuration, setValue]);
 
+  const handleFormConfigValidationError = useCallback((hasErrors: boolean, errorMessage?: string) => {
+    setFormConfigHasErrors(hasErrors);
+    if (hasErrors) {
+      console.warn('Form configuration validation error:', errorMessage);
+    }
+  }, []);
+
   // Set active page on mount
   useEffect(() => {
     setActivePage("Create Node");
@@ -80,6 +88,12 @@ export const useCreateNodePage = () => {
 
   const onSubmit = async (data: Partial<TNode>) => {
     try {
+      // Validate required fields
+      if (!data.name || data.name.trim() === '') {
+        uiHelpers.showError('Validation Error', 'Node name is required');
+        return;
+      }
+
       // Ensure we have a valid nodeGroup
       const selectedNodeGroup = data.node_group || (nodeGroups.length > 0 ? nodeGroups[0].id : '');
       
@@ -124,6 +138,15 @@ export const useCreateNodePage = () => {
 
   const isCreating = isCreatingNode || isCreatingForm;
 
+  // Check if all required fields are filled
+  const isFormValid = useMemo(() => {
+    const hasName = Boolean(formData.name && formData.name.trim() !== '');
+    const hasNodeGroup = Boolean(formData.node_group);
+    const hasValidFormConfig = !formConfigHasErrors;
+    
+    return hasName && hasNodeGroup && hasValidFormConfig;
+  }, [formData.name, formData.node_group, formConfigHasErrors]);
+
   return {
     // Form state
     control,
@@ -133,6 +156,7 @@ export const useCreateNodePage = () => {
     logoPreview,
     isPreviewOpen,
     isCreating,
+    isFormValid,
     
     // Actions
     handleSubmit,
@@ -140,6 +164,7 @@ export const useCreateNodePage = () => {
     handleTagsChange,
     handleLogoChange,
     handleFormConfigurationChange,
+    handleFormConfigValidationError,
     onSubmit,
     onError,
     setIsPreviewOpen,

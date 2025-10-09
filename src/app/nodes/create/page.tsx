@@ -5,6 +5,7 @@ import { FormConfigurationEditor } from "@/components/common/form-configuration-
 import { NodeForm, TagsInput, LogoUpload, FormActions, NodePreviewDialog } from "@/components/features/nodes";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useCreateNodePage } from "@/hooks/useCreateNodePage";
+import { BackendNodeType } from "@/types/api/backend";
 
 function CreateNodePageContent() {
   const {
@@ -14,11 +15,13 @@ function CreateNodePageContent() {
     logoPreview,
     isPreviewOpen,
     isCreating,
+    isFormValid,
     handleSubmit,
     handleVersionChange,
     handleTagsChange,
     handleLogoChange,
     handleFormConfigurationChange,
+    handleFormConfigValidationError,
     onSubmit,
     onError,
     setIsPreviewOpen,
@@ -53,6 +56,7 @@ function CreateNodePageContent() {
                   value={formData.form_configuration || {}}
                   onChange={handleFormConfigurationChange}
                   disabled={isCreating}
+                  onValidationError={handleFormConfigValidationError}
                 />
               </div>
 
@@ -61,7 +65,8 @@ function CreateNodePageContent() {
                 isCreating={isCreating}
                 onPreview={() => setIsPreviewOpen(true)}
                 onSave={() => {}} // This will be handled by form submission
-                formData={formData}
+                formData={formData as Partial<BackendNodeType>}
+                isFormValid={isFormValid}
               />
             </form>
           </CardContent>

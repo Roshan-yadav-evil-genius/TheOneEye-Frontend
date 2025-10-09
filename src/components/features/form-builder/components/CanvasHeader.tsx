@@ -17,20 +17,6 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({ widgetCount, onPreviewForm,
           {widgetCount} field{widgetCount !== 1 ? 's' : ''} added
         </p>
       </div>
-      
-      {widgetCount > 0 && onPreviewForm && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onPreviewForm}
-          className="border-slate-600 text-slate-300 hover:bg-slate-800"
-          disabled={disabled}
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          Preview Form
-        </Button>
-      )}
     </div>
   );
 };

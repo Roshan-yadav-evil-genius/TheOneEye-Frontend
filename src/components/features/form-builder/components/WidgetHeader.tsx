@@ -65,6 +65,11 @@ const WidgetHeader: React.FC<WidgetHeaderProps> = ({ widget, dragHandleProps }) 
           <span className="text-sm font-medium">{widget.type}</span>
         </div>
       </div>
+      {widget.name && (
+        <div className="text-xs text-slate-500 font-mono bg-slate-800 px-2 py-1 rounded">
+          {widget.name}
+        </div>
+      )}
     </div>
   );
 };

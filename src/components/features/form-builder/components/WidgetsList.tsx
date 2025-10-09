@@ -23,6 +23,7 @@ interface SortableWidgetProps {
   onDelete: () => void;
   onDuplicate: () => void;
   disabled?: boolean;
+  existingNames?: string[];
 }
 
 const SortableWidget: React.FC<SortableWidgetProps> = ({
@@ -34,6 +35,7 @@ const SortableWidget: React.FC<SortableWidgetProps> = ({
   onDelete,
   onDuplicate,
   disabled,
+  existingNames = [],
 }) => {
   const {
     attributes,
@@ -69,6 +71,7 @@ const SortableWidget: React.FC<SortableWidgetProps> = ({
         onDuplicate={onDuplicate}
         dragHandleProps={listeners}
         disabled={disabled}
+        existingNames={existingNames}
       />
     </div>
   );
@@ -83,6 +86,9 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
   onDuplicateWidget,
   disabled,
 }) => {
+  // Collect all widget names for duplicate checking
+  const existingNames = widgets.map(w => w.name).filter(Boolean);
+
   return (
     <div className="space-y-4">
       {widgets.map((widget, index) => (
@@ -96,6 +102,7 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
           onDelete={() => onDeleteWidget(widget.id)}
           onDuplicate={() => onDuplicateWidget(widget.id)}
           disabled={disabled}
+          existingNames={existingNames}
         />
       ))}
     </div>

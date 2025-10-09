@@ -25,6 +25,7 @@ import { NodePreviewDialog, FormActions } from "@/components/features/nodes";
 function EditNodePageContent() {
   const {
     formData,
+    setFormData,
     logoPreview,
     setLogoPreview,
     currentTagInput,
@@ -32,6 +33,7 @@ function EditNodePageContent() {
     nodeLoadError,
     isUpdating,
     isPreviewOpen,
+    isFormValid,
     handleInputChange,
     handleVersionChange,
     handleTagInputChange,
@@ -40,6 +42,7 @@ function EditNodePageContent() {
     handleLogoUpload,
     handleRemoveLogo,
     handleFormConfigurationChange,
+    handleFormConfigValidationError,
     handleSubmit,
     handleCancel,
     setIsPreviewOpen,
@@ -140,7 +143,7 @@ function EditNodePageContent() {
                     value={formData.node_group?.id || ""} 
                     onValueChange={(value) => {
                       const selectedGroup = nodeGroups.find(group => group.id === value);
-                      handleInputChange("node_group", selectedGroup || null);
+                      setFormData(prev => ({ ...prev, node_group: selectedGroup || undefined }));
                     }}
                     disabled={isLoadingGroups}
                   >
@@ -267,6 +270,7 @@ function EditNodePageContent() {
                   value={formData.form_configuration || {}}
                   onChange={handleFormConfigurationChange}
                   disabled={isUpdating}
+                  onValidationError={handleFormConfigValidationError}
                 />
               </div>
 
@@ -279,6 +283,7 @@ function EditNodePageContent() {
                 buttonText="Update Node"
                 isUpdating={isUpdating}
                 onCancel={handleCancel}
+                isFormValid={isFormValid}
               />
 
             </form>

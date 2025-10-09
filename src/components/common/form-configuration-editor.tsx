@@ -9,6 +9,7 @@ interface FormConfigurationEditorProps {
   value: Record<string, unknown>;
   onChange: (value: TFormConfiguration) => void;
   disabled?: boolean;
+  onValidationError?: (hasErrors: boolean, errorMessage?: string) => void;
 }
 
 // Helper function to convert form elements back to widgets for the FormBuilder
@@ -28,11 +29,27 @@ function convertElementsToWidgets(value: Record<string, unknown>): TWidgetConfig
   }));
 }
 
-export function FormConfigurationEditor({ value, onChange, disabled }: FormConfigurationEditorProps) {
+export function FormConfigurationEditor({ value, onChange, disabled, onValidationError }: FormConfigurationEditorProps) {
 
 
   // Handle form builder changes
   const handleFormBuilderChange = useCallback((widgets: TWidgetConfig[]) => {
+    // Validate that all widgets have required fields
+    const incompleteWidgets = widgets.filter(widget => 
+      !widget.name || widget.name.trim() === '' || 
+      !widget.label || widget.label.trim() === ''
+    );
+
+    if (incompleteWidgets.length > 0) {
+      // Don't save incomplete widgets, but still allow the form builder to work
+      console.warn('Some widgets are missing required fields (name or label)');
+      onValidationError?.(true, `${incompleteWidgets.length} field(s) are missing required name or label`);
+      return;
+    }
+
+    // Clear validation errors if all widgets are complete
+    onValidationError?.(false);
+
     // Convert widgets to form configuration format that matches backend expectations
     const formConfig: TFormConfiguration = {
       title: "Node Configuration Form",
@@ -47,7 +64,7 @@ export function FormConfigurationEditor({ value, onChange, disabled }: FormConfi
       }))
     };
     onChange(formConfig);
-  }, [onChange]);
+  }, [onChange, onValidationError]);
 
   return (
     <FormBuilder

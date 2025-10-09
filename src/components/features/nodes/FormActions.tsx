@@ -9,9 +9,10 @@ interface FormActionsProps {
   buttonText?: string;
   isUpdating?: boolean;
   onCancel?: () => void;
+  isFormValid?: boolean;
 }
 
-export function FormActions({ isCreating, onPreview, onSave, formData, buttonText = "Create Node", isUpdating, onCancel }: FormActionsProps) {
+export function FormActions({ isCreating, onPreview, onSave, formData, buttonText = "Create Node", isUpdating, onCancel, isFormValid = true }: FormActionsProps) {
   return (
     <div className="flex justify-end space-x-2 pt-4">
       {onCancel && (
@@ -34,7 +35,7 @@ export function FormActions({ isCreating, onPreview, onSave, formData, buttonTex
       </Button>
       <Button
         type="submit"
-        disabled={isCreating || isUpdating}
+        disabled={isCreating || isUpdating || !isFormValid}
         className="flex items-center gap-2"
       >
         {(isCreating || isUpdating) ? (
