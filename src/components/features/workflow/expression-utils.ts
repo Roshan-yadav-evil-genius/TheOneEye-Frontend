@@ -10,15 +10,16 @@ export interface FieldData {
 /**
  * Convert a schema field path to expression syntax
  * @param path - The schema field path (e.g., "row_number", "master.c1", "[0].Name")
- * @returns Expression syntax (e.g., "{{ $json[0].row_number }}")
+ * @returns Expression syntax (e.g., "{{ $json.row_number }}")
  */
 export function convertPathToExpression(path: string): string {
   if (path.startsWith('[')) {
-    // Array item path like "[0].Name"
-    return `{{ $json${path} }}`;
+    // Array item path like "[0].Name" - remove the array index
+    const cleanPath = path.replace(/^\[\d+\]\.?/, '');
+    return `{{ $json.${cleanPath} }}`;
   } else {
     // Regular field path like "row_number" or "master.c1"
-    return `{{ $json[0].${path} }}`;
+    return `{{ $json.${path} }}`;
   }
 }
 
@@ -29,7 +30,7 @@ export function convertPathToExpression(path: string): string {
  * @returns True if it's a valid expression
  */
 export function isExpression(text: string): boolean {
-  return /^\{\{\s*\$json\[0\]\..+?\s*\}\}$/.test(text) || /^\{\{\s*\$json\[.+\]\s*\}\}$/.test(text);
+  return /^\{\{\s*\$json\..+?\s*\}\}$/.test(text);
 }
 
 /**
@@ -38,7 +39,7 @@ export function isExpression(text: string): boolean {
  * @returns Array of found expressions
  */
 export function extractExpressions(text: string): string[] {
-  const expressionRegex = /\{\{\s*\$json\[0\]\..+?\s*\}\}|\{\{\s*\$json\[.+\]\s*\}\}/g;
+  const expressionRegex = /\{\{\s*\$json\..+?\s*\}\}/g;
   return text.match(expressionRegex) || [];
 }
 
