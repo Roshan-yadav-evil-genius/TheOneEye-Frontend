@@ -157,6 +157,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         data={data}
+        workflowId={workflowId || ''}
       />
     </div>
   );

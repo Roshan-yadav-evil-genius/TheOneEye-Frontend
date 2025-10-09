@@ -15,22 +15,28 @@ import { NodeEditor } from "./node-editor";
 import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { BackendWorkflowNode } from "@/types";
+import { useNodeData } from "@/hooks/useNodeData";
 
 interface NodeEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   data: BackendWorkflowNode;
+  workflowId: string;
 }
 
 export function NodeEditDialog({ 
   isOpen, 
   onOpenChange, 
   data, 
+  workflowId,
 }: NodeEditDialogProps) {
   // Tab state management
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
   const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "form">("parameters");
+  
+  // Fetch node data
+  const { inputData, outputData, isLoading, error } = useNodeData(workflowId, data.id);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
@@ -49,7 +55,7 @@ export function NodeEditDialog({
             <InputSection 
               activeInputTab={activeInputTab}
               onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
-              jsonData={sampleInputData}
+              jsonData={inputData}
             />
 
             {/* Node Editor Column */}
@@ -65,7 +71,7 @@ export function NodeEditDialog({
             <OutputSection 
               activeOutputTab={activeOutputTab}
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
-              jsonData={sampleInputData}
+              jsonData={outputData}
             />
           </ResizablePanels>
         </div>

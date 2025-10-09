@@ -288,6 +288,14 @@ export class ApiService {
     return response;
   }
 
+  static async getNodeInputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
+    return axiosApiClient.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/input/`);
+  }
+
+  static async getNodeOutputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
+    return axiosApiClient.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/output/`);
+  }
+
 
   // User operations
   static async getCurrentUser(): Promise<TUser | null> {
@@ -371,6 +379,8 @@ export const {
   addConnectionToWorkflow,
   removeConnectionFromWorkflow,
   executeSingleNode,
+  getNodeInputData,
+  getNodeOutputData,
   getCurrentUser,
   login,
   logout,
