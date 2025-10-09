@@ -221,6 +221,7 @@ export const useEditNodePage = () => {
     formData,
     logoFile,
     logoPreview,
+    setLogoPreview,
     currentTagInput,
     isLoadingNode,
     nodeLoadError,

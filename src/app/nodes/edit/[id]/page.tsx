@@ -26,6 +26,7 @@ function EditNodePageContent() {
   const {
     formData,
     logoPreview,
+    setLogoPreview,
     currentTagInput,
     isLoadingNode,
     nodeLoadError,
