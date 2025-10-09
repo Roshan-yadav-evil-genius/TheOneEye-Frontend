@@ -1,20 +1,18 @@
 "use client";
 
 import { useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconForms } from "@tabler/icons-react";
 import FormBuilder from "../features/form-builder/FormBuilder";
 import { TWidgetConfig, TWidgetType } from "../features/form-builder/inputs";
 import { TFormConfiguration } from "@/types/api/backend";
 
 interface FormConfigurationEditorProps {
-  value: TFormConfiguration;
+  value: Record<string, unknown>;
   onChange: (value: TFormConfiguration) => void;
   disabled?: boolean;
 }
 
 // Helper function to convert form elements back to widgets for the FormBuilder
-function convertElementsToWidgets(value: TFormConfiguration): TWidgetConfig[] {
+function convertElementsToWidgets(value: Record<string, unknown>): TWidgetConfig[] {
   if (!value || !value.elements || !Array.isArray(value.elements)) {
     return [];
   }

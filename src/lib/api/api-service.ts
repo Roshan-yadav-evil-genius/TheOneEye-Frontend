@@ -89,14 +89,40 @@ export class ApiService {
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
-    // Ensure node_group is an ID string if present
-    const dataToSend = {
-      ...nodeData,
-      node_group: nodeData.node_group 
-        ? (typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup).id)
-        : undefined
-    };
-    return axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, dataToSend);
+    const hasLogoFile = nodeData.logo instanceof File;
+    
+    if (hasLogoFile) {
+      // Handle file upload with FormData
+      const formData = new FormData();
+      
+      Object.entries(nodeData).forEach(([key, value]) => {
+        if (key === 'form_configuration' || key === 'tags') {
+          if (value !== null && value !== undefined) {
+            formData.append(key, JSON.stringify(value));
+          }
+        } else if (key === 'logo' && value instanceof File) {
+          formData.append('logo', value);
+        } else if (key === 'node_group') {
+          if (value) {
+            const groupId = typeof value === 'string' ? value : (value as BackendNodeGroup)?.id;
+            if (groupId) formData.append('node_group', groupId);
+          }
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+      
+      return axiosApiClient.uploadFile<BackendNodeType>(`/nodes/${id}/`, formData);
+    } else {
+      // Handle regular JSON update
+      const dataToSend = {
+        ...nodeData,
+        node_group: nodeData.node_group 
+          ? (typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup).id)
+          : undefined
+      };
+      return axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, dataToSend);
+    }
   }
 
   static async deleteNode(id: string): Promise<void> {

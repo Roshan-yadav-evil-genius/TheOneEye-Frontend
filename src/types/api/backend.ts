@@ -14,7 +14,7 @@ export interface BackendNodeType {
   created_at: string;
   updated_at: string;
   created_by?: string;
-  form_configuration: TFormConfiguration;
+  form_configuration?: Record<string, unknown>;  // More flexible - backend can return any JSON structure
   tags?: string[];
   logo?: string;
 }

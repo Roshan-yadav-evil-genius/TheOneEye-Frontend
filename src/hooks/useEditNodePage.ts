@@ -15,7 +15,7 @@ export const useEditNodePage = () => {
     description: "",
     version: "1.0.0",
     tags: [],
-    form_configuration: { title: "", elements: [] },
+    form_configuration: {},
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -172,7 +172,7 @@ export const useEditNodePage = () => {
   const handleFormConfigurationChange = useCallback((json: TFormConfiguration) => {
     // Only update if the JSON is actually different to prevent unnecessary re-renders
     if (JSON.stringify(formData.form_configuration) !== JSON.stringify(json)) {
-      setFormData(prev => ({ ...prev, form_configuration: json }));
+      setFormData(prev => ({ ...prev, form_configuration: json as unknown as Record<string, unknown> }));
     }
   }, [formData.form_configuration]);
 
@@ -193,7 +193,7 @@ export const useEditNodePage = () => {
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],
-        form_configuration: formData.form_configuration || { title: "", elements: [] },
+        form_configuration: formData.form_configuration || {},
         is_active: true,
         logo: logoFile || undefined, // Include the logo file if uploaded
       }, { showToast: true }); // showToast = true
