@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BackendNodeType } from "@/types/api/backend";
 import { WidgetLoader } from "./WidgetLoader";
 import { WidgetMapper } from "./WidgetMapper";
@@ -24,7 +24,7 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
     setFormValues(initialFormValues);
   }, [initialFormValues]);
 
-  const validateForm = (widgets: any[]) => {
+  const validateForm = useCallback((widgets: any[]) => {
     const errors: Record<string, string> = {};
     widgets.forEach(widget => {
       const fieldName = widget.name || widget.id;
@@ -34,25 +34,26 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
       }
     });
     return errors;
-  };
+  }, [formValues]);
 
-  const handleFormValueChange = (fieldName: string, value: unknown) => {
+  const handleFormValueChange = useCallback((fieldName: string, value: unknown) => {
     setFormValues(prev => ({
       ...prev,
       [fieldName]: value
     }));
     
     // Clear validation error for this field when user starts typing
-    if (validationErrors[fieldName]) {
-      setValidationErrors(prev => {
+    setValidationErrors(prev => {
+      if (prev[fieldName]) {
         const newErrors = { ...prev };
         delete newErrors[fieldName];
         return newErrors;
-      });
-    }
-  };
+      }
+      return prev; // Return the same object if no change needed
+    });
+  }, []);
 
-  const handleSave = async (widgets: any[]) => {
+  const handleSave = useCallback(async (widgets: any[]) => {
     // Validate form before saving
     const errors = validateForm(widgets);
     setValidationErrors(errors);
@@ -70,7 +71,7 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [nodeId, formValues, updateNodeFormValues, validateForm]);
 
   return (
     <div className="space-y-4">
