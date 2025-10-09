@@ -189,7 +189,7 @@ export const useEditNodePage = () => {
       await updateNode(nodeId, {
         name: formData.name || "Updated Node",
         type: (formData.type || "action") as TNode['type'],
-        nodeGroup: formData.node_group || "",
+        nodeGroup: formData.node_group, // Pass the actual node_group object/ID
         description: formData.description || "",
         version: formData.version || "1.0.0",
         tags: formData.tags || [],

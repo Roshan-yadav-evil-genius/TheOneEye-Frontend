@@ -103,11 +103,17 @@ export class ApiService {
   }
 
   static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
-    // Transform nodeGroup to ID if it's an object
+    // Transform frontend format to backend format
     const transformedData = {
       ...nodeData,
-      nodeGroup: typeof nodeData.nodeGroup === 'object' && nodeData.nodeGroup ? nodeData.nodeGroup.id : nodeData.nodeGroup
+      node_group: typeof nodeData.nodeGroup === 'object' && nodeData.nodeGroup ? nodeData.nodeGroup.id : nodeData.nodeGroup,
+      form_configuration: nodeData.formConfiguration,
+      is_active: nodeData.isActive
     };
+    // Remove the camelCase fields since we're using snake_case equivalents
+    delete transformedData.nodeGroup;
+    delete transformedData.formConfiguration;
+    delete transformedData.isActive;
     const response = await axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, transformedData);
     return response;
   }
