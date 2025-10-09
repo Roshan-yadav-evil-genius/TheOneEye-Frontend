@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { TWidgetConfig } from "@/components/features/form-builder/inputs";
+import { DroppableFormInput } from "@/components/features/workflow/droppable-form-input";
 
 interface FieldPreviewProps {
   widget: TWidgetConfig;
@@ -67,48 +68,37 @@ export function FieldPreview({ widget, value, onChange, error }: FieldPreviewPro
     case 'email':
     case 'password':
       return (
-        <div>
-          <input
-            type={widget.type}
-            placeholder={widget.placeholder || `Enter ${widget.type}...`}
-            value={currentValue}
-            onChange={(e) => handleValueChange(e.target.value)}
-            className={getErrorStyling("w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50")}
-          />
-          {error && (
-            <p className="text-red-500 text-xs mt-1">{error}</p>
-          )}
-        </div>
+        <DroppableFormInput
+          type={widget.type}
+          value={currentValue}
+          onChange={handleValueChange}
+          placeholder={widget.placeholder || `Enter ${widget.type}...`}
+          id={`form-field-${widget.id}`}
+          error={error}
+        />
       );
     case 'number':
       return (
-        <div>
-          <input
-            type="number"
-            placeholder={widget.placeholder || "Enter number..."}
-            value={currentValue}
-            onChange={(e) => handleValueChange(e.target.value)}
-            className={getErrorStyling("w-full h-10 bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50")}
-          />
-          {error && (
-            <p className="text-red-500 text-xs mt-1">{error}</p>
-          )}
-        </div>
+        <DroppableFormInput
+          type="number"
+          value={currentValue}
+          onChange={handleValueChange}
+          placeholder={widget.placeholder || "Enter number..."}
+          id={`form-field-${widget.id}`}
+          error={error}
+        />
       );
     case 'textarea':
       return (
-        <div>
-          <textarea
-            placeholder={widget.placeholder || "Enter text..."}
-            value={currentValue}
-            onChange={(e) => handleValueChange(e.target.value)}
-            rows={3}
-            className={getErrorStyling("w-full bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 resize-none")}
-          />
-          {error && (
-            <p className="text-red-500 text-xs mt-1">{error}</p>
-          )}
-        </div>
+        <DroppableFormInput
+          type="textarea"
+          value={currentValue}
+          onChange={handleValueChange}
+          placeholder={widget.placeholder || "Enter text..."}
+          rows={3}
+          id={`form-field-${widget.id}`}
+          error={error}
+        />
       );
     case 'select':
       return (
