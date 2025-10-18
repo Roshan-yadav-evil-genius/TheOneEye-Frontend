@@ -287,7 +287,7 @@ export class ApiService {
   }
 
   static async getTaskStatus(taskId: string): Promise<{ state: string; result?: any; error?: string; progress?: number }> {
-    const response = await axiosApiClient.get<{ state: string; result?: any; error?: string; progress?: number }>(`/api/celery/task/${taskId}/status/`);
+    const response = await axiosApiClient.get<{ state: string; result?: any; error?: string; progress?: number }>(`/celery/task/${taskId}/status/`);
     return response;
   }
 

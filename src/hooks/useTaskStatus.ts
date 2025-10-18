@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ApiService } from '@/lib/api/api-service';
 
 export interface TaskStatus {
   state: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | 'REVOKED';
@@ -42,14 +43,9 @@ export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatus
 
   const pollTaskStatus = useCallback(async (taskId: string) => {
     try {
-      const response = await fetch(`/api/celery/task/${taskId}/status/`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      const data = await ApiService.getTaskStatus(taskId);
       const taskStatus: TaskStatus = {
-        state: data.state,
+        state: data.state as TaskStatus['state'],
         result: data.result,
         error: data.error,
         progress: data.progress
