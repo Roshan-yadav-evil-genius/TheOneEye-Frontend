@@ -281,6 +281,21 @@ export class ApiService {
     return response;
   }
 
+  static async stopDevMode(workflowId: string): Promise<{ task_id: string; status: string; message: string }> {
+    const response = await axiosApiClient.post<{ task_id: string; status: string; message: string }>(`/workflow/${workflowId}/stop_dev_mode/`);
+    return response;
+  }
+
+  static async getTaskStatus(taskId: string): Promise<{ state: string; result?: any; error?: string; progress?: number }> {
+    const response = await axiosApiClient.get<{ state: string; result?: any; error?: string; progress?: number }>(`/api/celery/task/${taskId}/status/`);
+    return response;
+  }
+
+  static async getDevContainerStatus(workflowId: string): Promise<{ exists: boolean; status: string; uptime?: number }> {
+    const response = await axiosApiClient.get<{ exists: boolean; status: string; uptime?: number }>(`/workflow/${workflowId}/dev_container_status/`);
+    return response;
+  }
+
   static async startWorkflowExecution(workflowId: string): Promise<{ task_id: string; status: string }> {
     return axiosApiClient.get(`/workflow/${workflowId}/start_execution/`);
   }

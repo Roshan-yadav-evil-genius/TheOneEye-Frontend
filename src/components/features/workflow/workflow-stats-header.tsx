@@ -24,6 +24,10 @@ import {
   IconMap,
   IconMapOff
 } from "@tabler/icons-react";
+import { DevModeIndicator } from "./DevModeIndicator";
+import { useState, useEffect } from "react";
+import { ApiService } from "@/lib/api/api-service";
+import { toast } from "sonner";
 
 interface WorkflowStatsHeaderProps {
   isRunning: boolean;
@@ -57,6 +61,63 @@ const lineTypeOptions = [
 
 export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflowId }: WorkflowStatsHeaderProps) {
   const router = useRouter();
+  
+  // Dev mode state
+  const [devModeStatus, setDevModeStatus] = useState<{
+    isActive: boolean;
+    status: 'running' | 'stopped' | 'starting' | 'stopping';
+    uptime?: number;
+  }>({
+    isActive: false,
+    status: 'stopped'
+  });
+  const [isLoadingDevStatus, setIsLoadingDevStatus] = useState(false);
+
+  // Check dev container status on mount and when workflowId changes
+  useEffect(() => {
+    if (workflowId) {
+      checkDevContainerStatus();
+    }
+  }, [workflowId]);
+
+  const checkDevContainerStatus = async () => {
+    if (!workflowId) return;
+    
+    setIsLoadingDevStatus(true);
+    try {
+      const status = await ApiService.getDevContainerStatus(workflowId);
+      setDevModeStatus({
+        isActive: status.exists,
+        status: status.exists ? 'running' : 'stopped',
+        uptime: status.uptime
+      });
+    } catch (error) {
+      console.error('Failed to check dev container status:', error);
+      setDevModeStatus({
+        isActive: false,
+        status: 'stopped'
+      });
+    } finally {
+      setIsLoadingDevStatus(false);
+    }
+  };
+
+  const handleStopDevMode = async () => {
+    if (!workflowId) return;
+    
+    setDevModeStatus(prev => ({ ...prev, status: 'stopping' }));
+    try {
+      await ApiService.stopDevMode(workflowId);
+      toast.success('Dev mode stopped successfully');
+      setDevModeStatus({
+        isActive: false,
+        status: 'stopped'
+      });
+    } catch (error) {
+      toast.error('Failed to stop dev mode');
+      setDevModeStatus(prev => ({ ...prev, status: 'running' }));
+    }
+  };
 
   const handleDetailsClick = () => {
     if (workflowId) {
@@ -85,6 +146,16 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Dev Mode Indicator */}
+            <DevModeIndicator
+              isActive={devModeStatus.isActive}
+              status={devModeStatus.status}
+              uptime={devModeStatus.uptime}
+              onStop={handleStopDevMode}
+              onRefresh={checkDevContainerStatus}
+              isLoading={isLoadingDevStatus}
+            />
+            
             {/* Total Runs */}
             <div className="flex items-center gap-2">
               <div className="text-sm font-semibold">{mockStats.totalRuns.toLocaleString()}</div>
