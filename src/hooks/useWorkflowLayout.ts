@@ -5,7 +5,6 @@ interface UseWorkflowLayoutProps {
 }
 
 export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) => {
-  const [isRunning, setIsRunning] = useState(false);
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
@@ -17,10 +16,6 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
 
   // TODO: Load workflow data based on workflowId
   // const { data: workflow } = useWorkflow(workflowId);
-
-  const handleRunStop = () => {
-    setIsRunning(!isRunning);
-  };
 
   const handleNodeSelect = (nodeId: string) => {
     setSelectedNodes(prev => 
@@ -44,7 +39,6 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
 
   return {
     // State
-    isRunning,
     selectedNodes,
     searchTerm,
     filters,
@@ -55,7 +49,6 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
     // Actions
     setSearchTerm,
     setFilters,
-    handleRunStop,
     handleNodeSelect,
     handleLineTypeChange,
     handleMinimapToggle,

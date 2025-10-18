@@ -27,7 +27,8 @@ import {
 
 interface WorkflowStatsHeaderProps {
   isRunning: boolean;
-  onRunStop: () => void;
+  onStart: () => Promise<void>;
+  onStop: () => Promise<void>;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   lineType: string;
@@ -54,7 +55,7 @@ const lineTypeOptions = [
   { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
 ];
 
-export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflowId }: WorkflowStatsHeaderProps) {
+export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflowId }: WorkflowStatsHeaderProps) {
   const router = useRouter();
 
   const handleDetailsClick = () => {
@@ -205,7 +206,7 @@ export function WorkflowStatsHeader({ isRunning, onRunStop, isSidebarCollapsed, 
               <IconActivity className="h-3.5 w-3.5 text-blue-500 hover:text-blue-600" />
             </Button>
             <Button
-              onClick={onRunStop}
+              onClick={isRunning ? onStop : onStart}
               variant="ghost"
               size="sm"
               className="h-6 px-2 text-xs"

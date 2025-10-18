@@ -234,17 +234,10 @@ export class ApiService {
     nodeId: string, 
     position: { x: number; y: number }
   ): Promise<void> {
-    console.log('API: Updating node position', { workflowId, nodeId, position });
-    try {
-      await axiosApiClient.patch(`/workflow/${workflowId}/update_node_position/`, {
-        nodeId,
-        position
-      });
-      console.log('API: Node position updated successfully');
-    } catch (error) {
-      console.error('API: Failed to update node position:', error);
-      throw error;
-    }
+    await axiosApiClient.patch(`/workflow/${workflowId}/update_node_position/`, {
+      nodeId,
+      position
+    });
   }
 
   static async removeNodeFromWorkflow(workflowId: string, nodeId: string): Promise<void> {
@@ -286,6 +279,18 @@ export class ApiService {
       node_id: nodeId
     });
     return response;
+  }
+
+  static async startWorkflowExecution(workflowId: string): Promise<{ task_id: string; status: string }> {
+    return axiosApiClient.get(`/workflow/${workflowId}/start_execution/`);
+  }
+
+  static async stopWorkflowExecution(workflowId: string): Promise<{ task_id: string; status: string }> {
+    return axiosApiClient.get(`/workflow/${workflowId}/stop_execution/`);
+  }
+
+  static async getWorkflowTaskStatus(workflowId: string): Promise<{ task_id: string; status: string }> {
+    return axiosApiClient.get(`/workflow/${workflowId}/task_status/`);
   }
 
   static async getNodeInputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
@@ -379,6 +384,9 @@ export const {
   addConnectionToWorkflow,
   removeConnectionFromWorkflow,
   executeSingleNode,
+  startWorkflowExecution,
+  stopWorkflowExecution,
+  getWorkflowTaskStatus,
   getNodeInputData,
   getNodeOutputData,
   getCurrentUser,

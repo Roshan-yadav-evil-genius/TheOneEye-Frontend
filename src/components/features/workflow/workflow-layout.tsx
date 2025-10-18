@@ -4,6 +4,7 @@ import { WorkflowSidebar } from "./workflow-sidebar";
 import { WorkflowStatsHeader } from "./workflow-stats-header";
 import { WorkflowCanvas } from "./workflow-canvas";
 import { useWorkflowLayout } from "@/hooks/useWorkflowLayout";
+import { useWorkflowExecution } from "@/hooks/useWorkflowExecution";
 
 interface WorkflowLayoutProps {
   workflowId?: string;
@@ -11,7 +12,6 @@ interface WorkflowLayoutProps {
 
 export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   const {
-    isRunning,
     selectedNodes,
     searchTerm,
     filters,
@@ -20,12 +20,17 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
     showMinimap,
     setSearchTerm,
     setFilters,
-    handleRunStop,
     handleNodeSelect,
     handleLineTypeChange,
     handleMinimapToggle,
     handleToggleSidebar,
   } = useWorkflowLayout({ workflowId });
+
+  const {
+    isRunning,
+    startExecution,
+    stopExecution,
+  } = useWorkflowExecution({ workflowId });
 
   return (
     <div className="flex h-[calc(100vh-var(--header-height))] bg-background">
@@ -49,7 +54,8 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
         <div className="border-b border-border bg-card">
           <WorkflowStatsHeader
             isRunning={isRunning}
-            onRunStop={handleRunStop}
+            onStart={startExecution}
+            onStop={stopExecution}
             isSidebarCollapsed={isSidebarCollapsed}
             onToggleSidebar={handleToggleSidebar}
             lineType={lineType}
@@ -70,6 +76,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
               filters={filters}
               lineType={lineType}
               showMinimap={showMinimap}
+              isRunning={isRunning}
             />
           )}
         </div>

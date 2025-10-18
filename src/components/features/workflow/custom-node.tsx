@@ -49,10 +49,8 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
       toast.success(`Execution started for ${nodeName}. Task ID: ${result.task_id}`);
       
       // You could also poll for task status here if needed
-      console.log('Execution result:', result);
       
     } catch (error) {
-      console.error('Failed to execute node:', error);
       toast.error(`Failed to execute ${data.node_type?.name || 'node'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsExecuting(false);

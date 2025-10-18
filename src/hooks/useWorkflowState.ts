@@ -13,9 +13,10 @@ interface WorkflowStateProps {
   filters: {
     nodeGroup: string;
   };
+  isRunning: boolean;
 }
 
-export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTerm, filters }: WorkflowStateProps) => {
+export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning }: WorkflowStateProps) => {
   // Get workflow canvas store state and actions
   const {
     nodes: workflowNodes,
@@ -55,10 +56,10 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
       source: connection.source,
       target: connection.target,
       type: lineType,
-      animated: true,
+      animated: isRunning,
       style: { stroke: '#3b82f6', strokeWidth: 2 },
     }));
-  }, [workflowConnections, lineType]);
+  }, [workflowConnections, lineType, isRunning]);
 
   // ReactFlow state management
   const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
@@ -72,7 +73,6 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
 
   // Handle node drag stop to save position
   const handleNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
-    console.log('Node drag stopped:', node.id, node.position);
     updateNodePosition(node.id, node.position);
   }, [updateNodePosition]);
 
@@ -105,7 +105,6 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   const onConnect = useCallback(
     async (params: Connection) => {
       // Prevent self-connections
-      console.log(params)
       if (params.source === params.target) {
         return;
       }

@@ -24,9 +24,10 @@ interface WorkflowCanvasProps {
   };
   lineType: string;
   showMinimap: boolean;
+  isRunning: boolean;
 }
 
-export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters, lineType, showMinimap }: WorkflowCanvasProps) {
+export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters, lineType, showMinimap, isRunning }: WorkflowCanvasProps) {
   const {
     nodes,
     edges,
@@ -41,7 +42,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     isLoading,
     isSaving,
     error,
-  } = useWorkflowState({ workflowId, lineType, selectedNodes, searchTerm, filters });
+  } = useWorkflowState({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning });
 
   const {
     reactFlowWrapper,
@@ -117,7 +118,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
                            lineType === 'smoothstep' ? ConnectionLineType.SmoothStep :
                            ConnectionLineType.Bezier}
         defaultEdgeOptions={{
-          animated: true,
+          animated: isRunning,
           style: { stroke: '#3b82f6', strokeWidth: 2 },
           type: lineType,
         }}
