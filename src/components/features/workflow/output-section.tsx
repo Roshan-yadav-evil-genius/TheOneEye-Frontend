@@ -6,9 +6,17 @@ interface OutputSectionProps {
   activeOutputTab: "schema" | "json";
   onOutputTabChange: (value: "schema" | "json") => void;
   jsonData: Record<string, unknown> | unknown[] | string | null;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: OutputSectionProps) {
+export function OutputSection({ 
+  activeOutputTab, 
+  onOutputTabChange, 
+  jsonData,
+  isLoading,
+  error
+}: OutputSectionProps) {
   return (
     <JsonViewer
       title="OUTPUT"
@@ -17,6 +25,8 @@ export function OutputSection({ activeOutputTab, onOutputTabChange, jsonData }: 
       activeTab={activeOutputTab}
       onTabChange={onOutputTabChange}
       enableDragDrop={false}
+      isLoading={isLoading}
+      error={error}
     />
   );
 }

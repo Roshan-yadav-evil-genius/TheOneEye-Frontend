@@ -6,12 +6,16 @@ interface InputSectionProps {
   activeInputTab: "schema" | "json";
   onInputTabChange: (value: "schema" | "json") => void;
   jsonData: Record<string, unknown> | unknown[] | string | null;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 export function InputSection({ 
   activeInputTab, 
   onInputTabChange, 
-  jsonData
+  jsonData,
+  isLoading,
+  error
 }: InputSectionProps) {
   return (
     <JsonViewer
@@ -20,6 +24,8 @@ export function InputSection({
       jsonData={jsonData}
       activeTab={activeInputTab}
       onTabChange={onInputTabChange}
+      isLoading={isLoading}
+      error={error}
     />
   );
 }

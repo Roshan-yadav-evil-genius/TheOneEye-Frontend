@@ -23,6 +23,8 @@ interface JsonViewerProps {
   onDownload?: () => void;
   onRefresh?: () => void;
   enableDragDrop?: boolean;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 export function JsonViewer({
@@ -33,7 +35,9 @@ export function JsonViewer({
   onTabChange,
   onCopy,
   onDownload,
-  enableDragDrop = true
+  enableDragDrop = true,
+  isLoading = false,
+  error = null
 }: JsonViewerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -91,6 +95,45 @@ export function JsonViewer({
     return filteredLines.join('\n');
   }, [jsonData, searchTerm, activeTab]);
 
+  // Add loading state rendering
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between p-1 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 ${statusColor} rounded-full`}></div>
+            <h3 className="text-white font-medium">{title}</h3>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+            <p className="text-sm text-muted-foreground">Loading data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Add error state rendering
+  if (error) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between p-1 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 ${statusColor} rounded-full`}></div>
+            <h3 className="text-white font-medium">{title}</h3>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-red-500">
+            <p className="text-sm">Failed to load data</p>
+            <p className="text-xs text-muted-foreground mt-1">{error.message}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
