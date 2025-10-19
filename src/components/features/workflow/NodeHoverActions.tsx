@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { 
   IconPlayerPlay,
+  IconPlayerPause,
   IconTrash,
   IconPower,
   IconDots,
@@ -11,19 +12,23 @@ import {
 interface NodeHoverActionsProps {
   onEdit: (e: React.MouseEvent) => void;
   onPlay: (e: React.MouseEvent) => void;
+  onPause: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
   onShutdown: (e: React.MouseEvent) => void;
   onMore: (e: React.MouseEvent) => void;
   isExecuting?: boolean;
+  isPolling?: boolean;
 }
 
 export function NodeHoverActions({
   onEdit,
   onPlay,
+  onPause,
   onDelete,
   onShutdown,
   onMore,
-  isExecuting = false
+  isExecuting = false,
+  isPolling = false
 }: NodeHoverActionsProps) {
   return (
     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background border border-border rounded-md shadow-lg p-1">
@@ -39,11 +44,13 @@ export function NodeHoverActions({
         size="sm"
         variant="ghost"
         className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/20"
-        onClick={onPlay}
-        disabled={isExecuting}
+        onClick={isPolling ? onPause : onPlay}
+        disabled={isExecuting && !isPolling}
       >
-        {isExecuting ? (
+        {isExecuting && !isPolling ? (
           <div className="h-3 w-3 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+        ) : isPolling ? (
+          <IconPlayerPause className="h-3 w-3" />
         ) : (
           <IconPlayerPlay className="h-3 w-3" />
         )}

@@ -10,7 +10,6 @@ export interface TaskStatus {
 
 export interface UseTaskStatusOptions {
   pollInterval?: number;
-  maxPollingTime?: number;
   onSuccess?: (result: any) => void;
   onError?: (error: string) => void;
   onComplete?: (status: TaskStatus) => void;
@@ -28,7 +27,6 @@ export interface UseTaskStatusReturn {
 export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatusReturn {
   const {
     pollInterval = 2000, // Poll every 2 seconds
-    maxPollingTime = 60000, // Stop after 1 minute
     onSuccess,
     onError,
     onComplete
@@ -38,7 +36,6 @@ export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatus
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
-  const [pollingStartTime, setPollingStartTime] = useState<number | null>(null);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
 
   const pollTaskStatus = useCallback(async (taskId: string) => {
@@ -92,7 +89,6 @@ export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatus
     setIsPolling(true);
     setIsLoading(true);
     setError(null);
-    setPollingStartTime(Date.now());
     
     // Start polling immediately
     pollTaskStatus(taskId);
@@ -102,7 +98,6 @@ export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatus
     setIsPolling(false);
     setIsLoading(false);
     setCurrentTaskId(null);
-    setPollingStartTime(null);
   }, []);
 
   // Polling effect
@@ -110,19 +105,11 @@ export function useTaskStatus(options: UseTaskStatusOptions = {}): UseTaskStatus
     if (!isPolling || !currentTaskId) return;
 
     const interval = setInterval(async () => {
-      // Check if we've exceeded max polling time
-      if (pollingStartTime && Date.now() - pollingStartTime > maxPollingTime) {
-        stopPolling();
-        setError('Task polling timeout');
-        onError?.('Task polling timeout');
-        return;
-      }
-
       await pollTaskStatus(currentTaskId);
     }, pollInterval);
 
     return () => clearInterval(interval);
-  }, [isPolling, currentTaskId, pollInterval, maxPollingTime, pollingStartTime, pollTaskStatus, stopPolling, onError]);
+  }, [isPolling, currentTaskId, pollInterval, pollTaskStatus]);
 
   // Cleanup on unmount
   useEffect(() => {

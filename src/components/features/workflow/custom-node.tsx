@@ -97,6 +97,13 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
     e.stopPropagation();
   };
 
+  const handlePause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    stopPolling();
+    setIsExecuting(false);
+    toast.info("Stopped polling for task results");
+  };
+
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditDialogOpen(true);
@@ -110,9 +117,11 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
           selected ? "ring-2 ring-primary ring-offset-2" : ""
         } ${
-          isExecuting || isPolling ? "ring-2 ring-blue-500 animate-pulse" : ""
+          isExecuting && !isPolling ? "border-orange-500 animate-pulse" : ""
         } ${
-          lastExecutionResult ? "ring-2 ring-green-500" : ""
+          isPolling ? "border-blue-500 animate-pulse" : ""
+        } ${
+          lastExecutionResult && !isExecuting && !isPolling ? "border-green-500" : ""
         } ${colorClass}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -146,10 +155,12 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         <NodeHoverActions
           onEdit={handleEdit}
           onPlay={handlePlay}
+          onPause={handlePause}
           onDelete={handleDelete}
           onShutdown={handleShutdown}
           onMore={handleMore}
           isExecuting={isExecuting}
+          isPolling={isPolling}
         />
       )}
 
@@ -177,15 +188,6 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
           {data.node_type?.name || 'Unknown Node'}
         </h3>
         
-        {/* Execution Status Indicator */}
-        {(isExecuting || isPolling) && (
-          <div className="mt-1 flex items-center justify-center">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="ml-1 text-xs text-blue-600">
-              {isExecuting ? 'Starting...' : 'Executing...'}
-            </span>
-          </div>
-        )}
         
         {lastExecutionResult && !isExecuting && !isPolling && (
           <div className="mt-1 flex items-center justify-center">
