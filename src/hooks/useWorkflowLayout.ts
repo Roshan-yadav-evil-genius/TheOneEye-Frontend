@@ -1,54 +1,40 @@
-import { useState } from "react";
+import { useWorkflowLayout as useWorkflowLayoutStore } from "@/stores/workflow-layout-store";
 
 interface UseWorkflowLayoutProps {
   workflowId?: string;
 }
 
 export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) => {
-  const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    nodeGroup: "all",
-  });
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [lineType, setLineType] = useState("step");
-  const [showMinimap, setShowMinimap] = useState(true);
-
-  // TODO: Load workflow data based on workflowId
-  // const { data: workflow } = useWorkflow(workflowId);
+  const storeHook = useWorkflowLayoutStore(workflowId);
 
   const handleNodeSelect = (nodeId: string) => {
-    setSelectedNodes(prev => 
-      prev.includes(nodeId) 
-        ? prev.filter(id => id !== nodeId)
-        : [...prev, nodeId]
-    );
+    storeHook.toggleNodeSelection(nodeId);
   };
 
   const handleLineTypeChange = (type: string) => {
-    setLineType(type);
+    storeHook.setLineType(type);
   };
 
   const handleMinimapToggle = () => {
-    setShowMinimap(!showMinimap);
+    storeHook.toggleMinimap();
   };
 
   const handleToggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    storeHook.toggleSidebar();
   };
 
   return {
     // State
-    selectedNodes,
-    searchTerm,
-    filters,
-    isSidebarCollapsed,
-    lineType,
-    showMinimap,
+    selectedNodes: storeHook.selectedNodes,
+    searchTerm: storeHook.searchTerm,
+    filters: storeHook.filters,
+    isSidebarCollapsed: storeHook.isSidebarCollapsed,
+    lineType: storeHook.lineType,
+    showMinimap: storeHook.showMinimap,
     
     // Actions
-    setSearchTerm,
-    setFilters,
+    setSearchTerm: storeHook.setSearchTerm,
+    setFilters: storeHook.setFilters,
     handleNodeSelect,
     handleLineTypeChange,
     handleMinimapToggle,

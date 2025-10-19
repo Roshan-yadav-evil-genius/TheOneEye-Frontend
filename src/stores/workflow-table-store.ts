@@ -389,20 +389,20 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
           bValue = (b.category || '').toLowerCase();
           break;
         case 'lastRun':
-          aValue = a.lastRun ? new Date(a.lastRun) : new Date(0);
-          bValue = b.lastRun ? new Date(b.lastRun) : new Date(0);
+          aValue = a.last_run ? new Date(a.last_run) : new Date(0);
+          bValue = b.last_run ? new Date(b.last_run) : new Date(0);
           break;
         case 'nextRun':
-          aValue = a.nextRun ? new Date(a.nextRun) : new Date(0);
-          bValue = b.nextRun ? new Date(b.nextRun) : new Date(0);
+          aValue = a.next_run ? new Date(a.next_run) : new Date(0);
+          bValue = b.next_run ? new Date(b.next_run) : new Date(0);
           break;
         case 'runsCount':
-          aValue = a.runsCount || 0;
-          bValue = b.runsCount || 0;
+          aValue = a.runs_count || 0;
+          bValue = b.runs_count || 0;
           break;
         case 'successRate':
-          aValue = a.successRate || 0;
-          bValue = b.successRate || 0;
+          aValue = a.success_rate || 0;
+          bValue = b.success_rate || 0;
           break;
         default:
           aValue = a.name.toLowerCase();

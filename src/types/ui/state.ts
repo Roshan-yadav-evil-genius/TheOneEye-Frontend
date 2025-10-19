@@ -76,4 +76,5 @@ export interface TUIStoreState {
   };
   mobileMenuOpen: boolean;
   expandedNodeGroups: Set<string>;
+  hasHydrated: boolean;
 }

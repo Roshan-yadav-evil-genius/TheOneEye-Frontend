@@ -7,6 +7,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
+import { useUIStore } from "@/stores/ui-store"
 
 interface SidebarProviderWrapperProps {
   children: React.ReactNode
@@ -14,6 +15,7 @@ interface SidebarProviderWrapperProps {
 
 export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps) {
   const pathname = usePathname()
+  const { sidebarOpen, setSidebarOpen, hasHydrated } = useUIStore()
   
   // Check if we're on a dashboard page (pages that should have sidebar)
   const isWorkflowEditor = pathname.match(/^\/workflow\/[^\/]+$/)
@@ -26,8 +28,25 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
     return <>{children}</>
   }
 
+  // Show loading state during hydration to prevent flash
+  if (!hasHydrated) {
+    return (
+      <div className="flex h-screen">
+        <div className="w-72 bg-sidebar border-r border-border" />
+        <div className="flex-1">
+          <div className="h-12 border-b border-border" />
+          <div className="p-4">
+            {children}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <SidebarProvider
+      open={sidebarOpen}
+      onOpenChange={setSidebarOpen}
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",

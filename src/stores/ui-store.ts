@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { TTUIStoreState, TTBreadcrumb, TTNotification } from './types';
+import { TUIStoreState, TBreadcrumb, TNotification } from './types';
 
 interface UIActions {
   // Sidebar management
@@ -65,6 +65,7 @@ const initialState: TUIStoreState = {
   },
   mobileMenuOpen: false,
   expandedNodeGroups: new Set<string>(),
+  hasHydrated: false,
 };
 
 export const useUIStore = create<UIStore>()(
@@ -72,6 +73,8 @@ export const useUIStore = create<UIStore>()(
     persist(
       (set, get) => ({
         ...initialState,
+        // Ensure expandedNodeGroups is always a Set
+        expandedNodeGroups: new Set(initialState.expandedNodeGroups),
 
         // Sidebar management
         toggleSidebar: () => {
@@ -284,7 +287,7 @@ export const useUIStore = create<UIStore>()(
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
           expandedNodeGroups: Array.from(state.expandedNodeGroups), // Convert Set to Array for persistence
-          // Don't persist activePage, pageTitle, or mobileMenuOpen as they should reset on app start
+          // Don't persist activePage, pageTitle, mobileMenuOpen, or hasHydrated as they should reset on app start
         }),
         // Add version for future migrations
         version: 1,
@@ -299,7 +302,26 @@ export const useUIStore = create<UIStore>()(
               expandedNodeGroups: new Set<string>(),
             };
           }
+          
+          // Convert expandedNodeGroups array back to Set if it exists
+          if (persistedState && typeof persistedState === 'object') {
+            const state = persistedState as any;
+            if (Array.isArray(state.expandedNodeGroups)) {
+              state.expandedNodeGroups = new Set(state.expandedNodeGroups);
+            }
+          }
+          
           return persistedState;
+        },
+        onRehydrateStorage: () => (state) => {
+          // Convert expandedNodeGroups array back to Set after rehydration
+          if (state && Array.isArray(state.expandedNodeGroups)) {
+            state.expandedNodeGroups = new Set(state.expandedNodeGroups);
+          }
+          // Mark as hydrated
+          if (state) {
+            state.hasHydrated = true;
+          }
         },
       }
     ),

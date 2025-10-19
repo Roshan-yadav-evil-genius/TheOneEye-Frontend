@@ -1,30 +1,30 @@
-import { useState } from "react";
+import { useUIStore } from "@/stores/ui-store";
 
 export function useNodeGroupExpansion(availableGroups: string[] = []) {
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const { 
+    expandedNodeGroups, 
+    toggleNodeGroup, 
+    isNodeGroupExpanded, 
+    expandAllNodeGroups, 
+    collapseAllNodeGroups 
+  } = useUIStore();
 
   const toggleGroup = (nodeGroup: string) => {
-    const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(nodeGroup)) {
-      newExpanded.delete(nodeGroup);
-    } else {
-      newExpanded.add(nodeGroup);
-    }
-    setExpandedGroups(newExpanded);
+    toggleNodeGroup(nodeGroup);
   };
 
-  const isExpanded = (nodeGroup: string) => expandedGroups.has(nodeGroup);
+  const isExpanded = (nodeGroup: string) => isNodeGroupExpanded(nodeGroup);
 
   const expandAll = () => {
-    setExpandedGroups(new Set(availableGroups));
+    expandAllNodeGroups(availableGroups);
   };
 
   const collapseAll = () => {
-    setExpandedGroups(new Set());
+    collapseAllNodeGroups();
   };
 
   return {
-    expandedGroups,
+    expandedGroups: expandedNodeGroups,
     toggleGroup,
     isExpanded,
     expandAll,
