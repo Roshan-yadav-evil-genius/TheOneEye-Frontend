@@ -50,8 +50,9 @@ export function NodeEditDialog({
     nodeId: data.id,
     nodeName: data.node_type?.name || 'Unknown Node',
     onSuccess: (result) => {
-      // Update output data with execution result
-      setUpdatedOutputData(result as Record<string, unknown>);
+      // Extract just the result field from the execution response
+      const executionResponse = result as { result?: unknown };
+      setUpdatedOutputData(executionResponse.result as Record<string, unknown> || null);
     }
   });
 
