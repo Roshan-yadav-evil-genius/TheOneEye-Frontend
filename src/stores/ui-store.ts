@@ -7,6 +7,19 @@ interface UIActions {
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   
+  // Mobile menu management
+  toggleMobileMenu: () => void;
+  setMobileMenuOpen: (open: boolean) => void;
+  closeMobileMenu: () => void;
+  
+  // Node group expansion management
+  toggleNodeGroup: (nodeGroup: string) => void;
+  expandNodeGroup: (nodeGroup: string) => void;
+  collapseNodeGroup: (nodeGroup: string) => void;
+  expandAllNodeGroups: (nodeGroups: string[]) => void;
+  collapseAllNodeGroups: () => void;
+  isNodeGroupExpanded: (nodeGroup: string) => boolean;
+  
   // Theme management
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   toggleTheme: () => void;
@@ -50,6 +63,8 @@ const initialState: TUIStoreState = {
     createWorkflow: false,
     editWorkflow: false,
   },
+  mobileMenuOpen: false,
+  expandedNodeGroups: new Set<string>(),
 };
 
 export const useUIStore = create<UIStore>()(
@@ -65,6 +80,60 @@ export const useUIStore = create<UIStore>()(
 
         setSidebarOpen: (open: boolean) => {
           set({ sidebarOpen: open });
+        },
+
+        // Mobile menu management
+        toggleMobileMenu: () => {
+          set((state) => ({ mobileMenuOpen: !state.mobileMenuOpen }));
+        },
+
+        setMobileMenuOpen: (open: boolean) => {
+          set({ mobileMenuOpen: open });
+        },
+
+        closeMobileMenu: () => {
+          set({ mobileMenuOpen: false });
+        },
+
+        // Node group expansion management
+        toggleNodeGroup: (nodeGroup: string) => {
+          set((state) => {
+            const newExpanded = new Set(state.expandedNodeGroups);
+            if (newExpanded.has(nodeGroup)) {
+              newExpanded.delete(nodeGroup);
+            } else {
+              newExpanded.add(nodeGroup);
+            }
+            return { expandedNodeGroups: newExpanded };
+          });
+        },
+
+        expandNodeGroup: (nodeGroup: string) => {
+          set((state) => {
+            const newExpanded = new Set(state.expandedNodeGroups);
+            newExpanded.add(nodeGroup);
+            return { expandedNodeGroups: newExpanded };
+          });
+        },
+
+        collapseNodeGroup: (nodeGroup: string) => {
+          set((state) => {
+            const newExpanded = new Set(state.expandedNodeGroups);
+            newExpanded.delete(nodeGroup);
+            return { expandedNodeGroups: newExpanded };
+          });
+        },
+
+        expandAllNodeGroups: (nodeGroups: string[]) => {
+          set({ expandedNodeGroups: new Set(nodeGroups) });
+        },
+
+        collapseAllNodeGroups: () => {
+          set({ expandedNodeGroups: new Set<string>() });
+        },
+
+        isNodeGroupExpanded: (nodeGroup: string) => {
+          return get().expandedNodeGroups.has(nodeGroup);
         },
 
         // Theme management
@@ -204,6 +273,7 @@ export const useUIStore = create<UIStore>()(
             // Keep theme and sidebar state as they are user preferences
             theme: get().theme,
             sidebarOpen: get().sidebarOpen,
+            mobileMenuOpen: false, // Always close mobile menu on reset
           });
         },
       }),
@@ -213,7 +283,8 @@ export const useUIStore = create<UIStore>()(
           // Only persist user preferences, not temporary UI state
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
-          // Don't persist activePage and pageTitle as they should reset on app start
+          expandedNodeGroups: Array.from(state.expandedNodeGroups), // Convert Set to Array for persistence
+          // Don't persist activePage, pageTitle, or mobileMenuOpen as they should reset on app start
         }),
         // Add version for future migrations
         version: 1,
@@ -224,6 +295,8 @@ export const useUIStore = create<UIStore>()(
             return {
               ...(persistedState as TUIStoreState),
               pageTitle: 'Documents', // Add default value for new field
+              mobileMenuOpen: false,
+              expandedNodeGroups: new Set<string>(),
             };
           }
           return persistedState;
@@ -240,6 +313,13 @@ export const useUIStore = create<UIStore>()(
 export const uiSelectors = {
   // Sidebar selectors
   getSidebarState: () => useUIStore.getState().sidebarOpen,
+  
+  // Mobile menu selectors
+  getMobileMenuState: () => useUIStore.getState().mobileMenuOpen,
+  
+  // Node group expansion selectors
+  getExpandedNodeGroups: () => useUIStore.getState().expandedNodeGroups,
+  isNodeGroupExpanded: (nodeGroup: string) => useUIStore.getState().expandedNodeGroups.has(nodeGroup),
   
   // Theme selectors
   getTheme: () => useUIStore.getState().theme,
@@ -331,6 +411,28 @@ export const uiHelpers = {
 
   openEditWorkflowModal: () => {
     useUIStore.getState().openModal('editWorkflow');
+  },
+
+  // Mobile menu helpers
+  toggleMobileMenu: () => {
+    useUIStore.getState().toggleMobileMenu();
+  },
+
+  closeMobileMenu: () => {
+    useUIStore.getState().closeMobileMenu();
+  },
+
+  // Node group expansion helpers
+  toggleNodeGroup: (nodeGroup: string) => {
+    useUIStore.getState().toggleNodeGroup(nodeGroup);
+  },
+
+  expandAllNodeGroups: (nodeGroups: string[]) => {
+    useUIStore.getState().expandAllNodeGroups(nodeGroups);
+  },
+
+  collapseAllNodeGroups: () => {
+    useUIStore.getState().collapseAllNodeGroups();
   },
 
 };
