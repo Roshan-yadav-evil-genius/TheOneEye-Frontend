@@ -16,6 +16,7 @@ export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
 export { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
+export { useNodeExecutionStore } from './node-execution-store';
 
 // Export all types
 export type {

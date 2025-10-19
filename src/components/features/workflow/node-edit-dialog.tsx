@@ -1,22 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { 
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { InputSection } from "./input-section";
 import { OutputSection } from "./output-section";
 import { NodeEditor } from "./node-editor";
-import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { BackendWorkflowNode } from "@/types";
 import { useNodeData } from "@/hooks/useNodeData";
 import { useNodeExecution } from "@/hooks/useNodeExecution";
+import { useNodeExecutionStore } from "@/stores/node-execution-store";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -41,30 +40,21 @@ export function NodeEditDialog({
   // Fetch node data
   const { inputData, outputData, isLoading, error, refetch } = useNodeData(workflowId, data.id, isOpen);
 
-  // Local state for updated output data
-  const [updatedOutputData, setUpdatedOutputData] = useState<Record<string, unknown> | null>(null);
+  // Get execution state from store
+  const executionState = useNodeExecutionStore((state) => state.getExecutionState(data.id));
 
-  // Node execution hook
+  // Node execution hook (no need for onSuccess callback anymore)
   const nodeExecution = useNodeExecution({
     workflowId,
     nodeId: data.id,
     nodeName: data.node_type?.name || 'Unknown Node',
-    onSuccess: (result) => {
-      // Extract just the result field from the execution response
-      const executionResponse = result as { result?: unknown };
-      setUpdatedOutputData(executionResponse.result as Record<string, unknown> || null);
-    }
   });
 
-  // Use updated output if available, otherwise use fetched output
-  const displayOutputData = updatedOutputData || outputData;
+  // Use execution result from store if available, otherwise use fetched output
+  const displayOutputData = executionState.lastExecutionResult 
+    ? (executionState.lastExecutionResult as Record<string, unknown>)
+    : outputData;
 
-  // Clear updated output when dialog closes
-  useEffect(() => {
-    if (!isOpen) {
-      setUpdatedOutputData(null);
-    }
-  }, [isOpen]);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
