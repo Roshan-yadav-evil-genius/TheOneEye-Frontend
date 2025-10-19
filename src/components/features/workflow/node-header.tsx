@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Play, FileText } from "lucide-react";
+import { Play, Pause, FileText } from "lucide-react";
 import { getNodeColors } from "@/constants/node-styles";
 
 interface NodeHeaderProps {
@@ -9,7 +9,10 @@ interface NodeHeaderProps {
   nodeLabel: string;
   nodeId: string;
   onTestStep?: () => void;
+  onPauseStep?: () => void;
   onViewDocs?: () => void;
+  isExecuting?: boolean;
+  isPolling?: boolean;
 }
 
 export function NodeHeader({ 
@@ -17,7 +20,10 @@ export function NodeHeader({
   nodeLabel, 
   nodeId,
   onTestStep, 
-  onViewDocs 
+  onPauseStep,
+  onViewDocs,
+  isExecuting = false,
+  isPolling = false
 }: NodeHeaderProps) {
   const { colorClass, iconColorClass } = getNodeColors(nodeType);
 
@@ -39,9 +45,16 @@ export function NodeHeader({
           variant="ghost"
           size="sm"
           className="h-6 w-6 p-3 text-xs"
-          onClick={onTestStep}
+          onClick={isPolling ? onPauseStep : onTestStep}
+          disabled={isExecuting && !isPolling}
         >
-          <Play className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
+          {isExecuting && !isPolling ? (
+            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+          ) : isPolling ? (
+            <Pause className="h-3.5 w-3.5 text-orange-500 hover:text-orange-600" />
+          ) : (
+            <Play className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
+          )}
         </Button>
         <Button 
           variant="ghost"

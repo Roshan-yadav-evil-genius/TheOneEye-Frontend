@@ -16,6 +16,7 @@ import { sampleInputData } from "@/data";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { BackendWorkflowNode } from "@/types";
 import { useNodeData } from "@/hooks/useNodeData";
+import { useNodeExecution } from "@/hooks/useNodeExecution";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -39,6 +40,30 @@ export function NodeEditDialog({
   
   // Fetch node data
   const { inputData, outputData, isLoading, error, refetch } = useNodeData(workflowId, data.id, isOpen);
+
+  // Local state for updated output data
+  const [updatedOutputData, setUpdatedOutputData] = useState<Record<string, unknown> | null>(null);
+
+  // Node execution hook
+  const nodeExecution = useNodeExecution({
+    workflowId,
+    nodeId: data.id,
+    nodeName: data.node_type?.name || 'Unknown Node',
+    onSuccess: (result) => {
+      // Update output data with execution result
+      setUpdatedOutputData(result as Record<string, unknown>);
+    }
+  });
+
+  // Use updated output if available, otherwise use fetched output
+  const displayOutputData = updatedOutputData || outputData;
+
+  // Clear updated output when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setUpdatedOutputData(null);
+    }
+  }, [isOpen]);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
@@ -48,7 +73,7 @@ export function NodeEditDialog({
         <DndContext>
           <div className="flex flex-col h-full overflow-hidden">
             {/* Header with refresh button */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+            <div className="flex items-center justify-between px-5 pr-10 py-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
               <h2 className="text-sm font-semibold text-gray-300">
                 {data.node_type?.name}
               </h2>
@@ -84,6 +109,10 @@ export function NodeEditDialog({
                 activeTab={activeNodeTab}
                 data={data}
                 onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
+                onTestStep={nodeExecution.executeNode}
+                onPauseStep={nodeExecution.stopExecution}
+                isExecuting={nodeExecution.isExecuting}
+                isPolling={nodeExecution.isPolling}
               />
             </div>
 
@@ -91,8 +120,8 @@ export function NodeEditDialog({
             <OutputSection 
               activeOutputTab={activeOutputTab}
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
-              jsonData={outputData}
-              isLoading={isLoading}
+              jsonData={displayOutputData}
+              isLoading={isLoading || nodeExecution.isExecuting || nodeExecution.isPolling}
               error={error}
             />
           </ResizablePanels>

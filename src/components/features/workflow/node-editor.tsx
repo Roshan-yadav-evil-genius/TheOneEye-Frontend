@@ -10,7 +10,10 @@ interface NodeEditorProps {
   activeTab: "parameters" | "form";
   onTabChange: (tab: "parameters" | "form") => void;
   onTestStep?: () => void;
+  onPauseStep?: () => void;
   onViewDocs?: () => void;
+  isExecuting?: boolean;
+  isPolling?: boolean;
 }
 
 export function NodeEditor({
@@ -18,7 +21,10 @@ export function NodeEditor({
   activeTab,
   onTabChange,
   onTestStep,
-  onViewDocs
+  onPauseStep,
+  onViewDocs,
+  isExecuting = false,
+  isPolling = false
 }: NodeEditorProps) {
   return (
     <div className="border-r border-gray-700 flex flex-col bg-gray-900 overflow-hidden h-full">
@@ -27,7 +33,10 @@ export function NodeEditor({
         nodeLabel={data.node_type?.name || "Unknown Node"}
         nodeId={data.id}
         onTestStep={onTestStep}
+        onPauseStep={onPauseStep}
         onViewDocs={onViewDocs}
+        isExecuting={isExecuting}
+        isPolling={isPolling}
       />
 
       <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "parameters" | "form")} className="flex-1 flex flex-col overflow-hidden min-h-0">

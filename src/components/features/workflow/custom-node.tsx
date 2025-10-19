@@ -7,9 +7,7 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode } from "@/types";
-import { ApiService } from "@/lib/api/api-service";
-import { useTaskStatus } from "@/hooks/useTaskStatus";
-import { toast } from "sonner";
+import { useNodeExecution } from "@/hooks/useNodeExecution";
 import { IconGripVertical } from "@tabler/icons-react";
 
 interface CustomNodeProps {
@@ -23,63 +21,18 @@ interface CustomNodeProps {
 export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [lastExecutionResult, setLastExecutionResult] = useState<any>(null);
   
   const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
-  const { startPolling, stopPolling, isPolling, status } = useTaskStatus({
-    onSuccess: (result) => {
-      setLastExecutionResult(result);
-      const nodeName = data.node_type?.name || 'Unknown Node';
-      toast.success(`${nodeName} executed successfully!`, {
-        description: `Result: ${JSON.stringify(result, null, 2).substring(0, 100)}...`,
-        duration: 5000,
-      });
-    },
-    onError: (error) => {
-      const nodeName = data.node_type?.name || 'Unknown Node';
-      toast.error(`${nodeName} execution failed`, {
-        description: error,
-        duration: 5000,
-      });
-    },
-    onComplete: () => {
-      setIsExecuting(false);
-    }
+  const nodeExecution = useNodeExecution({
+    workflowId: workflowId || '',
+    nodeId: id,
+    nodeName: data.node_type?.name || 'Unknown Node'
   });
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    if (!workflowId) {
-      toast.error("Workflow ID not available");
-      return;
-    }
-    
-    if (isExecuting || isPolling) {
-      return; // Prevent multiple executions
-    }
-    
-    try {
-      setIsExecuting(true);
-      const nodeName = data.node_type?.name || 'Unknown Node';
-      
-      toast.info(`Starting execution of ${nodeName}...`);
-      
-      const result = await ApiService.executeSingleNode(workflowId, id);
-      
-      if (result.task_id) {
-        toast.info(`Execution started for ${nodeName}. Polling for results...`);
-        startPolling(result.task_id);
-      } else {
-        throw new Error('No task ID returned from server');
-      }
-      
-    } catch (error) {
-      setIsExecuting(false);
-      toast.error(`Failed to execute ${data.node_type?.name || 'node'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    await nodeExecution.executeNode();
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -99,9 +52,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
 
   const handlePause = (e: React.MouseEvent) => {
     e.stopPropagation();
-    stopPolling();
-    setIsExecuting(false);
-    toast.info("Stopped polling for task results");
+    nodeExecution.stopExecution();
   };
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -117,11 +68,11 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
           selected ? "ring-2 ring-primary ring-offset-2" : ""
         } ${
-          isExecuting && !isPolling ? "border-orange-500 animate-pulse" : ""
+          nodeExecution.isExecuting && !nodeExecution.isPolling ? "border-orange-500 animate-pulse" : ""
         } ${
-          isPolling ? "border-blue-500 animate-pulse" : ""
+          nodeExecution.isPolling ? "border-blue-500 animate-pulse" : ""
         } ${
-          lastExecutionResult && !isExecuting && !isPolling ? "border-green-500" : ""
+          nodeExecution.lastExecutionResult && !nodeExecution.isExecuting && !nodeExecution.isPolling ? "border-green-500" : ""
         } ${colorClass}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -159,8 +110,8 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
           onDelete={handleDelete}
           onShutdown={handleShutdown}
           onMore={handleMore}
-          isExecuting={isExecuting}
-          isPolling={isPolling}
+          isExecuting={nodeExecution.isExecuting}
+          isPolling={nodeExecution.isPolling}
         />
       )}
 
@@ -174,7 +125,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
               logo: data.node_type?.logo,
               nodeGroupIcon: data.node_type?.node_group?.icon,
               nodeGroupName: data.node_type?.node_group?.name,
-            } as any}
+            }}
             size="lg"
           />
         </div>
@@ -189,7 +140,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         </h3>
         
         
-        {lastExecutionResult && !isExecuting && !isPolling && (
+        {nodeExecution.lastExecutionResult && !nodeExecution.isExecuting && !nodeExecution.isPolling && (
           <div className="mt-1 flex items-center justify-center">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="ml-1 text-xs text-green-600">Completed</span>
