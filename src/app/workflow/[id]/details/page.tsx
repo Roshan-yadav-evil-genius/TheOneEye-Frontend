@@ -47,22 +47,40 @@ import {
   IconCpu,
   IconDeviceDesktop,
   IconNetwork,
-  IconServer
+  IconServer,
+  IconRefresh
 } from "@tabler/icons-react";
+import { useWorkflowStats } from "@/hooks/use-workflow-stats";
+import { TimeRange } from "@/types/stats";
 
 export default function WorkflowDetailsPage() {
   const params = useParams();
   const workflowId = params.id as string;
-  const [timeRange, setTimeRange] = useState("24h");
+  const [timeRange, setTimeRange] = useState<TimeRange>("24h");
 
-  // Current live values (in a real app this would come from real-time monitoring)
-  const currentValues = {
-    cpu: 45,
-    memory: 78,
-    networkIn: 420,
-    networkOut: 280,
-    diskRead: 18,
-    diskWrite: 12
+  // Use the real stats hook
+  const {
+    chartData,
+    currentStats,
+    isLoading,
+    error,
+    refetch,
+    setTimeRange: setStatsTimeRange,
+  } = useWorkflowStats({
+    workflowId,
+    timeRange,
+  });
+
+  // Handle time range change
+  const handleTimeRangeChange = (value: string) => {
+    const newRange = value as TimeRange;
+    setTimeRange(newRange);
+    setStatsTimeRange(newRange);
+  };
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    refetch();
   };
 
   // Mock data - in a real app this would come from an API
@@ -100,33 +118,8 @@ export default function WorkflowDetailsPage() {
     ]
   };
 
-  // Docker resource utilization data
-  const dockerResourceData = [
-    { time: "00:00", cpu: 15, memory: 45, networkIn: 120, networkOut: 80, diskRead: 5, diskWrite: 3 },
-    { time: "01:00", cpu: 12, memory: 42, networkIn: 95, networkOut: 65, diskRead: 4, diskWrite: 2 },
-    { time: "02:00", cpu: 8, memory: 38, networkIn: 70, networkOut: 45, diskRead: 3, diskWrite: 1 },
-    { time: "03:00", cpu: 6, memory: 35, networkIn: 50, networkOut: 30, diskRead: 2, diskWrite: 1 },
-    { time: "04:00", cpu: 10, memory: 40, networkIn: 85, networkOut: 55, diskRead: 4, diskWrite: 2 },
-    { time: "05:00", cpu: 18, memory: 48, networkIn: 150, networkOut: 100, diskRead: 6, diskWrite: 4 },
-    { time: "06:00", cpu: 25, memory: 55, networkIn: 200, networkOut: 130, diskRead: 8, diskWrite: 5 },
-    { time: "07:00", cpu: 35, memory: 65, networkIn: 280, networkOut: 180, diskRead: 12, diskWrite: 8 },
-    { time: "08:00", cpu: 45, memory: 75, networkIn: 350, networkOut: 220, diskRead: 15, diskWrite: 10 },
-    { time: "09:00", cpu: 55, memory: 85, networkIn: 420, networkOut: 280, diskRead: 18, diskWrite: 12 },
-    { time: "10:00", cpu: 60, memory: 90, networkIn: 480, networkOut: 320, diskRead: 20, diskWrite: 15 },
-    { time: "11:00", cpu: 58, memory: 88, networkIn: 460, networkOut: 300, diskRead: 19, diskWrite: 14 },
-    { time: "12:00", cpu: 52, memory: 82, networkIn: 400, networkOut: 260, diskRead: 16, diskWrite: 11 },
-    { time: "13:00", cpu: 48, memory: 78, networkIn: 380, networkOut: 240, diskRead: 14, diskWrite: 9 },
-    { time: "14:00", cpu: 50, memory: 80, networkIn: 390, networkOut: 250, diskRead: 15, diskWrite: 10 },
-    { time: "15:00", cpu: 55, memory: 85, networkIn: 430, networkOut: 290, diskRead: 17, diskWrite: 12 },
-    { time: "16:00", cpu: 62, memory: 92, networkIn: 500, networkOut: 340, diskRead: 21, diskWrite: 16 },
-    { time: "17:00", cpu: 65, memory: 95, networkIn: 520, networkOut: 360, diskRead: 22, diskWrite: 18 },
-    { time: "18:00", cpu: 58, memory: 88, networkIn: 470, networkOut: 310, diskRead: 19, diskWrite: 14 },
-    { time: "19:00", cpu: 45, memory: 75, networkIn: 360, networkOut: 230, diskRead: 14, diskWrite: 9 },
-    { time: "20:00", cpu: 35, memory: 65, networkIn: 280, networkOut: 180, diskRead: 11, diskWrite: 7 },
-    { time: "21:00", cpu: 25, memory: 55, networkIn: 200, networkOut: 130, diskRead: 8, diskWrite: 5 },
-    { time: "22:00", cpu: 18, memory: 48, networkIn: 150, networkOut: 100, diskRead: 6, diskWrite: 4 },
-    { time: "23:00", cpu: 12, memory: 42, networkIn: 100, networkOut: 70, diskRead: 4, diskWrite: 3 },
-  ];
+  // Use real chart data from the API
+  const dockerResourceData = chartData;
 
   // Chart configurations with high contrast colors
   const cpuChartConfig = {
@@ -238,21 +231,70 @@ export default function WorkflowDetailsPage() {
       {/* Time Range Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Resource Utilization</h2>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select time range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1h">Last Hour</SelectItem>
-            <SelectItem value="24h">Last 24 Hours</SelectItem>
-            <SelectItem value="7d">Last 7 Days</SelectItem>
-            <SelectItem value="30d">Last 30 Days</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            <IconRefresh className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Select value={timeRange} onValueChange={handleTimeRangeChange}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Select time range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1h">Last Hour</SelectItem>
+              <SelectItem value="24h">Last 24 Hours</SelectItem>
+              <SelectItem value="7d">Last 7 Days</SelectItem>
+              <SelectItem value="30d">Last 30 Days</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <IconActivity className="h-5 w-5" />
+              <span>Error loading resource statistics: {error}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Loading State */}
+      {isLoading && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <IconRefresh className="h-5 w-5 animate-spin" />
+              <span>Loading resource statistics...</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Data State */}
+      {!isLoading && !error && dockerResourceData.length === 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <IconActivity className="h-5 w-5" />
+              <span>No resource statistics available for the selected time range.</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Docker Resource Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {!isLoading && !error && dockerResourceData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CPU Usage Chart */}
         <Card>
           <CardHeader>
@@ -265,7 +307,9 @@ export default function WorkflowDetailsPage() {
                 <CardDescription>CPU utilization over time</CardDescription>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-blue-500">{currentValues.cpu}%</div>
+                <div className="text-2xl font-bold text-blue-500">
+                  {currentStats ? `${currentStats.cpu}%` : 'N/A'}
+                </div>
                 <div className="text-xs text-muted-foreground">Current</div>
               </div>
             </div>
@@ -316,7 +360,9 @@ export default function WorkflowDetailsPage() {
                 <CardDescription>Memory consumption over time</CardDescription>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-500">{currentValues.memory}%</div>
+                <div className="text-2xl font-bold text-green-500">
+                  {currentStats ? `${currentStats.memory}%` : 'N/A'}
+                </div>
                 <div className="text-xs text-muted-foreground">Current</div>
               </div>
             </div>
@@ -380,8 +426,12 @@ export default function WorkflowDetailsPage() {
                 <CardDescription>Network traffic in/out over time</CardDescription>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-orange-500">{currentValues.networkIn} KB/s</div>
-                <div className="text-sm font-bold text-red-500">{currentValues.networkOut} KB/s</div>
+                <div className="text-lg font-bold text-orange-500">
+                  {currentStats ? `${currentStats.networkIn} KB/s` : 'N/A'}
+                </div>
+                <div className="text-sm font-bold text-red-500">
+                  {currentStats ? `${currentStats.networkOut} KB/s` : 'N/A'}
+                </div>
                 <div className="text-xs text-muted-foreground">In / Out</div>
               </div>
             </div>
@@ -439,8 +489,12 @@ export default function WorkflowDetailsPage() {
                 <CardDescription>Disk read/write operations over time</CardDescription>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-purple-500">{currentValues.diskRead} MB/s</div>
-                <div className="text-sm font-bold text-cyan-500">{currentValues.diskWrite} MB/s</div>
+                <div className="text-lg font-bold text-purple-500">
+                  {currentStats ? `${currentStats.diskRead} MB/s` : 'N/A'}
+                </div>
+                <div className="text-sm font-bold text-cyan-500">
+                  {currentStats ? `${currentStats.diskWrite} MB/s` : 'N/A'}
+                </div>
                 <div className="text-xs text-muted-foreground">Read / Write</div>
               </div>
             </div>
@@ -485,7 +539,8 @@ export default function WorkflowDetailsPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Recent Runs */}
       <Card>
