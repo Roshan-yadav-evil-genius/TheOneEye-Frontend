@@ -6,7 +6,7 @@ import { TWidgetConfig } from "@/types/forms/widgets";
 
 interface WidgetLoaderProps {
   node_type: BackendNodeType;
-  children: (widgets: TWidgetConfig[]) => React.ReactNode;
+  children: (widgets: Record<string, any>[]) => React.ReactNode;
 }
 
 export function WidgetLoader({node_type, children }: WidgetLoaderProps) {

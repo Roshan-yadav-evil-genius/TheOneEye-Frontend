@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { TWidgetConfig } from "@/components/features/form-builder/inputs";
 import { DroppableFormInput } from "@/components/features/workflow/droppable-form-input";
+import { TemplateInputField } from "@/components/features/workflow/TemplateInputField";
+import { isExpression } from "@/components/features/workflow/expression-utils";
 
 interface FieldPreviewProps {
   widget: TWidgetConfig;
@@ -63,11 +65,22 @@ export function FieldPreview({ widget, value, onChange, error }: FieldPreviewPro
     }
     return baseClasses;
   };
+  // Check if the current value contains template syntax
+  const hasTemplateSyntax = isExpression(currentValue);
+
   switch (widget.type) {
     case 'text':
     case 'email':
     case 'password':
-      return (
+      return hasTemplateSyntax ? (
+        <TemplateInputField
+          value={currentValue}
+          onChange={handleValueChange}
+          placeholder={widget.placeholder || `Enter ${widget.type} or template...`}
+          id={`form-field-${widget.id}`}
+          error={error}
+        />
+      ) : (
         <DroppableFormInput
           type={widget.type}
           value={currentValue}
@@ -89,7 +102,16 @@ export function FieldPreview({ widget, value, onChange, error }: FieldPreviewPro
         />
       );
     case 'textarea':
-      return (
+      return hasTemplateSyntax ? (
+        <TemplateInputField
+          value={currentValue}
+          onChange={handleValueChange}
+          placeholder={widget.placeholder || "Enter text or template..."}
+          rows={3}
+          id={`form-field-${widget.id}`}
+          error={error}
+        />
+      ) : (
         <DroppableFormInput
           type="textarea"
           value={currentValue}

@@ -24,9 +24,9 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
     setFormValues(initialFormValues);
   }, [initialFormValues]);
 
-  const validateForm = useCallback((widgets: any[]) => {
+  const validateForm = useCallback((widgets: unknown[]) => {
     const errors: Record<string, string> = {};
-    widgets.forEach(widget => {
+    widgets.forEach((widget: Record<string, any>) => {
       const fieldName = widget.name || widget.id;
       const value = formValues[fieldName];
       if (widget.required && (!value || value === '')) {
@@ -53,7 +53,7 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
     });
   }, []);
 
-  const handleSave = useCallback(async (widgets: any[]) => {
+  const handleSave = useCallback(async (widgets: unknown[]) => {
     // Validate form before saving
     const errors = validateForm(widgets);
     setValidationErrors(errors);
@@ -76,7 +76,7 @@ export function FormFieldsSection({ node_type, nodeId, initialFormValues = {} }:
   return (
     <div className="space-y-4">
       <WidgetLoader node_type={node_type}>
-        {(widgets) => (
+        {(widgets: Record<string, any>[]) => (
           <>
             <WidgetMapper 
               widgets={widgets} 

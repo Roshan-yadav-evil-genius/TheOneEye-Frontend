@@ -3,7 +3,8 @@
 import React, { useRef, useState } from 'react';
 import { useDroppable, useDndMonitor } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
-import { convertPathToExpression } from './expression-utils';
+import { convertPathToExpression, isExpression } from './expression-utils';
+import { JinjaSyntaxHighlighter } from './JinjaSyntaxHighlighter';
 
 interface DroppableFormInputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'textarea';
@@ -100,6 +101,7 @@ export function DroppableFormInput({
   );
 
   const isTextarea = type === 'textarea';
+  const hasTemplateSyntax = isExpression(value);
 
   return (
     <div
@@ -109,7 +111,20 @@ export function DroppableFormInput({
         isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
       )}
     >
-      {isTextarea ? (
+      {isTextarea && hasTemplateSyntax ? (
+        <JinjaSyntaxHighlighter
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          rows={rows}
+          id={id}
+          error={error}
+          className={cn(
+            isOverInput && "ring-2 ring-pink-500 ring-opacity-50",
+            className
+          )}
+        />
+      ) : isTextarea ? (
         <textarea
           ref={inputRef as React.RefObject<HTMLTextAreaElement>}
           value={value}
@@ -145,7 +160,7 @@ export function DroppableFormInput({
         </div>
       )}
       
-      {error && (
+      {error && !hasTemplateSyntax && (
         <p className="text-red-500 text-xs mt-1">{error}</p>
       )}
     </div>

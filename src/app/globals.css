@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/prism-jinja2-theme.css";
 
 @custom-variant dark (&:is(.dark *));
 

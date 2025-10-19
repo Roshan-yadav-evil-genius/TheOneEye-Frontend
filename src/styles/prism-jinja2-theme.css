@@ -1,0 +1,198 @@
+/* Prism.js Jinja2 Theme for Dark Mode */
+
+/* Base styles */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6C7B7F;
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: #FF6B6B;
+}
+
+/* Jinja2 specific delimiters */
+.token.delimiter {
+  color: #FF6B6B;
+  font-weight: bold;
+}
+
+/* Jinja2 expressions {{ }} */
+.token.template-string .token.delimiter {
+  color: #FF6B6B;
+  font-weight: bold;
+}
+
+/* Jinja2 blocks {% %} */
+.token.block .token.delimiter {
+  color: #4ECDC4;
+  font-weight: bold;
+}
+
+/* Jinja2 comments {# #} */
+.token.comment .token.delimiter {
+  color: #6C7B7F;
+  font-weight: bold;
+}
+
+/* Keywords */
+.token.keyword,
+.token.boolean,
+.token.constant,
+.token.deleted {
+  color: #4ECDC4;
+  font-weight: bold;
+}
+
+/* Jinja2 specific keywords */
+.token.control-flow {
+  color: #4ECDC4;
+  font-weight: bold;
+}
+
+/* Operators */
+.token.operator,
+.token.entity,
+.token.url,
+.token.important,
+.token.atrule,
+.token.attr-name,
+.token.selector {
+  color: #FFE66D;
+}
+
+/* Filters */
+.token.filter {
+  color: #95E1D3;
+  font-weight: bold;
+}
+
+/* Variables and identifiers */
+.token.variable,
+.token.attr-value,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #95E1D3;
+}
+
+/* Numbers */
+.token.number,
+.token.function {
+  color: #FFA8A8;
+}
+
+/* Function names */
+.token.function-name {
+  color: #FFA8A8;
+  font-weight: bold;
+}
+
+/* Property names */
+.token.property {
+  color: #FFFFFF;
+}
+
+/* Class names */
+.token.class-name {
+  color: #FFA8A8;
+  font-weight: bold;
+}
+
+/* Regular expressions */
+.token.regex {
+  color: #95E1D3;
+}
+
+/* Markup */
+.token.tag {
+  color: #4ECDC4;
+  font-weight: bold;
+}
+
+.token.attr-name {
+  color: #FFE66D;
+}
+
+.token.attr-value {
+  color: #95E1D3;
+}
+
+/* Jinja2 specific styling */
+.token.jinja2-expression {
+  color: #FF6B6B;
+}
+
+.token.jinja2-block {
+  color: #4ECDC4;
+}
+
+.token.jinja2-comment {
+  color: #6C7B7F;
+  font-style: italic;
+}
+
+/* Error highlighting */
+.token.error {
+  color: #FF6B6B;
+  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+/* Selection */
+.token::selection,
+.token *::selection {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Focus styles */
+.token:focus {
+  outline: 1px solid #4ECDC4;
+  outline-offset: 1px;
+}
+
+/* Line numbers */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid #2D3748;
+}
+
+.line-numbers-rows > span:before {
+  color: #6C7B7F;
+}
+
+/* Code block background */
+pre[class*="language-"] {
+  background-color: #1a1a1a;
+  border: 1px solid #2D3748;
+  border-radius: 8px;
+}
+
+/* Inline code */
+code[class*="language-"] {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* Scrollbar styling for code blocks */
+pre[class*="language-"]::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+  background: #2D3748;
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+  background: #4A5568;
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
