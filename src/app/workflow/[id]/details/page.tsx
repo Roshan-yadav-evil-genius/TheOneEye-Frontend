@@ -188,39 +188,6 @@ export default function WorkflowDetailsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.history.back()}
-            className="flex items-center gap-2"
-          >
-            <IconArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{workflowData.name}</h1>
-            <p className="text-muted-foreground">{workflowData.description}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className={getStatusColor(workflowData.status)}>
-            {workflowData.status}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <IconSettings className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button size="sm">
-            <IconPlayerPlay className="h-4 w-4 mr-2" />
-            Run Now
-          </Button>
-        </div>
-      </div>
-
-      <Separator />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -261,19 +228,6 @@ export default function WorkflowDetailsPage() {
             <div className="text-2xl font-bold">{workflowData.avgExecutionTime}</div>
             <p className="text-xs text-muted-foreground">
               Total: {workflowData.totalExecutionTime}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Created By</CardTitle>
-            <IconUsers className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{workflowData.created_by}</div>
-            <p className="text-xs text-muted-foreground">
-              {workflowData.created_at}
             </p>
           </CardContent>
         </Card>
