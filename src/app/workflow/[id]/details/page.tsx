@@ -340,7 +340,7 @@ export default function WorkflowDetailsPage() {
                   type="monotone"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  dot={false}
                   activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#ffffff' }}
                 />
               </LineChart>
@@ -461,7 +461,7 @@ export default function WorkflowDetailsPage() {
                   type="monotone"
                   stroke="#f59e0b"
                   strokeWidth={3}
-                  dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                  dot={false}
                   activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#ffffff' }}
                 />
                 <Line
@@ -469,7 +469,7 @@ export default function WorkflowDetailsPage() {
                   type="monotone"
                   stroke="#ef4444"
                   strokeWidth={3}
-                  dot={{ fill: '#ef4444', strokeWidth: 2, r: 3 }}
+                  dot={false}
                   activeDot={{ r: 5, stroke: '#ef4444', strokeWidth: 2, fill: '#ffffff' }}
                 />
               </LineChart>
@@ -524,7 +524,7 @@ export default function WorkflowDetailsPage() {
                   type="monotone"
                   stroke="#8b5cf6"
                   strokeWidth={3}
-                  dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
+                  dot={false}
                   activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#ffffff' }}
                 />
                 <Line
@@ -532,7 +532,7 @@ export default function WorkflowDetailsPage() {
                   type="monotone"
                   stroke="#06b6d4"
                   strokeWidth={3}
-                  dot={{ fill: '#06b6d4', strokeWidth: 2, r: 3 }}
+                  dot={false}
                   activeDot={{ r: 5, stroke: '#06b6d4', strokeWidth: 2, fill: '#ffffff' }}
                 />
               </LineChart>
