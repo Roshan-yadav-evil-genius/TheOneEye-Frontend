@@ -1,23 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import NavBar from "@/components/global/NavBar";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
-import { FaUsersGear } from 'react-icons/fa6';
-import { GiRobotGrab } from 'react-icons/gi';
-import { MdOutlineSecurity } from 'react-icons/md';
-import { TbDeviceHeartMonitorFilled } from 'react-icons/tb';
-import { SiGoogledocs } from 'react-icons/si';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { HiOutlineUserGroup, HiOutlineCog, HiOutlineSpeakerphone, HiOutlineSupport } from "react-icons/hi";
-
 import ScrollFadeInSection from '@/components/common/ScrollFadeInSection';
 import { CheckCircleIcon, CheckIcon } from 'lucide-react';
 import DemoModal from '@/components/common/DemoModal';
@@ -426,7 +410,7 @@ export default function Home() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <main className="flex flex-col gap-10 p-5">
+    <main className="flex flex-col gap-10">
       <NavBar />
       <main>
         <HeroSection onBookDemo={handleOpenModal} />
