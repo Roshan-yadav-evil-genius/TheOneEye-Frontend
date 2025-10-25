@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Package, DollarSign, Users, BookOpen, LayoutDashboard } from 'lucide-react';
+import { Package, DollarSign, Users, BookOpen, LayoutDashboard, Mail } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
 
 interface NavItem {
   label: string;
@@ -9,18 +11,19 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
-  { label: 'Products', link: '#', icon: Package },
-  { label: 'Pricing', link: '#', icon: DollarSign },
-  { label: 'Clients', link: '#', icon: Users },
-  { label: 'Resources', link: '#', icon: BookOpen }
+  // { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
+  // { label: 'Products', link: '#', icon: Package },
+  // { label: 'Pricing', link: '#', icon: DollarSign },
+  // { label: 'Clients', link: '#', icon: Users },
+  // { label: 'Resources', link: '#', icon: BookOpen }
 ];
 
 export const DesktopNav = () => {
   const pathname = usePathname();
-  
+  const router = useRouter();
   return (
-    <nav className='absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%] hidden md:block'>
+    // <nav className='hidden md:block'>
+    <nav className=''>
       <div className='flex gap-4'>
         {navItems.map(item => {
           const isActive = pathname === item.link || 
@@ -30,10 +33,10 @@ export const DesktopNav = () => {
             <Link 
               key={item.label} 
               href={item.link} 
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-1 transition-colors ${
                 isActive 
-                  ? 'text-yellow-600 dark:text-yellow-400 font-medium' 
-                  : 'hover:text-yellow-600 dark:hover:text-yellow-400'
+                  ? 'text-blue-500 dark:text-blue-400 font-medium' 
+                  : 'hover:text-blue-500 dark:hover:text-blue-400 hover:font-bold'
               }`}
             >
               <item.icon size={16} />
@@ -41,6 +44,9 @@ export const DesktopNav = () => {
             </Link>
           );
         })}
+      <Button className='bg-blue-500 text-white hover:bg-blue-600' onClick={() => router.push('/dashboard')}>
+        Login
+      </Button>
       </div>
     </nav>
   );

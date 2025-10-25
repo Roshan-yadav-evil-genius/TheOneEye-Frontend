@@ -13,9 +13,7 @@ const NavBar = () => {
       <header className='fixed right-0 left-0 top-0 p-4 bg-slate-100 dark:bg-slate-900 backdrop-blur-lg z-50 rounded border-2 flex items-center justify-between'>
         <Logo />
         <DesktopNav />
-        <div className='flex items-center gap-4'>
-          <MobileMenuToggle isOpen={isOpen} onToggle={toggleMenu} />
-        </div>
+        {/* <MobileMenuToggle isOpen={isOpen} onToggle={toggleMenu} /> */}
       </header>
 
       <MobileMenuOverlay isOpen={isOpen} onClose={closeMenu} />
