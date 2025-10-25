@@ -55,7 +55,7 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset data-workflow-editor={isWorkflowEditor ? "true" : "false"}>
+      <SidebarInset data-workflow-editor={isWorkflowEditor ? "true" : "false"} className="m-16" >
         <SiteHeader />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">

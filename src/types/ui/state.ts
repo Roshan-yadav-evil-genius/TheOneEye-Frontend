@@ -65,7 +65,6 @@ export interface TUIStoreState {
   sidebarOpen: boolean;
   theme: 'light' | 'dark' | 'system';
   activePage: string;
-  pageTitle: string;
   breadcrumbs: TBreadcrumb[];
   notifications: TNotification[];
   modals: {

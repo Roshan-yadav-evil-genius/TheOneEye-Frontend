@@ -26,7 +26,6 @@ interface UIActions {
   
   // Page navigation
   setActivePage: (page: string) => void;
-  setPageTitle: (title: string) => void;
   setTBreadcrumbs: (breadcrumbs: TBreadcrumb[]) => void;
   addTBreadcrumb: (breadcrumb: TBreadcrumb) => void;
   removeTBreadcrumb: (index: number) => void;
@@ -54,7 +53,6 @@ const initialState: TUIStoreState = {
   sidebarOpen: true,
   theme: 'system',
   activePage: 'dashboard',
-  pageTitle: 'Documents',
   breadcrumbs: [],
   notifications: [],
   modals: {
@@ -168,9 +166,6 @@ export const useUIStore = create<UIStore>()(
           set({ activePage: page });
         },
 
-        setPageTitle: (title: string) => {
-          set({ pageTitle: title });
-        },
 
         setTBreadcrumbs: (breadcrumbs: TBreadcrumb[]) => {
           set({ breadcrumbs });
@@ -287,7 +282,7 @@ export const useUIStore = create<UIStore>()(
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
           expandedNodeGroups: Array.from(state.expandedNodeGroups), // Convert Set to Array for persistence
-          // Don't persist activePage, pageTitle, mobileMenuOpen, or hasHydrated as they should reset on app start
+          // Don't persist activePage, mobileMenuOpen, or hasHydrated as they should reset on app start
         }),
         // Add version for future migrations
         version: 1,
@@ -297,7 +292,6 @@ export const useUIStore = create<UIStore>()(
             // Example migration from v0 to v1
             return {
               ...(persistedState as TUIStoreState),
-              pageTitle: 'Documents', // Add default value for new field
               mobileMenuOpen: false,
               expandedNodeGroups: new Set<string>(),
             };
@@ -348,7 +342,6 @@ export const uiSelectors = {
   
   // Page selectors
   getActivePage: () => useUIStore.getState().activePage,
-  getPageTitle: () => useUIStore.getState().pageTitle,
   
   // TNotification selectors
   getTNotifications: () => useUIStore.getState().notifications,

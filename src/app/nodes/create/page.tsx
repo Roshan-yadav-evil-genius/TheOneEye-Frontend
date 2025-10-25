@@ -86,7 +86,7 @@ function CreateNodePageContent() {
 
 export default function Page() {
   return (
-    <DashboardLayout title="Create Node">
+    <DashboardLayout>
       <CreateNodePageContent />
     </DashboardLayout>
   )

@@ -7,22 +7,18 @@ import { useUserStore } from '@/stores/user-store';
 export const useUI = () => {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
   const theme = useUIStore((state) => state.theme);
-  const pageTitle = useUIStore((state) => state.pageTitle);
   const activePage = useUIStore((state) => state.activePage);
   
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
   const setTheme = useUIStore((state) => state.setTheme);
-  const setPageTitle = useUIStore((state) => state.setPageTitle);
   const setActivePage = useUIStore((state) => state.setActivePage);
   
   return {
     sidebarOpen,
     theme,
-    pageTitle,
     activePage,
     toggleSidebar,
     setTheme,
-    setPageTitle,
     setActivePage,
   };
 };

@@ -124,7 +124,7 @@ export default function Page({ params }: WorkflowDetailPageProps) {
 
   // Success state - render the workflow
   return (
-    <div className="h-screen">
+    <div className="">
       <WorkflowLayout workflowId={workflowId} />
     </div>
   );

@@ -304,7 +304,7 @@ function EditNodePageContent() {
 
 export default function Page() {
   return (
-    <DashboardLayout title="Edit Node">
+    <DashboardLayout>
       <EditNodePageContent />
     </DashboardLayout>
   )

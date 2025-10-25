@@ -4,11 +4,9 @@ import { DashboardControls } from "@/components/features/dashboard/dashboard-con
 export default function Page() {
   return (
     <DashboardLayout>
-      <div className="px-4 lg:px-6">
         <div className="space-y-6">
           <DashboardControls />
         </div>
-      </div>
     </DashboardLayout>
   )
 }
