@@ -18,7 +18,7 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
         <ScrollFadeInSection>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
             <span className="block">We do the busy work,</span>
-            <span className="block text-blue-500">so you can do the important work.</span>
+            <span className="block text-primary">so you can do the important work.</span>
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-300">
             TheOneEye builds and maintains end-to-end automations that deliver real business outcomes — without the hassle of setup, updates, or monitoring.
@@ -26,7 +26,7 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
           <div className="mt-10 flex justify-center gap-4">
             <button
               onClick={onBookDemo}
-              className="inline-block px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500"
+              className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary"
             >
               Book a Demo
             </button>
@@ -74,8 +74,8 @@ const Process: React.FC = () => {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <ScrollFadeInSection key={index}>
-              <div className="bg-slate-800/50 p-8 rounded-xl border border-slate-700 h-full text-center hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300">
-                <span className="text-5xl font-extrabold text-blue-500">{step.number}</span>
+              <div className="bg-slate-800/50 p-8 rounded-xl border border-slate-700 h-full text-center hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                <span className="text-5xl font-extrabold text-primary">{step.number}</span>
                 <h3 className="mt-4 text-xl font-bold text-slate-50">{step.title}</h3>
                 <p className="mt-2 text-slate-400">
                   {step.description}
@@ -128,7 +128,7 @@ const Services: React.FC = () => {
                   {services.map((service, index) => (
                       <ScrollFadeInSection key={index}>
                           <div className="flex items-start space-x-6 p-6 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
-                              <div className="flex-shrink-0 bg-blue-600/10 text-blue-400 p-4 rounded-lg">
+                              <div className="flex-shrink-0 bg-primary/10 text-primary p-4 rounded-lg">
                                   {service.icon}
                               </div>
                               <div>
@@ -140,7 +140,7 @@ const Services: React.FC = () => {
                   ))}
               </div>
               <ScrollFadeInSection className="mt-12 text-center">
-                  <blockquote className="max-w-3xl mx-auto p-6 border-l-4 border-blue-500 bg-slate-800/50 rounded-r-lg">
+                  <blockquote className="max-w-3xl mx-auto p-6 border-l-4 border-primary bg-slate-800/50 rounded-r-lg">
                       <p className="text-lg italic text-slate-300">
                           "Any repetitive, predictable, measurable task can be automated — if it slows your team down, we fix it."
                       </p>
@@ -180,7 +180,7 @@ const Benefits: React.FC = () => {
                           <div className="mt-8 space-y-6">
                               {whyChooseUs.map((item, index) => (
                                   <div key={index} className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
-                                      <h3 className="font-semibold text-blue-400">{item.title}</h3>
+                                      <h3 className="font-semibold text-primary">{item.title}</h3>
                                       <p className="text-slate-400">{item.description}</p>
                                   </div>
                               ))}
@@ -233,7 +233,7 @@ const Testimonials: React.FC = () => {
                   <p>“{testimonial.quote}”</p>
                 </blockquote>
                 <figcaption className="mt-6">
-                  <div className="font-semibold text-blue-400">— {testimonial.author}</div>
+                  <div className="font-semibold text-primary">— {testimonial.author}</div>
                 </figcaption>
               </figure>
             </ScrollFadeInSection>
@@ -273,7 +273,7 @@ const About: React.FC = () => {
           <div className="space-y-12">
             <ScrollFadeInSection>
               <div className="space-y-4 p-6 bg-slate-800/50 border border-slate-700 rounded-xl shadow-lg">
-                <h3 className="text-2xl font-bold text-blue-400">Our Vision</h3>
+                <h3 className="text-2xl font-bold text-primary">Our Vision</h3>
                 <p className="text-slate-300">
                   Our vision is to make automation <strong>intelligent, effortless, and outcome-driven</strong>, empowering businesses of all sizes to scale <strong>without chaos or wasted effort</strong>. We envision a world where teams can stop worrying about repetitive work and instead focus on innovation, strategy, and building value — while technology silently powers their success.
                 </p>
@@ -282,7 +282,7 @@ const About: React.FC = () => {
             
             <ScrollFadeInSection>
               <div className="space-y-4 p-6 bg-slate-800/50 border border-slate-700 rounded-xl shadow-lg">
-                <h3 className="text-2xl font-bold text-blue-400">Our Mission</h3>
+                <h3 className="text-2xl font-bold text-primary">Our Mission</h3>
                 <ul className="space-y-3">
                   {missionPoints.map((point, index) => (
                     <li key={index} className="flex items-start space-x-3">
@@ -374,13 +374,13 @@ const Cta: React.FC<CtaProps> = ({ onBookDemo }) => {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <ScrollFadeInSection>
                   <h2 className="text-3xl md:text-5xl font-extrabold text-slate-50 tracking-tight">Ready to Get Started?</h2>
-                  <p className="mt-4 text-xl md:text-2xl text-blue-400">
+                  <p className="mt-4 text-xl md:text-2xl text-primary">
                       Focus on growth. Let TheOneEye handle the execution.
                   </p>
                   <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
                       <button
                           onClick={onBookDemo}
-                          className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500">
+                          className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary">
                           Book a Demo
                       </button>
                       <a href="mailto:contact@theoneeye.com" className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">

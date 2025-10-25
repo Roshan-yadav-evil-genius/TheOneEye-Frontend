@@ -35,8 +35,8 @@ export const DesktopNav = () => {
               href={item.link} 
               className={`flex items-center gap-1 transition-colors ${
                 isActive 
-                  ? 'text-blue-500 dark:text-blue-400 font-medium' 
-                  : 'hover:text-blue-500 dark:hover:text-blue-400 hover:font-bold'
+                  ? 'text-primary font-medium' 
+                  : 'hover:text-primary hover:font-bold'
               }`}
             >
               <item.icon size={16} />
@@ -44,7 +44,7 @@ export const DesktopNav = () => {
             </Link>
           );
         })}
-      <Button className='bg-blue-500 text-white hover:bg-blue-600' onClick={() => router.push('/dashboard')}>
+      <Button className='bg-primary text-primary-foreground hover:bg-primary/90' onClick={() => router.push('/dashboard')}>
         Login
       </Button>
       </div>

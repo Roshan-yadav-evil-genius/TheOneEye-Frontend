@@ -85,7 +85,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
               required
               value={formData.fullName}
               onChange={handleInputChange}
-              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20"
+              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
               placeholder="Enter your full name"
             />
           </div>
@@ -101,7 +101,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
               required
               value={formData.companyName}
               onChange={handleInputChange}
-              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20"
+              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
               placeholder="Enter your company name"
             />
           </div>
@@ -117,7 +117,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
               required
               value={formData.workEmail}
               onChange={handleInputChange}
-              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20"
+              className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
               placeholder="Enter your work email"
             />
           </div>
@@ -140,7 +140,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-600 w-full hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold shadow-lg shadow-blue-600/30 hover:shadow-blue-600/40 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800"
+            className="bg-primary w-full hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
           >
             {isSubmitting ? 'Submitting...' : 'Request Demo'}
           </Button>
