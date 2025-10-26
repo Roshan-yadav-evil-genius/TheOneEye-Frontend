@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import {
+  IconBrowser,
   IconDashboard,
-  IconFolder,
   IconListDetails,
   IconNetwork,
 } from "@tabler/icons-react"
@@ -45,6 +45,11 @@ const data = {
       url: "/nodes",
       icon: IconNetwork,
     },
+    {
+      title:"Sessions",
+      url: "/browser-sessions",
+      icon: IconBrowser,
+    }
   ],
 }
 
