@@ -8,6 +8,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { WorkflowLayout } from "@/components/features/workflow/workflow-layout";
 import { ApiService } from "@/lib/api/api-service";
 import { TWorkflow } from "@/types";
+import { WorkflowsStoreInitializer } from "@/components/common/workflows-store-initializer";
 
 interface WorkflowDetailPageProps {
   params: Promise<{
@@ -124,8 +125,10 @@ export default function Page({ params }: WorkflowDetailPageProps) {
 
   // Success state - render the workflow
   return (
-    <div className="">
-      <WorkflowLayout workflowId={workflowId} />
-    </div>
+    <WorkflowsStoreInitializer>
+      <div className="">
+        <WorkflowLayout workflowId={workflowId} />
+      </div>
+    </WorkflowsStoreInitializer>
   );
 }

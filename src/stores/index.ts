@@ -45,14 +45,12 @@ export const initializeStores = async () => {
   // Initialize stores with default data if needed
   const { loadNodes } = useEnhancedNodesStore.getState();
   const { loadTWorkflows } = useTWorkflowStore.getState();
-  const { loadTFormConfigurations } = useFormStore.getState();
 
   try {
     // Load initial data in parallel
     await Promise.all([
       loadNodes({}, { showToast: false }), // Don't show toast on initial load
       loadTWorkflows(),
-      loadTFormConfigurations(),
     ]);
   } catch (error) {
     console.error('Failed to initialize stores:', error);

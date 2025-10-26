@@ -21,6 +21,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useEditNodePage } from "@/hooks/useEditNodePage";
 import { useNodeGroups } from "@/hooks/useNodeGroups";
 import { NodePreviewDialog, FormActions } from "@/components/features/nodes";
+import { NodesStoreInitializer } from "@/components/common/nodes-store-initializer";
 
 function EditNodePageContent() {
   const {
@@ -304,8 +305,10 @@ function EditNodePageContent() {
 
 export default function Page() {
   return (
-    <DashboardLayout>
-      <EditNodePageContent />
-    </DashboardLayout>
+    <NodesStoreInitializer>
+      <DashboardLayout>
+        <EditNodePageContent />
+      </DashboardLayout>
+    </NodesStoreInitializer>
   )
 }

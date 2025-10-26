@@ -6,6 +6,7 @@ import { NodeForm, TagsInput, LogoUpload, FormActions, NodePreviewDialog } from 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useCreateNodePage } from "@/hooks/useCreateNodePage";
 import { BackendNodeType } from "@/types/api/backend";
+import { NodesStoreInitializer } from "@/components/common/nodes-store-initializer";
 
 function CreateNodePageContent() {
   const {
@@ -86,8 +87,10 @@ function CreateNodePageContent() {
 
 export default function Page() {
   return (
-    <DashboardLayout>
-      <CreateNodePageContent />
-    </DashboardLayout>
+    <NodesStoreInitializer>
+      <DashboardLayout>
+        <CreateNodePageContent />
+      </DashboardLayout>
+    </NodesStoreInitializer>
   )
 }

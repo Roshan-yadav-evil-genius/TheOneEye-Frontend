@@ -30,7 +30,6 @@ export const useEditNodePage = () => {
     nodes, 
     updateNode,
     getNode,
-    loadNodes,
     isLoading: isUpdatingNode
   } = useNodesStore();
   const { createFormConfiguration, isLoading: isCreatingForm } = useFormStore();
@@ -85,7 +84,7 @@ export const useEditNodePage = () => {
     };
 
     loadNodeData();
-  }, [nodeId, nodes, getNode, loadNodes]);
+  }, [nodeId, nodes, getNode]);
 
   // Set active page on mount
   useEffect(() => {

@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/layout/sidebar-provider";
 import { AlertProvider } from "@/contexts/alert-context";
 import { Toaster } from "sonner";
-import { StoreInitializer } from "@/components/common/store-initializer";
 
 export const metadata: Metadata = {
   title: "TheOneEye - Automation-as-a-Service",
@@ -67,19 +66,17 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <StoreInitializer>
-              <AlertProvider>
-                <SidebarProviderWrapper>
-                  {children}
-                  <Toaster 
-                    position="top-right"
-                    expand={true}
-                    richColors={true}
-                    closeButton={true}
-                  />
-                </SidebarProviderWrapper>
-              </AlertProvider>
-            </StoreInitializer>
+            <AlertProvider>
+              <SidebarProviderWrapper>
+                {children}
+                <Toaster 
+                  position="top-right"
+                  expand={true}
+                  richColors={true}
+                  closeButton={true}
+                />
+              </SidebarProviderWrapper>
+            </AlertProvider>
           </ThemeProvider>
         </body>
       </html>

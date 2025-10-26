@@ -13,6 +13,7 @@ import {
 import { NodesList } from "@/components/features/nodes/nodes-list";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useNodesPage } from "@/hooks/useNodesPage";
+import { NodesStoreInitializer } from "@/components/common/nodes-store-initializer";
 
 const NodesPageContent = memo(function NodesPageContent() {
   const {
@@ -62,8 +63,10 @@ const NodesPageContent = memo(function NodesPageContent() {
 
 export default function Page() {
   return (
-    <DashboardLayout>
-      <NodesPageContent />
-    </DashboardLayout>
+    <NodesStoreInitializer>
+      <DashboardLayout>
+        <NodesPageContent />
+      </DashboardLayout>
+    </NodesStoreInitializer>
   )
 }

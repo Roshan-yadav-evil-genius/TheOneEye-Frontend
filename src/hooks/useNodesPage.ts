@@ -18,11 +18,10 @@ export const useNodesPage = () => {
   // Local state for UI
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Load nodes on component mount
+  // Set active page on component mount
   useEffect(() => {
-    loadNodes();
     setActivePage("Nodes");
-  }, [loadNodes, setActivePage]);
+  }, [setActivePage]);
 
   const handleDeleteNode = async () => {
     if (!selectedNode) return;
