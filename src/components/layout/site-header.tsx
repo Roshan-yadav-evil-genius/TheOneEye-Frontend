@@ -28,7 +28,7 @@ export function SiteHeader() {
         <Breadcrumb>
           <BreadcrumbList>
             {breadcrumbs.map((breadcrumb, index) => (
-              <div key={breadcrumb.href} className="flex items-center">
+              <div key={`${breadcrumb.href}-${index}`} className="flex items-center">
                 <BreadcrumbItem>
                   {breadcrumb.isCurrentPage ? (
                     <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>

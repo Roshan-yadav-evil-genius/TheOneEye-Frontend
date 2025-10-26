@@ -16,18 +16,6 @@ export function useBreadcrumb(): BreadcrumbItem[] {
     const segments = pathname.split('/').filter(Boolean)
     const breadcrumbs: BreadcrumbItem[] = []
 
-    // Always start with Dashboard
-    breadcrumbs.push({
-      label: "Dashboard",
-      href: "/dashboard",
-      isCurrentPage: pathname === "/dashboard"
-    })
-
-    // If we're on the dashboard page, return early
-    if (pathname === "/dashboard") {
-      return breadcrumbs
-    }
-
     // Build breadcrumbs for each segment
     let currentPath = ""
     segments.forEach((segment, index) => {
