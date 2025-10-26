@@ -27,6 +27,7 @@ export const ROUTES = {
   workflow: '/workflow',
   'form-builder': '/form-builder',
   'test-api': '/test-api',
+  'not-found': '/not-found',
 } as const;
 
 // Local Storage Keys
@@ -107,6 +108,11 @@ export const ERROR_MESSAGES = {
   SERVER_ERROR: 'An internal server error occurred. Please try again later.',
   VALIDATION_ERROR: 'Please check your input and try again.',
   TIMEOUT_ERROR: 'Request timed out. Please try again.',
+  PAGE_NOT_FOUND: 'The page you are looking for does not exist.',
+  GENERIC_ERROR: 'Something went wrong. Please try again.',
+  DASHBOARD_ERROR: 'Something went wrong while loading the dashboard.',
+  NODES_ERROR: 'Something went wrong while loading the nodes.',
+  WORKFLOW_ERROR: 'Something went wrong while loading the workflow.',
 } as const;
 
 // Success Messages
