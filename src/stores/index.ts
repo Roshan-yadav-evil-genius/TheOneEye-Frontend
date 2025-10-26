@@ -22,6 +22,7 @@ export { useNodeFormValuesStore, useNodeFormValues, useAutoSaveFormValues, useGl
 export { useWorkflowLayoutStore, useWorkflowLayout } from './workflow-layout-store';
 export { useNodesTableStore, useNodesTable } from './nodes-table-store';
 export { useWorkflowTableStore, useWorkflowTable } from './workflow-table-store';
+export { useBrowserSessionStore } from './browser-session-store';
 
 // Export all types
 export type {

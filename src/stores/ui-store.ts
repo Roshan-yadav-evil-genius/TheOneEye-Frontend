@@ -60,6 +60,8 @@ const initialState: TUIStoreState = {
     editNode: false,
     createWorkflow: false,
     editWorkflow: false,
+    createBrowserSession: false,
+    editBrowserSession: false,
   },
   mobileMenuOpen: false,
   expandedNodeGroups: new Set<string>(),
@@ -260,6 +262,8 @@ export const useUIStore = create<UIStore>()(
               editNode: false,
               createWorkflow: false,
               editWorkflow: false,
+              createBrowserSession: false,
+              editBrowserSession: false,
             },
           });
         },
