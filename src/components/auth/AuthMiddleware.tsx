@@ -12,7 +12,7 @@ interface AuthMiddlewareProps {
 const PUBLIC_ROUTES = [
   '/',
   '/login',
-  '/register',
+  '/signup', // Updated from '/register' to match actual route
   '/demo',
   '/about',
   '/contact',
