@@ -1,9 +1,9 @@
 "use client";
 import { useEffect } from "react";
-import { useTWorkflowStore } from "@/stores";
+import { useWorkflowStore } from "@/stores";
 
 export function WorkflowsStoreInitializer({ children }: { children: React.ReactNode }) {
-  const { loadTWorkflows } = useTWorkflowStore();
+  const { loadTWorkflows } = useWorkflowStore();
   
   useEffect(() => {
     loadTWorkflows();

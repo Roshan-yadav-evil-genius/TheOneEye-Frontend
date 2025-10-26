@@ -1,9 +1,9 @@
 "use client";
 import { useEffect } from "react";
-import { useEnhancedNodesStore } from "@/stores";
+import { useNodesStore } from "@/stores";
 
 export function NodesStoreInitializer({ children }: { children: React.ReactNode }) {
-  const { loadNodes } = useEnhancedNodesStore();
+  const { loadNodes } = useNodesStore();
   
   useEffect(() => {
     loadNodes({}, { showToast: false });
