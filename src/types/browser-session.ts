@@ -29,3 +29,4 @@ export interface TBrowserSessionUpdate {
   status: 'active' | 'inactive' | 'error';
   tags: string[];
 }
+

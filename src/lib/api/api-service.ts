@@ -21,7 +21,9 @@ import {
   BackendUser,
   BackendAuthResponse,
   BackendNodeType,
-  BackendWorkflowConnection
+  BackendWorkflowConnection,
+  DemoRequest,
+  DemoRequestCreateData
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
@@ -357,6 +359,26 @@ export class ApiService {
     }
   }
 
+  // Demo Request operations
+  static async createDemoRequest(demoData: DemoRequestCreateData): Promise<DemoRequest> {
+    return axiosApiClient.post<DemoRequest>('/demo-requests/', demoData);
+  }
+
+  static async getDemoRequests(): Promise<DemoRequest[]> {
+    return axiosApiClient.get<DemoRequest[]>('/demo-requests/');
+  }
+
+  static async getDemoRequest(id: string): Promise<DemoRequest> {
+    return axiosApiClient.get<DemoRequest>(`/demo-requests/${id}/`);
+  }
+
+  static async updateDemoRequestStatus(id: string, status: string, notes?: string): Promise<DemoRequest> {
+    return axiosApiClient.patch<DemoRequest>(`/demo-requests/${id}/update_status/`, {
+      status,
+      notes
+    });
+  }
+
   // Utility methods
   static async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
@@ -407,6 +429,10 @@ export const {
   getCurrentUser,
   login,
   logout,
+  createDemoRequest,
+  getDemoRequests,
+  getDemoRequest,
+  updateDemoRequestStatus,
   healthCheck,
   getApiVersion,
 } = ApiService;

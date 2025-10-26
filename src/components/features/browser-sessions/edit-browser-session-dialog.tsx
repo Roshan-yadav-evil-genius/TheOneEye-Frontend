@@ -84,3 +84,4 @@ export function EditBrowserSessionDialog({ open, onOpenChange, session }: EditBr
     </Dialog>
   );
 }
+

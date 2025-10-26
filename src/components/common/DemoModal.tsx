@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { ApiService } from '@/lib/api/api-service';
 
 interface DemoModalProps {
   isOpen: boolean;
@@ -42,23 +43,36 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      // Submit to backend API
+      await ApiService.createDemoRequest({
+        full_name: formData.fullName,
+        company_name: formData.companyName,
+        work_email: formData.workEmail,
+        automation_needs: formData.automationNeeds
+      });
 
-    // Show success toast
-    toast.success('Demo request submitted successfully! We\'ll be in touch soon.', {
-      duration: 4000,
-    });
+      // Show success toast
+      toast.success('Demo request submitted successfully! We\'ll be in touch soon.', {
+        duration: 4000,
+      });
 
-    // Reset form and close modal
-    setFormData({
-      fullName: '',
-      companyName: '',
-      workEmail: '',
-      automationNeeds: ''
-    });
-    setIsSubmitting(false);
-    onClose();
+      // Reset form and close modal
+      setFormData({
+        fullName: '',
+        companyName: '',
+        workEmail: '',
+        automationNeeds: ''
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error submitting demo request:', error);
+      toast.error('Failed to submit demo request. Please try again.', {
+        duration: 4000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

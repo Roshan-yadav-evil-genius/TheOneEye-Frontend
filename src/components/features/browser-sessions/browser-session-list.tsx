@@ -89,3 +89,4 @@ export function BrowserSessionList({ sessions }: BrowserSessionListProps) {
     </div>
   );
 }
+

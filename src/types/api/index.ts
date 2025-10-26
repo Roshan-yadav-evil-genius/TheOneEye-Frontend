@@ -3,3 +3,4 @@ export * from './responses';
 export * from './requests';
 export * from './errors';
 export * from './backend';
+export * from './demo-request';
