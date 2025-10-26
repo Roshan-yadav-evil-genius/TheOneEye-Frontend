@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link"
-import { useUserStore, useUIStore } from "@/stores"
+import { useAuthStore } from "@/stores/auth-store"
+import { useUIStore } from "@/stores"
 
 const data = {
   user: {
     name: "Roshan Yadav",
     email: "roshan.yadav@12thwonder.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   },
   navMain: [
     {
@@ -55,14 +56,14 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Zustand store hooks
-  const { user } = useUserStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { } = useUIStore();
 
   // Use store user data if available, fallback to static data
-  const userData = user ? {
-    name: user.name,
+  const userData = user && isAuthenticated ? {
+    name: `${user.first_name} ${user.last_name}`.trim() || user.username,
     email: user.email,
-    avatar: user.avatar || "/avatars/shadcn.jpg"
+    avatar: "" // No avatar image, will show initials fallback
   } : data.user;
 
   return (
