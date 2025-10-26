@@ -4,6 +4,7 @@ import {DM_Sans} from "next/font/google"
 import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/layout/sidebar-provider";
 import { AlertProvider } from "@/contexts/alert-context";
+import { AuthMiddleware } from "@/components/auth/AuthMiddleware";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
@@ -67,15 +68,17 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AlertProvider>
-              <SidebarProviderWrapper>
-                {children}
-                <Toaster 
-                  position="top-right"
-                  expand={true}
-                  richColors={true}
-                  closeButton={true}
-                />
-              </SidebarProviderWrapper>
+              <AuthMiddleware>
+                <SidebarProviderWrapper>
+                  {children}
+                  <Toaster 
+                    position="top-right"
+                    expand={true}
+                    richColors={true}
+                    closeButton={true}
+                  />
+                </SidebarProviderWrapper>
+              </AuthMiddleware>
             </AlertProvider>
           </ThemeProvider>
         </body>

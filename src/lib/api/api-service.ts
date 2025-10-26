@@ -322,6 +322,18 @@ export class ApiService {
   // User operations
   static async getCurrentUser(): Promise<TUser | null> {
     try {
+      // Check if we have a token in localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth-store') : null;
+      if (!token) {
+        return null;
+      }
+
+      // Parse the token to check if it exists
+      const authData = JSON.parse(token);
+      if (!authData.state?.token) {
+        return null;
+      }
+
       const response = await axiosApiClient.get<BackendUser>('/auth/me/');
       return {
         id: response.id,
@@ -336,27 +348,34 @@ export class ApiService {
     }
   }
 
-  static async login(credentials: { email: string; password: string }): Promise<{ user: TUser; token: string }> {
-    const response = await axiosApiClient.post<BackendAuthResponse>('/auth/login/', credentials);
-    return {
-      user: {
-        id: response.user.id,
-        name: response.user.name,
-        email: response.user.email,
-        avatar: response.user.avatar,
-        role: response.user.role,
-        permissions: response.user.permissions,
-      },
-      token: response.token,
-    };
+  static async login(credentials: { username: string; password: string }): Promise<{ user: TUser; access: string; refresh: string }> {
+    const response = await axiosApiClient.post<{ user: TUser; access: string; refresh: string }>('/auth/login/', credentials);
+    return response;
   }
 
-  static async logout(): Promise<void> {
+  static async logout(refreshToken?: string): Promise<void> {
     try {
-      await axiosApiClient.post('/auth/logout/');
+      await axiosApiClient.post('/auth/logout/', { refresh: refreshToken });
     } catch (error) {
       // Ignore logout errors - user is logged out regardless
     }
+  }
+
+  static async register(userData: {
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    password_confirm: string;
+  }): Promise<{ user: TUser; access: string; refresh: string }> {
+    const response = await axiosApiClient.post<{ user: TUser; access: string; refresh: string }>('/auth/register/', userData);
+    return response;
+  }
+
+  static async refreshToken(refreshToken: string): Promise<{ access: string; refresh: string }> {
+    const response = await axiosApiClient.post<{ access: string; refresh: string }>('/auth/refresh/', { refresh: refreshToken });
+    return response;
   }
 
   // Demo Request operations
@@ -429,6 +448,8 @@ export const {
   getCurrentUser,
   login,
   logout,
+  register,
+  refreshToken,
   createDemoRequest,
   getDemoRequests,
   getDemoRequest,

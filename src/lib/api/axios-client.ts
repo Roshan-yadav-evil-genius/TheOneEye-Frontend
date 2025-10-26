@@ -18,11 +18,19 @@ class AxiosApiClient {
     // Request interceptor for logging and auth
     this.client.interceptors.request.use(
       (config) => {
-        // Add any auth tokens here if needed
-        // const token = localStorage.getItem('authToken');
-        // if (token) {
-        //   config.headers.Authorization = `Bearer ${token}`;
-        // }
+        // Get token from auth store
+        const token = typeof window !== 'undefined' ? localStorage.getItem('auth-store') : null;
+        
+        if (token) {
+          try {
+            const authData = JSON.parse(token);
+            if (authData.state?.token) {
+              config.headers.Authorization = `Bearer ${authData.state.token}`;
+            }
+          } catch (error) {
+            console.error('Error parsing auth token:', error);
+          }
+        }
         
         console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
         return config;
@@ -33,13 +41,56 @@ class AxiosApiClient {
       }
     );
 
-    // Response interceptor for error handling
+    // Response interceptor for error handling and token refresh
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
         console.log(`✅ API Response: ${response.status} ${response.config.url}`);
         return response;
       },
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        
+        // Handle 401 errors with token refresh
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          
+          try {
+            // Try to refresh token
+            const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('auth-store') : null;
+            if (refreshToken) {
+              const authData = JSON.parse(refreshToken);
+              if (authData.state?.refreshToken) {
+                const response = await axios.post(`${this.client.defaults.baseURL}/auth/refresh/`, {
+                  refresh: authData.state.refreshToken,
+                });
+                
+                const { access } = response.data;
+                
+                // Update stored token
+                const updatedAuthData = {
+                  ...authData,
+                  state: {
+                    ...authData.state,
+                    token: access,
+                  },
+                };
+                localStorage.setItem('auth-store', JSON.stringify(updatedAuthData));
+                
+                // Retry original request with new token
+                originalRequest.headers = originalRequest.headers || {};
+                originalRequest.headers.Authorization = `Bearer ${access}`;
+                return this.client(originalRequest);
+              }
+            }
+          } catch (refreshError) {
+            // Refresh failed, redirect to login
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('auth-store');
+              window.location.href = '/login';
+            }
+          }
+        }
+        
         console.error('❌ API Error:', error.response?.status, error.message);
         
         // Transform axios error to our custom TApiError

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useUserStore } from "@/stores"
+import { useAuthStore } from "@/stores/auth-store"
 import { toast } from "sonner"
 
 export function SignupForm({
@@ -21,14 +21,16 @@ export function SignupForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
+    first_name: "",
+    last_name: "",
     password: "",
-    confirmPassword: "",
+    password_confirm: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   
-  const { register } = useUserStore()
+  const { register, error, clearError } = useAuthStore()
   const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,29 +41,33 @@ export function SignupForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.password_confirm) {
       toast.error("Passwords do not match")
       return
     }
 
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long")
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long")
       return
     }
 
     setIsLoading(true)
+    clearError()
     
     try {
       await register({
-        name: formData.name,
+        username: formData.username,
         email: formData.email,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
         password: formData.password,
+        password_confirm: formData.password_confirm,
       })
       
       toast.success("Account created successfully!")
       router.push("/dashboard")
-    } catch {
-      toast.error("Failed to create account. Please try again.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to create account. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -73,40 +79,50 @@ export function SignupForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create your account</CardTitle>
           <CardDescription>
-            Sign up with your Google account
+            Enter your information to create a new account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full" type="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  Sign up with Google
-                </Button>
-              </div>
-              <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
-                  Or continue with
-                </span>
-              </div>
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
-                    placeholder="John Doe"
-                    value={formData.name}
+                    placeholder="johndoe"
+                    value={formData.username}
                     onChange={handleInputChange}
                     required
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-3">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      name="first_name"
+                      type="text"
+                      placeholder="John"
+                      value={formData.first_name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input
+                      id="last_name"
+                      name="last_name"
+                      type="text"
+                      placeholder="Doe"
+                      value={formData.last_name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="email">Email</Label>
@@ -132,12 +148,12 @@ export function SignupForm({
                   />
                 </div>
                 <div className="grid gap-3">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="password_confirm">Confirm Password</Label>
                   <Input 
-                    id="confirmPassword" 
-                    name="confirmPassword"
+                    id="password_confirm" 
+                    name="password_confirm"
                     type="password" 
-                    value={formData.confirmPassword}
+                    value={formData.password_confirm}
                     onChange={handleInputChange}
                     required 
                   />
@@ -145,6 +161,9 @@ export function SignupForm({
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
+                {error && (
+                  <p className="text-sm text-red-500 text-center">{error}</p>
+                )}
               </div>
               <div className="text-center text-sm">
                 Already have an account?{" "}

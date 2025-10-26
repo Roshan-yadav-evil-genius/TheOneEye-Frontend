@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { TBrowserSession, TBrowserSessionCreate, TBrowserSessionUpdate } from '@/types/browser-session';
+import { axiosApiClient } from '@/lib/api/axios-client';
 
 interface BrowserSessionState {
   sessions: TBrowserSession[];
@@ -14,8 +15,6 @@ interface BrowserSessionState {
   launchBrowser: (id: string) => Promise<void>;
 }
 
-const API_BASE = 'http://127.0.0.1:7878/api';
-
 export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => ({
   sessions: [],
   isLoading: false,
@@ -24,11 +23,7 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
   loadSessions: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/browser-sessions/`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch browser sessions');
-      }
-      const sessions = await response.json();
+      const sessions = await axiosApiClient.get<TBrowserSession[]>('/browser-sessions/');
       set({ sessions, isLoading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Unknown error', isLoading: false });
@@ -38,19 +33,7 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
   createSession: async (sessionData: TBrowserSessionCreate) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/browser-sessions/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sessionData),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create browser session');
-      }
-      
-      const newSession = await response.json();
+      const newSession = await axiosApiClient.post<TBrowserSession>('/browser-sessions/', sessionData);
       set(state => ({ 
         sessions: [newSession, ...state.sessions], 
         isLoading: false 
@@ -65,19 +48,7 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
   updateSession: async (id: string, sessionData: TBrowserSessionUpdate) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/browser-sessions/${id}/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sessionData),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update browser session');
-      }
-      
-      const updatedSession = await response.json();
+      const updatedSession = await axiosApiClient.patch<TBrowserSession>(`/browser-sessions/${id}/`, sessionData);
       set(state => ({
         sessions: state.sessions.map(session => 
           session.id === id ? updatedSession : session
@@ -94,14 +65,7 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
   deleteSession: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/browser-sessions/${id}/`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete browser session');
-      }
-      
+      await axiosApiClient.delete(`/browser-sessions/${id}/`);
       set(state => ({
         sessions: state.sessions.filter(session => session.id !== id),
         isLoading: false
@@ -115,17 +79,8 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
   launchBrowser: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/browser-sessions/${id}/launch_browser/`, {
-        method: 'POST',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to launch browser');
-      }
-      
-      const result = await response.json();
+      await axiosApiClient.post(`/browser-sessions/${id}/launch_browser/`);
       set({ isLoading: false });
-      return result;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Unknown error', isLoading: false });
       throw error;
