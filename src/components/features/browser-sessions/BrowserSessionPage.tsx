@@ -7,10 +7,8 @@ interface BrowserSessionPageProps {
 
 export function BrowserSessionPage({ sessions, isLoading }: BrowserSessionPageProps) {
   return (
-    <div className="px-4 lg:px-6">
-      <main>
-        <BrowserSessionList sessions={sessions} />
-      </main>
-    </div>
+    <main className="p-4">
+      <BrowserSessionList sessions={sessions} />
+    </main>
   );
 }

@@ -36,7 +36,7 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
         <div className="w-72 bg-sidebar border-r border-border" />
         <div className="flex-1">
           <div className="h-12 border-b border-border" />
-          <div className="p-4">
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
             {children}
           </div>
         </div>

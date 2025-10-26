@@ -95,8 +95,8 @@ export function BrowserSessionTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sessions.map((session) => (
-              <TableRow key={session.id}>
+            {sessions.map((session, index) => (
+              <TableRow key={session.id || `session-${index}`}>
                 <TableCell className="font-medium">{session.name}</TableCell>
                 <TableCell className="max-w-[200px] truncate">
                   {session.description}
