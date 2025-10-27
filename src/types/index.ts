@@ -13,3 +13,6 @@ export * from './forms';
 
 // Common Types
 export * from './common';
+
+// Contact Types
+export * from './contact';

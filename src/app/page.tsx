@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
 import NavBar from "@/components/global/NavBar";
 import { HiOutlineUserGroup, HiOutlineCog, HiOutlineSpeakerphone, HiOutlineSupport } from "react-icons/hi";
 import ScrollFadeInSection from '@/components/common/ScrollFadeInSection';
@@ -383,9 +384,9 @@ const Cta: React.FC<CtaProps> = ({ onBookDemo }) => {
                           className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary">
                           Book a Demo
                       </button>
-                      <a href="mailto:contact@theoneeye.com" className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
+                      <Link href="/contact" className="w-full sm:w-auto inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500">
                           Contact Us
-                      </a>
+                      </Link>
                   </div>
               </ScrollFadeInSection>
           </div>

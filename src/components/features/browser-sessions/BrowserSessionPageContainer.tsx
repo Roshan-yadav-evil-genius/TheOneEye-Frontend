@@ -14,3 +14,4 @@ export function BrowserSessionPageContainer() {
   return <BrowserSessionPage sessions={sessions} isLoading={isLoading} />;
 }
 
+
