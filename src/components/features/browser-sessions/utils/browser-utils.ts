@@ -1,0 +1,9 @@
+export function getTabTitle(url: string): string {
+	try {
+		const urlObj = new URL(url);
+		return urlObj.hostname.replace('www.', '');
+	} catch {
+		return url.length > 20 ? url.substring(0, 20) + "..." : url;
+	}
+}
+
