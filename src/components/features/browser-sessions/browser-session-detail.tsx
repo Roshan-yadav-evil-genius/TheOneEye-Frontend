@@ -2,12 +2,22 @@
 
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { TBrowserSession } from "@/types/browser-session";
 import { useBrowserTabs } from "./hooks/useBrowserTabs";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
+import { BrowserSessionInfo } from "./components/browser-session-info";
 
-export function BrowserSessionDetail() {
+interface BrowserSessionDetailProps {
+	session: TBrowserSession;
+	onEdit?: (session: TBrowserSession) => void;
+}
+
+export function BrowserSessionDetail({
+	session,
+	onEdit,
+}: BrowserSessionDetailProps) {
 	const {
 		tabs,
 		activeTabId,
@@ -39,7 +49,13 @@ export function BrowserSessionDetail() {
 	};
 
 	return (
-		<div className="space-y-6 pt-5">
+		<div className="">
+			{/* Browser Session Details */}
+				<BrowserSessionInfo
+					session={session}
+					onEdit={onEdit}
+				/>
+
 			{/* Browser-Style Tabs Section */}
 			<Card className="p-0 overflow-hidden rounded-lg flex flex-col h-[calc(100vh-12rem)]">
 				<Tabs value={activeTabId} onValueChange={handleTabClick} className="w-full gap-0 flex flex-col flex-1 min-h-0">
