@@ -25,6 +25,7 @@ import {
   IconPlus,
   IconPlayerPlay
 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
 interface BrowserSessionTableProps {
   sessions: TBrowserSession[];
@@ -43,6 +44,8 @@ export function BrowserSessionTable({
   onLaunch,
   onCreate,
 }: BrowserSessionTableProps) {
+  const router = useRouter();
+
   const getStatusBadge = (status: string) => {
     const variants = {
       active: "default",
@@ -123,7 +126,7 @@ export function BrowserSessionTable({
                         <IconEdit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onLaunch(session)}>
+                      <DropdownMenuItem onClick={() => router.push(`/browser-sessions/${session.id}`)}>
                         <IconPlayerPlay className="mr-2 h-4 w-4" />
                         Launch Browser
                       </DropdownMenuItem>

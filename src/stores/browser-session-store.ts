@@ -9,6 +9,7 @@ interface BrowserSessionState {
   
   // Actions
   loadSessions: () => Promise<void>;
+  getSessionById: (id: string) => Promise<TBrowserSession>;
   createSession: (session: TBrowserSessionCreate) => Promise<TBrowserSession>;
   updateSession: (id: string, session: TBrowserSessionUpdate) => Promise<TBrowserSession>;
   deleteSession: (id: string) => Promise<void>;
@@ -27,6 +28,19 @@ export const useBrowserSessionStore = create<BrowserSessionState>((set, get) => 
       set({ sessions, isLoading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Unknown error', isLoading: false });
+    }
+  },
+
+  getSessionById: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const session = await axiosApiClient.get<TBrowserSession>(`/browser-sessions/${id}/`);
+      set({ isLoading: false });
+      return session;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      set({ error: errorMessage, isLoading: false });
+      throw error;
     }
   },
 
