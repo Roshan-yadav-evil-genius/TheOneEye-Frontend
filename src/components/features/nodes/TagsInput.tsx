@@ -7,9 +7,20 @@ import { useState } from "react";
 interface TagsInputProps {
   tags: string[];
   onTagsChange: (tags: string[]) => void;
+  label?: string;
+  placeholder?: string;
+  helpText?: string;
+  id?: string;
 }
 
-export function TagsInput({ tags, onTagsChange }: TagsInputProps) {
+export function TagsInput({ 
+  tags, 
+  onTagsChange,
+  label = "Tags",
+  placeholder = "Type a tag and press comma or enter",
+  helpText = "Type tags and press comma or enter to add them",
+  id = "tags"
+}: TagsInputProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +46,7 @@ export function TagsInput({ tags, onTagsChange }: TagsInputProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="tags">Tags</Label>
+      {label && <Label htmlFor={id}>{label}</Label>}
       {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {tags.map((tag, index) => (
@@ -54,14 +65,14 @@ export function TagsInput({ tags, onTagsChange }: TagsInputProps) {
         </div>
       )}
       <Input
-        id="tags"
+        id={id}
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleInputKeyDown}
-        placeholder="Type a tag and press comma or enter"
+        placeholder={placeholder}
       />
       <p className="text-sm text-muted-foreground">
-        Type tags and press comma or enter to add them
+        {helpText}
       </p>
     </div>
   );

@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { useBrowserSessionStore } from "@/stores/browser-session-store";
 import { uiHelpers } from "@/stores/ui-store";
-import { BrowserSessionForm, BrowserSessionFormData } from "./browser-session-form";
+import { BrowserSessionForm } from "./browser-session-form";
+import { BrowserSessionFormData } from "@/types/browser-session";
 
 interface CreateBrowserSessionDialogProps {
   open: boolean;

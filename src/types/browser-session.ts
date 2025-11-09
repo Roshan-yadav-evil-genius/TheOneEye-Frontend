@@ -30,6 +30,31 @@ export interface TBrowserSessionUpdate {
   tags: string[];
 }
 
+// Form-related types
+export interface BrowserSessionFormData {
+  name: string;
+  description: string;
+  browser_type: 'chromium' | 'firefox' | 'webkit';
+  playwright_config: {
+    headless: boolean;
+    viewport: {
+      width: number;
+      height: number;
+    };
+    user_agent?: string;
+    args?: string[];
+    timeout?: number;
+    slow_mo?: number;
+  };
+}
+
+export interface BrowserSessionFormProps {
+  initialData?: Partial<BrowserSessionFormData>;
+  onSubmit: (data: BrowserSessionFormData) => Promise<void>;
+  submitButtonText: string;
+  onCancel: () => void;
+}
+
 
 
 

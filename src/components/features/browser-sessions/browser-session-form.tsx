@@ -14,35 +14,9 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink } from "lucide-react";
-
-export const BROWSER_TYPES = [
-  { value: 'chromium', label: 'Chromium' },
-  { value: 'firefox', label: 'Firefox' },
-  { value: 'webkit', label: 'WebKit' },
-];
-
-export interface BrowserSessionFormData {
-  name: string;
-  description: string;
-  browser_type: 'chromium' | 'firefox' | 'webkit';
-  playwright_config: {
-    headless: boolean;
-    viewport: {
-      width: number;
-      height: number;
-    };
-    user_agent?: string;
-    timeout?: number;
-    slow_mo?: number;
-  };
-}
-
-export interface BrowserSessionFormProps {
-  initialData?: Partial<BrowserSessionFormData>;
-  onSubmit: (data: BrowserSessionFormData) => Promise<void>;
-  submitButtonText: string;
-  onCancel: () => void;
-}
+import { BROWSER_TYPES, BROWSER_INFO } from "@/constants/browser-session";
+import { BrowserSessionFormData, BrowserSessionFormProps } from "@/types/browser-session";
+import { TagsInput } from "@/components/features/nodes";
 
 export function BrowserSessionForm({
   initialData = {},
@@ -66,6 +40,7 @@ export function BrowserSessionForm({
         headless: true,
         viewport: { width: 1280, height: 720 },
         user_agent: "",
+        args: [],
         timeout: 30000,
         slow_mo: 0,
       },
@@ -87,6 +62,7 @@ export function BrowserSessionForm({
           headless: true,
           viewport: { width: 1280, height: 720 },
           user_agent: "",
+          args: [],
           timeout: 30000,
           slow_mo: 0,
         },
@@ -167,6 +143,22 @@ export function BrowserSessionForm({
             ))}
           </SelectContent>
         </Select>
+        {browserTypeValue && BROWSER_INFO[browserTypeValue] && (
+          <div className="flex items-start gap-2 mt-1">
+            <p className="text-sm text-gray-600 flex-1">
+              {BROWSER_INFO[browserTypeValue].description}
+            </p>
+            <a 
+              href={BROWSER_INFO[browserTypeValue].args_reference_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center mt-0.5"
+              aria-label="View browser args reference"
+            >
+              <ExternalLink className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+            </a>
+          </div>
+        )}
         {errors.browser_type && (
           <p className="text-sm text-red-500">{errors.browser_type.message}</p>
         )}
@@ -241,33 +233,15 @@ export function BrowserSessionForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="timeout">Timeout (ms)</Label>
-            <Input
-              id="timeout"
-              type="number"
-              placeholder="30000"
-              value={playwrightConfig?.timeout || 30000}
-              onChange={(e) => 
-                setValue("playwright_config.timeout", parseInt(e.target.value) || 30000)
-              }
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="slow_mo">Slow Motion (ms)</Label>
-            <Input
-              id="slow_mo"
-              type="number"
-              placeholder="0"
-              value={playwrightConfig?.slow_mo || 0}
-              onChange={(e) => 
-                setValue("playwright_config.slow_mo", parseInt(e.target.value) || 0)
-              }
-              disabled={isSubmitting}
-            />
-          </div>
+        <div className="space-y-2">
+          <TagsInput
+            tags={playwrightConfig?.args || []}
+            onTagsChange={(args) => setValue("playwright_config.args", args.length > 0 ? args : undefined)}
+            label="Args"
+            placeholder="Type an arg and press comma or enter"
+            helpText="Type args and press comma or enter to add them"
+            id="args"
+          />
         </div>
       </div>
 
