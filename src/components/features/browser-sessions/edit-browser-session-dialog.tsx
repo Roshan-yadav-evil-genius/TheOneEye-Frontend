@@ -31,7 +31,6 @@ export function EditBrowserSessionDialog({ open, onOpenChange, session }: EditBr
         browser_type: formData.browser_type,
         playwright_config: formData.playwright_config,
         status: session.status, // Keep existing status
-        tags: session.tags, // Keep existing tags
       };
 
       await updateSession(session.id, sessionData);

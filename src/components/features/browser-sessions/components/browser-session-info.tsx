@@ -73,7 +73,7 @@ export function BrowserSessionInfo({
 				</div>
 			</div>
 			{onSave && (
-				<Button onClick={() => onSave(session)} variant="outline" size="sm" className="h-7 text-xs ml-3 shrink-0">
+				<Button onClick={() => onSave(session)} size="lg" className="h-7 text-xs ml-3 shrink-0">
 					<IconCheck className="mr-1.5 h-3.5 w-3.5" />
 					Save
 				</Button>
