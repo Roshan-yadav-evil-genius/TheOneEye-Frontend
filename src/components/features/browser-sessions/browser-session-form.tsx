@@ -211,7 +211,7 @@ export function BrowserSessionForm({
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="user_agent">User Agent (Optional)</Label>
+            <Label htmlFor="user_agent">User Agent</Label>
             <a 
               href="https://www.useragents.me/" 
               target="_blank" 
