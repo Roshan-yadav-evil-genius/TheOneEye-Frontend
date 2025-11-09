@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ExternalLink } from "lucide-react";
 
 export const BROWSER_TYPES = [
   { value: 'chromium', label: 'Chromium' },
@@ -217,7 +218,18 @@ export function BrowserSessionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="user_agent">User Agent (Optional)</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="user_agent">User Agent (Optional)</Label>
+            <a 
+              href="https://www.useragents.me/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center"
+              aria-label="Visit useragents.me to choose a user agent"
+            >
+              <ExternalLink className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+            </a>
+          </div>
           <Input
             id="user_agent"
             placeholder="Custom user agent string"
