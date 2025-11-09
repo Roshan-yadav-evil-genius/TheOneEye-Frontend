@@ -12,9 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink } from "lucide-react";
-import { BROWSER_TYPES, BROWSER_INFO } from "@/constants/browser-session";
+import { BROWSER_TYPES, BROWSER_INFO, DEFAULT_BROWSER_ARGS, DEFAULT_USER_AGENTS } from "@/constants/browser-session";
 import { BrowserSessionFormData, BrowserSessionFormProps } from "@/types/browser-session";
 import { TagsInput } from "@/components/features/nodes";
 
@@ -36,11 +35,15 @@ export function BrowserSessionForm({
       name: initialData.name || "",
       description: initialData.description || "",
       browser_type: initialData.browser_type || "chromium",
-      playwright_config: initialData.playwright_config || {
-        headless: true,
-        viewport: { width: 1280, height: 720 },
-        user_agent: "",
-        args: [],
+      playwright_config: initialData.playwright_config ? {
+        ...initialData.playwright_config,
+        user_agent: initialData.playwright_config.user_agent || DEFAULT_USER_AGENTS[initialData.browser_type || "chromium"],
+        args: initialData.playwright_config.args && initialData.playwright_config.args.length > 0 
+          ? initialData.playwright_config.args 
+          : [...DEFAULT_BROWSER_ARGS],
+      } : {
+        user_agent: DEFAULT_USER_AGENTS[initialData.browser_type || "chromium"],
+        args: [...DEFAULT_BROWSER_ARGS],
         timeout: 30000,
         slow_mo: 0,
       },
@@ -51,18 +54,38 @@ export function BrowserSessionForm({
   const browserTypeValue = watch("browser_type");
   const playwrightConfig = watch("playwright_config");
 
+  // Update user agent when browser type changes (only if user_agent is empty or matches a default)
+  useEffect(() => {
+    if (browserTypeValue) {
+      const currentUserAgent = playwrightConfig?.user_agent || "";
+      const defaultUserAgent = DEFAULT_USER_AGENTS[browserTypeValue];
+      
+      // Update user agent if it's empty or matches one of the default user agents
+      const isDefaultUserAgent = Object.values(DEFAULT_USER_AGENTS).includes(currentUserAgent as any);
+      
+      if (!currentUserAgent || isDefaultUserAgent) {
+        setValue("playwright_config.user_agent", defaultUserAgent);
+      }
+    }
+  }, [browserTypeValue, playwrightConfig?.user_agent, setValue]);
+
   // Update form when initialData changes
   useEffect(() => {
     if (initialData.name || initialData.description || initialData.browser_type || initialData.playwright_config) {
+      const browserType = initialData.browser_type || "chromium";
       reset({
         name: initialData.name || "",
         description: initialData.description || "",
-        browser_type: initialData.browser_type || "chromium",
-        playwright_config: initialData.playwright_config || {
-          headless: true,
-          viewport: { width: 1280, height: 720 },
-          user_agent: "",
-          args: [],
+        browser_type: browserType,
+        playwright_config: initialData.playwright_config ? {
+          ...initialData.playwright_config,
+          user_agent: initialData.playwright_config.user_agent || DEFAULT_USER_AGENTS[browserType],
+          args: initialData.playwright_config.args && initialData.playwright_config.args.length > 0 
+            ? initialData.playwright_config.args 
+            : [...DEFAULT_BROWSER_ARGS],
+        } : {
+          user_agent: DEFAULT_USER_AGENTS[browserType],
+          args: [...DEFAULT_BROWSER_ARGS],
           timeout: 30000,
           slow_mo: 0,
         },
@@ -168,47 +191,6 @@ export function BrowserSessionForm({
       <div className="space-y-4 border-t pt-4">
         <h3 className="text-lg font-medium">Playwright Configuration</h3>
         
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="headless"
-            checked={playwrightConfig?.headless || false}
-            onCheckedChange={(checked) => 
-              setValue("playwright_config.headless", checked as boolean)
-            }
-            disabled={isSubmitting}
-          />
-          <Label htmlFor="headless">Run in headless mode</Label>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="viewport_width">Viewport Width</Label>
-            <Input
-              id="viewport_width"
-              type="number"
-              placeholder="1280"
-              value={playwrightConfig?.viewport?.width || 1280}
-              onChange={(e) => 
-                setValue("playwright_config.viewport.width", parseInt(e.target.value) || 1280)
-              }
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="viewport_height">Viewport Height</Label>
-            <Input
-              id="viewport_height"
-              type="number"
-              placeholder="720"
-              value={playwrightConfig?.viewport?.height || 720}
-              onChange={(e) => 
-                setValue("playwright_config.viewport.height", parseInt(e.target.value) || 720)
-              }
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
-
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Label htmlFor="user_agent">User Agent</Label>
