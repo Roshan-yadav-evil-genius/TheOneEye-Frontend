@@ -170,12 +170,7 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 	return (
 		<>
 			<DashboardLayout>
-				<BrowserSessionDetail
-					session={session}
-					onEdit={handleEdit}
-					onDelete={handleDelete}
-					onLaunch={handleLaunch}
-				/>
+          <BrowserSessionDetail />
 			</DashboardLayout>
 
 			{/* Edit Dialog */}
