@@ -4,14 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { BrowserSessionDetail } from "@/components/features/browser-sessions/browser-session-detail";
-import { EditBrowserSessionDialog } from "@/components/features/browser-sessions/edit-browser-session-dialog";
-import { DeleteBrowserSessionDialog } from "@/components/features/browser-sessions/delete-browser-session-dialog";
+import { BrowserSessionDetail } from "@/components/features/browser-sessions/browser-session-detail";			
 import { useBrowserSessionStore } from "@/stores/browser-session-store";
 import { TBrowserSession } from "@/types/browser-session";
-import { uiHelpers } from "@/stores/ui-store";
 
 interface BrowserSessionDetailPageProps {
 	params: Promise<{
@@ -22,13 +18,9 @@ interface BrowserSessionDetailPageProps {
 export default function Page({ params }: BrowserSessionDetailPageProps) {
 	const resolvedParams = React.use(params);
 	const sessionId = resolvedParams.id;
-	const router = useRouter();
 	const [session, setSession] = useState<TBrowserSession | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [editDialogOpen, setEditDialogOpen] = useState(false);
-	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
 
 	const { getSessionById, deleteSession, launchBrowser } = useBrowserSessionStore();
 
@@ -61,6 +53,9 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 		}
 	}, [sessionId, getSessionById]);
 
+	const handleSave = (sessionToSave: TBrowserSession) => {
+		console.log(sessionToSave);
+	};
 	// Loading state
 	if (isLoading) {
 		return (
@@ -120,78 +115,15 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 		);
 	}
 
-	const handleEdit = (session: TBrowserSession) => {
-		setEditDialogOpen(true);
-	};
-
-	const handleEditDialogClose = async (open: boolean) => {
-		setEditDialogOpen(open);
-		// Refresh session data after editing
-		if (!open && session) {
-			try {
-				const updatedSession = await getSessionById(sessionId);
-				setSession(updatedSession);
-			} catch (error) {
-				console.error("Failed to refresh session:", error);
-			}
-		}
-	};
-
-	const handleDelete = (session: TBrowserSession) => {
-		setDeleteDialogOpen(true);
-	};
-
-	const handleConfirmDelete = async () => {
-		if (!session) return;
-
-		setIsDeleting(true);
-		try {
-			await deleteSession(session.id);
-			uiHelpers.showSuccess("Session Deleted", "Browser session deleted successfully");
-			router.push("/browser-sessions");
-		} catch (error) {
-			uiHelpers.showError("Delete Failed", "Failed to delete browser session");
-		} finally {
-			setIsDeleting(false);
-			setDeleteDialogOpen(false);
-		}
-	};
-
-	const handleLaunch = async (session: TBrowserSession) => {
-		try {
-			await launchBrowser(session.id);
-			uiHelpers.showSuccess("Browser Launched", `Browser session "${session.name}" launched successfully`);
-		} catch (error) {
-			uiHelpers.showError("Launch Failed", "Failed to launch browser session");
-		}
-	};
 
 	// Success state - render the session detail
 	return (
-		<>
 			<DashboardLayout>
 				<BrowserSessionDetail
 					session={session}
-					onEdit={handleEdit}
+					onSave={handleSave}
 				/>
 			</DashboardLayout>
-
-			{/* Edit Dialog */}
-			<EditBrowserSessionDialog
-				open={editDialogOpen}
-				onOpenChange={handleEditDialogClose}
-				session={session}
-			/>
-
-			{/* Delete Dialog */}
-			<DeleteBrowserSessionDialog
-				open={deleteDialogOpen}
-				onOpenChange={setDeleteDialogOpen}
-				sessionName={session?.name || ""}
-				onConfirm={handleConfirmDelete}
-				isDeleting={isDeleting}
-			/>
-		</>
 	);
 }
 

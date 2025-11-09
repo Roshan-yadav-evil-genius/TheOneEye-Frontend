@@ -11,12 +11,12 @@ import { BrowserSessionInfo } from "./components/browser-session-info";
 
 interface BrowserSessionDetailProps {
 	session: TBrowserSession;
-	onEdit?: (session: TBrowserSession) => void;
+	onSave?: (session: TBrowserSession) => void;
 }
 
 export function BrowserSessionDetail({
 	session,
-	onEdit,
+	onSave,
 }: BrowserSessionDetailProps) {
 	const {
 		tabs,
@@ -53,7 +53,7 @@ export function BrowserSessionDetail({
 			{/* Browser Session Details */}
 				<BrowserSessionInfo
 					session={session}
-					onEdit={onEdit}
+					onSave={onSave}
 				/>
 
 			{/* Browser-Style Tabs Section */}

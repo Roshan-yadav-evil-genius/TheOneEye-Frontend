@@ -3,7 +3,7 @@
 import { TBrowserSession } from "@/types/browser-session";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { IconEdit, IconInfoCircle } from "@tabler/icons-react";
+import { IconCheck, IconInfoCircle } from "@tabler/icons-react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -12,12 +12,12 @@ import {
 
 interface BrowserSessionInfoProps {
 	session: TBrowserSession;
-	onEdit?: (session: TBrowserSession) => void;
+	onSave?: (session: TBrowserSession) => void;
 }
 
 export function BrowserSessionInfo({
 	session,
-	onEdit,
+	onSave,
 }: BrowserSessionInfoProps) {
 	const getStatusBadge = (status: string) => {
 		const variants = {
@@ -72,10 +72,10 @@ export function BrowserSessionInfo({
 					{getBrowserTypeBadge(session.browser_type)}
 				</div>
 			</div>
-			{onEdit && (
-				<Button onClick={() => onEdit(session)} variant="outline" size="sm" className="h-7 text-xs ml-3 shrink-0">
-					<IconEdit className="mr-1.5 h-3.5 w-3.5" />
-					Edit
+			{onSave && (
+				<Button onClick={() => onSave(session)} variant="outline" size="sm" className="h-7 text-xs ml-3 shrink-0">
+					<IconCheck className="mr-1.5 h-3.5 w-3.5" />
+					Save
 				</Button>
 			)}
 		</div>
