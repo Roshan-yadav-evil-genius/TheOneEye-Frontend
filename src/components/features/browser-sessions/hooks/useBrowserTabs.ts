@@ -1,63 +1,85 @@
-import { useState, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { BrowserTab } from "../types/browser-tab";
+import { UseBrowserWebSocketReturn } from "./useBrowserWebSocket";
+import { getTabTitle } from "../utils/browser-utils";
 
-// Dummy data for browser tabs
-const DUMMY_TABS: BrowserTab[] = [
-	{ id: "1", title: "Google", url: "https://www.google.com" },
-	{ id: "2", title: "GitHub", url: "https://www.github.com" },
-	{ id: "3", title: "Stack Overflow", url: "https://stackoverflow.com" },
-];
+export function useBrowserTabs(websocket: UseBrowserWebSocketReturn) {
+	// Store tab metadata (title, url) separately to preserve it across page syncs
+	const [tabMetadata, setTabMetadata] = useState<Map<string, { title: string; url: string }>>(new Map());
 
-export function useBrowserTabs() {
-	const [tabs, setTabs] = useState<BrowserTab[]>(DUMMY_TABS);
-	const [activeTabId, setActiveTabId] = useState<string>(DUMMY_TABS[0]?.id || "");
-	const [currentUrl, setCurrentUrl] = useState<string>(DUMMY_TABS[0]?.url || "");
+	// Convert activePageIds Set to tabs array
+	const tabs = useMemo(() => {
+		const pageIdsArray = Array.from(websocket.activePageIds);
+		return pageIdsArray.map((pageId, index) => {
+			// Get metadata for this pageId
+			const metadata = tabMetadata.get(pageId);
+			return {
+				id: pageId, // Use pageId as the ID
+				title: metadata?.title || getTabTitle(websocket.currentUrl) || `Tab ${index + 1}`,
+				url: metadata?.url || websocket.currentUrl || "",
+				pageId: pageId,
+			} as BrowserTab;
+		});
+	}, [websocket.activePageIds, websocket.currentUrl, tabMetadata]);
 
-	// Update current URL when active tab changes
+	// Find active tab based on currentPageId
+	const activeTabId = useMemo(() => {
+		if (!websocket.currentPageId) return tabs[0]?.id || "";
+		const activeTab = tabs.find(tab => tab.pageId === websocket.currentPageId);
+		return activeTab?.id || tabs[0]?.id || "";
+	}, [tabs, websocket.currentPageId]);
+
+	const currentUrl = websocket.currentUrl;
+
+	// Update tab metadata when URL changes
 	useEffect(() => {
-		const activeTab = tabs.find(tab => tab.id === activeTabId);
-		if (activeTab) {
-			setCurrentUrl(activeTab.url);
+		if (websocket.currentPageId && websocket.currentUrl) {
+			setTabMetadata(prev => {
+				const newMap = new Map(prev);
+				newMap.set(websocket.currentPageId!, {
+					title: getTabTitle(websocket.currentUrl),
+					url: websocket.currentUrl,
+				});
+				return newMap;
+			});
 		}
-	}, [activeTabId, tabs]);
+	}, [websocket.currentPageId, websocket.currentUrl]);
 
 	const handleTabClick = (tabId: string) => {
-		setActiveTabId(tabId);
+		const tab = tabs.find(t => t.id === tabId);
+		if (tab?.pageId && websocket.isStreaming) {
+			websocket.sendPageSwitch(tab.pageId);
+		}
 	};
 
 	const handleCloseTab = (tabId: string) => {
-		if (tabs.length <= 1) return; // Don't close the last tab
+		const tab = tabs.find(t => t.id === tabId);
+		if (!tab) return;
 
-		const newTabs = tabs.filter(tab => tab.id !== tabId);
-		setTabs(newTabs);
+		// Don't close the last tab
+		if (tabs.length <= 1) return;
 
-		// If closed tab was active, switch to another tab
-		if (activeTabId === tabId) {
-			const newActiveTab = newTabs[0];
-			if (newActiveTab) {
-				setActiveTabId(newActiveTab.id);
-			}
+		// Send close message to WebSocket
+		if (tab.pageId && websocket.isStreaming) {
+			websocket.sendCloseTab(tab.pageId);
 		}
 	};
 
 	const handleAddTab = () => {
-		const newTab: BrowserTab = {
-			id: Date.now().toString(),
-			title: "New Tab",
-			url: "https://www.example.com"
-		};
-		setTabs([...tabs, newTab]);
-		setActiveTabId(newTab.id);
+		if (websocket.isStreaming) {
+			websocket.sendNewTab();
+		}
 	};
 
 	return {
 		tabs,
 		activeTabId,
 		currentUrl,
-		setCurrentUrl,
+		setCurrentUrl: () => {
+			// URL is managed by WebSocket, but we provide this for compatibility
+		},
 		handleTabClick,
 		handleCloseTab,
 		handleAddTab,
 	};
 }
-

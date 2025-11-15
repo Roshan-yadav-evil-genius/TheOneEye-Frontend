@@ -19,6 +19,9 @@ export function BrowserTabBar({
 	onTabClose,
 	onAddTab,
 }: BrowserTabBarProps) {
+	// Only show close button if more than one tab exists
+	const showCloseButton = tabs.length > 1;
+
 	return (
 		<div className="flex items-end gap-0.5 px-1 pt-1">
 			{tabs.map((tab) => (
@@ -26,6 +29,7 @@ export function BrowserTabBar({
 					key={tab.id}
 					tab={tab}
 					isActive={activeTabId === tab.id}
+					showCloseButton={showCloseButton}
 					onClick={() => onTabClick(tab.id)}
 					onClose={(e) => {
 						e.stopPropagation();

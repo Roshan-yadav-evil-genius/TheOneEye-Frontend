@@ -1,13 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TBrowserSession } from "@/types/browser-session";
+import { useBrowserWebSocket } from "./hooks/useBrowserWebSocket";
 import { useBrowserTabs } from "./hooks/useBrowserTabs";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
 import { BrowserSessionInfo } from "./components/browser-session-info";
+import { IconPlayerPlay, IconPlayerStop } from "@tabler/icons-react";
 
 interface BrowserSessionDetailProps {
 	session: TBrowserSession;
@@ -18,6 +22,7 @@ export function BrowserSessionDetail({
 	session,
 	onSave,
 }: BrowserSessionDetailProps) {
+	const websocket = useBrowserWebSocket();
 	const {
 		tabs,
 		activeTabId,
@@ -26,35 +31,91 @@ export function BrowserSessionDetail({
 		handleTabClick,
 		handleCloseTab,
 		handleAddTab,
-	} = useBrowserTabs();
+	} = useBrowserTabs(websocket);
+
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			websocket.disconnect();
+		};
+	}, [websocket]);
 
 	const handleGoBack = () => {
-		// Browser navigation logic here
-		console.log("Go back");
+		if (websocket.isStreaming) {
+			websocket.sendNavigate('back');
+		}
 	};
 
 	const handleGoForward = () => {
-		// Browser navigation logic here
-		console.log("Go forward");
+		if (websocket.isStreaming) {
+			websocket.sendNavigate('forward');
+		}
 	};
 
 	const handleRefresh = () => {
-		// Browser refresh logic here
-		console.log("Refresh");
+		if (websocket.isStreaming) {
+			websocket.sendNavigate('refresh');
+		}
 	};
 
 	const handleGoHome = () => {
-		// Navigate to home page
-		setCurrentUrl("https://www.google.com");
+		if (websocket.isStreaming) {
+			websocket.sendNavigate('goto', 'https://duckduckgo.com/');
+		}
+	};
+
+	const handleNavigate = (url: string) => {
+		if (websocket.isStreaming) {
+			websocket.sendNavigate('goto', url);
+		}
+	};
+
+	const handleStartStreaming = () => {
+		if (!websocket.isConnected) {
+			websocket.connect();
+		}
+	};
+
+	const handleStopStreaming = () => {
+		websocket.disconnect();
 	};
 
 	return (
 		<div className="">
 			{/* Browser Session Details */}
+			<div className="flex items-center justify-between mb-2">
 				<BrowserSessionInfo
 					session={session}
 					onSave={onSave}
 				/>
+				<div className="flex items-center gap-2">
+					{/* Connection Status */}
+					<div className="text-sm text-muted-foreground">
+						Status: {websocket.status}
+					</div>
+					{/* Start/Stop Streaming Button */}
+					{!websocket.isStreaming ? (
+						<Button
+							onClick={handleStartStreaming}
+							size="sm"
+							className="gap-2"
+						>
+							<IconPlayerPlay className="h-4 w-4" />
+							Start Streaming
+						</Button>
+					) : (
+						<Button
+							onClick={handleStopStreaming}
+							size="sm"
+							variant="destructive"
+							className="gap-2"
+						>
+							<IconPlayerStop className="h-4 w-4" />
+							Stop Streaming
+						</Button>
+					)}
+				</div>
+			</div>
 
 			{/* Browser-Style Tabs Section */}
 			<Card className="p-0 overflow-hidden rounded-lg flex flex-col h-[calc(100vh-12rem)]">
@@ -75,18 +136,26 @@ export function BrowserSessionDetail({
 						onGoForward={handleGoForward}
 						onGoHome={handleGoHome}
 						onRefresh={handleRefresh}
+						onNavigate={handleNavigate}
+						isStreaming={websocket.isStreaming}
 					/>
 
 					{/* Browser Content Area */}
-					{tabs.map((tab) => (
-						<TabsContent
-							key={tab.id}
-							value={tab.id}
-							className="p-1 bg-background flex-1 min-h-0 flex flex-col"
-						>
-							<BrowserCanvas tabId={tab.id} />
-						</TabsContent>
-					))}
+					{tabs.length > 0 ? (
+						tabs.map((tab) => (
+							<TabsContent
+								key={tab.id}
+								value={tab.id}
+								className="p-1 bg-background flex-1 min-h-0 flex flex-col"
+							>
+								<BrowserCanvas tabId={tab.id} websocket={websocket} />
+							</TabsContent>
+						))
+					) : (
+						<div className="flex-1 flex items-center justify-center text-muted-foreground">
+							{websocket.isStreaming ? "Waiting for pages..." : "Start streaming to begin"}
+						</div>
+					)}
 				</Tabs>
 			</Card>
 		</div>
