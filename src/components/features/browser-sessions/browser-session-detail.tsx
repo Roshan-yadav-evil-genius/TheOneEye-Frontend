@@ -40,6 +40,7 @@ export function BrowserSessionDetail({
 		connect,
 		isConnected,
 		webSocketStatus,
+		sessionId: session.id,
 	});
 
 	// Create refs to store handlers from hooks

@@ -5,6 +5,7 @@ interface UseStartSessionProps {
 	connect: () => void;
 	isConnected: boolean;
 	webSocketStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
+	sessionId: string;
 }
 
 /**
@@ -17,13 +18,20 @@ export function useStartSession({
 	connect,
 	isConnected,
 	webSocketStatus,
+	sessionId,
 }: UseStartSessionProps) {
 	const pendingStartMessageRef = useRef(false);
+	const sessionIdRef = useRef(sessionId);
+
+	// Update sessionId ref when it changes
+	useEffect(() => {
+		sessionIdRef.current = sessionId;
+	}, [sessionId]);
 
 	// Watch for connection and send pending start message when connected
 	useEffect(() => {
 		if (isConnected && pendingStartMessageRef.current) {
-			sendMessage({ type: "start" });
+			sendMessage({ type: "start", session_id: sessionIdRef.current });
 			pendingStartMessageRef.current = false;
 		}
 	}, [isConnected, sendMessage]);
@@ -40,7 +48,7 @@ export function useStartSession({
 			connect();
 		} else if (isConnected) {
 			// Already connected, just send the start message
-			sendMessage({ type: "start" });
+			sendMessage({ type: "start", session_id: sessionIdRef.current });
 		}
 		// If connecting, do nothing (button should be disabled)
 	}, [isConnected, webSocketStatus, connect, sendMessage]);
