@@ -22,7 +22,8 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
   const isDashboardPage = pathname.startsWith('/dashboard') || 
                          pathname.startsWith('/workflow') || 
                          pathname.startsWith('/nodes') ||
-                         pathname.startsWith('/browser-sessions')
+                         pathname.startsWith('/browser-sessions') ||
+                         pathname.startsWith('/auth')
 
   if (!isDashboardPage) {
     // For non-dashboard pages, just render children without sidebar

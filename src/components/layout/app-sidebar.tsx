@@ -6,6 +6,7 @@ import {
   IconDashboard,
   IconListDetails,
   IconNetwork,
+  IconKey,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/navigation/nav-main"
@@ -50,6 +51,11 @@ const data = {
       title:"Sessions",
       url: "/browser-sessions",
       icon: IconBrowser,
+    },
+    {
+      title: "Auth",
+      url: "/auth",
+      icon: IconKey,
     }
   ],
 }
