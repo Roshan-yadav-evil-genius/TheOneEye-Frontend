@@ -72,6 +72,8 @@ export interface TUIStoreState {
     editNode: boolean;
     createWorkflow: boolean;
     editWorkflow: boolean;
+    createBrowserSession: boolean;
+    editBrowserSession: boolean;
   };
   mobileMenuOpen: boolean;
   expandedNodeGroups: Set<string>;
