@@ -8,12 +8,11 @@ import { getTabTitle } from "../utils/browser-utils";
 interface BrowserTabProps {
 	tab: BrowserTab;
 	isActive: boolean;
-	showCloseButton?: boolean;
 	onClick: () => void;
 	onClose: (e: React.MouseEvent) => void;
 }
 
-export function BrowserTabComponent({ tab, isActive, showCloseButton = false, onClick, onClose }: BrowserTabProps) {
+export function BrowserTabComponent({ tab, isActive, onClick, onClose }: BrowserTabProps) {
 	return (
 		<button
 			onClick={onClick}
@@ -26,9 +25,9 @@ export function BrowserTabComponent({ tab, isActive, showCloseButton = false, on
 		>
 			<IconBrowser className="h-4 w-4 shrink-0" />
 			<span className="text-sm font-medium whitespace-nowrap max-w-[150px] truncate">
-				{tab.title || getTabTitle(tab.url)}
+				{getTabTitle(tab.url)}
 			</span>
-			{isActive && showCloseButton && (
+			{isActive && (
 				<span
 					role="button"
 					tabIndex={0}
