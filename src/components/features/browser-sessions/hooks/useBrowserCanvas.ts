@@ -37,42 +37,102 @@ export function useBrowserCanvas(): UseBrowserCanvasReturn {
   }, []);
 
   /**
-   * Scale canvas to fit viewport while maintaining aspect ratio.
-   * Accounts for toolbar and tabs height.
+   * Scale canvas to fit container while maintaining aspect ratio.
+   * Dynamically measures container and sibling elements (tab bar, address bar).
    */
   const scaleCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const container = canvas.parentElement;
-    if (!container) return;
+    // Get the canvas container (the div wrapping the canvas)
+    const canvasContainer = canvas.parentElement;
+    if (!canvasContainer) return;
 
-    // Get toolbar and tabs height (approximate, can be adjusted)
-    const toolbarHeight = 64; // Approximate toolbar height
-    const tabsHeight = 48; // Approximate tabs height
+    // Get the parent container that holds tab bar, address bar, and canvas
+    const parentContainer = canvasContainer.parentElement;
+    if (!parentContainer) return;
 
-    const maxWidth = window.innerWidth;
-    const maxHeight = window.innerHeight - toolbarHeight - tabsHeight;
+    // Get container's actual dimensions using clientWidth/clientHeight (more reliable)
+    const containerWidth = parentContainer.clientWidth;
+    const containerHeight = parentContainer.clientHeight;
 
+    // Dynamically measure tab bar and address bar heights
+    // Sum heights of all sibling elements before the canvas container
+    let usedHeight = 0;
+    const children = Array.from(parentContainer.children);
+    for (const child of children) {
+      if (child === canvasContainer) {
+        break; // Stop when we reach the canvas container
+      }
+      usedHeight += child.clientHeight || 0;
+    }
+
+    // Calculate available space for canvas
+    // Account for padding on canvas container (p-1 = 4px on each side = 8px total)
+    const padding = 8;
+    const availableWidth = containerWidth - padding;
+    const availableHeight = containerHeight - usedHeight - padding;
+
+    // Ensure we have positive dimensions
+    if (availableWidth <= 0 || availableHeight <= 0) {
+      return; // Not enough space, skip scaling
+    }
+
+    // Calculate aspect ratio
     const aspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-    let displayWidth = maxWidth;
+    // Calculate display dimensions maintaining aspect ratio
+    // Start with width-based calculation
+    let displayWidth = availableWidth;
     let displayHeight = displayWidth / aspectRatio;
 
-    if (displayHeight > maxHeight) {
-      displayHeight = maxHeight;
+    // If height exceeds available space, scale down based on height
+    if (displayHeight > availableHeight) {
+      displayHeight = availableHeight;
       displayWidth = displayHeight * aspectRatio;
     }
 
+    // Ensure we don't exceed container width (safety check)
+    if (displayWidth > availableWidth) {
+      displayWidth = availableWidth;
+      displayHeight = displayWidth / aspectRatio;
+    }
+
+    // Apply dimensions
     canvas.style.width = displayWidth + 'px';
     canvas.style.height = displayHeight + 'px';
+    canvas.style.maxWidth = '100%';
+    canvas.style.maxHeight = '100%';
+    canvas.style.objectFit = 'contain';
   }, []);
 
-  // Scale on mount and window resize
+  // Scale on mount, window resize, and container size changes
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Initial scale
     scaleCanvas();
+
+    // Use ResizeObserver for container size changes (more reliable)
+    const container = canvas.parentElement?.parentElement;
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (container && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        // Small delay to ensure layout is complete
+        setTimeout(scaleCanvas, 0);
+      });
+      resizeObserver.observe(container);
+    }
+
+    // Also listen to window resize as fallback
     window.addEventListener('resize', scaleCanvas);
+
     return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       window.removeEventListener('resize', scaleCanvas);
     };
   }, [scaleCanvas]);

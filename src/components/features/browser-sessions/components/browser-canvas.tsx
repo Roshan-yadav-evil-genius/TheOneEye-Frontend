@@ -48,13 +48,13 @@ export function BrowserCanvas({
 	});
 
 	return (
-		<div className="w-full h-full flex-1 min-h-0 relative">
+		<div className="w-full h-full flex-1 min-h-0 relative overflow-hidden flex items-center justify-center">
 			<canvas
 				ref={canvasRef}
 				id={`browser-canvas-${tabId}`}
-				className="w-full h-full border border-border rounded"
+				className="border border-border rounded"
 				tabIndex={0}
-				style={{ outline: 'none' }}
+				style={{ outline: 'none', display: 'block' }}
 			>
 			</canvas>
 		</div>
