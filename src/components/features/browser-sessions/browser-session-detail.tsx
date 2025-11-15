@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TBrowserSession } from "@/types/browser-session";
 import { useStartSession } from "./hooks/useStartSession";
 import { useVideoWebSocket } from "@/hooks/useVideoWebSocket";
@@ -11,7 +9,6 @@ import { useBrowserNavigation } from "./hooks/useBrowserNavigation";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
-import { BrowserSessionInfo } from "./components/browser-session-info";
 
 interface BrowserSessionDetailProps {
 	session: TBrowserSession;
@@ -111,15 +108,6 @@ export function BrowserSessionDetail({
 
 	return (
 		<div className="flex flex-col flex-1 mx-4 my-2">
-			{/* Browser Session Details */}
-			<BrowserSessionInfo
-				session={session}
-				onSave={onSave}
-				onStartSession={handleStartSession}
-				isWebSocketConnected={isWebSocketConnected || isConnected}
-				webSocketStatus={startSessionStatus || webSocketStatus}
-			/>
-
 			{/* Browser-Style Tabs Section */}
 			<div id="browser-session-detail" className="bg-gray-900 rounded-lg overflow-hidden w-full gap-0 border-2 flex flex-col flex-1">
 				{/* Browser Tab Bar */}
@@ -129,6 +117,10 @@ export function BrowserSessionDetail({
 					onPageSwitch={handlePageSwitch}
 					onPageClose={handleCloseTab}
 					onNewTab={handleNewTab}
+					onStartSession={handleStartSession}
+					onSave={onSave ? () => onSave(session) : undefined}
+					isConnected={isConnected}
+					webSocketStatus={startSessionStatus || webSocketStatus}
 				/>
 
 				{/* Browser Address Bar */}
@@ -142,7 +134,7 @@ export function BrowserSessionDetail({
 				/>
 
 				{/* Browser Content Area */}
-				<div className="p-1 bg-background flex-1 min-h-0 flex flex-col">
+				<div className="bg-background flex-1 min-h-0 flex flex-col">
 					{currentPageId && (
 						<BrowserCanvas
 							tabId={currentPageId}
