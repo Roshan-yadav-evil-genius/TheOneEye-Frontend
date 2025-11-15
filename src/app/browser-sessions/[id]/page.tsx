@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { BrowserSessionDetail } from "@/components/features/browser-sessions/browser-session-detail";			
 import { useBrowserSessionStore } from "@/stores/browser-session-store";
@@ -21,6 +22,7 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 	const [session, setSession] = useState<TBrowserSession | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const router = useRouter();
 
 	const { getSessionById, deleteSession, launchBrowser } = useBrowserSessionStore();
 
@@ -54,7 +56,8 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 	}, [sessionId, getSessionById]);
 
 	const handleSave = (sessionToSave: TBrowserSession) => {
-		console.log(sessionToSave);
+		// Redirect to browser sessions list page after save
+		router.push("/browser-sessions");
 	};
 	// Loading state
 	if (isLoading) {

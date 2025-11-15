@@ -105,7 +105,7 @@ export function BrowserSessionDetail({
 
 	const handleGoHome = () => {
 		// Navigate to home page
-		handleGoToUrl("https://duckduckgo.com/");
+		handleGoToUrl("https://www.google.com/");
 	};
 
 	return (
