@@ -6,12 +6,8 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="px-4 lg:px-6">
-      <div className="space-y-4">
-        <main>
-          {children}
-        </main>
-      </div>
-    </div>
+    <main className="flex flex-col flex-1">
+      {children}
+    </main>
   )
 }

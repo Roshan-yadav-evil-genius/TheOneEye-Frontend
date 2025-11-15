@@ -110,56 +110,55 @@ export function BrowserSessionDetail({
 	};
 
 	return (
-		<div className="">
+		<>
 			{/* Browser Session Details */}
-				<BrowserSessionInfo
-					session={session}
-					onSave={onSave}
-					onStartSession={handleStartSession}
-					isWebSocketConnected={isWebSocketConnected || isConnected}
-					webSocketStatus={startSessionStatus || webSocketStatus}
-				/>
+			<BrowserSessionInfo
+				session={session}
+				onSave={onSave}
+				onStartSession={handleStartSession}
+				isWebSocketConnected={isWebSocketConnected || isConnected}
+				webSocketStatus={startSessionStatus || webSocketStatus}
+			/>
 
 			{/* Browser-Style Tabs Section */}
-			<Card className="p-0 overflow-hidden rounded-lg flex flex-col h-[calc(100vh-12rem)]">
-				<div className="w-full gap-0 flex flex-col flex-1 min-h-0">
-					{/* Browser Tab Bar */}
-					<BrowserTabBar
-						activePageIds={activePageIds}
-						currentPageId={currentPageId}
-						onPageSwitch={handlePageSwitch}
-						onPageClose={handleCloseTab}
-						onNewTab={handleNewTab}
-					/>
+			<div id="browser-session-detail" className="bg-gray-900 rounded-lg w-full gap-0 border-2 flex flex-col flex-1">
+				{/* Browser Tab Bar */}
+				<BrowserTabBar
+					activePageIds={activePageIds}
+					currentPageId={currentPageId}
+					onPageSwitch={handlePageSwitch}
+					onPageClose={handleCloseTab}
+					onNewTab={handleNewTab}
+				/>
 
-					{/* Browser Address Bar */}
-					<BrowserAddressBar
-						currentUrl={currentUrl}
-						onGoBack={handleGoBack}
-						onGoForward={handleGoForward}
-						onGoHome={handleGoHome}
-						onRefresh={handleRefresh}
-						onGoToUrl={handleGoToUrl}
-					/>
+				{/* Browser Address Bar */}
+				<BrowserAddressBar
+					currentUrl={currentUrl}
+					onGoBack={handleGoBack}
+					onGoForward={handleGoForward}
+					onGoHome={handleGoHome}
+					onRefresh={handleRefresh}
+					onGoToUrl={handleGoToUrl}
+				/>
 
-					{/* Browser Content Area */}
-					<div className="p-1 bg-background flex-1 min-h-0 flex flex-col">
-						{currentPageId && (
-							<BrowserCanvas
-								tabId={currentPageId}
-								sendMessage={sendMessage}
-								isStreaming={isConnected}
-								setOnBinaryFrame={setOnBinaryFrame}
-							/>
-						)}
-						{!currentPageId && activePageIds.length === 0 && (
-							<div className="flex items-center justify-center h-full text-muted-foreground">
-								No active page. Click "Start Session" to begin.
-							</div>
-						)}
-					</div>
+				{/* Browser Content Area */}
+				<div className="p-1 bg-background flex-1 min-h-0 flex flex-col">
+					{currentPageId && (
+						<BrowserCanvas
+							tabId={currentPageId}
+							sendMessage={sendMessage}
+							isStreaming={isConnected}
+							setOnBinaryFrame={setOnBinaryFrame}
+						/>
+					)}
+					{!currentPageId && activePageIds.length === 0 && (
+						<div className="flex items-center justify-center h-full text-muted-foreground">
+							No active page. Click "Start Session" to begin.
+						</div>
+					)}
 				</div>
-			</Card>
-		</div>
+			</div>
+
+		</>
 	);
 }

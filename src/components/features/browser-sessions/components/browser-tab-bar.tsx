@@ -21,6 +21,7 @@ export function BrowserTabBar({
 	const showCloseButton = activePageIds.length > 1; // Only show close button if more than one tab
 
 	return (
+		
 		<div className="flex items-end gap-0.5 px-1 pt-1">
 			{activePageIds.length === 0 ? (
 				<div className="px-3 py-2 text-sm text-muted-foreground">No tabs open</div>
