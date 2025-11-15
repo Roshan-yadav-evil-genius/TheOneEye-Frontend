@@ -10,6 +10,10 @@ interface UseVideoWebSocketReturn {
   connect: () => void;
   disconnect: () => void;
   isConnected: boolean;
+  onBinaryFrame?: (data: Blob | ArrayBuffer) => void;
+  onControlMessage?: (data: Record<string, unknown>) => void;
+  setOnBinaryFrame: (callback: (data: Blob | ArrayBuffer) => void) => void;
+  setOnControlMessage: (callback: (data: Record<string, unknown>) => void) => void;
 }
 
 export function useVideoWebSocket(): UseVideoWebSocketReturn {
@@ -19,6 +23,8 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
   const reconnectAttemptsRef = useRef(0);
   const isConnectingRef = useRef(false);
   const isMountedRef = useRef(true);
+  const binaryFrameCallbackRef = useRef<((data: Blob | ArrayBuffer) => void) | undefined>(undefined);
+  const controlMessageCallbackRef = useRef<((data: Record<string, unknown>) => void) | undefined>(undefined);
   const maxReconnectAttempts = 5;
   const reconnectDelay = 3000; // 3 seconds
 
@@ -85,6 +91,9 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
       const wsUrl = getWebSocketUrl();
       console.log('🔌 Attempting WebSocket connection to:', wsUrl.replace(/\?token=.*/, '?token=***'));
       const ws = new WebSocket(wsUrl);
+      
+      // Set binary type to handle binary frame data
+      ws.binaryType = 'blob'; // Use 'blob' for easier handling
 
       ws.onopen = () => {
         if (!isMountedRef.current) {
@@ -99,8 +108,24 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
 
       ws.onmessage = (event) => {
         if (!isMountedRef.current) return;
-        console.log('📨 WebSocket message received:', event.data);
-        // Handle incoming messages if needed
+        
+        // Check if message is binary (frame data) or text (control message)
+        if (event.data instanceof Blob || event.data instanceof ArrayBuffer) {
+          // Binary message = frame data (raw JPEG bytes)
+          if (binaryFrameCallbackRef.current) {
+            binaryFrameCallbackRef.current(event.data);
+          }
+        } else {
+          // Text message = control message (JSON)
+          try {
+            const data = JSON.parse(event.data as string);
+            if (controlMessageCallbackRef.current) {
+              controlMessageCallbackRef.current(data);
+            }
+          } catch (error) {
+            console.error('❌ Failed to parse control message:', error);
+          }
+        }
       };
 
       ws.onerror = (error) => {
@@ -196,6 +221,14 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
     setStatus('disconnected');
   }, []);
 
+  const setOnBinaryFrame = useCallback((callback: (data: Blob | ArrayBuffer) => void) => {
+    binaryFrameCallbackRef.current = callback;
+  }, []);
+
+  const setOnControlMessage = useCallback((callback: (data: Record<string, unknown>) => void) => {
+    controlMessageCallbackRef.current = callback;
+  }, []);
+
   // Setup mount tracking and cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true;
@@ -228,6 +261,10 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
     connect,
     disconnect,
     isConnected: status === 'connected',
+    onBinaryFrame: binaryFrameCallbackRef.current,
+    onControlMessage: controlMessageCallbackRef.current,
+    setOnBinaryFrame,
+    setOnControlMessage,
   };
 }
 

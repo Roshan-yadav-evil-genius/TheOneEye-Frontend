@@ -1,13 +1,23 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useVideoWebSocket } from "@/hooks/useVideoWebSocket";
+
+interface UseStartSessionProps {
+	sendMessage: (message: { type: string; [key: string]: unknown }) => void;
+	connect: () => void;
+	isConnected: boolean;
+	webSocketStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
+}
 
 /**
  * Hook to manage the start session flow.
  * Handles WebSocket connection and sending start message.
  * Single responsibility: Start session logic only.
  */
-export function useStartSession() {
-	const { status: webSocketStatus, sendMessage, connect, isConnected } = useVideoWebSocket();
+export function useStartSession({
+	sendMessage,
+	connect,
+	isConnected,
+	webSocketStatus,
+}: UseStartSessionProps) {
 	const pendingStartMessageRef = useRef(false);
 
 	// Watch for connection and send pending start message when connected
@@ -41,4 +51,3 @@ export function useStartSession() {
 		webSocketStatus,
 	};
 }
-

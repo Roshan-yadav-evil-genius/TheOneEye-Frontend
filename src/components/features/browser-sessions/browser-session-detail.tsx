@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TBrowserSession } from "@/types/browser-session";
-import { useBrowserTabs } from "./hooks/useBrowserTabs";
 import { useStartSession } from "./hooks/useStartSession";
+import { useVideoWebSocket } from "@/hooks/useVideoWebSocket";
+import { useBrowserPages } from "./hooks/useBrowserPages";
+import { useBrowserNavigation } from "./hooks/useBrowserNavigation";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
@@ -19,41 +22,91 @@ export function BrowserSessionDetail({
 	session,
 	onSave,
 }: BrowserSessionDetailProps) {
+	// WebSocket connection
 	const {
-		tabs,
-		activeTabId,
-		currentUrl,
-		setCurrentUrl,
-		handleTabClick,
-		handleCloseTab,
-		handleAddTab,
-	} = useBrowserTabs();
+		status: webSocketStatus,
+		sendMessage,
+		connect,
+		isConnected,
+		setOnBinaryFrame,
+		setOnControlMessage,
+	} = useVideoWebSocket();
 
 	// Start session logic (handles WebSocket connection and start message)
 	const {
 		handleStartSession,
 		isWebSocketConnected,
+		webSocketStatus: startSessionStatus,
+	} = useStartSession({
+		sendMessage,
+		connect,
+		isConnected,
 		webSocketStatus,
-	} = useStartSession();
+	});
 
-	const handleGoBack = () => {
-		// Browser navigation logic here
-		console.log("Go back");
+	// Create refs to store handlers from hooks
+	const pagesHandlerRef = useRef<((data: Record<string, unknown>) => void) | null>(null);
+	const navigationHandlerRef = useRef<((data: Record<string, unknown>) => void) | null>(null);
+
+	// Wrapper to set pages handler
+	const setPagesHandler = (handler: (data: Record<string, unknown>) => void) => {
+		pagesHandlerRef.current = handler;
 	};
 
-	const handleGoForward = () => {
-		// Browser navigation logic here
-		console.log("Go forward");
+	// Wrapper to set navigation handler
+	const setNavigationHandler = (handler: (data: Record<string, unknown>) => void) => {
+		navigationHandlerRef.current = handler;
 	};
 
-	const handleRefresh = () => {
-		// Browser refresh logic here
-		console.log("Refresh");
-	};
+	// Register combined handler with WebSocket
+	useEffect(() => {
+		const combinedHandler = (data: Record<string, unknown>) => {
+			if (pagesHandlerRef.current) {
+				pagesHandlerRef.current(data);
+			}
+			if (navigationHandlerRef.current) {
+				navigationHandlerRef.current(data);
+			}
+		};
+		setOnControlMessage(combinedHandler);
+	}, [setOnControlMessage]);
+
+	// Browser pages/tabs management from backend
+	const {
+		activePageIds,
+		currentPageId,
+		handlePageSwitch,
+		handleCloseTab,
+		handleNewTab,
+	} = useBrowserPages({
+		setOnControlMessage: setPagesHandler,
+		sendMessage,
+		isStreaming: isConnected,
+	});
+
+	// Browser navigation
+	const {
+		currentUrl,
+		handleGoBack,
+		handleGoForward,
+		handleRefresh,
+		handleGoToUrl,
+	} = useBrowserNavigation({
+		setOnControlMessage: setNavigationHandler,
+		sendMessage,
+		isStreaming: isConnected,
+	});
+
+	// Auto-focus canvas when streaming starts
+	useEffect(() => {
+		if (isConnected) {
+			// Focus will be handled by canvas component
+		}
+	}, [isConnected]);
 
 	const handleGoHome = () => {
 		// Navigate to home page
-		setCurrentUrl("https://www.google.com");
+		handleGoToUrl("https://duckduckgo.com/");
 	};
 
 	return (
@@ -63,20 +116,20 @@ export function BrowserSessionDetail({
 					session={session}
 					onSave={onSave}
 					onStartSession={handleStartSession}
-					isWebSocketConnected={isWebSocketConnected}
-					webSocketStatus={webSocketStatus}
+					isWebSocketConnected={isWebSocketConnected || isConnected}
+					webSocketStatus={startSessionStatus || webSocketStatus}
 				/>
 
 			{/* Browser-Style Tabs Section */}
 			<Card className="p-0 overflow-hidden rounded-lg flex flex-col h-[calc(100vh-12rem)]">
-				<Tabs value={activeTabId} onValueChange={handleTabClick} className="w-full gap-0 flex flex-col flex-1 min-h-0">
+				<div className="w-full gap-0 flex flex-col flex-1 min-h-0">
 					{/* Browser Tab Bar */}
 					<BrowserTabBar
-						tabs={tabs}
-						activeTabId={activeTabId}
-						onTabClick={handleTabClick}
-						onTabClose={handleCloseTab}
-						onAddTab={handleAddTab}
+						activePageIds={activePageIds}
+						currentPageId={currentPageId}
+						onPageSwitch={handlePageSwitch}
+						onPageClose={handleCloseTab}
+						onNewTab={handleNewTab}
 					/>
 
 					{/* Browser Address Bar */}
@@ -86,19 +139,26 @@ export function BrowserSessionDetail({
 						onGoForward={handleGoForward}
 						onGoHome={handleGoHome}
 						onRefresh={handleRefresh}
+						onGoToUrl={handleGoToUrl}
 					/>
 
 					{/* Browser Content Area */}
-					{tabs.map((tab) => (
-						<TabsContent
-							key={tab.id}
-							value={tab.id}
-							className="p-1 bg-background flex-1 min-h-0 flex flex-col"
-						>
-							<BrowserCanvas tabId={tab.id} />
-						</TabsContent>
-					))}
-				</Tabs>
+					<div className="p-1 bg-background flex-1 min-h-0 flex flex-col">
+						{currentPageId && (
+							<BrowserCanvas
+								tabId={currentPageId}
+								sendMessage={sendMessage}
+								isStreaming={isConnected}
+								setOnBinaryFrame={setOnBinaryFrame}
+							/>
+						)}
+						{!currentPageId && activePageIds.length === 0 && (
+							<div className="flex items-center justify-center h-full text-muted-foreground">
+								No active page. Click "Start Session" to begin.
+							</div>
+						)}
+					</div>
+				</div>
 			</Card>
 		</div>
 	);
