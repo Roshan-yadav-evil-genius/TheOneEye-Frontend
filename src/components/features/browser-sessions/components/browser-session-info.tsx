@@ -3,7 +3,7 @@
 import { TBrowserSession } from "@/types/browser-session";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { IconCheck, IconInfoCircle } from "@tabler/icons-react";
+import { IconCheck, IconInfoCircle, IconPlayerPlay } from "@tabler/icons-react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -13,11 +13,17 @@ import {
 interface BrowserSessionInfoProps {
 	session: TBrowserSession;
 	onSave?: (session: TBrowserSession) => void;
+	onStartSession?: () => void;
+	isWebSocketConnected?: boolean;
+	webSocketStatus?: 'connecting' | 'connected' | 'disconnected' | 'error';
 }
 
 export function BrowserSessionInfo({
 	session,
 	onSave,
+	onStartSession,
+	isWebSocketConnected = false,
+	webSocketStatus = 'disconnected',
 }: BrowserSessionInfoProps) {
 	const getStatusBadge = (status: string) => {
 		const variants = {
@@ -72,12 +78,52 @@ export function BrowserSessionInfo({
 					{getBrowserTypeBadge(session.browser_type)}
 				</div>
 			</div>
-			{onSave && (
-				<Button onClick={() => onSave(session)} size="lg" className="h-7 text-xs ml-3 shrink-0">
-					<IconCheck className="mr-1.5 h-3.5 w-3.5" />
-					Save
-				</Button>
-			)}
+			<div className="flex items-center gap-2 ml-3 shrink-0">
+				{onStartSession && (
+					<>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<span>
+									<Button
+										onClick={onStartSession}
+										disabled={webSocketStatus === 'connecting'}
+										size="lg"
+										className="h-7 text-xs"
+										variant={isWebSocketConnected ? "default" : "secondary"}
+									>
+										<IconPlayerPlay className="mr-1.5 h-3.5 w-3.5" />
+										Start Session
+									</Button>
+								</span>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>
+									{webSocketStatus === 'connecting' && 'Connecting to server...'}
+									{webSocketStatus === 'connected' && 'Start the session'}
+									{webSocketStatus === 'disconnected' && 'Click to connect and start session'}
+									{webSocketStatus === 'error' && 'Connection error. Click to retry.'}
+								</p>
+							</TooltipContent>
+						</Tooltip>
+						{webSocketStatus === 'connecting' && (
+							<Badge variant="secondary" className="text-xs">
+								Connecting...
+							</Badge>
+						)}
+						{webSocketStatus === 'connected' && (
+							<Badge variant="default" className="text-xs">
+								Connected
+							</Badge>
+						)}
+					</>
+				)}
+				{onSave && (
+					<Button onClick={() => onSave(session)} size="lg" className="h-7 text-xs">
+						<IconCheck className="mr-1.5 h-3.5 w-3.5" />
+						Save
+					</Button>
+				)}
+			</div>
 		</div>
 	);
 }

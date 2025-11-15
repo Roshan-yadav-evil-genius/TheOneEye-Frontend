@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TBrowserSession } from "@/types/browser-session";
 import { useBrowserTabs } from "./hooks/useBrowserTabs";
+import { useStartSession } from "./hooks/useStartSession";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
@@ -27,6 +28,13 @@ export function BrowserSessionDetail({
 		handleCloseTab,
 		handleAddTab,
 	} = useBrowserTabs();
+
+	// Start session logic (handles WebSocket connection and start message)
+	const {
+		handleStartSession,
+		isWebSocketConnected,
+		webSocketStatus,
+	} = useStartSession();
 
 	const handleGoBack = () => {
 		// Browser navigation logic here
@@ -54,6 +62,9 @@ export function BrowserSessionDetail({
 				<BrowserSessionInfo
 					session={session}
 					onSave={onSave}
+					onStartSession={handleStartSession}
+					isWebSocketConnected={isWebSocketConnected}
+					webSocketStatus={webSocketStatus}
 				/>
 
 			{/* Browser-Style Tabs Section */}
