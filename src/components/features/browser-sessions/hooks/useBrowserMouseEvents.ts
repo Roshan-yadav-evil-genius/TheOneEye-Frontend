@@ -8,7 +8,7 @@ const CANVAS_HEIGHT = 1080;
 const MOUSEMOVE_THROTTLE_MS = 16; // ~60fps for mouse movement
 
 interface UseBrowserMouseEventsProps {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   sendMessage: (message: { type: string; [key: string]: unknown }) => void;
   isStreaming: boolean;
 }
@@ -62,7 +62,7 @@ export function useBrowserMouseEvents({
     if (!isStreaming) return;
 
     const coords = mapCoordinates(event.clientX, event.clientY);
-    const message: Record<string, unknown> = {
+    const message: { type: string; [key: string]: unknown } = {
       type,
       x: coords.x,
       y: coords.y,
@@ -74,7 +74,7 @@ export function useBrowserMouseEvents({
     }
 
     // Add wheel delta for wheel events
-    if (type === 'wheel') {
+    if (type === 'wheel' && 'deltaX' in event) {
       message.deltaX = event.deltaX || 0;
       message.deltaY = event.deltaY || 0;
       message.deltaZ = event.deltaZ || 0;

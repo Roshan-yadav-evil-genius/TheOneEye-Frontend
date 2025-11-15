@@ -5,7 +5,7 @@ const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 
 interface UseBrowserCanvasReturn {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   scaleCanvas: () => void;
   renderFrame: (frameData: Blob | ArrayBuffer) => void;
 }

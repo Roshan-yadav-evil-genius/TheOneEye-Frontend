@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 interface UseBrowserKeyboardEventsProps {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   sendMessage: (message: { type: string; [key: string]: unknown }) => void;
   isStreaming: boolean;
 }
