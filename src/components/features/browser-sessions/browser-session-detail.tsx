@@ -110,7 +110,7 @@ export function BrowserSessionDetail({
 	};
 
 	return (
-		<>
+		<div className="flex flex-col flex-1 mx-4 my-2">
 			{/* Browser Session Details */}
 			<BrowserSessionInfo
 				session={session}
@@ -121,7 +121,7 @@ export function BrowserSessionDetail({
 			/>
 
 			{/* Browser-Style Tabs Section */}
-			<div id="browser-session-detail" className="bg-gray-900 rounded-lg w-full gap-0 border-2 flex flex-col flex-1">
+			<div id="browser-session-detail" className="bg-gray-900 rounded-lg overflow-hidden w-full gap-0 border-2 flex flex-col flex-1">
 				{/* Browser Tab Bar */}
 				<BrowserTabBar
 					activePageIds={activePageIds}
@@ -159,6 +159,6 @@ export function BrowserSessionDetail({
 				</div>
 			</div>
 
-		</>
+		</div>
 	);
 }
