@@ -1,7 +1,6 @@
 "use client";
 
-import { IconPlus, IconPlayerPlay, IconCheck } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { IconPlus, IconDeviceFloppy } from "@tabler/icons-react";
 import { BrowserTabComponent } from "./browser-tab";
 
 interface BrowserTabBarProps {
@@ -10,10 +9,8 @@ interface BrowserTabBarProps {
 	onPageSwitch: (pageId: string) => void;
 	onPageClose: (pageId: string) => void;
 	onNewTab: () => void;
-	onStartSession?: () => void;
 	onSave?: () => void;
 	isConnected?: boolean;
-	webSocketStatus?: 'connecting' | 'connected' | 'disconnected' | 'error';
 }
 
 export function BrowserTabBar({
@@ -22,15 +19,13 @@ export function BrowserTabBar({
 	onPageSwitch,
 	onPageClose,
 	onNewTab,
-	onStartSession,
 	onSave,
 	isConnected = false,
-	webSocketStatus = 'disconnected',
 }: BrowserTabBarProps) {
 	const showCloseButton = activePageIds.length > 1; // Only show close button if more than one tab
 
 	return (
-		<div className="flex items-end justify-between gap-0.5 px-1 pt-1">
+		<div className="flex items-center justify-between gap-0.5 px-1 pt-1">
 			<div className="flex items-end gap-0.5">
 				{activePageIds.length === 0 ? (
 					<div className="px-3 py-2 text-sm text-muted-foreground">No tabs open</div>
@@ -79,28 +74,15 @@ export function BrowserTabBar({
 			</div>
 
 			{/* Action Buttons on the Right */}
-			<div className="flex items-center gap-2 ml-auto">
-				{onStartSession && !isConnected && (
-					<Button
-						onClick={onStartSession}
-						disabled={webSocketStatus === 'connecting'}
-						size="sm"
-						className="h-7 text-xs"
-						variant="secondary"
-					>
-						<IconPlayerPlay className="mr-1.5 h-3.5 w-3.5" />
-						Start Session
-					</Button>
-				)}
+			<div className="flex items-center gap-2 ml-auto mr-2 ">
 				{onSave && isConnected && (
-					<Button
+					<button
 						onClick={onSave}
-						size="sm"
-						className="h-7 text-xs"
+						className="cursor-pointer transition-colors text-green-600 hover:text-green-700"
+						title="Save (Connected)"
 					>
-						<IconCheck className="mr-1.5 h-3.5 w-3.5" />
-						Save
-					</Button>
+						<IconDeviceFloppy className="h-5 w-5" />
+					</button>
 				)}
 			</div>
 		</div>

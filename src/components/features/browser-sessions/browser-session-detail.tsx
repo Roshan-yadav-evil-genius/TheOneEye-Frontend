@@ -9,6 +9,7 @@ import { useBrowserNavigation } from "./hooks/useBrowserNavigation";
 import { BrowserTabBar } from "./components/browser-tab-bar";
 import { BrowserAddressBar } from "./components/browser-address-bar";
 import { BrowserCanvas } from "./components/browser-canvas";
+import { IconPlayerPlay } from "@tabler/icons-react";
 
 interface BrowserSessionDetailProps {
 	session: TBrowserSession;
@@ -117,10 +118,8 @@ export function BrowserSessionDetail({
 					onPageSwitch={handlePageSwitch}
 					onPageClose={handleCloseTab}
 					onNewTab={handleNewTab}
-					onStartSession={handleStartSession}
 					onSave={onSave ? () => onSave(session) : undefined}
 					isConnected={isConnected}
-					webSocketStatus={startSessionStatus || webSocketStatus}
 				/>
 
 				{/* Browser Address Bar */}
@@ -144,8 +143,20 @@ export function BrowserSessionDetail({
 						/>
 					)}
 					{!currentPageId && activePageIds.length === 0 && (
-						<div className="flex items-center justify-center h-full text-muted-foreground">
-							No active page. Click "Start Session" to begin.
+						<div className="flex flex-col items-center justify-center h-full gap-4">
+							<p className="text-muted-foreground text-lg">
+								No active page. Click "Start Session" to begin.
+							</p>
+							{!isConnected && (
+								<button
+									onClick={handleStartSession}
+									disabled={webSocketStatus === 'connecting' || startSessionStatus === 'connecting'}
+									className="cursor-pointer transition-all text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
+									title={webSocketStatus === 'connecting' || startSessionStatus === 'connecting' ? 'Connecting...' : 'Start Session'}
+								>
+									<IconPlayerPlay className="h-24 w-24" />
+								</button>
+							)}
 						</div>
 					)}
 				</div>
