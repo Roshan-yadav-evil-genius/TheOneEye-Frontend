@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { IconSearch, IconFilter, IconLoader2, IconAlertCircle, IconRefresh } from "@tabler/icons-react";
-import { useNodeTree } from "@/hooks/useNodeTree";
+import { IconSearch, IconFilter, IconLoader2, IconAlertCircle, IconRefresh, IconList, IconFolders } from "@tabler/icons-react";
+import { useNodeTree, ViewMode } from "@/hooks/useNodeTree";
 import { NodeCategoryTree } from "./node-category-tree";
+import { DraggableNodeItem } from "./draggable-node-item";
 import { cn } from "@/lib/utils";
 
 interface WorkflowSidebarProps {
@@ -25,37 +26,67 @@ export function WorkflowSidebar({
   selectedNodes,
   onNodeSelect,
 }: WorkflowSidebarProps) {
-  const { nodeTree, isLoading, error, refresh } = useNodeTree({ searchTerm });
+  const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [showFilters, setShowFilters] = useState(false);
+  
+  const { nodeTree, flatNodes, isLoading, error, refresh } = useNodeTree({ 
+    searchTerm, 
+    viewMode 
+  });
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'tree' ? 'flat' : 'tree');
+  };
 
   return (
     <div className="h-full flex flex-col bg-card">
       {/* Search Header */}
       <div className="p-3 border-b border-border space-y-2">
         {/* Search Input */}
-        <div className="relative">
-          <IconSearch 
-            size={16} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
-          />
-          <input
-            type="text"
-            placeholder="Search nodes..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+        <div className="relative flex gap-1">
+          <div className="relative flex-1">
+            <IconSearch 
+              size={16} 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
+            />
+            <input
+              type="text"
+              placeholder="Search nodes..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className={cn(
+                "w-full pl-9 pr-3 py-2 text-sm rounded-md",
+                "bg-background border border-border",
+                "placeholder:text-muted-foreground",
+                "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              )}
+            />
+          </div>
+          
+          {/* View Mode Toggle */}
+          <button
+            onClick={toggleViewMode}
             className={cn(
-              "w-full pl-9 pr-10 py-2 text-sm rounded-md",
-              "bg-background border border-border",
-              "placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              "p-2 rounded-md border border-border",
+              "hover:bg-muted transition-colors",
+              "bg-background"
             )}
-          />
+            title={viewMode === 'tree' ? 'Switch to flat view' : 'Switch to tree view'}
+          >
+            {viewMode === 'tree' ? (
+              <IconFolders size={16} className="text-primary" />
+            ) : (
+              <IconList size={16} className="text-primary" />
+            )}
+          </button>
+          
+          {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded",
+              "p-2 rounded-md border border-border",
               "hover:bg-muted transition-colors",
-              showFilters && "bg-muted text-primary"
+              showFilters ? "bg-muted text-primary" : "bg-background"
             )}
             title="Toggle filters"
           >
@@ -87,7 +118,7 @@ export function WorkflowSidebar({
         )}
       </div>
 
-      {/* Node Tree Content */}
+      {/* Node Tree/List Content */}
       <div className="flex-1 overflow-y-auto p-2">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
@@ -110,8 +141,24 @@ export function WorkflowSidebar({
               Retry
             </button>
           </div>
-        ) : (
+        ) : viewMode === 'tree' ? (
           <NodeCategoryTree nodeTree={nodeTree} searchTerm={searchTerm} />
+        ) : (
+          /* Flat List View */
+          <div className="space-y-2">
+            {flatNodes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <IconList className="w-10 h-10 text-muted-foreground/50 mb-3" />
+                <p className="text-sm text-muted-foreground">
+                  {searchTerm ? 'No nodes match your search' : 'No nodes available'}
+                </p>
+              </div>
+            ) : (
+              flatNodes.map((node) => (
+                <DraggableNodeItem key={node.identifier} node={node} />
+              ))
+            )}
+          </div>
         )}
       </div>
     </div>

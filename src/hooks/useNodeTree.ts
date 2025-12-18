@@ -2,12 +2,16 @@ import { useState, useEffect, useMemo } from 'react';
 import { nodeApi } from '@/lib/api/services/node-api';
 import { TNodeTree, TNodeFolder, TNodeMetadata } from '@/types';
 
+export type ViewMode = 'tree' | 'flat';
+
 interface UseNodeTreeOptions {
   searchTerm?: string;
+  viewMode?: ViewMode;
 }
 
 interface UseNodeTreeResult {
   nodeTree: TNodeTree;
+  flatNodes: TNodeMetadata[];
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -85,10 +89,29 @@ function filterNodeTree(tree: TNodeTree, searchTerm: string): TNodeTree {
 }
 
 /**
- * Hook to fetch and manage node tree data with search filtering
+ * Filter flat nodes list based on search term
  */
-export function useNodeTree({ searchTerm = '' }: UseNodeTreeOptions = {}): UseNodeTreeResult {
+function filterFlatNodes(nodes: TNodeMetadata[], searchTerm: string): TNodeMetadata[] {
+  if (!searchTerm.trim()) {
+    return nodes;
+  }
+  
+  const lowerSearch = searchTerm.toLowerCase();
+  return nodes.filter(node => 
+    node.name.toLowerCase().includes(lowerSearch) ||
+    node.label?.toLowerCase().includes(lowerSearch) ||
+    node.identifier.toLowerCase().includes(lowerSearch) ||
+    node.category?.toLowerCase().includes(lowerSearch)
+  );
+}
+
+/**
+ * Hook to fetch and manage node tree data with search filtering
+ * Supports both tree view and flat view modes
+ */
+export function useNodeTree({ searchTerm = '', viewMode = 'tree' }: UseNodeTreeOptions = {}): UseNodeTreeResult {
   const [nodeTree, setNodeTree] = useState<TNodeTree>({});
+  const [flatNodes, setFlatNodes] = useState<TNodeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,8 +120,13 @@ export function useNodeTree({ searchTerm = '' }: UseNodeTreeOptions = {}): UseNo
     setError(null);
     
     try {
-      const data = await nodeApi.getNodes();
-      setNodeTree(data);
+      // Fetch both tree and flat data
+      const [treeData, flatData] = await Promise.all([
+        nodeApi.getNodes(),
+        nodeApi.getNodesFlat(),
+      ]);
+      setNodeTree(treeData);
+      setFlatNodes(flatData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch nodes');
       console.error('Failed to fetch node tree:', err);
@@ -116,11 +144,16 @@ export function useNodeTree({ searchTerm = '' }: UseNodeTreeOptions = {}): UseNo
     return filterNodeTree(nodeTree, searchTerm);
   }, [nodeTree, searchTerm]);
 
+  // Filter the flat list based on search term
+  const filteredFlatNodes = useMemo(() => {
+    return filterFlatNodes(flatNodes, searchTerm);
+  }, [flatNodes, searchTerm]);
+
   return {
     nodeTree: filteredTree,
+    flatNodes: filteredFlatNodes,
     isLoading,
     error,
     refresh: fetchNodes,
   };
 }
-
