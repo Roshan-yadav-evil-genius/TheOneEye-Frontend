@@ -1,26 +1,43 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 
+// Data structure for each node's persisted test data
+interface NodeTestSession {
+  inputData: Record<string, unknown>;
+  formData: Record<string, string>;
+}
+
 interface NodeTestDataState {
-  // Map of node identifier to test input data
-  testData: Record<string, Record<string, unknown>>;
+  // Map of node identifier to test session data
+  sessions: Record<string, NodeTestSession>;
 }
 
 interface NodeTestDataActions {
-  // Get test data for a specific node
-  getTestData: (nodeIdentifier: string) => Record<string, unknown>;
-  // Set test data for a specific node
-  setTestData: (nodeIdentifier: string, data: Record<string, unknown>) => void;
-  // Clear test data for a specific node
-  clearTestData: (nodeIdentifier: string) => void;
-  // Clear all test data
-  clearAllTestData: () => void;
+  // Get full session for a node
+  getSession: (nodeIdentifier: string) => NodeTestSession;
+  
+  // Input data
+  getInputData: (nodeIdentifier: string) => Record<string, unknown>;
+  setInputData: (nodeIdentifier: string, data: Record<string, unknown>) => void;
+  
+  // Form data
+  getFormData: (nodeIdentifier: string) => Record<string, string>;
+  setFormData: (nodeIdentifier: string, data: Record<string, string>) => void;
+  
+  // Clear operations
+  clearSession: (nodeIdentifier: string) => void;
+  clearAllSessions: () => void;
 }
 
 type NodeTestDataStore = NodeTestDataState & NodeTestDataActions;
 
+const emptySession: NodeTestSession = {
+  inputData: {},
+  formData: {},
+};
+
 const initialState: NodeTestDataState = {
-  testData: {},
+  sessions: {},
 };
 
 export const useNodeTestDataStore = create<NodeTestDataStore>()(
@@ -29,30 +46,57 @@ export const useNodeTestDataStore = create<NodeTestDataStore>()(
       (set, get) => ({
         ...initialState,
 
-        getTestData: (nodeIdentifier: string) => {
-          const { testData } = get();
-          return testData[nodeIdentifier] || {};
+        getSession: (nodeIdentifier: string) => {
+          const { sessions } = get();
+          return sessions[nodeIdentifier] || { ...emptySession };
         },
 
-        setTestData: (nodeIdentifier: string, data: Record<string, unknown>) => {
+        getInputData: (nodeIdentifier: string) => {
+          const { sessions } = get();
+          return sessions[nodeIdentifier]?.inputData || {};
+        },
+
+        setInputData: (nodeIdentifier: string, data: Record<string, unknown>) => {
           set((state) => ({
-            testData: {
-              ...state.testData,
-              [nodeIdentifier]: data,
+            sessions: {
+              ...state.sessions,
+              [nodeIdentifier]: {
+                ...emptySession,
+                ...state.sessions[nodeIdentifier],
+                inputData: data,
+              },
             },
           }));
         },
 
-        clearTestData: (nodeIdentifier: string) => {
+        getFormData: (nodeIdentifier: string) => {
+          const { sessions } = get();
+          return sessions[nodeIdentifier]?.formData || {};
+        },
+
+        setFormData: (nodeIdentifier: string, data: Record<string, string>) => {
+          set((state) => ({
+            sessions: {
+              ...state.sessions,
+              [nodeIdentifier]: {
+                ...emptySession,
+                ...state.sessions[nodeIdentifier],
+                formData: data,
+              },
+            },
+          }));
+        },
+
+        clearSession: (nodeIdentifier: string) => {
           set((state) => {
-            const newTestData = { ...state.testData };
-            delete newTestData[nodeIdentifier];
-            return { testData: newTestData };
+            const newSessions = { ...state.sessions };
+            delete newSessions[nodeIdentifier];
+            return { sessions: newSessions };
           });
         },
 
-        clearAllTestData: () => {
-          set({ testData: {} });
+        clearAllSessions: () => {
+          set({ sessions: {} });
         },
       }),
       {
@@ -64,4 +108,3 @@ export const useNodeTestDataStore = create<NodeTestDataStore>()(
     }
   )
 );
-

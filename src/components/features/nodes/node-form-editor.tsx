@@ -11,12 +11,16 @@ interface NodeFormEditorProps {
   node: TNodeMetadata;
   onExecute: (formData: Record<string, string>) => void;
   isExecuting?: boolean;
+  initialFormValues?: Record<string, string>;
+  onFormValuesChange?: (formData: Record<string, string>) => void;
 }
 
 export function NodeFormEditor({
   node,
   onExecute,
   isExecuting = false,
+  initialFormValues,
+  onFormValuesChange,
 }: NodeFormEditorProps) {
   const [formState, setFormState] = useState<TNodeFormData | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -60,22 +64,28 @@ export function NodeFormEditor({
           console.log("[NodeFormEditor] Form dependencies:", response.form.dependencies);
           setFormState(response.form);
           
-          // Initialize form values with defaults
-          const initialValues: Record<string, string> = {};
+          // Initialize form values - prefer persisted values, fall back to defaults
+          const defaultValues: Record<string, string> = {};
           response.form.fields?.forEach((field) => {
             if (field.value !== undefined && field.value !== null) {
-              initialValues[field.name] = String(field.value);
+              defaultValues[field.name] = String(field.value);
             } else if (field.options?.find((o) => o.selected)) {
               const selected = field.options.find((o) => o.selected);
               if (selected) {
-                initialValues[field.name] = selected.value;
+                defaultValues[field.name] = selected.value;
               }
             } else {
-              initialValues[field.name] = "";
+              defaultValues[field.name] = "";
             }
           });
-          console.log("[NodeFormEditor] Initial values:", initialValues);
-          setFormValues(initialValues);
+          
+          // Merge persisted values with defaults (persisted takes precedence)
+          const mergedValues = initialFormValues && Object.keys(initialFormValues).length > 0
+            ? { ...defaultValues, ...initialFormValues }
+            : defaultValues;
+          
+          console.log("[NodeFormEditor] Initial values:", mergedValues);
+          setFormValues(mergedValues);
         } else {
           console.warn("[NodeFormEditor] No form in response, message:", response.message);
           setFormError(response.message || "This node does not have a form");
@@ -97,6 +107,13 @@ export function NodeFormEditor({
       setFormError("This node does not have a form");
     }
   }, [node.identifier, node.has_form]);
+
+  // Notify parent when form values change
+  useEffect(() => {
+    if (onFormValuesChange && Object.keys(formValues).length > 0) {
+      onFormValuesChange(formValues);
+    }
+  }, [formValues, onFormValuesChange]);
 
   // Handle field value change with dynamic field updates
   const handleFieldChange = useCallback(

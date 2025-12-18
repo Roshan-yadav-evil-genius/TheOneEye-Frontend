@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogTitle,
@@ -23,17 +23,17 @@ interface NodeEditDialogProps {
   workflowId: string;
 }
 
-export function NodeEditDialog({ 
-  isOpen, 
-  onOpenChange, 
-  data, 
+export function NodeEditDialog({
+  isOpen,
+  onOpenChange,
+  data,
   workflowId,
 }: NodeEditDialogProps) {
   // Tab state management
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
   const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "form">("parameters");
-  
+
   // Placeholder data - execution functionality removed
   const inputData: Record<string, unknown> = {};
   const outputData: Record<string, unknown> = {};
@@ -67,8 +67,8 @@ export function NodeEditDialog({
   };
 
   return (
-    <DndContext 
-      onDragStart={handleDragStart} 
+    <DndContext
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       collisionDetection={pointerWithin}
     >
@@ -83,8 +83,8 @@ export function NodeEditDialog({
               <h2 className="text-sm font-semibold text-gray-300">
                 {data.node_type?.name}
               </h2>
-              <Button 
-                onClick={handleRefresh} 
+              <Button
+                onClick={handleRefresh}
                 disabled={isLoading}
                 variant="ghost"
                 size="sm"
@@ -94,44 +94,46 @@ export function NodeEditDialog({
                 Refresh
               </Button>
             </div>
-            <ResizablePanels 
+            <ResizablePanels
               defaultSizes={[33.33, 33.33, 33.34]}
               minSizes={[20, 25, 20]}
               maxSizes={[60, 60, 60]}
               className="flex-1 overflow-hidden"
             >
-            {/* INPUT Column */}
-            <InputSection 
-              activeInputTab={activeInputTab}
-              onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
-              jsonData={inputData}
-              isLoading={isLoading}
-              error={error}
-            />
-
-            {/* Node Editor Column */}
-            <div className="h-full overflow-hidden">
-              <NodeEditor
-                activeTab={activeNodeTab}
-                data={data}
-                onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
-                onTestStep={handleTestStep}
-                onPauseStep={handlePauseStep}
-                isExecuting={false}
-                isPolling={false}
+              {/* INPUT Column */}
+              <InputSection
+                activeInputTab={activeInputTab}
+                onInputTabChange={(value) => setActiveInputTab(value as "schema" | "json")}
+                jsonData={inputData}
+                isLoading={isLoading}
+                error={error}
               />
-            </div>
 
-            {/* OUTPUT Column */}
-            <OutputSection 
-              activeOutputTab={activeOutputTab}
-              onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
-              jsonData={outputData}
-              isLoading={isLoading}
-              error={error}
-            />
-          </ResizablePanels>
-        </div>
+              {/* Node Editor Column */}
+              <div className="h-full overflow-hidden">
+                <NodeEditor
+                  activeTab={activeNodeTab}
+                  data={data}
+                  onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
+                  onTestStep={handleTestStep}
+                  onPauseStep={handlePauseStep}
+                  isExecuting={false}
+                  isPolling={false}
+                />
+              </div>
+
+              {/* OUTPUT Column */}
+              <div className="p-5">
+                <OutputSection
+                  activeOutputTab={activeOutputTab}
+                  onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
+                  jsonData={outputData}
+                  isLoading={isLoading}
+                  error={error}
+                />
+              </div>
+            </ResizablePanels>
+          </div>
         </DialogContent>
       </Dialog>
 

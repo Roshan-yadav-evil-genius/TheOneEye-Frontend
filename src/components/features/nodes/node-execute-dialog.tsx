@@ -32,29 +32,43 @@ export function NodeExecuteDialog({
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
   // Get persisted test data from store
-  const { getTestData, setTestData } = useNodeTestDataStore();
+  const { 
+    getInputData, setInputData: persistInputData,
+    getFormData, setFormData: persistFormData,
+  } = useNodeTestDataStore();
 
   // Input JSON state - initialize from persisted store
   const [inputData, setInputData] = useState<Record<string, unknown>>(() => 
-    getTestData(node.identifier)
+    getInputData(node.identifier)
   );
+
+  // Form values state - initialize from persisted store
+  const [persistedFormValues, setPersistedFormValues] = useState<Record<string, string>>(() =>
+    getFormData(node.identifier)
+  );
+
+  // Output state - not persisted
+  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
 
   // Load persisted data when dialog opens or node changes
   useEffect(() => {
     if (isOpen) {
-      const persistedData = getTestData(node.identifier);
-      setInputData(persistedData);
+      setInputData(getInputData(node.identifier));
+      setPersistedFormValues(getFormData(node.identifier));
     }
-  }, [isOpen, node.identifier, getTestData]);
+  }, [isOpen, node.identifier, getInputData, getFormData]);
 
   // Persist input data whenever it changes
   const handleInputDataChange = useCallback((data: Record<string, unknown>) => {
     setInputData(data);
-    setTestData(node.identifier, data);
-  }, [node.identifier, setTestData]);
+    persistInputData(node.identifier, data);
+  }, [node.identifier, persistInputData]);
 
-  // Output state
-  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
+  // Persist form data whenever it changes
+  const handleFormValuesChange = useCallback((data: Record<string, string>) => {
+    setPersistedFormValues(data);
+    persistFormData(node.identifier, data);
+  }, [node.identifier, persistFormData]);
   const [isExecuting, setIsExecuting] = useState(false);
 
   // Drag state for overlay
@@ -174,6 +188,8 @@ export function NodeExecuteDialog({
                     node={node}
                     onExecute={handleExecute}
                     isExecuting={isExecuting}
+                    initialFormValues={persistedFormValues}
+                    onFormValuesChange={handleFormValuesChange}
                   />
                 </div>
               </div>
