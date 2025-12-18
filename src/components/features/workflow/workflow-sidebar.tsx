@@ -28,10 +28,12 @@ export function WorkflowSidebar({
 }: WorkflowSidebarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [showFilters, setShowFilters] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
   
-  const { nodeTree, flatNodes, isLoading, error, refresh } = useNodeTree({ 
+  const { nodeTree, flatNodes, categories, isLoading, error, refresh } = useNodeTree({ 
     searchTerm, 
-    viewMode 
+    viewMode,
+    categoryFilter,
   });
 
   const toggleViewMode = () => {
@@ -86,7 +88,7 @@ export function WorkflowSidebar({
             className={cn(
               "p-2 rounded-md border border-border",
               "hover:bg-muted transition-colors",
-              showFilters ? "bg-muted text-primary" : "bg-background"
+              showFilters || categoryFilter ? "bg-muted text-primary" : "bg-background"
             )}
             title="Toggle filters"
           >
@@ -98,20 +100,22 @@ export function WorkflowSidebar({
         {showFilters && (
           <div className="p-2 bg-muted/30 rounded-md space-y-2">
             <label className="block">
-              <span className="text-xs text-muted-foreground">Node Group</span>
+              <span className="text-xs text-muted-foreground">Category</span>
               <select
-                value={filters.nodeGroup}
-                onChange={(e) => onFiltersChange({ ...filters, nodeGroup: e.target.value })}
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
                 className={cn(
                   "w-full mt-1 px-2 py-1.5 text-sm rounded-md",
                   "bg-background border border-border",
                   "focus:outline-none focus:ring-2 focus:ring-primary/50"
                 )}
               >
-                <option value="">All Groups</option>
-                <option value="trigger">Triggers</option>
-                <option value="action">Actions</option>
-                <option value="logic">Logic</option>
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
@@ -150,7 +154,7 @@ export function WorkflowSidebar({
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <IconList className="w-10 h-10 text-muted-foreground/50 mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm ? 'No nodes match your search' : 'No nodes available'}
+                  {searchTerm || categoryFilter ? 'No nodes match your filters' : 'No nodes available'}
                 </p>
               </div>
             ) : (

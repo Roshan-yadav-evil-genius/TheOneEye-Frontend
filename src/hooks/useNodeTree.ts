@@ -7,11 +7,13 @@ export type ViewMode = 'tree' | 'flat';
 interface UseNodeTreeOptions {
   searchTerm?: string;
   viewMode?: ViewMode;
+  categoryFilter?: string;
 }
 
 interface UseNodeTreeResult {
   nodeTree: TNodeTree;
   flatNodes: TNodeMetadata[];
+  categories: string[];
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -26,6 +28,37 @@ export function countNodesInFolder(folder: TNodeFolder): number {
     count += countNodesInFolder(subfolder);
   }
   return count;
+}
+
+/**
+ * Recursively extract all category paths from a folder
+ */
+function extractSubcategories(folder: TNodeFolder, prefix: string): string[] {
+  const paths: string[] = [];
+  
+  for (const [name, subfolder] of Object.entries(folder.subfolders)) {
+    const fullPath = prefix ? `${prefix}/${name}` : name;
+    paths.push(fullPath);
+    paths.push(...extractSubcategories(subfolder, fullPath));
+  }
+  
+  return paths;
+}
+
+/**
+ * Extract all unique categories from the node tree (including nested subcategories)
+ */
+function extractCategories(tree: TNodeTree): string[] {
+  const categories: string[] = [];
+  
+  for (const [categoryName, folder] of Object.entries(tree)) {
+    // Add top-level category
+    categories.push(categoryName);
+    // Add all nested subcategories
+    categories.push(...extractSubcategories(folder, categoryName));
+  }
+  
+  return categories.sort();
 }
 
 /**
@@ -62,42 +95,100 @@ function filterFolder(folder: TNodeFolder, searchTerm: string): TNodeFolder | nu
 }
 
 /**
- * Filter entire node tree based on search term
+ * Navigate to a subfolder by path (e.g., "Browser/actions/linkedin")
  */
-function filterNodeTree(tree: TNodeTree, searchTerm: string): TNodeTree {
-  if (!searchTerm.trim()) {
-    return tree;
+function getSubfolderByPath(folder: TNodeFolder, pathParts: string[]): TNodeFolder | null {
+  if (pathParts.length === 0) {
+    return folder;
   }
   
-  const filteredTree: TNodeTree = {};
+  const [first, ...rest] = pathParts;
+  const subfolder = folder.subfolders[first];
   
-  for (const [categoryName, folder] of Object.entries(tree)) {
-    // Also match category name
-    const categoryMatches = categoryName.toLowerCase().includes(searchTerm.toLowerCase());
+  if (!subfolder) {
+    return null;
+  }
+  
+  return getSubfolderByPath(subfolder, rest);
+}
+
+/**
+ * Filter entire node tree based on search term and category
+ */
+function filterNodeTree(tree: TNodeTree, searchTerm: string, categoryFilter: string): TNodeTree {
+  let filteredTree: TNodeTree = tree;
+  
+  // Apply category filter first
+  if (categoryFilter.trim()) {
+    filteredTree = {};
     
-    if (categoryMatches) {
-      filteredTree[categoryName] = folder;
-    } else {
-      const filtered = filterFolder(folder, searchTerm);
-      if (filtered) {
-        filteredTree[categoryName] = filtered;
+    // Parse the category path (e.g., "Browser/actions/linkedin")
+    const pathParts = categoryFilter.split('/');
+    const topCategory = pathParts[0];
+    const subPath = pathParts.slice(1);
+    
+    if (tree[topCategory]) {
+      if (subPath.length === 0) {
+        // Just top-level category
+        filteredTree[topCategory] = tree[topCategory];
+      } else {
+        // Navigate to the specific subfolder
+        const subfolder = getSubfolderByPath(tree[topCategory], subPath);
+        if (subfolder) {
+          // Create a new tree with just this subfolder
+          filteredTree[categoryFilter] = subfolder;
+        }
       }
     }
   }
   
-  return filteredTree;
+  // Then apply search filter
+  if (!searchTerm.trim()) {
+    return filteredTree;
+  }
+  
+  const searchFilteredTree: TNodeTree = {};
+  
+  for (const [categoryName, folder] of Object.entries(filteredTree)) {
+    // Also match category name
+    const categoryMatches = categoryName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (categoryMatches) {
+      searchFilteredTree[categoryName] = folder;
+    } else {
+      const filtered = filterFolder(folder, searchTerm);
+      if (filtered) {
+        searchFilteredTree[categoryName] = filtered;
+      }
+    }
+  }
+  
+  return searchFilteredTree;
 }
 
 /**
- * Filter flat nodes list based on search term
+ * Filter flat nodes list based on search term and category
  */
-function filterFlatNodes(nodes: TNodeMetadata[], searchTerm: string): TNodeMetadata[] {
+function filterFlatNodes(nodes: TNodeMetadata[], searchTerm: string, categoryFilter: string): TNodeMetadata[] {
+  let filteredNodes = nodes;
+  
+  // Apply category filter first
+  if (categoryFilter.trim()) {
+    filteredNodes = nodes.filter(node => {
+      // Check if the node's category starts with the filter
+      // This handles nested categories like "WebPageParsers/Linkedin"
+      const nodeCategory = node.category || '';
+      return nodeCategory === categoryFilter || nodeCategory.startsWith(categoryFilter + '/');
+    });
+  }
+  
+  // Then apply search filter
   if (!searchTerm.trim()) {
-    return nodes;
+    return filteredNodes;
   }
   
   const lowerSearch = searchTerm.toLowerCase();
-  return nodes.filter(node => 
+  return filteredNodes.filter(node => 
     node.name.toLowerCase().includes(lowerSearch) ||
     node.label?.toLowerCase().includes(lowerSearch) ||
     node.identifier.toLowerCase().includes(lowerSearch) ||
@@ -106,10 +197,14 @@ function filterFlatNodes(nodes: TNodeMetadata[], searchTerm: string): TNodeMetad
 }
 
 /**
- * Hook to fetch and manage node tree data with search filtering
+ * Hook to fetch and manage node tree data with search and category filtering
  * Supports both tree view and flat view modes
  */
-export function useNodeTree({ searchTerm = '', viewMode = 'tree' }: UseNodeTreeOptions = {}): UseNodeTreeResult {
+export function useNodeTree({ 
+  searchTerm = '', 
+  viewMode = 'tree',
+  categoryFilter = ''
+}: UseNodeTreeOptions = {}): UseNodeTreeResult {
   const [nodeTree, setNodeTree] = useState<TNodeTree>({});
   const [flatNodes, setFlatNodes] = useState<TNodeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,21 +234,28 @@ export function useNodeTree({ searchTerm = '', viewMode = 'tree' }: UseNodeTreeO
     fetchNodes();
   }, []);
 
-  // Filter the tree based on search term
-  const filteredTree = useMemo(() => {
-    return filterNodeTree(nodeTree, searchTerm);
-  }, [nodeTree, searchTerm]);
+  // Extract available categories from the tree
+  const categories = useMemo(() => {
+    return extractCategories(nodeTree);
+  }, [nodeTree]);
 
-  // Filter the flat list based on search term
+  // Filter the tree based on search term and category
+  const filteredTree = useMemo(() => {
+    return filterNodeTree(nodeTree, searchTerm, categoryFilter);
+  }, [nodeTree, searchTerm, categoryFilter]);
+
+  // Filter the flat list based on search term and category
   const filteredFlatNodes = useMemo(() => {
-    return filterFlatNodes(flatNodes, searchTerm);
-  }, [flatNodes, searchTerm]);
+    return filterFlatNodes(flatNodes, searchTerm, categoryFilter);
+  }, [flatNodes, searchTerm, categoryFilter]);
 
   return {
     nodeTree: filteredTree,
     flatNodes: filteredFlatNodes,
+    categories,
     isLoading,
     error,
     refresh: fetchNodes,
   };
 }
+
