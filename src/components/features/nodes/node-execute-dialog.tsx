@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { NodeFormEditor } from "./node-form-editor";
 import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { useNodeTestDataStore } from "@/stores/node-test-data-store";
 
 interface NodeExecuteDialogProps {
   isOpen: boolean;
@@ -30,8 +31,27 @@ export function NodeExecuteDialog({
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
-  // Input JSON state
-  const [inputData, setInputData] = useState<Record<string, unknown>>({});
+  // Get persisted test data from store
+  const { getTestData, setTestData } = useNodeTestDataStore();
+
+  // Input JSON state - initialize from persisted store
+  const [inputData, setInputData] = useState<Record<string, unknown>>(() => 
+    getTestData(node.identifier)
+  );
+
+  // Load persisted data when dialog opens or node changes
+  useEffect(() => {
+    if (isOpen) {
+      const persistedData = getTestData(node.identifier);
+      setInputData(persistedData);
+    }
+  }, [isOpen, node.identifier, getTestData]);
+
+  // Persist input data whenever it changes
+  const handleInputDataChange = useCallback((data: Record<string, unknown>) => {
+    setInputData(data);
+    setTestData(node.identifier, data);
+  }, [node.identifier, setTestData]);
 
   // Output state
   const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
@@ -139,7 +159,7 @@ export function NodeExecuteDialog({
                   onTabChange={setActiveInputTab}
                   enableDragDrop={true}
                   editable={true}
-                  onJsonChange={setInputData}
+                  onJsonChange={handleInputDataChange}
                 />
               </div>
 
