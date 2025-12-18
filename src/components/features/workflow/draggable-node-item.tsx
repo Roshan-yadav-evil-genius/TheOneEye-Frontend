@@ -46,7 +46,7 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
       draggable
       onDragStart={handleDragStart}
       className={cn(
-        'relative flex items-start gap-3 p-3 rounded-lg cursor-grab active:cursor-grabbing',
+        'flex items-start gap-3 p-3 rounded-lg cursor-grab active:cursor-grabbing',
         'transition-all duration-150',
         'bg-card/50 hover:bg-card',
         'border border-border/30 hover:border-border/60',
@@ -63,28 +63,27 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 pr-16">
-        {/* Node Name */}
-        <div className="text-sm font-medium text-foreground truncate">
-          {displayName}
+      <div className="flex-1 min-w-0">
+        {/* Top row: Name + Type Badge */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="text-sm font-medium text-foreground truncate flex-1">
+            {displayName}
+          </div>
+          {/* Type Badge */}
+          <span
+            className={cn(
+              'inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border flex-shrink-0',
+              badgeStyles.bg,
+              badgeStyles.text
+            )}
+          >
+            {node.type}
+          </span>
         </div>
         {/* Identifier */}
         <div className="text-xs text-muted-foreground truncate mt-0.5">
           {node.identifier}
         </div>
-      </div>
-
-      {/* Type Badge - Top Right */}
-      <div className="absolute top-2 right-2">
-        <span
-          className={cn(
-            'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border',
-            badgeStyles.bg,
-            badgeStyles.text
-          )}
-        >
-          {node.type}
-        </span>
       </div>
     </div>
   );
