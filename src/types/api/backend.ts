@@ -1,6 +1,12 @@
 // Backend API response types (as they come from the server)
 // These interfaces represent the exact structure returned by the Django backend
 
+// Port configuration for node inputs/outputs
+export interface NodePort {
+  id: string;
+  label: string;
+}
+
 // Simplified node type structure matching core/views node metadata
 export interface BackendNodeType {
   identifier: string;
@@ -10,6 +16,8 @@ export interface BackendNodeType {
   description?: string;
   has_form?: boolean;
   category?: string;
+  input_ports?: NodePort[];
+  output_ports?: NodePort[];
 }
 
 export interface TFormConfiguration {

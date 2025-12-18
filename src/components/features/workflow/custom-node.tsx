@@ -23,6 +23,10 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
   
   const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
+  // Get port configurations with defaults
+  const inputPorts = data.node_type?.input_ports || [{ id: 'default', label: 'In' }];
+  const outputPorts = data.node_type?.output_ports || [{ id: 'default', label: 'Out' }];
+
   // Event handlers
   const handleDelete = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -63,21 +67,37 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
           <IconGripVertical className="w-3 h-3 text-muted-foreground" />
         </div>
 
-        {/* Connection Handles */}
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
-          style={{ left: -6 }}
-          id="target"
-        />
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
-          style={{ right: -6 }}
-          id="source"
-        />
+        {/* Input Handles */}
+        {inputPorts.map((port, idx) => (
+          <Handle
+            key={port.id}
+            type="target"
+            position={Position.Left}
+            className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+            style={{ 
+              left: -6,
+              top: `${((idx + 1) / (inputPorts.length + 1)) * 100}%`
+            }}
+            id={port.id}
+            title={port.label}
+          />
+        ))}
+
+        {/* Output Handles */}
+        {outputPorts.map((port, idx) => (
+          <Handle
+            key={port.id}
+            type="source"
+            position={Position.Right}
+            className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+            style={{ 
+              right: -6,
+              top: `${((idx + 1) / (outputPorts.length + 1)) * 100}%`
+            }}
+            id={port.id}
+            title={port.label}
+          />
+        ))}
 
         {/* Hover Actions */}
         {isHovered && (
