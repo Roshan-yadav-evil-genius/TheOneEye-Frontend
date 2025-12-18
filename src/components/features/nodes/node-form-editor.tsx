@@ -1,0 +1,220 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { NodeFormField, FormFieldDefinition } from "./node-form-field";
+import { ApiService } from "@/lib/api/api-service";
+import { TNodeMetadata } from "@/types";
+import { IconPlayerPlay, IconLoader2 } from "@tabler/icons-react";
+
+interface FormState {
+  fields: FormFieldDefinition[];
+  dependencies?: Record<string, string[]>;
+  non_field_errors?: string[];
+}
+
+interface NodeFormEditorProps {
+  node: TNodeMetadata;
+  onExecute: (formData: Record<string, string>) => void;
+  isExecuting?: boolean;
+}
+
+export function NodeFormEditor({
+  node,
+  onExecute,
+  isExecuting = false,
+}: NodeFormEditorProps) {
+  const [formState, setFormState] = useState<FormState | null>(null);
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
+  const [isLoadingForm, setIsLoadingForm] = useState(true);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Load form schema from API
+  useEffect(() => {
+    const loadForm = async () => {
+      setIsLoadingForm(true);
+      setFormError(null);
+      try {
+        const response = await ApiService.getNodeForm(node.identifier);
+        if (response.form) {
+          setFormState(response.form as unknown as FormState);
+          
+          // Initialize form values with defaults
+          const initialValues: Record<string, string> = {};
+          (response.form as unknown as FormState).fields?.forEach((field) => {
+            if (field.value !== undefined && field.value !== null) {
+              initialValues[field.name] = String(field.value);
+            } else if (field.options?.find((o) => o.selected)) {
+              const selected = field.options.find((o) => o.selected);
+              if (selected) {
+                initialValues[field.name] = selected.value;
+              }
+            } else {
+              initialValues[field.name] = "";
+            }
+          });
+          setFormValues(initialValues);
+        } else {
+          setFormError(response.message || "This node does not have a form");
+        }
+      } catch (error) {
+        console.error("Failed to load node form:", error);
+        setFormError("Failed to load form");
+      } finally {
+        setIsLoadingForm(false);
+      }
+    };
+
+    if (node.has_form) {
+      loadForm();
+    } else {
+      setIsLoadingForm(false);
+      setFormError("This node does not have a form");
+    }
+  }, [node.identifier, node.has_form]);
+
+  // Handle field value change with dynamic field updates
+  const handleFieldChange = useCallback(
+    async (fieldName: string, value: string) => {
+      // Update the field value
+      setFormValues((prev) => ({ ...prev, [fieldName]: value }));
+
+      // Check if this field has dependents
+      if (formState?.dependencies && formState.dependencies[fieldName]) {
+        const dependentFields = formState.dependencies[fieldName];
+
+        // Load options for each dependent field
+        for (const dependentField of dependentFields) {
+          setLoadingFields((prev) => new Set(prev).add(dependentField));
+
+          try {
+            const response = await ApiService.getNodeFieldOptions(node.identifier, {
+              parent_field: fieldName,
+              parent_value: value,
+              dependent_field: dependentField,
+            });
+
+            // Update the dependent field's options
+            setFormState((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                fields: prev.fields.map((field) => {
+                  if (field.name === dependentField) {
+                    return {
+                      ...field,
+                      options: response.options,
+                    };
+                  }
+                  return field;
+                }),
+              };
+            });
+
+            // Clear the dependent field's value
+            setFormValues((prev) => ({ ...prev, [dependentField]: "" }));
+          } catch (error) {
+            console.error(`Failed to load options for ${dependentField}:`, error);
+          } finally {
+            setLoadingFields((prev) => {
+              const next = new Set(prev);
+              next.delete(dependentField);
+              return next;
+            });
+          }
+        }
+      }
+    },
+    [formState?.dependencies, node.identifier]
+  );
+
+  const handleExecute = () => {
+    onExecute(formValues);
+  };
+
+  // Loading state
+  if (isLoadingForm) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <IconLoader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-400">Loading form...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (formError) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-gray-400">
+          <p className="text-sm">{formError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No form state
+  if (!formState || !formState.fields) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-gray-400">
+          <p className="text-sm">No form available for this node</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Form Fields */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 sidebar-scrollbar">
+        {/* Non-field errors */}
+        {formState.non_field_errors && formState.non_field_errors.length > 0 && (
+          <div className="bg-red-900/20 border border-red-500/30 rounded-md p-3">
+            {formState.non_field_errors.map((error, index) => (
+              <p key={index} className="text-red-400 text-sm">
+                {error}
+              </p>
+            ))}
+          </div>
+        )}
+
+        {/* Render form fields */}
+        {formState.fields.map((field) => (
+          <NodeFormField
+            key={field.name}
+            field={field}
+            value={formValues[field.name] || ""}
+            onChange={(value) => handleFieldChange(field.name, value)}
+            isLoading={loadingFields.has(field.name)}
+          />
+        ))}
+      </div>
+
+      {/* Execute Button */}
+      <div className="border-t border-gray-700 p-4 flex-shrink-0">
+        <Button
+          onClick={handleExecute}
+          disabled={isExecuting}
+          className="w-full"
+        >
+          {isExecuting ? (
+            <>
+              <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
+              Executing...
+            </>
+          ) : (
+            <>
+              <IconPlayerPlay className="h-4 w-4 mr-2" />
+              Execute Node
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
+

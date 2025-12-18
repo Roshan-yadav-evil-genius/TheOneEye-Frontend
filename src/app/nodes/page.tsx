@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { NodesTable } from "@/components/features/nodes";
+import { NodesTable, NodeExecuteDialog } from "@/components/features/nodes";
 import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata } from "@/types";
 
 export default function NodesPage() {
   const [nodes, setNodes] = useState<TNodeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Execute dialog state
+  const [executeDialogOpen, setExecuteDialogOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<TNodeMetadata | null>(null);
 
   const fetchNodes = async () => {
     setIsLoading(true);
@@ -32,27 +36,16 @@ export default function NodesPage() {
     }
   };
 
-  const handleViewForm = async (node: TNodeMetadata) => {
-    try {
-      const formData = await ApiService.getNodeForm(node.identifier);
-      console.log("Node form:", formData);
-      // TODO: Open form modal/dialog
-    } catch (error) {
-      console.error("Failed to fetch node form:", error);
-    }
+  const handleViewForm = (node: TNodeMetadata) => {
+    // Open execute dialog to view form
+    setSelectedNode(node);
+    setExecuteDialogOpen(true);
   };
 
-  const handleExecute = async (node: TNodeMetadata) => {
-    try {
-      const result = await ApiService.executeNode(node.identifier, {
-        input_data: {},
-        form_data: {},
-      });
-      console.log("Node execution result:", result);
-      // TODO: Show result in a modal/toast
-    } catch (error) {
-      console.error("Failed to execute node:", error);
-    }
+  const handleExecute = (node: TNodeMetadata) => {
+    // Open execute dialog
+    setSelectedNode(node);
+    setExecuteDialogOpen(true);
   };
 
   const handleViewDetails = (node: TNodeMetadata) => {
@@ -76,6 +69,15 @@ export default function NodesPage() {
           onViewDetails={handleViewDetails}
         />
       </div>
+
+      {/* Execute Dialog */}
+      {selectedNode && (
+        <NodeExecuteDialog
+          isOpen={executeDialogOpen}
+          onOpenChange={setExecuteDialogOpen}
+          node={selectedNode}
+        />
+      )}
     </DashboardLayout>
   );
 }

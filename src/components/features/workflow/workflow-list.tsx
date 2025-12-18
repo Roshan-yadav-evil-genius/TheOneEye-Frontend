@@ -36,7 +36,7 @@ export function WorkflowList({
   } = useWorkflowList({ workflows });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-6">
       {/* Workflow table */}
       {workflows.length > 0 ? (
         <WorkflowTable
