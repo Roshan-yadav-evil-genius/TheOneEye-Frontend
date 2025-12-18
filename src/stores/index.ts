@@ -31,7 +31,8 @@ export { useUIStore, uiHelpers, uiSelectors } from './ui';
 // ============================================================================
 
 // Re-export with old names for backward compatibility
-export { useWorkflowListStore as useWorkflowStore } from './workflow';
+// useTWorkflowStore provides backward-compatible method names (loadTWorkflows, createTWorkflow, etc.)
+export { useTWorkflowStore, useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useTUserStore as useUserStore } from './user-store';
 export { useFormStore } from './form-store';
 export { useWorkflowLayoutStore, useWorkflowLayout } from './workflow-layout-store';
