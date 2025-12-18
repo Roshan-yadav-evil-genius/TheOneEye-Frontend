@@ -24,6 +24,24 @@ export function NodeFormEditor({
   const [isLoadingForm, setIsLoadingForm] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Get all transitive dependent fields (recursive)
+  const getAllDependentFields = useCallback(
+    (fieldName: string, visited = new Set<string>()): string[] => {
+      if (!formState?.dependencies || visited.has(fieldName)) return [];
+      visited.add(fieldName);
+      
+      const directDependents = formState.dependencies[fieldName] || [];
+      const allDependents: string[] = [...directDependents];
+      
+      for (const dependent of directDependents) {
+        allDependents.push(...getAllDependentFields(dependent, visited));
+      }
+      
+      return allDependents;
+    },
+    [formState?.dependencies]
+  );
+
   // Load form schema from API
   useEffect(() => {
     const loadForm = async () => {
@@ -86,6 +104,18 @@ export function NodeFormEditor({
       // Update the field value
       setFormValues((prev) => ({ ...prev, [fieldName]: value }));
 
+      // Clear all transitive dependent field values immediately
+      const allDependents = getAllDependentFields(fieldName);
+      if (allDependents.length > 0) {
+        setFormValues((prev) => {
+          const updated = { ...prev, [fieldName]: value };
+          for (const dep of allDependents) {
+            updated[dep] = "";
+          }
+          return updated;
+        });
+      }
+
       // Check if this field has dependents
       if (formState?.dependencies && formState.dependencies[fieldName]) {
         const dependentFields = formState.dependencies[fieldName];
@@ -132,7 +162,7 @@ export function NodeFormEditor({
         }
       }
     },
-    [formState?.dependencies, node.identifier]
+    [formState?.dependencies, node.identifier, getAllDependentFields]
   );
 
   const handleExecute = () => {

@@ -53,16 +53,18 @@ export function NodeFormField({
             <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-gray-600">
-            {field.options?.map((option) => (
-              <SelectItem
-                key={option.value}
-                value={option.value}
-                className="text-gray-200 focus:bg-gray-700"
-              >
-                {option.text}
-              </SelectItem>
-            ))}
-            {(!field.options || field.options.length === 0) && (
+            {field.options
+              ?.filter((option) => option.value !== "")
+              .map((option) => (
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  className="text-gray-200 focus:bg-gray-700"
+                >
+                  {option.text}
+                </SelectItem>
+              ))}
+            {(!field.options || field.options.filter(o => o.value !== "").length === 0) && (
               <div className="px-2 py-1.5 text-sm text-gray-400">
                 {isLoading ? "Loading options..." : "No options available"}
               </div>
