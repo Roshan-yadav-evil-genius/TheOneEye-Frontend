@@ -4,28 +4,11 @@ import React from 'react';
 import { TNodeMetadata } from '@/types';
 import { IconCube } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { getBadgeStyles } from '@/constants/node-styles';
 
 interface DraggableNodeItemProps {
   node: TNodeMetadata;
   className?: string;
-}
-
-/**
- * Get badge styles based on node type (matching nodes table colors)
- */
-function getTypeBadgeStyles(type: string): { bg: string; text: string } {
-  switch (type) {
-    case 'BlockingNode':
-      return { bg: 'bg-pink-500/20 border-pink-500/50', text: 'text-pink-400' };
-    case 'NonBlockingNode':
-      return { bg: 'bg-cyan-500/20 border-cyan-500/50', text: 'text-cyan-400' };
-    case 'QueueNode':
-      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-300' };
-    case 'QueueReader':
-      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-300' };
-    default:
-      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-400' };
-  }
 }
 
 /**
@@ -39,7 +22,7 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
   };
 
   const displayName = node.label || node.name;
-  const badgeStyles = getTypeBadgeStyles(node.type);
+  const badgeStyle = getBadgeStyles(node.type);
 
   return (
     <div
@@ -73,8 +56,8 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
           <span
             className={cn(
               'inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border flex-shrink-0',
-              badgeStyles.bg,
-              badgeStyles.text
+              badgeStyle.bg,
+              badgeStyle.text
             )}
           >
             {node.type}

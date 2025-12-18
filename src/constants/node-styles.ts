@@ -1,49 +1,85 @@
 // Shared node styling constants for consistency across components
+// Centralized source of truth for node type colors matching backend types:
+// BlockingNode, NonBlockingNode, ProducerNode, and default for everything else
 
-import { TNodeType as BaseNodeType } from '@/types/ui';
+// Node types that come from the backend (metadata_extractor.py)
+export type NodeType = 'BlockingNode' | 'NonBlockingNode' | 'ProducerNode';
 
+// Node colors for canvas borders/backgrounds
 export const nodeColors = {
-  trigger: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
-  action: "border-green-400 bg-green-50 dark:bg-green-950/20",
-  logic: "border-purple-400 bg-purple-50 dark:bg-purple-950/20",
-  system: "border-gray-400 bg-gray-50 dark:bg-gray-950/20",
-  communication: "border-orange-400 bg-orange-50 dark:bg-orange-950/20",
-  data: "border-cyan-400 bg-cyan-50 dark:bg-cyan-950/20",
-  integration: "border-pink-400 bg-pink-50 dark:bg-pink-950/20",
-  control: "border-indigo-400 bg-indigo-50 dark:bg-indigo-950/20",
+  BlockingNode: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
+  NonBlockingNode: "border-green-400 bg-green-50 dark:bg-green-950/20",
+  ProducerNode: "border-pink-400 bg-pink-50 dark:bg-pink-950/20",
+  default: "border-gray-400 bg-gray-50 dark:bg-gray-950/20",
 } as const;
 
+// Icon colors for node logos/icons
 export const iconColors = {
-  trigger: "text-blue-600 dark:text-blue-400",
-  action: "text-green-600 dark:text-green-400",
-  logic: "text-purple-600 dark:text-purple-400",
-  system: "text-gray-600 dark:text-gray-400",
-  communication: "text-orange-600 dark:text-orange-400",
-  data: "text-cyan-600 dark:text-cyan-400",
-  integration: "text-pink-600 dark:text-pink-400",
-  control: "text-indigo-600 dark:text-indigo-400",
+  BlockingNode: "text-blue-600 dark:text-blue-400",
+  NonBlockingNode: "text-green-600 dark:text-green-400",
+  ProducerNode: "text-pink-600 dark:text-pink-400",
+  default: "text-gray-600 dark:text-gray-400",
 } as const;
 
-// Badge colors for UI components
+// Badge styles for tables/lists (includes background and text colors with border)
+export const badgeStyles = {
+  BlockingNode: { bg: "bg-blue-500/20 border-blue-500/50", text: "text-blue-400" },
+  NonBlockingNode: { bg: "bg-green-500/20 border-green-500/50", text: "text-green-400" },
+  ProducerNode: { bg: "bg-pink-500/20 border-pink-500/50", text: "text-pink-400" },
+  default: { bg: "bg-zinc-600/30 border-zinc-500/50", text: "text-zinc-400" },
+} as const;
+
+// Badge colors for UI badge components (simpler format)
 export const badgeColors = {
-  trigger: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  action: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  logic: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
-  system: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  communication: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-  data: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300",
-  integration: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
-  control: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
+  BlockingNode: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  NonBlockingNode: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+  ProducerNode: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
+  default: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 } as const;
 
-export type NodeType = BaseNodeType;
+type NodeColorKey = keyof typeof nodeColors;
+type BadgeStyleKey = keyof typeof badgeStyles;
 
-// Helper function to get node colors
-export const getNodeColors = (nodeType: string) => {
-  const type = nodeType as NodeType;
+/**
+ * Get node canvas colors (border and background) for a given node type
+ */
+export function getNodeColor(type: string): string {
+  const key = type as NodeColorKey;
+  return nodeColors[key] || nodeColors.default;
+}
+
+/**
+ * Get icon color for a given node type
+ */
+export function getIconColor(type: string): string {
+  const key = type as NodeColorKey;
+  return iconColors[key] || iconColors.default;
+}
+
+/**
+ * Get badge styles (bg and text classes) for a given node type
+ * Used in tables, lists, and drag items
+ */
+export function getBadgeStyles(type: string): { bg: string; text: string } {
+  const key = type as BadgeStyleKey;
+  return badgeStyles[key] || badgeStyles.default;
+}
+
+/**
+ * Get badge color class for UI badge components
+ */
+export function getBadgeColor(type: string): string {
+  const key = type as NodeColorKey;
+  return badgeColors[key] || badgeColors.default;
+}
+
+/**
+ * Get all node colors (canvas color and icon color) for a given node type
+ * Backward compatible with existing getNodeColors usage
+ */
+export function getNodeColors(nodeType: string) {
   return {
-    colorClass: nodeColors[type] || nodeColors.system,
-    iconColorClass: iconColors[type] || iconColors.system,
+    colorClass: getNodeColor(nodeType),
+    iconColorClass: getIconColor(nodeType),
   };
-};
-
+}

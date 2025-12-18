@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Handle, Position } from "reactflow";
 import { NodeEditDialog } from "./node-edit-dialog";
 import { NodeHoverActions } from "./NodeHoverActions";
-import { nodeColors } from "@/constants/node-styles";
+import { getNodeColor } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode } from "@/types";
 import { IconGripVertical } from "@tabler/icons-react";
@@ -21,7 +21,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
-  const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
+  const colorClass = getNodeColor(data.node_type?.type || '');
 
   // Get port configurations with defaults
   const inputPorts = data.node_type?.input_ports || [{ id: 'default', label: 'In' }];

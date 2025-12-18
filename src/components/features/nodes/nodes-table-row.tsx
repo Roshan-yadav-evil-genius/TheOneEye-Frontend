@@ -17,6 +17,7 @@ import {
   IconEye,
 } from "@tabler/icons-react";
 import { TNodeMetadata } from "@/types";
+import { getBadgeStyles } from "@/constants/node-styles";
 
 interface ColumnConfig {
   id: string;
@@ -44,16 +45,8 @@ export function NodesTableRow({
   onViewDetails,
 }: NodesTableRowProps) {
   const getTypeBadge = (type: string) => {
-    switch (type) {
-      case "ProducerNode":
-        return <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">{type}</Badge>;
-      case "NonBlockingNode":
-        return <Badge className="bg-indigo-500/20 text-indigo-400 border-indigo-500/30">{type}</Badge>;
-      case "BlockingNode":
-        return <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/30">{type}</Badge>;
-      default:
-        return <Badge variant="secondary">{type}</Badge>;
-    }
+    const styles = getBadgeStyles(type);
+    return <Badge className={`${styles.bg} ${styles.text} border`}>{type}</Badge>;
   };
 
   const getHasFormBadge = (hasForm: boolean) => {

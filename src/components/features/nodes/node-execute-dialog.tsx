@@ -15,6 +15,7 @@ import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { useNodeTestDataStore } from "@/stores/node-test-data-store";
+import { getBadgeStyles } from "@/constants/node-styles";
 
 interface NodeExecuteDialogProps {
   isOpen: boolean;
@@ -140,16 +141,8 @@ export function NodeExecuteDialog({
   );
 
   const getTypeBadgeColor = (type: string) => {
-    switch (type) {
-      case "ProducerNode":
-        return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
-      case "NonBlockingNode":
-        return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30";
-      case "BlockingNode":
-        return "bg-pink-500/20 text-pink-400 border-pink-500/30";
-      default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-    }
+    const styles = getBadgeStyles(type);
+    return `${styles.bg} ${styles.text}`;
   };
 
   return (

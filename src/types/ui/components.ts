@@ -1,2 +1,3 @@
 // UI Component Types
-export type TNodeType = 'trigger' | 'action' | 'logic' | 'system' | 'communication' | 'data' | 'integration' | 'control';
+// Node types matching backend (metadata_extractor.py NODE_BASE_TYPES)
+export type TNodeType = 'BlockingNode' | 'NonBlockingNode' | 'ProducerNode';
