@@ -85,9 +85,10 @@ interface DraggableFieldProps {
   level: number;
   isExpanded: boolean;
   onToggle: () => void;
+  wordWrap?: boolean;
 }
 
-function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldProps) {
+function DraggableField({ field, level, isExpanded, onToggle, wordWrap = false }: DraggableFieldProps) {
 
   const handleClick = (e: React.MouseEvent) => {
     // If clicking on expand button, let it handle the click
@@ -126,7 +127,7 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
     <div
       style={{ marginLeft: `${level * 16}px` }}
       onClick={handleClick}
-      className="group flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors"
+      className={`group flex ${wordWrap ? 'items-start' : 'items-center'} gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors`}
     >
       {isExpandable && (
         <button
@@ -136,7 +137,7 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
             onToggle();
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          className="flex items-center justify-center w-4 h-4 hover:bg-gray-600 rounded"
+          className="flex items-center justify-center w-4 h-4 hover:bg-gray-600 rounded flex-shrink-0"
         >
           {isExpanded ? (
             <ChevronDown className="w-3 h-3 text-gray-300" />
@@ -146,15 +147,15 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
         </button>
       )}
       
-      {!isExpandable && <div className="w-4" />}
+      {!isExpandable && <div className="w-4 flex-shrink-0" />}
       
-      {getTypeIcon(field.type)}
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
+      <div className="flex-shrink-0">{getTypeIcon(field.type)}</div>
+      <div className={`flex ${wordWrap ? 'flex-col items-start gap-1' : 'items-center justify-between'} w-full min-w-0`}>
+        <div className="flex items-center gap-2 flex-shrink-0">
           <DraggableKey field={field} />
         </div>
         {field.type !== 'object' && field.type !== 'array' && field.value !== undefined && (
-          <span className="text-gray-400 font-mono text-sm">
+          <span className={`text-gray-400 font-mono text-sm ${wordWrap ? 'break-all' : 'truncate'}`}>
             {typeof field.value === 'string' ? `"${field.value}"` : JSON.stringify(field.value)}
           </span>
         )}
@@ -166,9 +167,10 @@ function DraggableField({ field, level, isExpanded, onToggle }: DraggableFieldPr
 interface DraggableSchemaProps {
   jsonData: unknown;
   title: string;
+  wordWrap?: boolean;
 }
 
-export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
+export function DraggableSchema({ jsonData, title, wordWrap = false }: DraggableSchemaProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
   const [isDragging, setIsDragging] = useState(false);
 
@@ -240,6 +242,7 @@ export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
             level={level}
             isExpanded={isExpanded}
             onToggle={() => toggleExpanded(field.path)}
+            wordWrap={wordWrap}
           />
           {hasChildren && isExpanded && (
             <div className="mt-1">

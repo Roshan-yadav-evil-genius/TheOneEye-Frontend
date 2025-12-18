@@ -270,9 +270,9 @@ export function JsonViewer({
         
         <TabsContent value="schema" className="flex-1 m-0 overflow-hidden">
           {enableDragDrop ? (
-            <DraggableSchema jsonData={jsonData} title={title} />
+            <DraggableSchema jsonData={jsonData} title={title} wordWrap={wordWrap} />
           ) : (
-            <NonDraggableSchema jsonData={jsonData} title={title} />
+            <NonDraggableSchema jsonData={jsonData} title={title} wordWrap={wordWrap} />
           )}
         </TabsContent>
       </Tabs>
@@ -294,9 +294,10 @@ interface NonDraggableFieldProps {
   level: number;
   isExpanded: boolean;
   onToggle: () => void;
+  wordWrap?: boolean;
 }
 
-function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableFieldProps) {
+function NonDraggableField({ field, level, isExpanded, onToggle, wordWrap = false }: NonDraggableFieldProps) {
   const handleClick = (e: React.MouseEvent) => {
     // If clicking on expand button, let it handle the click
     if ((e.target as HTMLElement).closest('button')) {
@@ -333,7 +334,7 @@ function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableF
     <div
       style={{ marginLeft: `${level * 16}px` }}
       onClick={handleClick}
-      className="group flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors"
+      className={`group flex ${wordWrap ? 'items-start' : 'items-center'} gap-2 py-1 px-2 rounded hover:bg-gray-700/30 transition-colors`}
     >
       {isExpandable && (
         <button
@@ -343,7 +344,7 @@ function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableF
             onToggle();
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          className="flex items-center justify-center w-4 h-4 hover:bg-gray-600 rounded"
+          className="flex items-center justify-center w-4 h-4 hover:bg-gray-600 rounded flex-shrink-0"
         >
           {isExpanded ? (
             <ChevronDown className="w-3 h-3 text-gray-300" />
@@ -353,17 +354,17 @@ function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableF
         </button>
       )}
       
-      {!isExpandable && <div className="w-4" />}
+      {!isExpandable && <div className="w-4 flex-shrink-0" />}
       
-      {getTypeIcon(field.type)}
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
+      <div className="flex-shrink-0">{getTypeIcon(field.type)}</div>
+      <div className={`flex ${wordWrap ? 'flex-col items-start gap-1' : 'items-center justify-between'} w-full min-w-0`}>
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="px-2 py-1 rounded text-xs font-mono bg-gray-600/20 text-gray-300 border border-gray-500/30">
             {field.key}
           </span>
         </div>
         {field.type !== 'object' && field.type !== 'array' && field.value !== undefined && (
-          <span className="text-gray-400 font-mono text-sm">
+          <span className={`text-gray-400 font-mono text-sm ${wordWrap ? 'break-all' : 'truncate'}`}>
             {typeof field.value === 'string' ? `"${field.value}"` : JSON.stringify(field.value)}
           </span>
         )}
@@ -375,9 +376,10 @@ function NonDraggableField({ field, level, isExpanded, onToggle }: NonDraggableF
 interface NonDraggableSchemaProps {
   jsonData: unknown;
   title: string;
+  wordWrap?: boolean;
 }
 
-function NonDraggableSchema({ jsonData, title }: NonDraggableSchemaProps) {
+function NonDraggableSchema({ jsonData, title, wordWrap = false }: NonDraggableSchemaProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
 
   const parseJsonToSchema = (data: unknown, key: string = '', path: string = ''): SchemaField[] => {
@@ -441,6 +443,7 @@ function NonDraggableSchema({ jsonData, title }: NonDraggableSchemaProps) {
             level={level}
             isExpanded={isExpanded}
             onToggle={() => toggleExpanded(field.path)}
+            wordWrap={wordWrap}
           />
           {hasChildren && isExpanded && (
             <div className="mt-1">
