@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { DndContext } from "@dnd-kit/core";
+import { useState, useCallback } from "react";
+import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import { 
   Dialog,
   DialogContent,
@@ -40,6 +40,20 @@ export function NodeEditDialog({
   const isLoading = false;
   const error: string | null = null;
 
+  // Drag state for overlay
+  const [activeDragKey, setActiveDragKey] = useState<string | null>(null);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    if (active.data.current?.type === 'field') {
+      setActiveDragKey(active.data.current.key);
+    }
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setActiveDragKey(null);
+  }, []);
+
   const handleRefresh = () => {
     // Refresh functionality removed
   };
@@ -53,12 +67,16 @@ export function NodeEditDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
-        <VisuallyHidden>
-          <DialogTitle>Edit Node: {data.node_type?.name} (ID: {data.id})</DialogTitle>
-        </VisuallyHidden>
-        <DndContext>
+    <DndContext 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+      collisionDetection={pointerWithin}
+    >
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
+          <VisuallyHidden>
+            <DialogTitle>Edit Node: {data.node_type?.name} (ID: {data.id})</DialogTitle>
+          </VisuallyHidden>
           <div className="flex flex-col h-full overflow-hidden">
             {/* Header with refresh button */}
             <div className="flex items-center justify-between px-5 pr-10 py-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
@@ -114,8 +132,17 @@ export function NodeEditDialog({
             />
           </ResizablePanels>
         </div>
-        </DndContext>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* DragOverlay outside Dialog - not affected by dialog's CSS transforms */}
+      <DragOverlay dropAnimation={null} style={{ width: 'auto', height: 'auto' }}>
+        {activeDragKey ? (
+          <div className="inline-flex px-3 py-1.5 rounded text-sm font-mono bg-blue-600 text-white border border-blue-400 shadow-xl cursor-grabbing whitespace-nowrap w-auto">
+            {activeDragKey}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

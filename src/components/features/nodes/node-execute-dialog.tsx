@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { DndContext } from "@dnd-kit/core";
+import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +36,20 @@ export function NodeExecuteDialog({
   // Output state
   const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
+
+  // Drag state for overlay
+  const [activeDragKey, setActiveDragKey] = useState<string | null>(null);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    if (active.data.current?.type === 'field') {
+      setActiveDragKey(active.data.current.key);
+    }
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setActiveDragKey(null);
+  }, []);
 
   // Execute node
   const handleExecute = useCallback(
@@ -79,13 +93,17 @@ export function NodeExecuteDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
-        <VisuallyHidden>
-          <DialogTitle>Execute Node: {node.name}</DialogTitle>
-        </VisuallyHidden>
+    <DndContext 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+      collisionDetection={pointerWithin}
+    >
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
+          <VisuallyHidden>
+            <DialogTitle>Execute Node: {node.name}</DialogTitle>
+          </VisuallyHidden>
 
-        <DndContext>
           <div className="flex flex-col h-full overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-5 pr-10 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
@@ -154,9 +172,18 @@ export function NodeExecuteDialog({
               </div>
             </ResizablePanels>
           </div>
-        </DndContext>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* DragOverlay outside Dialog - not affected by dialog's CSS transforms */}
+      <DragOverlay dropAnimation={null} style={{ width: 'auto', height: 'auto' }}>
+        {activeDragKey ? (
+          <div className="inline-flex px-3 py-1.5 rounded text-sm font-mono bg-blue-600 text-white border border-blue-400 shadow-xl cursor-grabbing whitespace-nowrap w-auto">
+            {activeDragKey}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 
