@@ -10,16 +10,16 @@ export interface FieldData {
 /**
  * Convert a schema field path to simplified Jinja2 expression syntax
  * @param path - The schema field path (e.g., "row_number", "master.c1", "[0].Name")
- * @returns Simplified expression syntax (e.g., "{{ row_number }}")
+ * @returns Simplified expression syntax with data prefix (e.g., "{{ data.row_number }}")
  */
 export function convertPathToExpression(path: string): string {
   if (path.startsWith('[')) {
     // Array item path like "[0].Name" - remove the array index
     const cleanPath = path.replace(/^\[\d+\]\.?/, '');
-    return `{{ ${cleanPath} }}`;
+    return `{{ data.${cleanPath} }}`;
   } else {
     // Regular field path like "row_number" or "master.c1"
-    return `{{ ${path} }}`;
+    return `{{ data.${path} }}`;
   }
 }
 

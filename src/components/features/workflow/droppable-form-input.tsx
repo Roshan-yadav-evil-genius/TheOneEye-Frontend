@@ -113,6 +113,7 @@ export function DroppableFormInput({
     >
       {isTextarea && hasTemplateSyntax ? (
         <JinjaSyntaxHighlighter
+          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
