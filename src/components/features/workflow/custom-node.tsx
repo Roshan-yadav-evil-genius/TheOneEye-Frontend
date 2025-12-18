@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Handle, Position } from "reactflow";
-import { NodeEditDialog } from "./node-edit-dialog";
+import { NodeExecuteDialog } from "@/components/features/nodes/node-execute-dialog";
 import { NodeHoverActions } from "./NodeHoverActions";
 import { getNodeColor } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
-import { BackendWorkflowNode } from "@/types";
+import { BackendWorkflowNode, TNodeMetadata } from "@/types";
 import { IconGripVertical } from "@tabler/icons-react";
 
 interface CustomNodeProps {
@@ -14,14 +14,24 @@ interface CustomNodeProps {
   data: BackendWorkflowNode;
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
-  workflowId?: string;
 }
 
-export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomNodeProps) {
+export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const colorClass = getNodeColor(data.node_type?.type || '');
+
+  // Convert BackendNodeType to TNodeMetadata for the execute dialog
+  const nodeMetadata: TNodeMetadata = useMemo(() => ({
+    name: data.node_type?.name || 'Unknown',
+    identifier: data.node_type?.identifier || '',
+    type: data.node_type?.type || 'unknown',
+    label: data.node_type?.label,
+    description: data.node_type?.description,
+    has_form: data.node_type?.has_form ?? false,
+    category: data.node_type?.category,
+  }), [data.node_type]);
 
   // Get port configurations with defaults
   const inputPorts = data.node_type?.input_ports || [{ id: 'default', label: 'In' }];
@@ -47,6 +57,16 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
   const handlePause = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: Implement pause functionality
+  }, []);
+
+  const handleShutdown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement shutdown functionality
+  }, []);
+
+  const handleMore = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement more menu
   }, []);
 
   return (
@@ -131,11 +151,10 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
       </div>
 
       {/* Edit Dialog */}
-      <NodeEditDialog
+      <NodeExecuteDialog
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        data={data}
-        workflowId={workflowId || ''}
+        node={nodeMetadata}
       />
     </div>
   );
