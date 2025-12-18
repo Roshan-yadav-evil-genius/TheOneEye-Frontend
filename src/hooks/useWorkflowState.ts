@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
-import { Node, Edge, addEdge, Connection, useNodesState, useEdgesState, NodeChange } from "reactflow";
-import { useWorkflowCanvasStore } from "@/stores";
+import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange } from "reactflow";
+import { useWorkflowCanvasStore, useWorkflowSelectionStore } from "@/stores";
 import { TWorkflowNodeCreateRequest } from "@/types";
-import { TWorkflowNode } from "@/types/common/entities";
 
 interface WorkflowStateProps {
   workflowId: string;
@@ -30,11 +29,14 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     updateNodePosition,
     removeNode,
     addConnection,
-    removeConnection,
     setDragOver,
+  } = useWorkflowCanvasStore();
+
+  // Get selection store actions (now separate from canvas store)
+  const {
     selectNode,
     clearSelection,
-  } = useWorkflowCanvasStore();
+  } = useWorkflowSelectionStore();
 
   // Convert workflow nodes to ReactFlow format
   const reactFlowNodes = useMemo(() => {
@@ -129,7 +131,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     [edges, addConnection]
   );
 
-  const addNodeFromDrag = useCallback(async (nodeData: any, position: { x: number; y: number }) => {
+  const addNodeFromDrag = useCallback(async (nodeData: { id: string }, position: { x: number; y: number }) => {
     const nodeRequest: TWorkflowNodeCreateRequest = {
       nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
       position,

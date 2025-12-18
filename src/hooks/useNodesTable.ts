@@ -1,130 +1,127 @@
-import { useMemo, useState } from "react";
-import { TNodeMetadata } from "@/types";
-
-interface ColumnConfig {
-  id: string;
-  label: string;
-  visible: boolean;
-}
+/**
+ * useNodesTable Hook
+ * 
+ * Composed hook that combines table selection, pagination, filters, and columns
+ * for the nodes table. This provides a simplified API while internally using
+ * the smaller, focused hooks.
+ */
+import { useMemo, useCallback } from 'react';
+import { TNodeMetadata } from '@/types';
+import { useTableSelection } from './table/useTableSelection';
+import { useTablePagination } from './table/useTablePagination';
+import { useTableFilters } from './table/useTableFilters';
+import { useTableColumns, ColumnConfig } from './table/useTableColumns';
 
 interface UseNodesTableProps {
   nodes: TNodeMetadata[];
 }
 
 const defaultColumns: ColumnConfig[] = [
-  { id: "name", label: "Name", visible: true },
-  { id: "type", label: "Type", visible: true },
-  { id: "category", label: "Category", visible: true },
-  { id: "hasForm", label: "Has Form", visible: true },
-  { id: "description", label: "Description", visible: false },
+  { id: 'name', label: 'Name', visible: true },
+  { id: 'type', label: 'Type', visible: true },
+  { id: 'category', label: 'Category', visible: true },
+  { id: 'hasForm', label: 'Has Form', visible: true },
+  { id: 'description', label: 'Description', visible: false },
+];
+
+const searchableFields: (keyof TNodeMetadata)[] = [
+  'name',
+  'identifier',
+  'label',
+  'description',
 ];
 
 export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
-  // State
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
+  // Use the filters hook
+  const {
+    searchTerm,
+    filters,
+    filteredItems: filteredBySearch,
+    setSearchTerm: setSearchTermBase,
+    setFilter,
+    getUniqueValues,
+  } = useTableFilters<TNodeMetadata>({
+    items: nodes,
+    searchableFields,
+  });
 
-  // Get unique types and categories
-  const types = useMemo(() => {
-    const t = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type) t.add(node.type);
-    });
-    return Array.from(t).sort();
-  }, [nodes]);
+  // Extract type and category filters
+  const typeFilter = filters.type || 'all';
+  const categoryFilter = filters.category || 'all';
 
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.category) cats.add(node.category);
-    });
-    return Array.from(cats).sort();
-  }, [nodes]);
-
-  // Filter nodes
+  // Apply type and category filters
   const filteredNodes = useMemo(() => {
-    return nodes.filter((node) => {
-      const matchesSearch =
-        searchTerm === "" ||
-        node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        node.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (node.label?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-        (node.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-
-      const matchesType = typeFilter === "all" || node.type === typeFilter;
-      const matchesCategory = categoryFilter === "all" || node.category === categoryFilter;
-
-      return matchesSearch && matchesType && matchesCategory;
+    return filteredBySearch.filter((node) => {
+      const matchesType = typeFilter === 'all' || node.type === typeFilter;
+      const matchesCategory = categoryFilter === 'all' || node.category === categoryFilter;
+      return matchesType && matchesCategory;
     });
-  }, [nodes, searchTerm, typeFilter, categoryFilter]);
+  }, [filteredBySearch, typeFilter, categoryFilter]);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredNodes.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const currentNodes = filteredNodes.slice(startIndex, endIndex);
+  // Use the pagination hook with filtered nodes
+  const {
+    currentPage,
+    rowsPerPage,
+    totalPages,
+    currentItems: currentNodes,
+    handlePageChange: handlePageChangeBase,
+    handleRowsPerPageChange: handleRowsPerPageChangeBase,
+  } = useTablePagination({
+    items: filteredNodes,
+    initialPage: 1,
+    initialRowsPerPage: 10,
+  });
 
-  // Selection helpers
-  const isAllSelected = currentNodes.length > 0 && selectedRows.length === currentNodes.length;
-  const isIndeterminate = selectedRows.length > 0 && selectedRows.length < currentNodes.length;
+  // Use the selection hook with current page items
+  const {
+    selectedRows,
+    isAllSelected,
+    isIndeterminate,
+    handleSelectAll,
+    handleSelectRow,
+    clearSelection,
+  } = useTableSelection({
+    items: currentNodes,
+    getItemId: (node) => node.identifier,
+  });
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedRows(currentNodes.map((node) => node.identifier));
-    } else {
-      setSelectedRows([]);
-    }
-  };
+  // Use the columns hook
+  const {
+    columns,
+    toggleColumnVisibility,
+  } = useTableColumns({
+    initialColumns: defaultColumns,
+  });
 
-  const handleSelectRow = (identifier: string, checked: boolean) => {
-    if (checked) {
-      setSelectedRows((prev) => [...prev, identifier]);
-    } else {
-      setSelectedRows((prev) => prev.filter((id) => id !== identifier));
-    }
-  };
+  // Get unique types and categories for filter dropdowns
+  const types = useMemo(() => getUniqueValues('type'), [getUniqueValues]);
+  const categories = useMemo(() => getUniqueValues('category'), [getUniqueValues]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    setSelectedRows([]);
-  };
+  // Wrap handlers to clear selection when filters/pagination change
+  const setSearchTerm = useCallback((term: string) => {
+    setSearchTermBase(term);
+    clearSelection();
+  }, [setSearchTermBase, clearSelection]);
 
-  const handleRowsPerPageChange = (value: string) => {
-    setRowsPerPage(Number(value));
-    setCurrentPage(1);
-    setSelectedRows([]);
-  };
+  const setTypeFilter = useCallback((value: string) => {
+    setFilter('type', value);
+    clearSelection();
+  }, [setFilter, clearSelection]);
 
-  const toggleColumnVisibility = (columnId: string) => {
-    setColumns((prev) =>
-      prev.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col
-      )
-    );
-  };
+  const setCategoryFilter = useCallback((value: string) => {
+    setFilter('category', value);
+    clearSelection();
+  }, [setFilter, clearSelection]);
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-    setSelectedRows([]);
-  };
+  const handlePageChange = useCallback((page: number) => {
+    handlePageChangeBase(page);
+    clearSelection();
+  }, [handlePageChangeBase, clearSelection]);
 
-  const handleTypeFilterChange = (value: string) => {
-    setTypeFilter(value);
-    setCurrentPage(1);
-    setSelectedRows([]);
-  };
-
-  const handleCategoryFilterChange = (value: string) => {
-    setCategoryFilter(value);
-    setCurrentPage(1);
-    setSelectedRows([]);
-  };
+  const handleRowsPerPageChange = useCallback((value: string) => {
+    handleRowsPerPageChangeBase(value);
+    clearSelection();
+  }, [handleRowsPerPageChangeBase, clearSelection]);
 
   return {
     // State
@@ -144,9 +141,9 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
     isIndeterminate,
 
     // Actions
-    setSearchTerm: handleSearchChange,
-    setTypeFilter: handleTypeFilterChange,
-    setCategoryFilter: handleCategoryFilterChange,
+    setSearchTerm,
+    setTypeFilter,
+    setCategoryFilter,
     handleSelectAll,
     handleSelectRow,
     handlePageChange,
@@ -154,4 +151,3 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
     toggleColumnVisibility,
   };
 };
-

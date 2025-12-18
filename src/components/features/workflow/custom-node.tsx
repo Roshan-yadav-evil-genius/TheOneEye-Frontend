@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Handle, Position } from "reactflow";
 import { NodeEditDialog } from "./node-edit-dialog";
 import { NodeHoverActions } from "./NodeHoverActions";
@@ -23,35 +23,27 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
   
   const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
-  const handlePlay = async (e: React.MouseEvent) => {
+  // Event handlers
+  const handleDelete = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    // Node execution removed
-  };
+    onDelete?.(id);
+  }, [id, onDelete]);
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onDelete) {
-      onDelete(id);
-    }
-  };
-
-  const handleShutdown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  const handleMore = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  const handlePause = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleEdit = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditDialogOpen(true);
-  };
+  }, []);
 
+  // Placeholder handlers for future functionality
+  const handlePlay = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement node execution
+  }, []);
+
+  const handlePause = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement pause functionality
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -63,43 +55,41 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-      {/* Drag Handle */}
-      <div 
-        className="drag-handle absolute top-1 left-1 w-4 h-4 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-60 hover:opacity-100 transition-opacity z-10"
-        title="Drag to move node"
-      >
-        <IconGripVertical className="w-3 h-3 text-muted-foreground" />
-      </div>
+        {/* Drag Handle */}
+        <div 
+          className="drag-handle absolute top-1 left-1 w-4 h-4 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-60 hover:opacity-100 transition-opacity z-10"
+          title="Drag to move node"
+        >
+          <IconGripVertical className="w-3 h-3 text-muted-foreground" />
+        </div>
 
-      {/* Connection Handles */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
-        style={{ left: -6 }}
-        id="target"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
-        style={{ right: -6 }}
-        id="source"
-      />
-
-      {/* Hover Actions */}
-      {isHovered && (
-        <NodeHoverActions
-          onEdit={handleEdit}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onDelete={handleDelete}
-          onShutdown={handleShutdown}
-          onMore={handleMore}
-          isExecuting={false}
-          isPolling={false}
+        {/* Connection Handles */}
+        <Handle
+          type="target"
+          position={Position.Left}
+          className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+          style={{ left: -6 }}
+          id="target"
         />
-      )}
+        <Handle
+          type="source"
+          position={Position.Right}
+          className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+          style={{ right: -6 }}
+          id="source"
+        />
+
+        {/* Hover Actions */}
+        {isHovered && (
+          <NodeHoverActions
+            onEdit={handleEdit}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onDelete={handleDelete}
+            isExecuting={false}
+            isPolling={false}
+          />
+        )}
 
         {/* Node Content - Just Icon */}
         <div className="flex items-center justify-center h-full">
@@ -115,11 +105,9 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
             size="lg"
           />
         </div>
-
-
       </div>
 
-      {/* External Title and Description */}
+      {/* External Title */}
       <div className="mt-2 text-center max-w-40">
         <h3 className="font-semibold text-sm text-foreground leading-tight">
           {data.node_type?.name || 'Unknown Node'}
