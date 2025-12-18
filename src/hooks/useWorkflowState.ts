@@ -57,6 +57,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
       id: connection.id,
       source: connection.source,
       target: connection.target,
+      sourceHandle: connection.sourceHandle || 'default',
       type: lineType,
       animated: isRunning,
       style: { stroke: '#3b82f6', strokeWidth: 2 },
@@ -111,20 +112,23 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         return;
       }
       
-      // Check if connection already exists
+      // Check if connection already exists (including sourceHandle)
       const connectionExists = edges.some(
-        edge => edge.source === params.source && edge.target === params.target
+        edge => edge.source === params.source && 
+                edge.target === params.target &&
+                edge.sourceHandle === params.sourceHandle
       );
       
       if (connectionExists) {
         return;
       }
       
-      // Add connection to workflow store
+      // Add connection to workflow store with sourceHandle
       if (params.source && params.target) {
         await addConnection({
           source: params.source,
           target: params.target,
+          sourceHandle: params.sourceHandle || 'default',
         });
       }
     },

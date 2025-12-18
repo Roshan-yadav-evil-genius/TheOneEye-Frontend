@@ -46,6 +46,7 @@ export interface TWorkflowConnection {
   id: string;
   source: string;
   target: string;
+  sourceHandle?: string; // The specific output handle (e.g., 'yes', 'no' for conditional nodes)
 }
 
 

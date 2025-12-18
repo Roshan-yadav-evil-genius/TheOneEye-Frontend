@@ -105,7 +105,8 @@ class WorkflowApiService {
     return {
       id: response.id,
       source: response.source_node,
-      target: response.target_node
+      target: response.target_node,
+      sourceHandle: response.source_handle || 'default',
     };
   }
 

@@ -54,6 +54,7 @@ export interface BackendWorkflowConnection {
   id: string;
   source_node: string;
   target_node: string;
+  source_handle?: string; // The specific output handle (e.g., 'yes', 'no' for conditional nodes)
 }
 
 

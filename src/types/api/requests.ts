@@ -22,6 +22,7 @@ export interface TWorkflowNodeCreateRequest {
 export interface TWorkflowConnectionCreateRequest {
   source: string; // Source node ID
   target: string; // Target node ID
+  sourceHandle?: string; // The specific output handle (e.g., 'yes', 'no' for conditional nodes)
 }
 
 export interface TWorkflowNodePositionUpdateRequest {

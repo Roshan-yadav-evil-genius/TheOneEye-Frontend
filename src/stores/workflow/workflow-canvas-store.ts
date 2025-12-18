@@ -112,7 +112,8 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.connections = canvasData.edges.map(edge => ({
                 id: edge.id,
                 source: edge.source_node,
-                target: edge.target_node
+                target: edge.target_node,
+                sourceHandle: edge.source_handle || 'default',
               }));
               state.workflow = canvasData.workflow;
               state.isLoading = false;
