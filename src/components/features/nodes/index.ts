@@ -5,3 +5,4 @@ export { NodesTablePagination } from "./nodes-table-pagination";
 export { NodeFormField } from "./node-form-field";
 export { NodeFormEditor } from "./node-form-editor";
 export { NodeExecuteDialog } from "./node-execute-dialog";
+export { TagsInput } from "./tags-input";
