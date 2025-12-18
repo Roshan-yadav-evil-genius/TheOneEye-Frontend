@@ -11,7 +11,15 @@ import {
   BackendUser,
   BackendWorkflowConnection,
   DemoRequest,
-  DemoRequestCreateData
+  DemoRequestCreateData,
+  TNodeMetadata,
+  TNodeTree,
+  TNodeCount,
+  TNodeForm,
+  TFieldOptionsRequest,
+  TFieldOptionsResponse,
+  TNodeExecuteRequest,
+  TNodeExecuteResponse,
 } from '@/types';
 
 // Centralized API service that provides a clean interface for all API operations
@@ -249,6 +257,45 @@ export class ApiService {
     });
   }
 
+  // Node Registry operations
+  static async getNodes(): Promise<TNodeTree> {
+    return axiosApiClient.get<TNodeTree>('/nodes/');
+  }
+
+  static async getNodesFlat(): Promise<TNodeMetadata[]> {
+    return axiosApiClient.get<TNodeMetadata[]>('/nodes/flat/');
+  }
+
+  static async getNodesCount(): Promise<TNodeCount> {
+    return axiosApiClient.get<TNodeCount>('/nodes/count/');
+  }
+
+  static async getNodeDetail(identifier: string): Promise<TNodeMetadata> {
+    return axiosApiClient.get<TNodeMetadata>(`/nodes/${identifier}/`);
+  }
+
+  static async getNodeForm(identifier: string): Promise<TNodeForm> {
+    return axiosApiClient.get<TNodeForm>(`/nodes/${identifier}/form/`);
+  }
+
+  static async executeNode(
+    identifier: string, 
+    data: TNodeExecuteRequest
+  ): Promise<TNodeExecuteResponse> {
+    return axiosApiClient.post<TNodeExecuteResponse>(`/nodes/${identifier}/execute/`, data);
+  }
+
+  static async getNodeFieldOptions(
+    identifier: string, 
+    data: TFieldOptionsRequest
+  ): Promise<TFieldOptionsResponse> {
+    return axiosApiClient.post<TFieldOptionsResponse>(`/nodes/${identifier}/field-options/`, data);
+  }
+
+  static async refreshNodeCache(): Promise<{ message: string }> {
+    return axiosApiClient.post<{ message: string }>('/nodes/refresh/');
+  }
+
   // Utility methods
   static async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
@@ -292,6 +339,14 @@ export const {
   getDemoRequests,
   getDemoRequest,
   updateDemoRequestStatus,
+  getNodes,
+  getNodesFlat,
+  getNodesCount,
+  getNodeDetail,
+  getNodeForm,
+  executeNode,
+  getNodeFieldOptions,
+  refreshNodeCache,
   healthCheck,
   getApiVersion,
 } = ApiService;

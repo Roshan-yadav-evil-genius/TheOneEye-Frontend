@@ -6,6 +6,7 @@ import {
   IconDashboard,
   IconListDetails,
   IconKey,
+  IconComponents,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/navigation/nav-main"
@@ -40,6 +41,11 @@ const data = {
       title: "Workflow",
       url: "/workflow",
       icon: IconListDetails,
+    },
+    {
+      title: "Nodes",
+      url: "/nodes",
+      icon: IconComponents,
     },
     {
       title:"Sessions",

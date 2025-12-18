@@ -16,3 +16,6 @@ export * from './common';
 
 // Contact Types
 export * from './contact';
+
+// Node Types
+export * from './node';
