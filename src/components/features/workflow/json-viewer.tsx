@@ -4,8 +4,7 @@ import { Copy, Download, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { CodeEditor } from "@/components/ui/code-editor";
 import { DraggableSchema } from './draggable-schema';
 import { useState, useMemo } from 'react';
 import React from 'react';
@@ -25,6 +24,8 @@ interface JsonViewerProps {
   enableDragDrop?: boolean;
   isLoading?: boolean;
   error?: Error | null;
+  editable?: boolean;
+  onJsonChange?: (data: Record<string, unknown>) => void;
 }
 
 export function JsonViewer({
@@ -37,11 +38,40 @@ export function JsonViewer({
   onDownload,
   enableDragDrop = true,
   isLoading = false,
-  error = null
+  error = null,
+  editable = false,
+  onJsonChange,
 }: JsonViewerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [editableJsonText, setEditableJsonText] = useState(() => 
+    JSON.stringify(jsonData, null, 2)
+  );
+  const [jsonError, setJsonError] = useState<string | null>(null);
+
+  // Update editable text when jsonData changes externally
+  React.useEffect(() => {
+    if (!editable) return;
+    const newText = JSON.stringify(jsonData, null, 2);
+    if (newText !== editableJsonText) {
+      setEditableJsonText(newText);
+      setJsonError(null);
+    }
+  }, [jsonData, editable]);
+
+  const handleEditableJsonChange = (value: string) => {
+    setEditableJsonText(value);
+    try {
+      const parsed = JSON.parse(value);
+      setJsonError(null);
+      if (onJsonChange) {
+        onJsonChange(parsed);
+      }
+    } catch {
+      setJsonError("Invalid JSON syntax");
+    }
+  };
 
   const handleCopy = async () => {
     try {
@@ -215,23 +245,16 @@ export function JsonViewer({
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="json" className="flex-1 overflow-hidden">
-          <div className="h-full overflow-auto sidebar-scrollbar">
-            <SyntaxHighlighter
-              language="json"
-              style={vscDarkPlus}
-              customStyle={{
-                margin: 0,
-                fontSize: '0.875rem',
-                height: '100%',
-                overflow: 'auto'
-              }}
-              showLineNumbers={true}
-              wrapLines={true}
-            >
-              {typeof filteredJsonData === 'string' ? filteredJsonData : JSON.stringify(filteredJsonData, null, 2)}
-            </SyntaxHighlighter>
-          </div>
+        <TabsContent value="json" className="flex-1 overflow-hidden m-0">
+          <CodeEditor
+            value={editable ? editableJsonText : (typeof filteredJsonData === 'string' ? filteredJsonData : JSON.stringify(filteredJsonData, null, 2))}
+            onChange={editable ? handleEditableJsonChange : undefined}
+            readOnly={!editable}
+            language="json"
+            showLineNumbers={true}
+            error={editable ? jsonError : null}
+            placeholder='{"key": "value"}'
+          />
         </TabsContent>
         
         <TabsContent value="schema" className="flex-1 m-0 overflow-hidden">

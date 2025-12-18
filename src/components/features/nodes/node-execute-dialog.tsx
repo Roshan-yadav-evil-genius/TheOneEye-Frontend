@@ -14,9 +14,6 @@ import { NodeFormEditor } from "./node-form-editor";
 import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { IconCode, IconPlayerPlay } from "@tabler/icons-react";
 
 interface NodeExecuteDialogProps {
   isOpen: boolean;
@@ -34,25 +31,11 @@ export function NodeExecuteDialog({
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
   // Input JSON state
-  const [inputJsonText, setInputJsonText] = useState<string>("{}");
   const [inputData, setInputData] = useState<Record<string, unknown>>({});
-  const [inputError, setInputError] = useState<string | null>(null);
 
   // Output state
   const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
-
-  // Parse input JSON
-  const handleInputJsonChange = useCallback((value: string) => {
-    setInputJsonText(value);
-    try {
-      const parsed = JSON.parse(value);
-      setInputData(parsed);
-      setInputError(null);
-    } catch {
-      setInputError("Invalid JSON");
-    }
-  }, []);
 
   // Execute node
   const handleExecute = useCallback(
@@ -130,46 +113,16 @@ export function NodeExecuteDialog({
             >
               {/* INPUT Panel */}
               <div className="h-full flex flex-col overflow-hidden border-r border-gray-700">
-                <div className="flex items-center justify-between p-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <h3 className="text-white font-medium text-sm">INPUT</h3>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setActiveInputTab(activeInputTab === "schema" ? "json" : "schema")}
-                    className="h-7 px-2 text-xs text-gray-400 hover:text-white"
-                  >
-                    <IconCode className="w-3 h-3 mr-1" />
-                    {activeInputTab === "schema" ? "Edit JSON" : "View Schema"}
-                  </Button>
-                </div>
-
-                {activeInputTab === "json" ? (
-                  <div className="flex-1 p-3 overflow-hidden">
-                    <Textarea
-                      value={inputJsonText}
-                      onChange={(e) => handleInputJsonChange(e.target.value)}
-                      placeholder='{"key": "value"}'
-                      className="h-full font-mono text-sm bg-gray-800 border-gray-600 text-gray-200 resize-none"
-                    />
-                    {inputError && (
-                      <p className="text-red-400 text-xs mt-1">{inputError}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex-1 overflow-hidden">
-                    <JsonViewer
-                      title="INPUT"
-                      statusColor="bg-blue-500"
-                      jsonData={inputData}
-                      activeTab="schema"
-                      onTabChange={() => {}}
-                      enableDragDrop={true}
-                    />
-                  </div>
-                )}
+                <JsonViewer
+                  title="INPUT"
+                  statusColor="bg-blue-500"
+                  jsonData={inputData}
+                  activeTab={activeInputTab}
+                  onTabChange={setActiveInputTab}
+                  enableDragDrop={true}
+                  editable={true}
+                  onJsonChange={setInputData}
+                />
               </div>
 
               {/* FORM Panel */}
