@@ -8,6 +8,7 @@ import {
   TWorkflowNodeCreateResponse,
   BackendWorkflowCanvasResponse,
   BackendWorkflowConnection,
+  WorkflowNodeExecuteResponse,
 } from '@/types';
 
 /**
@@ -168,6 +169,33 @@ class WorkflowApiService {
   async getNodeOutputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
     return axiosApiClient.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/output/`);
   }
+
+  /**
+   * Execute a workflow node and save all execution data to the database.
+   * 
+   * Flow:
+   * 1. Save form_values and input_data to Node model
+   * 2. Execute the node using core engine
+   * 3. Save output_data to Node model
+   * 4. Return execution result
+   */
+  async executeAndSaveNode(
+    workflowId: string,
+    nodeId: string,
+    data: {
+      form_values: Record<string, unknown>;
+      input_data: Record<string, unknown>;
+    }
+  ): Promise<WorkflowNodeExecuteResponse> {
+    return axiosApiClient.post<WorkflowNodeExecuteResponse>(
+      `/workflow/${workflowId}/execute_and_save_node/`,
+      {
+        node_id: nodeId,
+        form_values: data.form_values,
+        input_data: data.input_data,
+      }
+    );
+  }
 }
 
 // Export singleton instance
@@ -195,5 +223,6 @@ export const {
   getWorkflowTaskStatus,
   getNodeInputData,
   getNodeOutputData,
+  executeAndSaveNode,
 } = workflowApi;
 

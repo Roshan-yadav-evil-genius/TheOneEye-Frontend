@@ -48,6 +48,11 @@ interface WorkflowCanvasActions {
   addNode: (nodeData: TWorkflowNodeCreateRequest) => Promise<BackendWorkflowNode | null>;
   updateNodePosition: (nodeId: string, position: { x: number; y: number }) => Promise<void>;
   updateNodeFormValues: (nodeId: string, formValues: Record<string, unknown>) => Promise<void>;
+  updateNodeExecutionData: (nodeId: string, data: { 
+    form_values?: Record<string, unknown>; 
+    input_data?: Record<string, unknown>; 
+    output_data?: Record<string, unknown> 
+  }) => void;
   removeNode: (nodeId: string) => Promise<void>;
   
   // Connection Operations
@@ -258,6 +263,21 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               description: errorMessage,
             });
           }
+        },
+
+        updateNodeExecutionData: (nodeId: string, data: { 
+          form_values?: Record<string, unknown>; 
+          input_data?: Record<string, unknown>; 
+          output_data?: Record<string, unknown> 
+        }) => {
+          set((state) => {
+            const node = state.nodes.find(n => n.id === nodeId);
+            if (node) {
+              if (data.form_values !== undefined) node.form_values = data.form_values;
+              if (data.input_data !== undefined) node.input_data = data.input_data;
+              if (data.output_data !== undefined) node.output_data = data.output_data;
+            }
+          });
         },
 
         removeNode: async (nodeId: string) => {

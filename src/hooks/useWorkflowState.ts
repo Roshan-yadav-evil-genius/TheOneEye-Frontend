@@ -155,6 +155,20 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     });
   }, [nodes, searchTerm, filters]);
 
+  // Helper function to get connected node's output data
+  const getConnectedNodeOutput = useCallback((nodeId: string): Record<string, unknown> | null => {
+    // Find incoming edge to this node
+    const incomingEdge = edges.find(edge => edge.target === nodeId);
+    if (!incomingEdge) return null;
+    
+    // Find the source node
+    const sourceNode = nodes.find(n => n.id === incomingEdge.source);
+    if (!sourceNode) return null;
+    
+    // Return the source node's output_data
+    return sourceNode.data?.output_data || null;
+  }, [edges, nodes]);
+
   // Update node selection and add delete callback and workflow context
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
@@ -164,9 +178,10 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         ...node.data,
         onDeleteNode: removeNode,
         workflowId: workflowId,
+        getConnectedNodeOutput: getConnectedNodeOutput,
       },
     }));
-  }, [nodes, selectedNodes, removeNode, workflowId]);
+  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput]);
 
   return {
     nodes: updatedNodes,

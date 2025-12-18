@@ -46,7 +46,21 @@ export interface BackendWorkflowNode {
     y: number;
   };
   form_values?: Record<string, unknown>;
+  input_data?: Record<string, unknown>;   // Last execution input
+  output_data?: Record<string, unknown>;  // Last execution output
   node_type: BackendNodeType;
+}
+
+// Response from execute_and_save_node endpoint
+export interface WorkflowNodeExecuteResponse {
+  success: boolean;
+  node_id: string;
+  node_type: string;
+  input_data?: Record<string, unknown>;
+  form_values?: Record<string, unknown>;
+  output?: unknown;
+  error?: string;
+  error_type?: string;
 }
 
 // Represents a Connection between nodes in a workflow

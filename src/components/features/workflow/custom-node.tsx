@@ -9,14 +9,22 @@ import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode, TNodeMetadata } from "@/types";
 import { IconGripVertical } from "@tabler/icons-react";
 
+// Workflow context for the execute dialog
+export interface WorkflowNodeContext {
+  workflowId: string;
+  nodeInstanceId: string;
+  getConnectedNodeOutput?: () => Record<string, unknown> | null;
+}
+
 interface CustomNodeProps {
   id: string;
   data: BackendWorkflowNode;
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
+  workflowContext?: WorkflowNodeContext;
 }
 
-export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
+export function CustomNode({ id, data, selected, onDelete, workflowContext }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
@@ -145,6 +153,12 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         node={nodeMetadata}
+        workflowContext={workflowContext ? {
+          ...workflowContext,
+          savedFormValues: data.form_values,
+          savedInputData: data.input_data,
+          savedOutputData: data.output_data,
+        } : undefined}
       />
     </div>
   );

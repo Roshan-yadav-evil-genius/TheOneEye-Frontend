@@ -15,61 +15,133 @@ import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { useNodeTestDataStore } from "@/stores/node-test-data-store";
+import { useWorkflowCanvasStore } from "@/stores";
 import { getBadgeStyles } from "@/constants/node-styles";
+import { workflowApi } from "@/lib/api/services/workflow-api";
+
+// Workflow context for DB persistence
+export interface WorkflowExecuteContext {
+  workflowId: string;
+  nodeInstanceId: string;
+  savedFormValues?: Record<string, unknown>;
+  savedInputData?: Record<string, unknown>;
+  savedOutputData?: Record<string, unknown>;
+  getConnectedNodeOutput?: () => Record<string, unknown> | null;
+}
 
 interface NodeExecuteDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   node: TNodeMetadata;
+  workflowContext?: WorkflowExecuteContext;
 }
 
 export function NodeExecuteDialog({
   isOpen,
   onOpenChange,
   node,
+  workflowContext,
 }: NodeExecuteDialogProps) {
+  // Determine if we're in workflow mode (with DB persistence)
+  const isWorkflowMode = !!workflowContext;
+
   // Tab state
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
-  // Get persisted test data from store
+  // Get persisted test data from store (for standalone mode)
   const { 
     getInputData, setInputData: persistInputData,
     getFormData, setFormData: persistFormData,
   } = useNodeTestDataStore();
 
-  // Input JSON state - initialize from persisted store
-  const [inputData, setInputData] = useState<Record<string, unknown>>(() => 
-    getInputData(node.identifier)
-  );
+  // Input JSON state - initialize from workflow context or persisted store
+  const [inputData, setInputData] = useState<Record<string, unknown>>(() => {
+    if (isWorkflowMode) {
+      // In workflow mode: prefer connected node's output, then saved input
+      const connectedOutput = workflowContext?.getConnectedNodeOutput?.();
+      if (connectedOutput && Object.keys(connectedOutput).length > 0) {
+        return connectedOutput;
+      }
+      return (workflowContext?.savedInputData as Record<string, unknown>) || {};
+    }
+    return getInputData(node.identifier);
+  });
 
-  // Form values state - initialize from persisted store
-  const [persistedFormValues, setPersistedFormValues] = useState<Record<string, string>>(() =>
-    getFormData(node.identifier)
-  );
+  // Form values state - initialize from workflow context or persisted store
+  const [persistedFormValues, setPersistedFormValues] = useState<Record<string, string>>(() => {
+    if (isWorkflowMode && workflowContext?.savedFormValues) {
+      // Convert Record<string, unknown> to Record<string, string>
+      const formValues: Record<string, string> = {};
+      for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
+        formValues[key] = String(value ?? '');
+      }
+      return formValues;
+    }
+    return getFormData(node.identifier);
+  });
 
-  // Output state - not persisted
-  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
+  // Output state - initialize from workflow context or null
+  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(() => {
+    if (isWorkflowMode && workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
+      return {
+        success: true,
+        output: { data: workflowContext.savedOutputData },
+      };
+    }
+    return null;
+  });
 
-  // Load persisted data when dialog opens or node changes
+  // Load data when dialog opens or node changes
   useEffect(() => {
     if (isOpen) {
-      setInputData(getInputData(node.identifier));
-      setPersistedFormValues(getFormData(node.identifier));
+      if (isWorkflowMode) {
+        // In workflow mode: load from workflow context
+        const connectedOutput = workflowContext?.getConnectedNodeOutput?.();
+        if (connectedOutput && Object.keys(connectedOutput).length > 0) {
+          setInputData(connectedOutput);
+        } else if (workflowContext?.savedInputData) {
+          setInputData(workflowContext.savedInputData as Record<string, unknown>);
+        }
+        
+        if (workflowContext?.savedFormValues) {
+          const formValues: Record<string, string> = {};
+          for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
+            formValues[key] = String(value ?? '');
+          }
+          setPersistedFormValues(formValues);
+        }
+        
+        if (workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
+          setOutputData({
+            success: true,
+            output: { data: workflowContext.savedOutputData },
+          });
+        }
+      } else {
+        // In standalone mode: load from local store
+        setInputData(getInputData(node.identifier));
+        setPersistedFormValues(getFormData(node.identifier));
+      }
     }
-  }, [isOpen, node.identifier, getInputData, getFormData]);
+  }, [isOpen, node.identifier, isWorkflowMode, workflowContext, getInputData, getFormData]);
 
-  // Persist input data whenever it changes
+  // Persist input data whenever it changes (only in standalone mode)
   const handleInputDataChange = useCallback((data: Record<string, unknown>) => {
     setInputData(data);
-    persistInputData(node.identifier, data);
-  }, [node.identifier, persistInputData]);
+    if (!isWorkflowMode) {
+      persistInputData(node.identifier, data);
+    }
+  }, [node.identifier, persistInputData, isWorkflowMode]);
 
-  // Persist form data whenever it changes
+  // Persist form data whenever it changes (only in standalone mode)
   const handleFormValuesChange = useCallback((data: Record<string, string>) => {
     setPersistedFormValues(data);
-    persistFormData(node.identifier, data);
-  }, [node.identifier, persistFormData]);
+    if (!isWorkflowMode) {
+      persistFormData(node.identifier, data);
+    }
+  }, [node.identifier, persistFormData, isWorkflowMode]);
+  
   const [isExecuting, setIsExecuting] = useState(false);
 
   // Drag state for overlay
@@ -112,6 +184,9 @@ export function NodeExecuteDialog({
     return { message: "No data in output" };
   }, [outputData]);
 
+  // Get store method to update node execution data
+  const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
+
   // Execute node
   const handleExecute = useCallback(
     async (formData: Record<string, string>) => {
@@ -119,10 +194,52 @@ export function NodeExecuteDialog({
       setOutputData(null);
 
       try {
-        const result = await ApiService.executeNode(node.identifier, {
-          input_data: inputData,
-          form_data: formData,
-        });
+        let result: TNodeExecuteResponse;
+        
+        if (isWorkflowMode && workflowContext) {
+          // Workflow mode: use execute_and_save_node API (saves to DB)
+          const response = await workflowApi.executeAndSaveNode(
+            workflowContext.workflowId,
+            workflowContext.nodeInstanceId,
+            {
+              form_values: formData,
+              input_data: inputData,
+            }
+          );
+          
+          // Convert workflow response to standard format
+          result = {
+            success: response.success,
+            output: response.output,
+            error: response.error,
+            error_type: response.error_type,
+          };
+          
+          // Update the local store with the execution data so it persists without page refresh
+          if (response.success) {
+            // Extract output_data from the response
+            const outputPayload = response.output;
+            let outputData: Record<string, unknown> = {};
+            if (outputPayload && typeof outputPayload === 'object' && 'data' in outputPayload) {
+              outputData = (outputPayload as { data: Record<string, unknown> }).data || {};
+            } else if (outputPayload && typeof outputPayload === 'object') {
+              outputData = outputPayload as Record<string, unknown>;
+            }
+            
+            updateNodeExecutionData(workflowContext.nodeInstanceId, {
+              form_values: formData,
+              input_data: inputData,
+              output_data: outputData,
+            });
+          }
+        } else {
+          // Standalone mode: use regular execute API
+          result = await ApiService.executeNode(node.identifier, {
+            input_data: inputData,
+            form_data: formData,
+          });
+        }
+        
         setOutputData(result);
         // Switch to output tab to show result
         setActiveOutputTab("schema");
@@ -137,7 +254,7 @@ export function NodeExecuteDialog({
         setIsExecuting(false);
       }
     },
-    [node.identifier, inputData]
+    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData]
   );
 
   const getTypeBadgeColor = (type: string) => {
