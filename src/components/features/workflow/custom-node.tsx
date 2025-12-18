@@ -22,9 +22,10 @@ interface CustomNodeProps {
   selected?: boolean;
   onDelete?: (nodeId: string) => void;
   workflowContext?: WorkflowNodeContext;
+  isExecuting?: boolean;
 }
 
-export function CustomNode({ id, data, selected, onDelete, workflowContext }: CustomNodeProps) {
+export function CustomNode({ id, data, selected, onDelete, workflowContext, isExecuting = false }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
@@ -117,8 +118,8 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext }: Cu
           />
         ))}
 
-        {/* Hover Actions */}
-        {isHovered && (
+        {/* Hover Actions - Hidden during workflow execution */}
+        {isHovered && !isExecuting && (
           <NodeHoverActions
             onEdit={handleEdit}
             onPlay={handlePlay}
@@ -127,6 +128,14 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext }: Cu
             isExecuting={false}
             isPolling={false}
           />
+        )}
+
+        {/* Execution indicator */}
+        {isExecuting && (
+          <div className="absolute -top-1 -right-1 w-3 h-3">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          </div>
         )}
 
         {/* Node Content - Just Icon */}

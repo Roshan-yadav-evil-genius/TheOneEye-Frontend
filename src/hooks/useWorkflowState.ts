@@ -169,7 +169,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     return sourceNode.data?.output_data || null;
   }, [edges, nodes]);
 
-  // Update node selection and add delete callback and workflow context
+  // Update node selection and add delete callback, workflow context, and execution state
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
       ...node,
@@ -179,9 +179,10 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         onDeleteNode: removeNode,
         workflowId: workflowId,
         getConnectedNodeOutput: getConnectedNodeOutput,
+        isExecuting: isRunning,
       },
     }));
-  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput]);
+  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, isRunning]);
 
   return {
     nodes: updatedNodes,

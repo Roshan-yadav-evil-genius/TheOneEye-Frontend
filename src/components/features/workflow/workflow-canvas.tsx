@@ -98,17 +98,29 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
         </div>
       )}
 
+      {/* Execution mode indicator */}
+      {isRunning && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-green-500/90 backdrop-blur-sm border border-green-600 rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+          <div className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+          </div>
+          <span className="text-sm font-medium text-white">Workflow Running</span>
+          <span className="text-xs text-green-100">Editing disabled</span>
+        </div>
+      )}
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeDragStop={onNodeDragStop}
+        onNodesChange={isRunning ? undefined : onNodesChange}
+        onEdgesChange={isRunning ? undefined : onEdgesChange}
+        onConnect={isRunning ? undefined : onConnect}
+        onNodeDragStop={isRunning ? undefined : onNodeDragStop}
         onInit={setReactFlowInstance}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
+        onDrop={isRunning ? undefined : onDrop}
+        onDragOver={isRunning ? undefined : onDragOver}
+        onDragLeave={isRunning ? undefined : onDragLeave}
         nodeTypes={nodeTypes}
         fitView
         className="bg-background"
@@ -119,9 +131,13 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
                            ConnectionLineType.Bezier}
         defaultEdgeOptions={{
           animated: isRunning,
-          style: { stroke: '#3b82f6', strokeWidth: 2 },
+          style: { stroke: isRunning ? '#10b981' : '#3b82f6', strokeWidth: 2 },
           type: lineType,
         }}
+        nodesDraggable={!isRunning}
+        nodesConnectable={!isRunning}
+        elementsSelectable={!isRunning}
+        deleteKeyCode={isRunning ? null : 'Delete'}
       >
         <Controls />
         {showMinimap && (

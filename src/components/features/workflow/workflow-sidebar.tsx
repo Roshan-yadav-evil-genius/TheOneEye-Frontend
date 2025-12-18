@@ -16,6 +16,7 @@ interface WorkflowSidebarProps {
   onFiltersChange: (filters: { nodeGroup: string }) => void;
   selectedNodes: string[];
   onNodeSelect: (nodeId: string) => void;
+  isExecuting?: boolean;
 }
 
 export function WorkflowSidebar({
@@ -25,6 +26,7 @@ export function WorkflowSidebar({
   onFiltersChange,
   selectedNodes,
   onNodeSelect,
+  isExecuting = false,
 }: WorkflowSidebarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [showFilters, setShowFilters] = useState(false);
@@ -122,8 +124,24 @@ export function WorkflowSidebar({
         )}
       </div>
 
+      {/* Execution Mode Banner */}
+      {isExecuting && (
+        <div className="px-3 py-2 bg-green-500/10 border-b border-green-500/20">
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </div>
+            <span className="text-xs font-medium">Workflow Running - Drag Disabled</span>
+          </div>
+        </div>
+      )}
+
       {/* Node Tree/List Content */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className={cn(
+        "flex-1 overflow-y-auto p-2",
+        isExecuting && "opacity-50 pointer-events-none"
+      )}>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <IconLoader2 className="w-8 h-8 text-primary animate-spin mb-3" />

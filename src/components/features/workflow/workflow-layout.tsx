@@ -96,6 +96,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onFiltersChange={setFilters}
             selectedNodes={selectedNodes}
             onNodeSelect={handleNodeSelect}
+            isExecuting={isRunning}
           />
           
           {/* Resize Handle */}
