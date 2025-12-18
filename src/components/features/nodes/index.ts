@@ -1,4 +1,4 @@
-export { NodeCard } from "./node-card";
-export { NodeList } from "./node-list";
-export { NodeFolder } from "./node-folder";
-export { NodeTree } from "./node-tree";
+export { NodesTable } from "./nodes-table";
+export { NodesTableHeader } from "./nodes-table-header";
+export { NodesTableRow } from "./nodes-table-row";
+export { NodesTablePagination } from "./nodes-table-pagination";

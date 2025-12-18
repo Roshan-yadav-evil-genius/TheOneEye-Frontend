@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { NodeList } from "@/components/features/nodes";
+import { NodesTable } from "@/components/features/nodes";
 import { ApiService } from "@/lib/api/api-service";
-import { TNodeTree, TNodeMetadata } from "@/types";
+import { TNodeMetadata } from "@/types";
 
 export default function NodesPage() {
-  const [tree, setTree] = useState<TNodeTree>({});
+  const [nodes, setNodes] = useState<TNodeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchNodes = async () => {
     setIsLoading(true);
     try {
-      const data = await ApiService.getNodes();
-      setTree(data);
+      const data = await ApiService.getNodesFlat();
+      setNodes(data);
     } catch (error) {
       console.error("Failed to fetch nodes:", error);
-      setTree({});
+      setNodes([]);
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +33,6 @@ export default function NodesPage() {
   };
 
   const handleViewForm = async (node: TNodeMetadata) => {
-    // For now, log the form data - can be extended to show in a modal
     try {
       const formData = await ApiService.getNodeForm(node.identifier);
       console.log("Node form:", formData);
@@ -44,7 +43,6 @@ export default function NodesPage() {
   };
 
   const handleExecute = async (node: TNodeMetadata) => {
-    // For now, execute with empty data - can be extended to collect form input
     try {
       const result = await ApiService.executeNode(node.identifier, {
         input_data: {},
@@ -57,6 +55,11 @@ export default function NodesPage() {
     }
   };
 
+  const handleViewDetails = (node: TNodeMetadata) => {
+    console.log("View details for node:", node);
+    // TODO: Open details modal/dialog
+  };
+
   useEffect(() => {
     fetchNodes();
   }, []);
@@ -64,18 +67,13 @@ export default function NodesPage() {
   return (
     <DashboardLayout>
       <div className="px-4 lg:px-6 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">Available Nodes</h1>
-          <p className="text-muted-foreground">
-            Browse and manage all available node types in the system
-          </p>
-        </div>
-        <NodeList
-          tree={tree}
+        <NodesTable
+          nodes={nodes}
           isLoading={isLoading}
           onRefresh={handleRefresh}
           onViewForm={handleViewForm}
           onExecute={handleExecute}
+          onViewDetails={handleViewDetails}
         />
       </div>
     </DashboardLayout>

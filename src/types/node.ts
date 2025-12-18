@@ -4,7 +4,7 @@
  */
 
 /**
- * Node metadata returned from the API
+ * Node metadata returned from the API (flat list)
  */
 export interface TNodeMetadata {
   name: string;
@@ -102,4 +102,3 @@ export interface TNodeExecuteResponse {
   error_type?: string;
   details?: string;
 }
-
