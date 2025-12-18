@@ -1,26 +1,19 @@
 // Store management utilities and middleware
 // Import stores for internal use
 import { useTUserStore } from './user-store';
-import { useEnhancedNodesStore, nodesSelectors } from './enhanced-nodes-store';
 import { useTWorkflowStore } from './workflow-store';
 import { useFormStore } from './form-store';
 import { useUIStore, uiHelpers } from './ui-store';
 import { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
-import { BackendNodeType } from '@/types/api/backend';
-import { TFormConfiguration, TNodeCreateData } from '@/types';
+import { TFormConfiguration } from '@/types';
 
 // Re-export stores for external use
 export { useTUserStore as useUserStore } from './user-store';
-export { useEnhancedNodesStore as useNodesStore, nodesSelectors } from './enhanced-nodes-store';
 export { useTWorkflowStore as useWorkflowStore } from './workflow-store';
 export { useFormStore } from './form-store';
 export { useUIStore, uiHelpers } from './ui-store';
 export { useWorkflowCanvasStore, workflowCanvasSelectors } from './workflow-canvas-store';
-export { useNodeExecutionStore } from './node-execution-store';
-export { useNodeFormStore, useNodeForm, useAutoSave } from './node-form-store';
-export { useNodeFormValuesStore, useNodeFormValues, useAutoSaveFormValues, useGlobalUnsavedChanges } from './node-form-values-store';
 export { useWorkflowLayoutStore, useWorkflowLayout } from './workflow-layout-store';
-export { useNodesTableStore, useNodesTable } from './nodes-table-store';
 export { useWorkflowTableStore, useWorkflowTable } from './workflow-table-store';
 export { useBrowserSessionStore } from './browser-session-store';
 
@@ -34,7 +27,6 @@ export type {
   TBreadcrumb,
   TNotification,
   TUserState,
-  TNodesState,
   TWorkflowState,
   TFormState,
   TUIStoreState,
@@ -43,15 +35,11 @@ export type {
 // Store initialization utilities
 export const initializeStores = async () => {
   // Initialize stores with default data if needed
-  const { loadNodes } = useEnhancedNodesStore.getState();
   const { loadTWorkflows } = useTWorkflowStore.getState();
 
   try {
-    // Load initial data in parallel
-    await Promise.all([
-      loadNodes({}, { showToast: false }), // Don't show toast on initial load
-      loadTWorkflows(),
-    ]);
+    // Load initial data
+    await loadTWorkflows();
   } catch (error) {
     console.error('Failed to initialize stores:', error);
   }
@@ -61,7 +49,6 @@ export const initializeStores = async () => {
 export const resetAllStores = () => {
   // Reset all stores to initial state
   useTUserStore.getState().logout();
-  useEnhancedNodesStore.getState().reset();
   useTWorkflowStore.setState({
     workflows: [],
     activeWorkflow: null,
@@ -88,20 +75,6 @@ export const storeSelectors = {
   getCurrentUser: () => useTUserStore.getState().user,
   isAuthenticated: () => useTUserStore.getState().isAuthenticated,
   
-  // Node selectors
-  getNodesByType: (type: string) => 
-    useEnhancedNodesStore.getState().nodes.filter((node) => node.type === type),
-  getNodesByCategory: (category: string) => 
-    useEnhancedNodesStore.getState().nodes.filter((node) => node.category === category),
-  getFilteredNodes: () => {
-    const { nodes, filters } = useEnhancedNodesStore.getState();
-    return nodes.filter((node) => {
-      if (filters.type && node.type !== filters.type) return false;
-      if (filters.search && !node.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
-      return true;
-    });
-  },
-  
   // Workflow selectors
   getActiveWorkflow: () => useTWorkflowStore.getState().activeWorkflow,
   getWorkflowsByStatus: (status: string) => 
@@ -124,66 +97,17 @@ export const storeSelectors = {
 
 // Store actions for common operations
 export const storeActions = {
-  // Create new entities with proper relationships
-  createNodeWithForm: async (nodeData: Partial<BackendNodeType>, formData: Partial<TFormConfiguration>) => {
-    const { createNode } = useEnhancedNodesStore.getState();
-    const { createFormConfiguration } = useFormStore.getState();
-    
-    const node = await createNode(nodeData as TNodeCreateData);
-    const formConfig = await createFormConfiguration({
-      ...(formData as TFormConfiguration),
-      nodeId: node.id,
-    });
-    
-    return { node, formConfig };
-  },
-  
   createWorkflowWithNodes: async (workflowData: Partial<TWorkflow>, nodeIds: string[]) => {
     const { createWorkflow } = useTWorkflowStore.getState();
-    const { nodes } = useEnhancedNodesStore.getState();
     
     const workflow = await createWorkflow(workflowData as TWorkflow);
-    const workflowNodes = nodes.filter((node) => nodeIds.includes(node.id));
     
-    // Add nodes to workflow
-    for (const node of workflowNodes) {
-      await useTWorkflowStore.getState().addNodeToWorkflow(workflow.id, node);
-    }
-    
-    return { workflow, nodes: workflowNodes };
+    return { workflow };
   },
   
-  // Bulk operations
-  deleteNodeAndForm: async (nodeId: string) => {
-    const { deleteNode } = useEnhancedNodesStore.getState();
-    const { configurations } = useFormStore.getState();
-    const { deleteFormConfiguration } = useFormStore.getState();
-    
-    // Find and delete associated form configuration
-    const formConfig = configurations.find((config) => config.nodeId === nodeId);
-    if (formConfig) {
-      await deleteFormConfiguration(formConfig.id);
-    }
-    
-    // Delete the node
-    await deleteNode(nodeId);
-  },
-  
-  deleteWorkflowAndNodes: async (workflowId: string) => {
-    const { workflows } = useTWorkflowStore.getState();
+  deleteWorkflow: async (workflowId: string) => {
     const { deleteWorkflow } = useTWorkflowStore.getState();
-    const { deleteNode } = useEnhancedNodesStore.getState();
-    
-    const workflow = workflows.find((w) => w.id === workflowId);
-    if (workflow) {
-      // Delete all nodes in the workflow
-      for (const node of workflow.nodes) {
-        await deleteNode(node.id);
-      }
-      
-      // Delete the workflow
-      await deleteWorkflow(workflowId);
-    }
+    await deleteWorkflow(workflowId);
   },
 };
 

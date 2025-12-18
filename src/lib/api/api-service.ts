@@ -1,26 +1,14 @@
 import { axiosApiClient } from './axios-client';
 import { 
-  TNodeGroup,
-  TNodeCreateData, 
-  TNodeUpdateData, 
-  TNodeFilters, 
-  TPaginatedResponse,
-  TNodeStats,
-  TApiError,
   TWorkflow,
   TUser,
-  TWorkflowNode,
   TWorkflowConnection,
   TWorkflowCanvasData,
   TWorkflowNodeCreateRequest,
   TWorkflowConnectionCreateRequest,
-  TWorkflowNodePositionUpdateRequest,
   TWorkflowNodeCreateResponse,
-  BackendNodeGroup,
   BackendWorkflowCanvasResponse,
   BackendUser,
-  BackendAuthResponse,
-  BackendNodeType,
   BackendWorkflowConnection,
   DemoRequest,
   DemoRequestCreateData
@@ -30,143 +18,6 @@ import {
 export class ApiService {
   // Request deduplication map to prevent duplicate API calls
   private static pendingRequests = new Map<string, Promise<unknown>>();
-
-
-
-  // Node operations
-  static async getNodes(filters: TNodeFilters = {}): Promise<TPaginatedResponse<BackendNodeType>> {
-    const response = await axiosApiClient.get<TPaginatedResponse<BackendNodeType> | BackendNodeType[]>('/nodes/', {
-      params: filters,
-    });
-    
-    // Handle both array and paginated response formats
-    if (Array.isArray(response)) {
-      return {
-        count: response.length,
-        next: null,
-        previous: null,
-        results: response,
-      };
-    }
-    
-    // Handle paginated response
-    return response;
-  }
-
-  static async getNode(id: string): Promise<BackendNodeType> {
-    const response = await axiosApiClient.get<BackendNodeType>(`/nodes/${id}/`);
-    return response;
-  }
-
-  static async createNode(nodeData: TNodeCreateData): Promise<BackendNodeType> {
-    const hasLogoFile = nodeData.logo instanceof File;
-    
-    if (hasLogoFile) {
-      const formData = new FormData();
-      
-      // Keys already match backend - no transformation needed!
-      Object.entries(nodeData).forEach(([key, value]) => {
-        if (key === 'form_configuration' || key === 'tags') {
-          formData.append(key, JSON.stringify(value));
-        } else if (key === 'logo' && value instanceof File) {
-          formData.append('logo', value);
-        } else if (key === 'node_group') {
-          // Handle node_group - extract ID if it's an object
-          const groupId = typeof value === 'string' ? value : (value as BackendNodeGroup)?.id;
-          if (groupId) formData.append('node_group', groupId);
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-      
-      return axiosApiClient.uploadFile<BackendNodeType>('/nodes/', formData);
-    } else {
-      // Ensure node_group is an ID string
-      const dataToSend = {
-        ...nodeData,
-        node_group: typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup)?.id
-      };
-      return axiosApiClient.post<BackendNodeType>('/nodes/', dataToSend);
-    }
-  }
-
-  static async updateNode(id: string, nodeData: TNodeUpdateData): Promise<BackendNodeType> {
-    const hasLogoFile = nodeData.logo instanceof File;
-    
-    if (hasLogoFile) {
-      // Handle file upload with FormData
-      const formData = new FormData();
-      
-      Object.entries(nodeData).forEach(([key, value]) => {
-        if (key === 'form_configuration' || key === 'tags') {
-          if (value !== null && value !== undefined) {
-            formData.append(key, JSON.stringify(value));
-          }
-        } else if (key === 'logo' && value instanceof File) {
-          formData.append('logo', value);
-        } else if (key === 'node_group') {
-          if (value) {
-            const groupId = typeof value === 'string' ? value : (value as BackendNodeGroup)?.id;
-            if (groupId) formData.append('node_group', groupId);
-          }
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-      
-      return axiosApiClient.uploadFile<BackendNodeType>(`/nodes/${id}/`, formData);
-    } else {
-      // Handle regular JSON update
-      const dataToSend = {
-        ...nodeData,
-        node_group: nodeData.node_group 
-          ? (typeof nodeData.node_group === 'string' ? nodeData.node_group : (nodeData.node_group as BackendNodeGroup).id)
-          : undefined
-      };
-      return axiosApiClient.put<BackendNodeType>(`/nodes/${id}/`, dataToSend);
-    }
-  }
-
-  static async deleteNode(id: string): Promise<void> {
-    return axiosApiClient.delete(`/nodes/${id}/`);
-  }
-
-  static async bulkCreateNodes(nodesData: TNodeCreateData[]): Promise<BackendNodeType[]> {
-    const response = await axiosApiClient.post<BackendNodeType[]>('/nodes/bulk_create/', nodesData);
-    return response;
-  }
-
-  static async bulkDeleteNodes(ids: string[]): Promise<void> {
-    // This would need to be implemented on the backend
-    // For now, we'll delete them one by one
-    await Promise.all(ids.map(id => this.deleteNode(id)));
-  }
-
-  static async getNodeStats(): Promise<TNodeStats> {
-    return axiosApiClient.get<TNodeStats>('/nodes/stats/');
-  }
-
-  // NodeGroup operations
-  static async getNodeGroups(): Promise<BackendNodeGroup[]> {
-    // Return backend type directly!
-    return axiosApiClient.get<BackendNodeGroup[]>('/node-groups/');
-  }
-
-  static async getNodeGroup(id: string): Promise<BackendNodeGroup> {
-    return axiosApiClient.get<BackendNodeGroup>(`/node-groups/${id}/`);
-  }
-
-  static async createNodeGroup(groupData: Partial<BackendNodeGroup>): Promise<BackendNodeGroup> {
-    return axiosApiClient.post<BackendNodeGroup>('/node-groups/', groupData);
-  }
-
-  static async updateNodeGroup(id: string, groupData: Partial<BackendNodeGroup>): Promise<BackendNodeGroup> {
-    return axiosApiClient.put<BackendNodeGroup>(`/node-groups/${id}/`, groupData);
-  }
-
-  static async deleteNodeGroup(id: string): Promise<void> {
-    return axiosApiClient.delete(`/node-groups/${id}/`);
-  }
 
   // Workflow operations
   static async getWorkflows(): Promise<TWorkflow[]> {
@@ -401,8 +252,8 @@ export class ApiService {
   // Utility methods
   static async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
-      // Use the nodes endpoint as a health check since /health/ doesn't exist
-      await axiosApiClient.get('/nodes/');
+      // Use the workflow endpoint as a health check
+      await axiosApiClient.get('/workflow/');
       return { status: 'ok', timestamp: new Date().toISOString() };
     } catch (error) {
       return { status: 'error', timestamp: new Date().toISOString() };
@@ -416,19 +267,6 @@ export class ApiService {
 
 // Export individual methods for easier importing
 export const {
-  getNodes,
-  getNode,
-  createNode,
-  updateNode,
-  deleteNode,
-  bulkCreateNodes,
-  bulkDeleteNodes,
-  getNodeStats,
-  getNodeGroups,
-  getNodeGroup,
-  createNodeGroup,
-  updateNodeGroup,
-  deleteNodeGroup,
   getWorkflows,
   createWorkflow,
   updateWorkflow,

@@ -13,9 +13,6 @@ import { OutputSection } from "./output-section";
 import { NodeEditor } from "./node-editor";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { BackendWorkflowNode } from "@/types";
-import { useNodeData } from "@/hooks/useNodeData";
-import { useNodeExecution } from "@/hooks/useNodeExecution";
-import { useNodeExecutionStore } from "@/stores/node-execution-store";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -37,23 +34,23 @@ export function NodeEditDialog({
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
   const [activeNodeTab, setActiveNodeTab] = useState<"parameters" | "form">("parameters");
   
-  // Fetch node data
-  const { inputData, outputData, isLoading, error, refetch } = useNodeData(workflowId, data.id, isOpen);
+  // Placeholder data - execution functionality removed
+  const inputData: Record<string, unknown> = {};
+  const outputData: Record<string, unknown> = {};
+  const isLoading = false;
+  const error: string | null = null;
 
-  // Get execution state from store
-  const executionState = useNodeExecutionStore((state) => state.getExecutionState(data.id));
+  const handleRefresh = () => {
+    // Refresh functionality removed
+  };
 
-  // Node execution hook (no need for onSuccess callback anymore)
-  const nodeExecution = useNodeExecution({
-    workflowId,
-    nodeId: data.id,
-    nodeName: data.node_type?.name || 'Unknown Node',
-  });
+  const handleTestStep = async () => {
+    // Execution functionality removed
+  };
 
-  // Use execution result from store if available, otherwise use fetched output
-  const displayOutputData = executionState.lastExecutionResult 
-    ? (executionState.lastExecutionResult as Record<string, unknown>)
-    : outputData;
+  const handlePauseStep = () => {
+    // Pause functionality removed
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -69,7 +66,7 @@ export function NodeEditDialog({
                 {data.node_type?.name}
               </h2>
               <Button 
-                onClick={refetch} 
+                onClick={handleRefresh} 
                 disabled={isLoading}
                 variant="ghost"
                 size="sm"
@@ -100,10 +97,10 @@ export function NodeEditDialog({
                 activeTab={activeNodeTab}
                 data={data}
                 onTabChange={(value) => setActiveNodeTab(value as "parameters" | "form")}
-                onTestStep={nodeExecution.executeNode}
-                onPauseStep={nodeExecution.stopExecution}
-                isExecuting={nodeExecution.isExecuting}
-                isPolling={nodeExecution.isPolling}
+                onTestStep={handleTestStep}
+                onPauseStep={handlePauseStep}
+                isExecuting={false}
+                isPolling={false}
               />
             </div>
 
@@ -111,8 +108,8 @@ export function NodeEditDialog({
             <OutputSection 
               activeOutputTab={activeOutputTab}
               onOutputTabChange={(value) => setActiveOutputTab(value as "schema" | "json")}
-              jsonData={displayOutputData}
-              isLoading={isLoading || nodeExecution.isExecuting || nodeExecution.isPolling}
+              jsonData={outputData}
+              isLoading={isLoading}
               error={error}
             />
           </ResizablePanels>

@@ -5,7 +5,6 @@ import {
   IconBrowser,
   IconDashboard,
   IconListDetails,
-  IconNetwork,
   IconKey,
 } from "@tabler/icons-react"
 
@@ -41,11 +40,6 @@ const data = {
       title: "Workflow",
       url: "/workflow",
       icon: IconListDetails,
-    },
-    {
-      title: "Nodes",
-      url: "/nodes",
-      icon: IconNetwork,
     },
     {
       title:"Sessions",

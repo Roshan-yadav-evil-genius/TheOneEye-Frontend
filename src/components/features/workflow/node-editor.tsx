@@ -2,7 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NodeHeader } from "./node-header";
-import { FormFieldsSection } from "@/components/features/nodes/FormFieldsSection";
 import { BackendWorkflowNode } from "@/types/api/backend";
 
 interface NodeEditorProps {
@@ -62,17 +61,9 @@ export function NodeEditor({
         </TabsContent>
 
         <TabsContent value="form" className="flex-1 p-4 m-0 overflow-y-auto overflow-x-hidden min-h-0 sidebar-scrollbar">
-          {data?.node_type?.form_configuration ? (
-            <FormFieldsSection 
-              node_type={{...data.node_type}} 
-              nodeId={data.id}
-              initialFormValues={data.form_values || {}}
-            />
-          ) : (
-            <div className="text-gray-400 text-center py-8">
-              No form configuration available
-            </div>
-          )}
+          <div className="text-gray-400 text-center py-8">
+            Form editor has been removed
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -56,8 +56,6 @@ const initialState: TUIStoreState = {
   breadcrumbs: [],
   notifications: [],
   modals: {
-    createNode: false,
-    editNode: false,
     createWorkflow: false,
     editWorkflow: false,
     createBrowserSession: false,
@@ -258,8 +256,6 @@ export const useUIStore = create<UIStore>()(
         closeAllModals: () => {
           set({
             modals: {
-              createNode: false,
-              editNode: false,
               createWorkflow: false,
               editWorkflow: false,
               createBrowserSession: false,
@@ -416,14 +412,6 @@ export const uiHelpers = {
   },
 
   // Modal helpers
-  openCreateNodeModal: () => {
-    useUIStore.getState().openModal('createNode');
-  },
-
-  openEditNodeModal: () => {
-    useUIStore.getState().openModal('editNode');
-  },
-
   openCreateWorkflowModal: () => {
     useUIStore.getState().openModal('createWorkflow');
   },

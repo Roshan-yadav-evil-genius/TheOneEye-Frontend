@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useUIStore } from '@/stores/ui-store';
-import { useEnhancedNodesStore } from '@/stores/enhanced-nodes-store';
 import { useUserStore } from '@/stores/user-store';
 
 // Custom hooks for optimized store access
@@ -97,35 +96,6 @@ export const useUser = () => {
     login,
     logout,
     updateProfile,
-  };
-};
-
-export const useNodes = () => {
-  const nodes = useEnhancedNodesStore((state) => state.nodes);
-  const selectedNode = useEnhancedNodesStore((state) => state.selectedNode);
-  const isLoading = useEnhancedNodesStore((state) => state.isLoading);
-  const error = useEnhancedNodesStore((state) => state.error);
-  const filters = useEnhancedNodesStore((state) => state.filters);
-
-  const loadNodes = useEnhancedNodesStore((state) => state.loadNodes);
-  const createNode = useEnhancedNodesStore((state) => state.createNode);
-  const updateNode = useEnhancedNodesStore((state) => state.updateNode);
-  const deleteNode = useEnhancedNodesStore((state) => state.deleteNode);
-  const selectNode = useEnhancedNodesStore((state) => state.selectNode);
-  const setFilters = useEnhancedNodesStore((state) => state.setFilters);
-  
-  return {
-    nodes,
-    selectedNode,
-    isLoading,
-    error,
-    filters,
-    loadNodes,
-    createNode,
-    updateNode,
-    deleteNode,
-    selectNode,
-    setFilters,
   };
 };
 

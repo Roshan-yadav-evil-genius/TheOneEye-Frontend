@@ -32,18 +32,6 @@ export interface TUserState {
   error: string | null;
 }
 
-export interface TNodesState {
-  nodes: TNode[];
-  selectedNode: TNode | null;
-  isLoading: boolean;
-  error: string | null;
-  filters: {
-    type?: string;
-    category?: string;
-    search?: string;
-  };
-}
-
 export interface TWorkflowState {
   workflows: TWorkflow[];
   activeWorkflow: TWorkflow | null;
@@ -68,8 +56,6 @@ export interface TUIStoreState {
   breadcrumbs: TBreadcrumb[];
   notifications: TNotification[];
   modals: {
-    createNode: boolean;
-    editNode: boolean;
     createWorkflow: boolean;
     editWorkflow: boolean;
     createBrowserSession: boolean;

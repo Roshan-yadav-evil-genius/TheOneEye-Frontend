@@ -7,7 +7,6 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { nodeColors } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode } from "@/types";
-import { useNodeExecution } from "@/hooks/useNodeExecution";
 import { IconGripVertical } from "@tabler/icons-react";
 
 interface CustomNodeProps {
@@ -24,15 +23,9 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
   
   const colorClass = nodeColors[data.node_type?.type as keyof typeof nodeColors] || nodeColors.system;
 
-  const nodeExecution = useNodeExecution({
-    workflowId: workflowId || '',
-    nodeId: id,
-    nodeName: data.node_type?.name || 'Unknown Node'
-  });
-
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await nodeExecution.executeNode();
+    // Node execution removed
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -52,7 +45,6 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
 
   const handlePause = (e: React.MouseEvent) => {
     e.stopPropagation();
-    nodeExecution.stopExecution();
   };
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -67,12 +59,6 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
       <div 
         className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
           selected ? "ring-2 ring-primary ring-offset-2" : ""
-        } ${
-          nodeExecution.isExecuting && !nodeExecution.isPolling ? "border-orange-500 animate-pulse" : ""
-        } ${
-          nodeExecution.isPolling ? "border-blue-500 animate-pulse" : ""
-        } ${
-          nodeExecution.lastExecutionResult && !nodeExecution.isExecuting && !nodeExecution.isPolling ? "border-green-500" : ""
         } ${colorClass}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -110,8 +96,8 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
           onDelete={handleDelete}
           onShutdown={handleShutdown}
           onMore={handleMore}
-          isExecuting={nodeExecution.isExecuting}
-          isPolling={nodeExecution.isPolling}
+          isExecuting={false}
+          isPolling={false}
         />
       )}
 
@@ -138,14 +124,6 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         <h3 className="font-semibold text-sm text-foreground leading-tight">
           {data.node_type?.name || 'Unknown Node'}
         </h3>
-        
-        
-        {nodeExecution.lastExecutionResult && !nodeExecution.isExecuting && !nodeExecution.isPolling && (
-          <div className="mt-1 flex items-center justify-center">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="ml-1 text-xs text-green-600">Completed</span>
-          </div>
-        )}
       </div>
 
       {/* Edit Dialog */}
