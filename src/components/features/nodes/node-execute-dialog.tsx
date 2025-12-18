@@ -199,7 +199,11 @@ export function NodeExecuteDialog({
                 <JsonViewer
                   title="OUTPUT"
                   statusColor={outputData?.success ? "bg-green-500" : outputData?.error ? "bg-red-500" : "bg-yellow-500"}
-                  jsonData={outputData || { message: "Execute node to see output" }}
+                  jsonData={
+                    outputData?.error 
+                      ? { error: outputData.error, error_type: outputData.error_type }
+                      : (outputData?.output as Record<string, unknown>)?.data ?? { message: "Execute node to see output" }
+                  }
                   activeTab={activeOutputTab}
                   onTabChange={setActiveOutputTab}
                   enableDragDrop={false}
