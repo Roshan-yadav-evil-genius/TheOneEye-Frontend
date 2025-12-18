@@ -11,25 +11,10 @@ import {
 } from "@/components/ui/select";
 import { DroppableFormInput } from "@/components/features/workflow/droppable-form-input";
 import { cn } from "@/lib/utils";
-
-/**
- * Form field definition from the backend API
- */
-export interface FormFieldDefinition {
-  tag: "input" | "select" | "textarea";
-  name: string;
-  label: string;
-  type?: string;
-  value?: unknown;
-  options?: Array<{ value: string; text: string; selected?: boolean }>;
-  required?: boolean;
-  placeholder?: string;
-  disabled?: boolean;
-  errors?: string[];
-}
+import { TNodeFormField } from "@/types";
 
 interface NodeFormFieldProps {
-  field: FormFieldDefinition;
+  field: TNodeFormField;
   value: string;
   onChange: (value: string) => void;
   isLoading?: boolean;

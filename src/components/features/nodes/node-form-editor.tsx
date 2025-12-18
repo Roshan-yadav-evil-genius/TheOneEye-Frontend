@@ -2,16 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { NodeFormField, FormFieldDefinition } from "./node-form-field";
+import { NodeFormField } from "./node-form-field";
 import { ApiService } from "@/lib/api/api-service";
-import { TNodeMetadata } from "@/types";
+import { TNodeMetadata, TNodeFormData } from "@/types";
 import { IconPlayerPlay, IconLoader2 } from "@tabler/icons-react";
-
-interface FormState {
-  fields: FormFieldDefinition[];
-  dependencies?: Record<string, string[]>;
-  non_field_errors?: string[];
-}
 
 interface NodeFormEditorProps {
   node: TNodeMetadata;
@@ -24,7 +18,7 @@ export function NodeFormEditor({
   onExecute,
   isExecuting = false,
 }: NodeFormEditorProps) {
-  const [formState, setFormState] = useState<FormState | null>(null);
+  const [formState, setFormState] = useState<TNodeFormData | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
   const [isLoadingForm, setIsLoadingForm] = useState(true);
@@ -35,14 +29,22 @@ export function NodeFormEditor({
     const loadForm = async () => {
       setIsLoadingForm(true);
       setFormError(null);
+      console.log("[NodeFormEditor] Loading form for:", node.identifier);
+      console.log("[NodeFormEditor] Node has_form:", node.has_form);
       try {
         const response = await ApiService.getNodeForm(node.identifier);
+        console.log("[NodeFormEditor] API Response:", response);
+        console.log("[NodeFormEditor] response.form:", response.form);
+        console.log("[NodeFormEditor] response.message:", response.message);
+        
         if (response.form) {
-          setFormState(response.form as unknown as FormState);
+          console.log("[NodeFormEditor] Form fields:", response.form.fields);
+          console.log("[NodeFormEditor] Form dependencies:", response.form.dependencies);
+          setFormState(response.form);
           
           // Initialize form values with defaults
           const initialValues: Record<string, string> = {};
-          (response.form as unknown as FormState).fields?.forEach((field) => {
+          response.form.fields?.forEach((field) => {
             if (field.value !== undefined && field.value !== null) {
               initialValues[field.name] = String(field.value);
             } else if (field.options?.find((o) => o.selected)) {
@@ -54,12 +56,14 @@ export function NodeFormEditor({
               initialValues[field.name] = "";
             }
           });
+          console.log("[NodeFormEditor] Initial values:", initialValues);
           setFormValues(initialValues);
         } else {
+          console.warn("[NodeFormEditor] No form in response, message:", response.message);
           setFormError(response.message || "This node does not have a form");
         }
       } catch (error) {
-        console.error("Failed to load node form:", error);
+        console.error("[NodeFormEditor] Failed to load node form:", error);
         setFormError("Failed to load form");
       } finally {
         setIsLoadingForm(false);
@@ -67,8 +71,10 @@ export function NodeFormEditor({
     };
 
     if (node.has_form) {
+      console.log("[NodeFormEditor] Node has form, loading...");
       loadForm();
     } else {
+      console.log("[NodeFormEditor] Node does not have form flag set");
       setIsLoadingForm(false);
       setFormError("This node does not have a form");
     }

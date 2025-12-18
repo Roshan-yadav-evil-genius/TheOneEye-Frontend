@@ -39,17 +39,29 @@ export interface TNodeCount {
 }
 
 /**
- * Node form field
+ * Node form field from FormSerializer
+ * Matches the output structure from core/Node/Core/Form/Core/FormSerializer.py
  */
 export interface TNodeFormField {
+  tag: "input" | "select" | "textarea";
   name: string;
-  type: string;
-  label?: string;
-  placeholder?: string;
+  label: string;
+  type?: string;
+  value?: unknown;
+  options?: Array<{ value: string; text: string; selected?: boolean }>;
   required?: boolean;
-  default?: unknown;
-  options?: Array<{ value: string; text: string }>;
-  depends_on?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  errors?: string[];
+}
+
+/**
+ * Form data structure with fields and dependencies
+ */
+export interface TNodeFormData {
+  fields: TNodeFormField[];
+  dependencies?: Record<string, string[]>;
+  non_field_errors?: string[];
 }
 
 /**
@@ -57,7 +69,7 @@ export interface TNodeFormField {
  */
 export interface TNodeForm {
   node: TNodeMetadata;
-  form: TNodeFormField[] | null;
+  form: TNodeFormData | null;
   message?: string;
 }
 
