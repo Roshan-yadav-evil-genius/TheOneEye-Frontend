@@ -95,12 +95,8 @@ export function CustomNode({ id, data, selected, onDelete, workflowId }: CustomN
         <div className="flex items-center justify-center h-full">
           <NodeLogo
             node={{
-              id: id,
               name: data.node_type?.name || 'Unknown',
               type: data.node_type?.type || 'unknown',
-              logo: data.node_type?.logo,
-              nodeGroupIcon: data.node_type?.node_group?.icon,
-              nodeGroupName: data.node_type?.node_group?.name,
             }}
             size="lg"
           />

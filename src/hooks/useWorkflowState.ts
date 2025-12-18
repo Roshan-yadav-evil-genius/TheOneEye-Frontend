@@ -131,9 +131,9 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     [edges, addConnection]
   );
 
-  const addNodeFromDrag = useCallback(async (nodeData: { id: string }, position: { x: number; y: number }) => {
+  const addNodeFromDrag = useCallback(async (nodeData: { identifier: string }, position: { x: number; y: number }) => {
     const nodeRequest: TWorkflowNodeCreateRequest = {
-      nodeTemplate: nodeData.id, // This should be the StandaloneNode ID
+      nodeTemplate: nodeData.identifier, // The node identifier from TNodeMetadata
       position,
       form_values: {},
     };

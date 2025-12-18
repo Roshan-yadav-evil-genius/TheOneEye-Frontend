@@ -1,8 +1,7 @@
-import { BackendNodeType, BackendNodeGroup } from "../api";
+import { BackendNodeType } from "../api";
 
 // Core entity types
 export type TNode = BackendNodeType;
-export type TNodeGroup = BackendNodeGroup;
 
 export interface TUser {
   id: string;
@@ -11,18 +10,6 @@ export interface TUser {
   avatar?: string;
   role?: string;
   permissions?: string[];
-}
-
-
-// Node Template - Standalone node template data
-export interface TNodeTemplate {
-  id: string;
-  name: string;
-  type: string;
-  description?: string;
-  logo?: string;
-  form_configuration: Record<string, unknown>;
-  tags: string[];
 }
 
 // WorkflowNode - Instance of a node in a specific workflow

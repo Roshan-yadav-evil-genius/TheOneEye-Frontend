@@ -1,41 +1,21 @@
 // Backend API response types (as they come from the server)
 // These interfaces represent the exact structure returned by the Django backend
 
-// Shared interface for node type structure (used in both BackendNode and BackendWorkflowNode.node_type)
-// This represents a StandaloneNode from the backend
+// Simplified node type structure matching core/views node metadata
 export interface BackendNodeType {
-  id: string;
+  identifier: string;
   name: string;
   type: string;
-  node_group: BackendNodeGroup;
+  label?: string;
   description?: string;
-  version?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  created_by?: string;
-  form_configuration?: Record<string, unknown>;  // More flexible - backend can return any JSON structure
-  tags?: string[];
-  logo?: string;
+  has_form?: boolean;
+  category?: string;
 }
-
-
 
 export interface TFormConfiguration {
   title: string;
   description?: string;
   elements: Record<string, unknown>[];
-}
-
-// Represents NodeGroup from the backend
-export interface BackendNodeGroup {
-  id: string;
-  name: string;
-  description?: string;
-  icon?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 // Response from /workflow/{id}/canvas_data/ endpoint

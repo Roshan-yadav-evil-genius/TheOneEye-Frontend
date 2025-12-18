@@ -1,23 +1,9 @@
-import { BackendNodeType, BackendNodeGroup } from './backend';
-
 // API Request Types
-// For CREATE: omit auto-generated fields, allow logo as File
-export type TNodeCreateData = Omit<BackendNodeType, 'id' | 'created_at' | 'updated_at' | 'logo'> & {
-  logo?: File;  // Allow File upload
-  node_group: string | BackendNodeGroup;  // Allow ID string or full object
-};
-
-// For UPDATE: all fields optional, allow logo as File
-export type TNodeUpdateData = Partial<Omit<BackendNodeType, 'id' | 'created_at' | 'updated_at' | 'logo'>> & {
-  logo?: File;
-  node_group?: string | BackendNodeGroup;
-};
 
 export interface TNodeFilters {
   type?: string;
-  is_active?: boolean;
-  tags?: string[];
   search?: string;
+  category?: string;
   ordering?: string;
   page?: number;
   page_size?: number;
