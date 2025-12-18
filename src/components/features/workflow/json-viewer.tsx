@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Search, X } from "lucide-react";
+import { Copy, Download, Search, X, WrapText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,6 +45,7 @@ export function JsonViewer({
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [wordWrap, setWordWrap] = useState(false);
   const [editableJsonText, setEditableJsonText] = useState(() => 
     JSON.stringify(jsonData, null, 2)
   );
@@ -200,6 +201,15 @@ export function JsonViewer({
           >
             <Search className="w-4 h-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setWordWrap(!wordWrap)}
+            className={`text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0 ${wordWrap ? 'bg-gray-700 text-white' : ''}`}
+            title={wordWrap ? "Disable Word Wrap" : "Enable Word Wrap"}
+          >
+            <WrapText className="w-4 h-4" />
+          </Button>
         </div>
         <div></div>
       </div>
@@ -254,6 +264,7 @@ export function JsonViewer({
             showLineNumbers={true}
             error={editable ? jsonError : null}
             placeholder='{"key": "value"}'
+            wordWrap={wordWrap}
           />
         </TabsContent>
         

@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useCallback } from "react";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import "prismjs/components/prism-json";
+import React from "react";
+import Editor from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
 
 interface CodeEditorProps {
@@ -15,6 +13,7 @@ interface CodeEditorProps {
   error?: string | null;
   className?: string;
   placeholder?: string;
+  wordWrap?: boolean;
 }
 
 export function CodeEditor({
@@ -25,79 +24,49 @@ export function CodeEditor({
   showLineNumbers = true,
   error,
   className,
-  placeholder = "",
+  wordWrap = false,
 }: CodeEditorProps) {
-  const highlight = useCallback(
-    (code: string) => {
-      try {
-        const grammar = Prism.languages[language] || Prism.languages.json;
-        return Prism.highlight(code, grammar, language);
-      } catch {
-        return code;
-      }
-    },
-    [language]
-  );
-
-  const handleChange = useCallback(
-    (code: string) => {
-      if (!readOnly && onChange) {
-        onChange(code);
-      }
-    },
-    [readOnly, onChange]
-  );
-
-  // Generate line numbers
-  const lineCount = value.split("\n").length;
-  const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1);
+  const handleChange = (newValue: string | undefined) => {
+    if (!readOnly && onChange && newValue !== undefined) {
+      onChange(newValue);
+    }
+  };
 
   return (
     <div className={cn("h-full flex flex-col overflow-hidden", className)}>
-      <div className="flex-1 overflow-auto sidebar-scrollbar">
-        <div className="flex min-h-full">
-          {/* Line numbers */}
-          {showLineNumbers && (
-            <div className="flex-shrink-0 py-2.5 px-2 text-right select-none bg-gray-900/50 border-r border-gray-700/50">
-              {lineNumbers.map((num) => (
-                <div
-                  key={num}
-                  className="text-xs text-gray-500 font-mono leading-5"
-                  style={{ height: "1.25rem" }}
-                >
-                  {num}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Editor */}
-          <div className="flex-1 min-w-0">
-            <Editor
-              value={value}
-              onValueChange={handleChange}
-              highlight={highlight}
-              padding={10}
-              disabled={readOnly}
-              placeholder={placeholder}
-              className={cn(
-                "min-h-full font-mono text-sm",
-                readOnly && "cursor-default"
-              )}
-              style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-                fontSize: "0.875rem",
-                lineHeight: "1.25rem",
-                minHeight: "100%",
-                background: "transparent",
-              }}
-              textareaClassName={cn(
-                "outline-none focus:outline-none",
-                readOnly && "pointer-events-none"
-              )}
-            />
-          </div>
-        </div>
+      <div className="flex-1 overflow-hidden">
+        <Editor
+          height="100%"
+          language={language}
+          value={value}
+          onChange={handleChange}
+          theme="vs-dark"
+          options={{
+            readOnly,
+            lineNumbers: showLineNumbers ? "on" : "off",
+            folding: true,
+            foldingStrategy: "indentation",
+            showFoldingControls: "always",
+            minimap: { enabled: false },
+            automaticLayout: true,
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+            lineHeight: 20,
+            padding: { top: 10, bottom: 10 },
+            renderLineHighlight: "none",
+            scrollbar: {
+              vertical: "auto",
+              horizontal: "auto",
+              verticalScrollbarSize: 8,
+              horizontalScrollbarSize: 8,
+            },
+            wordWrap: wordWrap ? "on" : "off",
+            contextmenu: true,
+            formatOnPaste: true,
+            formatOnType: true,
+          }}
+        />
       </div>
 
       {/* Error message */}
@@ -106,58 +75,6 @@ export function CodeEditor({
           {error}
         </div>
       )}
-
-      {/* Prism theme styles */}
-      <style jsx global>{`
-        .token.comment,
-        .token.prolog,
-        .token.doctype,
-        .token.cdata {
-          color: #6a9955;
-        }
-        .token.punctuation {
-          color: #d4d4d4;
-        }
-        .token.property,
-        .token.tag,
-        .token.boolean,
-        .token.number,
-        .token.constant,
-        .token.symbol,
-        .token.deleted {
-          color: #b5cea8;
-        }
-        .token.selector,
-        .token.attr-name,
-        .token.string,
-        .token.char,
-        .token.builtin,
-        .token.inserted {
-          color: #ce9178;
-        }
-        .token.operator,
-        .token.entity,
-        .token.url,
-        .language-css .token.string,
-        .style .token.string {
-          color: #d4d4d4;
-        }
-        .token.atrule,
-        .token.attr-value,
-        .token.keyword {
-          color: #569cd6;
-        }
-        .token.function,
-        .token.class-name {
-          color: #dcdcaa;
-        }
-        .token.regex,
-        .token.important,
-        .token.variable {
-          color: #d16969;
-        }
-      `}</style>
     </div>
   );
 }
-
