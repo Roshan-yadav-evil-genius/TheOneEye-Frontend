@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { TNodeMetadata } from '@/types';
-import { IconGripVertical } from '@tabler/icons-react';
+import { IconCube } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
 interface DraggableNodeItemProps {
@@ -11,42 +11,20 @@ interface DraggableNodeItemProps {
 }
 
 /**
- * Get icon color based on node type
+ * Get badge styles based on node type (matching nodes table colors)
  */
-function getNodeTypeColor(type: string): string {
+function getTypeBadgeStyles(type: string): { bg: string; text: string } {
   switch (type) {
-    case 'trigger':
-      return 'text-blue-400';
-    case 'action':
-      return 'text-emerald-400';
-    case 'logic':
-      return 'text-violet-400';
-    case 'iterator':
-      return 'text-amber-400';
-    case 'crawler':
-      return 'text-cyan-400';
+    case 'BlockingNode':
+      return { bg: 'bg-pink-500/20 border-pink-500/50', text: 'text-pink-400' };
+    case 'NonBlockingNode':
+      return { bg: 'bg-cyan-500/20 border-cyan-500/50', text: 'text-cyan-400' };
+    case 'QueueNode':
+      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-300' };
+    case 'QueueReader':
+      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-300' };
     default:
-      return 'text-muted-foreground';
-  }
-}
-
-/**
- * Get background color based on node type
- */
-function getNodeTypeBg(type: string): string {
-  switch (type) {
-    case 'trigger':
-      return 'bg-blue-500/10 hover:bg-blue-500/20';
-    case 'action':
-      return 'bg-emerald-500/10 hover:bg-emerald-500/20';
-    case 'logic':
-      return 'bg-violet-500/10 hover:bg-violet-500/20';
-    case 'iterator':
-      return 'bg-amber-500/10 hover:bg-amber-500/20';
-    case 'crawler':
-      return 'bg-cyan-500/10 hover:bg-cyan-500/20';
-    default:
-      return 'bg-muted/50 hover:bg-muted';
+      return { bg: 'bg-zinc-600/30 border-zinc-500/50', text: 'text-zinc-400' };
   }
 }
 
@@ -61,30 +39,53 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
   };
 
   const displayName = node.label || node.name;
-  const typeColor = getNodeTypeColor(node.type);
-  const typeBg = getNodeTypeBg(node.type);
+  const badgeStyles = getTypeBadgeStyles(node.type);
 
   return (
     <div
       draggable
       onDragStart={handleDragStart}
       className={cn(
-        'flex items-center gap-2 px-3 py-2 rounded-md cursor-grab active:cursor-grabbing',
-        'transition-colors duration-150',
-        'border border-transparent hover:border-border/50',
-        typeBg,
+        'relative flex items-start gap-3 p-3 rounded-lg cursor-grab active:cursor-grabbing',
+        'transition-all duration-150',
+        'bg-card/50 hover:bg-card',
+        'border border-border/30 hover:border-border/60',
+        'shadow-sm hover:shadow-md',
         className
       )}
       title={node.description || displayName}
     >
-      <IconGripVertical 
-        size={14} 
-        className="text-muted-foreground/50 flex-shrink-0" 
-      />
-      <span className={cn('text-sm font-medium truncate', typeColor)}>
-        {displayName}
-      </span>
+      {/* Left Icon */}
+      <div className="flex-shrink-0 mt-0.5">
+        <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+          <IconCube size={18} className="text-primary" />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0 pr-16">
+        {/* Node Name */}
+        <div className="text-sm font-medium text-foreground truncate">
+          {displayName}
+        </div>
+        {/* Identifier */}
+        <div className="text-xs text-muted-foreground truncate mt-0.5">
+          {node.identifier}
+        </div>
+      </div>
+
+      {/* Type Badge - Top Right */}
+      <div className="absolute top-2 right-2">
+        <span
+          className={cn(
+            'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border',
+            badgeStyles.bg,
+            badgeStyles.text
+          )}
+        >
+          {node.type}
+        </span>
+      </div>
     </div>
   );
 }
-
