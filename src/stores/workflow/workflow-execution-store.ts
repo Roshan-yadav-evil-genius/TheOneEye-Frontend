@@ -32,14 +32,6 @@ interface WorkflowExecutionState {
   isStarting: boolean;
   isStopping: boolean;
   isPolling: boolean;
-  
-  // Dev mode
-  isDevMode: boolean;
-  devContainerStatus: {
-    exists: boolean;
-    status: string;
-    uptime?: number;
-  } | null;
 }
 
 // Execution Actions Interface
@@ -50,17 +42,9 @@ interface WorkflowExecutionActions {
   pauseExecution: () => Promise<void>;
   resumeExecution: () => Promise<void>;
   
-  // Single node execution
-  executeSingleNode: (workflowId: string, nodeId: string) => Promise<{ task_id: string; status: string; message: string } | null>;
-  
   // Task status polling
   pollTaskStatus: (taskId: string) => Promise<void>;
   stopPolling: () => void;
-  
-  // Dev mode
-  startDevMode: (workflowId: string) => Promise<void>;
-  stopDevMode: (workflowId: string) => Promise<void>;
-  getDevContainerStatus: (workflowId: string) => Promise<void>;
   
   // State management
   setWorkflowId: (workflowId: string | null) => void;
@@ -85,8 +69,6 @@ const initialState: WorkflowExecutionState = {
   isStarting: false,
   isStopping: false,
   isPolling: false,
-  isDevMode: false,
-  devContainerStatus: null,
 };
 
 // Polling interval reference
@@ -198,51 +180,6 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
         toastInfo('Workflow execution resumed');
       },
 
-      // Single node execution
-      executeSingleNode: async (workflowId: string, nodeId: string) => {
-        set((state) => {
-          state.currentNodeId = nodeId;
-          state.isStarting = true;
-          state.error = null;
-        });
-
-        try {
-          const response = await workflowApi.executeSingleNode(workflowId, nodeId);
-          
-          set((state) => {
-            state.taskId = response.task_id;
-            state.status = 'running';
-            state.isStarting = false;
-          });
-
-          toastSuccess('Node execution started!', {
-            description: response.message,
-          });
-
-          // Start polling for task status
-          get().pollTaskStatus(response.task_id);
-          
-          return response;
-        } catch (error) {
-          const errorMessage = error instanceof Error 
-            ? error.message 
-            : 'Failed to execute node';
-
-          set((state) => {
-            state.isStarting = false;
-            state.status = 'failed';
-            state.error = errorMessage;
-            state.currentNodeId = null;
-          });
-
-          toastError('Failed to execute node', {
-            description: errorMessage,
-          });
-          
-          return null;
-        }
-      },
-
       // Task status polling
       pollTaskStatus: async (taskId: string) => {
         // Clear any existing polling
@@ -310,54 +247,6 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
         });
       },
 
-      // Dev mode
-      startDevMode: async (workflowId: string) => {
-        set((state) => {
-          state.isDevMode = true;
-          state.workflowId = workflowId;
-        });
-
-        await get().getDevContainerStatus(workflowId);
-        
-        toastInfo('Dev mode enabled');
-      },
-
-      stopDevMode: async (workflowId: string) => {
-        try {
-          await workflowApi.stopDevMode(workflowId);
-          
-          set((state) => {
-            state.isDevMode = false;
-            state.devContainerStatus = null;
-          });
-
-          toastSuccess('Dev mode stopped');
-        } catch (error) {
-          const errorMessage = error instanceof Error 
-            ? error.message 
-            : 'Failed to stop dev mode';
-
-          toastError('Failed to stop dev mode', {
-            description: errorMessage,
-          });
-        }
-      },
-
-      getDevContainerStatus: async (workflowId: string) => {
-        try {
-          const status = await workflowApi.getDevContainerStatus(workflowId);
-          
-          set((state) => {
-            state.devContainerStatus = status;
-          });
-        } catch (error) {
-          // Silently fail - dev container might not exist
-          set((state) => {
-            state.devContainerStatus = null;
-          });
-        }
-      },
-
       // State management
       setWorkflowId: (workflowId: string | null) => {
         set((state) => {
@@ -417,4 +306,3 @@ export const workflowExecutionSelectors = {
   isExecuting: (state: WorkflowExecutionStore) => 
     state.status === 'running' || state.isStarting,
 };
-

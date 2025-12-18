@@ -35,10 +35,7 @@ export class ApiService {
   static addConnectionToWorkflow = workflowApi.addConnectionToWorkflow.bind(workflowApi);
   static removeConnectionFromWorkflow = workflowApi.removeConnectionFromWorkflow.bind(workflowApi);
   static updateNodeFormValues = workflowApi.updateNodeFormValues.bind(workflowApi);
-  static executeSingleNode = workflowApi.executeSingleNode.bind(workflowApi);
-  static stopDevMode = workflowApi.stopDevMode.bind(workflowApi);
   static getTaskStatus = workflowApi.getTaskStatus.bind(workflowApi);
-  static getDevContainerStatus = workflowApi.getDevContainerStatus.bind(workflowApi);
   static startWorkflowExecution = workflowApi.startWorkflowExecution.bind(workflowApi);
   static stopWorkflowExecution = workflowApi.stopWorkflowExecution.bind(workflowApi);
   static getWorkflowTaskStatus = workflowApi.getWorkflowTaskStatus.bind(workflowApi);

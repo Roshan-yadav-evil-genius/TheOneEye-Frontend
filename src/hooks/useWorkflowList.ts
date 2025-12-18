@@ -41,7 +41,8 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/workflow/${id}/details`);
+    // Navigate to workflow canvas (same as edit since details page was removed)
+    router.push(`/workflow/${id}`);
   };
 
   const handleDelete = (id: string) => {

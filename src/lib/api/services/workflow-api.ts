@@ -128,25 +128,8 @@ class WorkflowApiService {
   }
 
   // Workflow Execution Operations
-  async executeSingleNode(workflowId: string, nodeId: string): Promise<{ task_id: string; status: string; message: string }> {
-    const response = await axiosApiClient.post<{ task_id: string; status: string; message: string }>(`/workflow/${workflowId}/execute_single_node/`, {
-      node_id: nodeId
-    });
-    return response;
-  }
-
-  async stopDevMode(workflowId: string): Promise<{ task_id: string; status: string; message: string }> {
-    const response = await axiosApiClient.post<{ task_id: string; status: string; message: string }>(`/workflow/${workflowId}/stop_dev_mode/`);
-    return response;
-  }
-
   async getTaskStatus(taskId: string): Promise<{ state: string; result?: unknown; error?: string; progress?: number }> {
     const response = await axiosApiClient.get<{ state: string; result?: unknown; error?: string; progress?: number }>(`/celery/task/${taskId}/status/`);
-    return response;
-  }
-
-  async getDevContainerStatus(workflowId: string): Promise<{ exists: boolean; status: string; uptime?: number }> {
-    const response = await axiosApiClient.get<{ exists: boolean; status: string; uptime?: number }>(`/workflow/${workflowId}/dev_container_status/`);
     return response;
   }
 
@@ -214,10 +197,7 @@ export const {
   addConnectionToWorkflow,
   removeConnectionFromWorkflow,
   updateNodeFormValues,
-  executeSingleNode,
-  stopDevMode,
   getTaskStatus,
-  getDevContainerStatus,
   startWorkflowExecution,
   stopWorkflowExecution,
   getWorkflowTaskStatus,
@@ -225,4 +205,3 @@ export const {
   getNodeOutputData,
   executeAndSaveNode,
 } = workflowApi;
-
