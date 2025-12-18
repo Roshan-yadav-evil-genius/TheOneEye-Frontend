@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useDraggable } from '@dnd-kit/core';
+import { useDraggable, useDndMonitor } from '@dnd-kit/core';
 import { ChevronRight, ChevronDown, Hash, Type, Folder, FileText } from 'lucide-react';
 
 interface SchemaField {
@@ -170,6 +170,14 @@ interface DraggableSchemaProps {
 
 export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Monitor drag events to disable scroll during drag
+  useDndMonitor({
+    onDragStart: () => setIsDragging(true),
+    onDragEnd: () => setIsDragging(false),
+    onDragCancel: () => setIsDragging(false),
+  });
 
   const parseJsonToSchema = (data: unknown, key: string = '', path: string = ''): SchemaField[] => {
     if (Array.isArray(data)) {
@@ -262,7 +270,7 @@ export function DraggableSchema({ jsonData, title }: DraggableSchemaProps) {
   const totalItems = getTotalItems(schemaFields);
 
   return (
-    <div className="h-full overflow-auto p-4 sidebar-scrollbar">
+    <div className={`h-full p-4 sidebar-scrollbar ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
       <div className="mb-3 text-gray-400 text-sm">
         {totalItems} items
       </div>
