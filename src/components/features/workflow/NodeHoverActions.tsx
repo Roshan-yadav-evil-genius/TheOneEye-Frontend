@@ -4,8 +4,6 @@ import {
   IconPlayerPlay,
   IconPlayerPause,
   IconTrash,
-  IconPower,
-  IconDots,
   IconEdit
 } from "@tabler/icons-react";
 
@@ -14,8 +12,6 @@ interface NodeHoverActionsProps {
   onPlay: (e: React.MouseEvent) => void;
   onPause: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
-  onShutdown: (e: React.MouseEvent) => void;
-  onMore: (e: React.MouseEvent) => void;
   isExecuting?: boolean;
   isPolling?: boolean;
 }
@@ -25,8 +21,6 @@ export function NodeHoverActions({
   onPlay,
   onPause,
   onDelete,
-  onShutdown,
-  onMore,
   isExecuting = false,
   isPolling = false
 }: NodeHoverActionsProps) {
@@ -62,22 +56,6 @@ export function NodeHoverActions({
         onClick={onDelete}
       >
         <IconTrash className="h-3 w-3" />
-      </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        className="h-6 w-6 p-0 hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-900/20"
-        onClick={onShutdown}
-      >
-        <IconPower className="h-3 w-3" />
-      </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        className="h-6 w-6 p-0 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-900/20"
-        onClick={onMore}
-      >
-        <IconDots className="h-3 w-3" />
       </Button>
     </div>
   );

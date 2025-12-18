@@ -59,16 +59,6 @@ export function CustomNode({ id, data, selected, onDelete }: CustomNodeProps) {
     // TODO: Implement pause functionality
   }, []);
 
-  const handleShutdown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: Implement shutdown functionality
-  }, []);
-
-  const handleMore = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: Implement more menu
-  }, []);
-
   return (
     <div className="flex flex-col items-center">
       {/* Node Container */}
