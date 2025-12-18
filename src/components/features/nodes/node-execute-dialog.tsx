@@ -85,6 +85,32 @@ export function NodeExecuteDialog({
     setActiveDragKey(null);
   }, []);
 
+  // Helper to extract output data for display
+  const getOutputDisplayData = useCallback((): Record<string, unknown> | unknown[] | string | null => {
+    if (!outputData) {
+      return { message: "Execute node to see output" };
+    }
+    if (outputData.error) {
+      return { error: outputData.error, error_type: outputData.error_type };
+    }
+    // Safely extract data from output
+    const output = outputData.output;
+    if (output && typeof output === 'object' && 'data' in output) {
+      const data = (output as { data: unknown }).data;
+      if (data && typeof data === 'object') {
+        return data as Record<string, unknown>;
+      }
+      if (typeof data === 'string') {
+        return data;
+      }
+      return { result: data };
+    }
+    if (output && typeof output === 'object') {
+      return output as Record<string, unknown>;
+    }
+    return { message: "No data in output" };
+  }, [outputData]);
+
   // Execute node
   const handleExecute = useCallback(
     async (formData: Record<string, string>) => {
@@ -199,11 +225,7 @@ export function NodeExecuteDialog({
                 <JsonViewer
                   title="OUTPUT"
                   statusColor={outputData?.success ? "bg-green-500" : outputData?.error ? "bg-red-500" : "bg-yellow-500"}
-                  jsonData={
-                    outputData?.error 
-                      ? { error: outputData.error, error_type: outputData.error_type }
-                      : (outputData?.output as Record<string, unknown>)?.data ?? { message: "Execute node to see output" }
-                  }
+                  jsonData={getOutputDisplayData()}
                   activeTab={activeOutputTab}
                   onTabChange={setActiveOutputTab}
                   enableDragDrop={false}

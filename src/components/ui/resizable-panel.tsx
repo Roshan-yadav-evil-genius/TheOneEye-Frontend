@@ -111,12 +111,12 @@ export function ResizablePanels({
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
   return (
-    <div ref={containerRef} className={`flex h-full ${className}`}>
+    <div ref={containerRef} className={`flex h-full w-full overflow-hidden ${className}`}>
       {children.map((child, index) => (
         <React.Fragment key={index}>
           <div 
-            className="flex-shrink-0"
-            style={{ width: `${sizes[index]}%` }}
+            className="h-full min-w-0 overflow-hidden"
+            style={{ flex: `0 0 calc(${sizes[index]}% - ${(children.length - 1) * 4 / children.length}px)` }}
           >
             {child}
           </div>
