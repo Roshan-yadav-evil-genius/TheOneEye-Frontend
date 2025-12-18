@@ -18,16 +18,16 @@ interface TUserActions {
   clearError: () => void;
 }
 
-type TUserStore = TTUserState & TUserActions;
+type TUserStore = TUserState & TUserActions;
 
-const initialState: TTUserState = {
+const initialState: TUserState = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
 };
 
-export const useTUserStore = create<TUserStore>()(
+export const useUserStore = create<TUserStore>()(
   devtools(
     persist(
       (set, get) => ({

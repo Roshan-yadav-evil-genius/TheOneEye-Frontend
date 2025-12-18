@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { OAuth2Form } from "./OAuth2Form";
 import { OAuth2FormData } from "@/types/auth";
-import { uiHelpers } from "@/stores/ui-store";
+import { uiHelpers } from "@/stores";
 
 interface CreateOAuth2DialogProps {
   open: boolean;

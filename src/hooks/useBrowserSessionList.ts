@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { TBrowserSession } from '@/types/browser-session';
 import { useBrowserSessionStore } from '@/stores/browser-session-store';
-import { useUIStore } from '@/stores/ui-store';
-import { uiHelpers } from '@/stores/ui-store';
+import { useUIStore, uiHelpers } from '@/stores';
 
 interface UseBrowserSessionListProps {
   sessions: TBrowserSession[];

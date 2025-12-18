@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
 import { useWorkflowList } from "@/hooks/useWorkflowList";
-import { useUIStore } from "@/stores/ui-store";
+import { useUIStore } from "@/stores";
 
 interface WorkflowListProps {
   workflows: TWorkflow[];

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import { useUIStore } from '@/stores/ui-store';
+import { useUIStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
 
 // Custom hooks for optimized store access

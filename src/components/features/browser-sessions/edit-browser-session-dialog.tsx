@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useBrowserSessionStore } from "@/stores/browser-session-store";
-import { uiHelpers } from "@/stores/ui-store";
+import { uiHelpers } from "@/stores";
 import { BrowserSessionForm } from "./browser-session-form";
 import { BrowserSessionFormData, TBrowserSession } from "@/types/browser-session";
 

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { TBrowserSession } from "@/types/browser-session";
 import { useBrowserSessionList } from "@/hooks/useBrowserSessionList";
-import { useUIStore } from "@/stores/ui-store";
+import { useUIStore } from "@/stores";
 
 interface BrowserSessionListProps {
   sessions: TBrowserSession[];

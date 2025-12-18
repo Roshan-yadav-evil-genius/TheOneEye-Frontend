@@ -7,7 +7,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
-import { useUIStore } from "@/stores/ui-store"
+import { useUIStore } from "@/stores"
 
 interface SidebarProviderWrapperProps {
   children: React.ReactNode

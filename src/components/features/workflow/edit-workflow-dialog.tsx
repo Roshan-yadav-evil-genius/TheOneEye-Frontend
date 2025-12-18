@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useWorkflowStore } from "@/stores";
-import { uiHelpers } from "@/stores/ui-store";
+import { useWorkflowListStore } from "@/stores";
+import { uiHelpers } from "@/stores";
 import { TWorkflow } from "@/types";
 import { WorkflowForm, WorkflowFormData } from "./workflow-form";
 
@@ -19,7 +19,7 @@ interface EditWorkflowDialogProps {
 }
 
 export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflowDialogProps) {
-  const { updateTWorkflow } = useWorkflowStore();
+  const { updateWorkflow } = useWorkflowListStore();
 
   const handleSubmit = async (formData: WorkflowFormData) => {
     if (!workflow) {
@@ -35,7 +35,7 @@ export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflo
         updatedAt: new Date(),
       };
 
-      await updateTWorkflow(workflow.id, updatedWorkflow);
+      await updateWorkflow(workflow.id, updatedWorkflow);
       
       uiHelpers.showSuccess(
         "Workflow Updated",

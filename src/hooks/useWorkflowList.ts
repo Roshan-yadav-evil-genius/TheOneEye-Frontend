@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TWorkflow } from "@/types";
-import { useUIStore, uiHelpers } from "@/stores/ui-store";
-import { useWorkflowStore } from "@/stores";
+import { useUIStore, uiHelpers, useWorkflowListStore } from "@/stores";
 
 interface UseWorkflowListProps {
   workflows: TWorkflow[];
@@ -11,7 +10,7 @@ interface UseWorkflowListProps {
 export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
   const router = useRouter();
   const { modals } = useUIStore();
-  const { deleteTWorkflow } = useWorkflowStore();
+  const { deleteWorkflow } = useWorkflowListStore();
   
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -58,7 +57,7 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     
     setIsDeleting(true);
     try {
-      await deleteTWorkflow(workflowToDelete.id);
+      await deleteWorkflow(workflowToDelete.id);
       uiHelpers.showSuccess(
         "Workflow Deleted",
         `Workflow "${workflowToDelete.name}" has been deleted successfully.`

@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useWorkflowStore } from "@/stores";
-import { uiHelpers } from "@/stores/ui-store";
+import { useWorkflowListStore } from "@/stores";
+import { uiHelpers } from "@/stores";
 import { WorkflowForm, WorkflowFormData } from "./workflow-form";
 
 interface CreateWorkflowDialogProps {
@@ -17,7 +17,7 @@ interface CreateWorkflowDialogProps {
 }
 
 export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialogProps) {
-  const { createTWorkflow } = useWorkflowStore();
+  const { createWorkflow } = useWorkflowListStore();
 
   const handleSubmit = async (formData: WorkflowFormData) => {
     try {
@@ -36,7 +36,7 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         createdBy: "current-user", // TODO: Get from auth context
       };
 
-      await createTWorkflow(workflowData);
+      await createWorkflow(workflowData);
       
       uiHelpers.showSuccess(
         "Workflow Created",

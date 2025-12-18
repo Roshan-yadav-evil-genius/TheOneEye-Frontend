@@ -7,7 +7,7 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react"
-import { useAuthStore } from "@/stores/auth-store"
+import { useAuthStore } from "@/stores"
 import { useRouter } from "next/navigation"
 
 import {

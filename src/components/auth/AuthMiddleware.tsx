@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuthStore } from '@/stores';
 
 interface AuthMiddlewareProps {
   children: React.ReactNode;

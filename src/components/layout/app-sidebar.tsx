@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link"
-import { useAuthStore } from "@/stores/auth-store"
+import { useAuthStore } from "@/stores"
 import { mainNavItems, defaultUserInfo } from "@/constants/navigation"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

@@ -1,10 +1,10 @@
 "use client";
 
-import { useWorkflowStore } from "@/stores";
+import { useWorkflowListStore } from "@/stores";
 import { WorkflowPage } from "./WorkflowPage";
 
 export function WorkflowPageContainer() {
-  const { workflows, isLoading } = useWorkflowStore();
+  const { workflows, isLoading } = useWorkflowListStore();
 
 
   return <WorkflowPage workflows={workflows} isLoading={isLoading} />;
