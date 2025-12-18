@@ -4,20 +4,20 @@ import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { NodeList } from "@/components/features/nodes";
 import { ApiService } from "@/lib/api/api-service";
-import { TNodeMetadata } from "@/types";
+import { TNodeTree, TNodeMetadata } from "@/types";
 
 export default function NodesPage() {
-  const [nodes, setNodes] = useState<TNodeMetadata[]>([]);
+  const [tree, setTree] = useState<TNodeTree>({});
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchNodes = async () => {
     setIsLoading(true);
     try {
-      const data = await ApiService.getNodesFlat();
-      setNodes(data);
+      const data = await ApiService.getNodes();
+      setTree(data);
     } catch (error) {
       console.error("Failed to fetch nodes:", error);
-      setNodes([]);
+      setTree({});
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +71,7 @@ export default function NodesPage() {
           </p>
         </div>
         <NodeList
-          nodes={nodes}
+          tree={tree}
           isLoading={isLoading}
           onRefresh={handleRefresh}
           onViewForm={handleViewForm}
@@ -81,4 +81,3 @@ export default function NodesPage() {
     </DashboardLayout>
   );
 }
-

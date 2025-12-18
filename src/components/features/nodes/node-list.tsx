@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { TNodeMetadata } from "@/types";
-import { NodeCard } from "./node-card";
+import { TNodeTree, TNodeMetadata, TNodeFolder } from "@/types";
+import { NodeTree } from "./node-tree";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,76 +12,135 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IconSearch, IconRefresh, IconLayoutGrid, IconList, IconLoader2 } from "@tabler/icons-react";
+import { IconSearch, IconRefresh, IconLoader2 } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 
 interface NodeListProps {
-  nodes: TNodeMetadata[];
+  tree: TNodeTree;
   isLoading?: boolean;
   onRefresh?: () => void;
   onViewForm?: (node: TNodeMetadata) => void;
   onExecute?: (node: TNodeMetadata) => void;
 }
 
-export function NodeList({ 
-  nodes, 
-  isLoading, 
-  onRefresh,
-  onViewForm,
-  onExecute 
-}: NodeListProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+/**
+ * Count total nodes in a tree
+ */
+function countTreeNodes(tree: TNodeTree): number {
+  let count = 0;
+  for (const folder of Object.values(tree)) {
+    count += countFolderNodes(folder);
+  }
+  return count;
+}
 
-  // Get unique categories and types
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.category) cats.add(node.category);
-    });
-    return Array.from(cats).sort();
-  }, [nodes]);
+function countFolderNodes(folder: TNodeFolder): number {
+  let count = folder.nodes.length;
+  for (const subfolder of Object.values(folder.subfolders)) {
+    count += countFolderNodes(subfolder);
+  }
+  return count;
+}
 
-  const types = useMemo(() => {
-    const t = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type) t.add(node.type);
-    });
-    return Array.from(t).sort();
-  }, [nodes]);
+/**
+ * Extract all unique types from the tree
+ */
+function extractTypes(tree: TNodeTree): string[] {
+  const types = new Set<string>();
+  
+  function processFolder(folder: TNodeFolder) {
+    for (const node of folder.nodes) {
+      if (node.type) types.add(node.type);
+    }
+    for (const subfolder of Object.values(folder.subfolders)) {
+      processFolder(subfolder);
+    }
+  }
+  
+  for (const folder of Object.values(tree)) {
+    processFolder(folder);
+  }
+  
+  return Array.from(types).sort();
+}
 
-  // Filter nodes
-  const filteredNodes = useMemo(() => {
-    return nodes.filter((node) => {
+/**
+ * Filter tree by search term and type filter
+ */
+function filterTree(
+  tree: TNodeTree,
+  searchTerm: string,
+  typeFilter: string
+): TNodeTree {
+  const search = searchTerm.toLowerCase();
+  
+  function filterFolder(folder: TNodeFolder): TNodeFolder | null {
+    // Filter nodes in this folder
+    const filteredNodes = folder.nodes.filter((node) => {
       const matchesSearch =
-        searchTerm === "" ||
-        node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        node.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (node.label?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-        (node.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-
-      const matchesCategory =
-        categoryFilter === "all" || node.category === categoryFilter;
+        search === "" ||
+        node.name.toLowerCase().includes(search) ||
+        node.identifier.toLowerCase().includes(search) ||
+        (node.label?.toLowerCase().includes(search) ?? false) ||
+        (node.description?.toLowerCase().includes(search) ?? false);
 
       const matchesType = typeFilter === "all" || node.type === typeFilter;
 
-      return matchesSearch && matchesCategory && matchesType;
+      return matchesSearch && matchesType;
     });
-  }, [nodes, searchTerm, categoryFilter, typeFilter]);
 
-  // Group nodes by category
-  const groupedNodes = useMemo(() => {
-    const groups: Record<string, TNodeMetadata[]> = {};
-    filteredNodes.forEach((node) => {
-      const category = node.category || "Uncategorized";
-      if (!groups[category]) {
-        groups[category] = [];
+    // Filter subfolders recursively
+    const filteredSubfolders: Record<string, TNodeFolder> = {};
+    for (const [name, subfolder] of Object.entries(folder.subfolders)) {
+      const filtered = filterFolder(subfolder);
+      if (filtered && (filtered.nodes.length > 0 || Object.keys(filtered.subfolders).length > 0)) {
+        filteredSubfolders[name] = filtered;
       }
-      groups[category].push(node);
-    });
-    return groups;
-  }, [filteredNodes]);
+    }
+
+    // Return null if folder is empty after filtering
+    if (filteredNodes.length === 0 && Object.keys(filteredSubfolders).length === 0) {
+      return null;
+    }
+
+    return {
+      nodes: filteredNodes,
+      subfolders: filteredSubfolders,
+    };
+  }
+
+  const filteredTree: TNodeTree = {};
+  for (const [categoryName, folder] of Object.entries(tree)) {
+    const filtered = filterFolder(folder);
+    if (filtered) {
+      filteredTree[categoryName] = filtered;
+    }
+  }
+
+  return filteredTree;
+}
+
+export function NodeList({
+  tree,
+  isLoading,
+  onRefresh,
+  onViewForm,
+  onExecute,
+}: NodeListProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // Get unique types from tree
+  const types = useMemo(() => extractTypes(tree), [tree]);
+
+  // Filter tree based on search and type
+  const filteredTree = useMemo(
+    () => filterTree(tree, searchTerm, typeFilter),
+    [tree, searchTerm, typeFilter]
+  );
+
+  const totalNodes = useMemo(() => countTreeNodes(tree), [tree]);
+  const filteredNodes = useMemo(() => countTreeNodes(filteredTree), [filteredTree]);
 
   if (isLoading) {
     return (
@@ -106,20 +165,6 @@ export function NodeList({
               className="pl-9"
             />
           </div>
-          
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[150px]">
@@ -138,7 +183,7 @@ export function NodeList({
 
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-sm">
-            {filteredNodes.length} of {nodes.length} nodes
+            {filteredNodes} of {totalNodes} nodes
           </Badge>
           {onRefresh && (
             <Button variant="outline" size="sm" onClick={onRefresh}>
@@ -149,44 +194,13 @@ export function NodeList({
         </div>
       </div>
 
-      {/* Node grid grouped by category */}
-      {Object.keys(groupedNodes).length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-muted p-3 mb-4">
-            <IconSearch className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">No nodes found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm || categoryFilter !== "all" || typeFilter !== "all"
-              ? "Try adjusting your filters"
-              : "No nodes are available"}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {Object.entries(groupedNodes)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([category, categoryNodes]) => (
-              <div key={category}>
-                <div className="flex items-center gap-2 mb-4">
-                  <h2 className="text-lg font-semibold">{category}</h2>
-                  <Badge variant="secondary">{categoryNodes.length}</Badge>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {categoryNodes.map((node) => (
-                    <NodeCard
-                      key={node.identifier}
-                      node={node}
-                      onViewForm={onViewForm}
-                      onExecute={onExecute}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
+      {/* Node tree */}
+      <NodeTree
+        tree={filteredTree}
+        isLoading={false}
+        onViewForm={onViewForm}
+        onExecute={onExecute}
+      />
     </div>
   );
 }
-
