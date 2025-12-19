@@ -80,6 +80,7 @@ export interface TFieldOptionsRequest {
   parent_field: string;
   parent_value: string;
   dependent_field: string;
+  form_values?: Record<string, string>;  // All current form values for multi-parent access
 }
 
 /**

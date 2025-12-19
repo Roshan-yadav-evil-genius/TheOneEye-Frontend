@@ -146,6 +146,7 @@ export function NodeFormEditor({
               parent_field: fieldName,
               parent_value: value,
               dependent_field: dependentField,
+              form_values: { ...formValues, [fieldName]: value },
             });
 
             // Update the dependent field's options
