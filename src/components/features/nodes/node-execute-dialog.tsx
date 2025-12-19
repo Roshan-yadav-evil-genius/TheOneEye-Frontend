@@ -357,18 +357,16 @@ export function NodeExecuteDialog({
                 </div>
               </div>
               {/* Reset button - clears node state for fresh execution */}
-              {!isWorkflowMode && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleReset}
-                  disabled={isExecuting}
-                  className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Reset
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                disabled={isExecuting}
+                className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Reset
+              </Button>
             </div>
 
             {/* Main Content - 3 Panels */}
