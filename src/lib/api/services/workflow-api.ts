@@ -71,7 +71,7 @@ class WorkflowApiService {
     workflowId: string, 
     nodeData: TWorkflowNodeCreateRequest
   ): Promise<TWorkflowNodeCreateResponse> {
-    const response = await axiosApiClient.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/add_node/`, nodeData);
+    const response = await axiosApiClient.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/nodes/add/`, nodeData);
     
     return {
       id: response.id,
@@ -86,23 +86,20 @@ class WorkflowApiService {
     nodeId: string, 
     position: { x: number; y: number }
   ): Promise<void> {
-    await axiosApiClient.patch(`/workflow/${workflowId}/update_node_position/`, {
-      nodeId,
+    await axiosApiClient.patch(`/workflow/${workflowId}/nodes/${nodeId}/position/`, {
       position
     });
   }
 
   async removeNodeFromWorkflow(workflowId: string, nodeId: string): Promise<void> {
-    await axiosApiClient.delete(`/workflow/${workflowId}/remove_node/`, {
-      data: { nodeId }
-    });
+    await axiosApiClient.delete(`/workflow/${workflowId}/nodes/${nodeId}/remove/`);
   }
 
   async addConnectionToWorkflow(
     workflowId: string, 
     connectionData: TWorkflowConnectionCreateRequest
   ): Promise<TWorkflowConnection> {
-    const response = await axiosApiClient.post<BackendWorkflowConnection>(`/workflow/${workflowId}/add_connection/`, connectionData);
+    const response = await axiosApiClient.post<BackendWorkflowConnection>(`/workflow/${workflowId}/connections/add/`, connectionData);
     return {
       id: response.id,
       source: response.source_node,
@@ -112,9 +109,7 @@ class WorkflowApiService {
   }
 
   async removeConnectionFromWorkflow(workflowId: string, connectionId: string): Promise<void> {
-    await axiosApiClient.delete(`/workflow/${workflowId}/remove_connection/`, {
-      data: { connectionId }
-    });
+    await axiosApiClient.delete(`/workflow/${workflowId}/connections/${connectionId}/remove/`);
   }
 
   async updateNodeFormValues(
