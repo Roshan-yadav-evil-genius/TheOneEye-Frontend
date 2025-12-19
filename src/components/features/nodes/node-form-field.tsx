@@ -38,8 +38,8 @@ export function NodeFormField({
           {field.required && <span className="text-red-400 ml-1">*</span>}
         </Label>
         <Select
-          value={value}
-          onValueChange={onChange}
+          value={value || "__clear__"}
+          onValueChange={(val) => onChange(val === "__clear__" ? "" : val)}
           disabled={field.disabled || isLoading}
         >
           <SelectTrigger
@@ -53,6 +53,14 @@ export function NodeFormField({
             <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-gray-600">
+            {/* Clear/placeholder option */}
+            <SelectItem
+              value="__clear__"
+              className="text-gray-400 focus:bg-gray-700"
+            >
+              {field.options?.find(o => o.value === "")?.text || `Select ${field.label}`}
+            </SelectItem>
+            {/* Actual options */}
             {field.options
               ?.filter((option) => option.value !== "")
               .map((option) => (

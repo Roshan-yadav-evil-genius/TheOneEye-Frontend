@@ -81,9 +81,9 @@ export function ConnectGoogleDialog({
     }
   };
 
-  // Filter scopes to show only sheets-related for now (as per plan)
-  const sheetsScopes = Object.entries(GOOGLE_OAUTH_SCOPES).filter(
-    ([key]) => key.startsWith("sheets")
+  // Filter scopes to show sheets and drive (required for Google Sheets nodes)
+  const availableScopes = Object.entries(GOOGLE_OAUTH_SCOPES).filter(
+    ([key]) => key.startsWith("sheets") || key.startsWith("drive")
   );
 
   return (
@@ -122,7 +122,7 @@ export function ConnectGoogleDialog({
             </p>
 
             <div className="space-y-3 border rounded-md p-4 bg-muted/30">
-              {sheetsScopes.map(([key, scope]) => (
+              {availableScopes.map(([key, scope]) => (
                 <div key={key} className="flex items-start space-x-3">
                   <Checkbox
                     id={key}
