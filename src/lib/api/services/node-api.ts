@@ -8,6 +8,8 @@ import {
   TFieldOptionsResponse,
   TNodeExecuteRequest,
   TNodeExecuteResponse,
+  TNodeResetSessionRequest,
+  TNodeResetSessionResponse,
 } from '@/types';
 
 /**
@@ -52,6 +54,16 @@ class NodeApiService {
   async refreshNodeCache(): Promise<{ message: string }> {
     return axiosApiClient.post<{ message: string }>('/nodes/refresh/');
   }
+
+  async resetNodeSession(
+    identifier: string,
+    data: TNodeResetSessionRequest
+  ): Promise<TNodeResetSessionResponse> {
+    return axiosApiClient.post<TNodeResetSessionResponse>(
+      `/nodes/${identifier}/reset-session/`,
+      data
+    );
+  }
 }
 
 // Export singleton instance
@@ -67,5 +79,6 @@ export const {
   executeNode,
   getNodeFieldOptions,
   refreshNodeCache,
+  resetNodeSession,
 } = nodeApi;
 

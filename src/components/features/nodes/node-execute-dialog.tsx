@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import {
   Dialog,
@@ -14,10 +14,17 @@ import { NodeFormEditor } from "./node-form-editor";
 import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { useNodeTestDataStore } from "@/stores/node-test-data-store";
 import { useWorkflowCanvasStore } from "@/stores";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { workflowApi } from "@/lib/api/services/workflow-api";
+
+// Generate a unique session ID
+function generateSessionId(): string {
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+}
 
 // Workflow context for DB persistence
 export interface WorkflowExecuteContext {
@@ -44,6 +51,10 @@ export function NodeExecuteDialog({
 }: NodeExecuteDialogProps) {
   // Determine if we're in workflow mode (with DB persistence)
   const isWorkflowMode = !!workflowContext;
+
+  // Session ID for stateful execution - persists across executes, regenerated on reset
+  const [sessionId, setSessionId] = useState<string>(() => generateSessionId());
+  const isResettingRef = useRef(false);
 
   // Tab state
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
@@ -187,6 +198,24 @@ export function NodeExecuteDialog({
   // Get store method to update node execution data
   const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
 
+  // Reset session - clears server-side state and generates new session ID
+  const handleReset = useCallback(async () => {
+    if (isResettingRef.current) return;
+    isResettingRef.current = true;
+
+    try {
+      // Clear server-side session
+      await ApiService.resetNodeSession(node.identifier, { session_id: sessionId });
+    } catch (error) {
+      console.error("Failed to reset session:", error);
+    }
+
+    // Generate new session ID and clear output
+    setSessionId(generateSessionId());
+    setOutputData(null);
+    isResettingRef.current = false;
+  }, [node.identifier, sessionId]);
+
   // Execute node
   const handleExecute = useCallback(
     async (formData: Record<string, string>) => {
@@ -233,10 +262,11 @@ export function NodeExecuteDialog({
             });
           }
         } else {
-          // Standalone mode: use regular execute API
+          // Standalone mode: use regular execute API with session_id for stateful execution
           result = await ApiService.executeNode(node.identifier, {
             input_data: inputData,
             form_data: formData,
+            session_id: sessionId,
           });
         }
         
@@ -254,7 +284,7 @@ export function NodeExecuteDialog({
         setIsExecuting(false);
       }
     },
-    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData]
+    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData, sessionId]
   );
 
   const getTypeBadgeColor = (type: string) => {
@@ -290,6 +320,19 @@ export function NodeExecuteDialog({
                   </p>
                 </div>
               </div>
+              {/* Reset button - clears node state for fresh execution */}
+              {!isWorkflowMode && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  disabled={isExecuting}
+                  className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset
+                </Button>
+              )}
             </div>
 
             {/* Main Content - 3 Panels */}

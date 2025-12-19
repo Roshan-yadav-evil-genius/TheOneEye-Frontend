@@ -97,6 +97,7 @@ export interface TFieldOptionsResponse {
 export interface TNodeExecuteRequest {
   input_data: Record<string, unknown>;
   form_data: Record<string, unknown>;
+  session_id: string;  // Required for stateful execution
 }
 
 /**
@@ -110,8 +111,25 @@ export interface TNodeExecuteResponse {
   };
   input?: Record<string, unknown>;
   form_data?: Record<string, unknown>;
+  session_id?: string;
   output?: unknown;
   error?: string;
   error_type?: string;
   details?: string;
+}
+
+/**
+ * Node reset session request
+ */
+export interface TNodeResetSessionRequest {
+  session_id: string;
+}
+
+/**
+ * Node reset session response
+ */
+export interface TNodeResetSessionResponse {
+  success: boolean;
+  session_id: string;
+  cleared: boolean;
 }

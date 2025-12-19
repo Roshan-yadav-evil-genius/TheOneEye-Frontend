@@ -58,6 +58,7 @@ export class ApiService {
   static executeNode = nodeApi.executeNode.bind(nodeApi);
   static getNodeFieldOptions = nodeApi.getNodeFieldOptions.bind(nodeApi);
   static refreshNodeCache = nodeApi.refreshNodeCache.bind(nodeApi);
+  static resetNodeSession = nodeApi.resetNodeSession.bind(nodeApi);
 
   // Demo operations
   static createDemoRequest = demoApi.createDemoRequest.bind(demoApi);
