@@ -21,9 +21,29 @@ import { useWorkflowCanvasStore } from "@/stores";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { workflowApi } from "@/lib/api/services/workflow-api";
 
-// Generate a unique session ID
-function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+// Get or create a single node execution ID (stored in localStorage)
+// Used to generate deterministic session IDs for standalone mode
+function getSingleNodeExecutionId(): string {
+  const key = 'single_node_execution_id';
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = `sne_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+// Generate a deterministic session ID based on context
+function generateSessionId(
+  nodeIdentifier: string,
+  workflowContext?: { workflowId: string; nodeInstanceId: string }
+): string {
+  if (workflowContext) {
+    // Workflow mode: use workflow_id + node_instance_id
+    return `${workflowContext.workflowId}_${workflowContext.nodeInstanceId}`;
+  }
+  // Standalone mode: use single_node_execution_id + node_identifier
+  return `${getSingleNodeExecutionId()}_${nodeIdentifier}`;
 }
 
 // Workflow context for DB persistence
@@ -52,8 +72,9 @@ export function NodeExecuteDialog({
   // Determine if we're in workflow mode (with DB persistence)
   const isWorkflowMode = !!workflowContext;
 
-  // Session ID for stateful execution - persists across executes, regenerated on reset
-  const [sessionId, setSessionId] = useState<string>(() => generateSessionId());
+  // Deterministic session ID for stateful execution
+  // Standalone: sne_xxx_counter, Workflow: wf-123_node-456
+  const sessionId = generateSessionId(node.identifier, workflowContext);
   const isResettingRef = useRef(false);
 
   // Tab state
@@ -64,6 +85,7 @@ export function NodeExecuteDialog({
   const { 
     getInputData, setInputData: persistInputData,
     getFormData, setFormData: persistFormData,
+    getOutputData, setOutputData: persistOutputData,
   } = useNodeTestDataStore();
 
   // Input JSON state - initialize from workflow context or persisted store
@@ -92,7 +114,7 @@ export function NodeExecuteDialog({
     return getFormData(node.identifier);
   });
 
-  // Output state - initialize from workflow context or null
+  // Output state - initialize from workflow context or persisted store
   const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(() => {
     if (isWorkflowMode && workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
       return {
@@ -100,7 +122,8 @@ export function NodeExecuteDialog({
         output: { data: workflowContext.savedOutputData },
       };
     }
-    return null;
+    // In standalone mode: load last output from store
+    return getOutputData(node.identifier);
   });
 
   // Load data when dialog opens or node changes
@@ -133,10 +156,10 @@ export function NodeExecuteDialog({
         // In standalone mode: load from local store
         setInputData(getInputData(node.identifier));
         setPersistedFormValues(getFormData(node.identifier));
-        setOutputData(null);  // Clear previous node's output
+        setOutputData(getOutputData(node.identifier));  // Load last output
       }
     }
-  }, [isOpen, node.identifier, isWorkflowMode, workflowContext, getInputData, getFormData]);
+  }, [isOpen, node.identifier, isWorkflowMode, workflowContext, getInputData, getFormData, getOutputData]);
 
   // Persist input data whenever it changes (only in standalone mode)
   const handleInputDataChange = useCallback((data: Record<string, unknown>) => {
@@ -199,7 +222,7 @@ export function NodeExecuteDialog({
   // Get store method to update node execution data
   const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
 
-  // Reset session - clears server-side state and generates new session ID
+  // Reset session - clears server-side state (keeps deterministic session_id)
   const handleReset = useCallback(async () => {
     if (isResettingRef.current) return;
     isResettingRef.current = true;
@@ -211,11 +234,13 @@ export function NodeExecuteDialog({
       console.error("Failed to reset session:", error);
     }
 
-    // Generate new session ID and clear output
-    setSessionId(generateSessionId());
+    // Clear output (session_id stays the same - deterministic)
     setOutputData(null);
+    if (!isWorkflowMode) {
+      persistOutputData(node.identifier, null);
+    }
     isResettingRef.current = false;
-  }, [node.identifier, sessionId]);
+  }, [node.identifier, sessionId, isWorkflowMode, persistOutputData]);
 
   // Execute node
   const handleExecute = useCallback(
@@ -234,6 +259,7 @@ export function NodeExecuteDialog({
             {
               form_values: formData,
               input_data: inputData,
+              session_id: sessionId,
             }
           );
           
@@ -272,18 +298,29 @@ export function NodeExecuteDialog({
         }
         
         setOutputData(result);
+        
+        // Persist output to store (standalone mode only)
+        if (!isWorkflowMode) {
+          persistOutputData(node.identifier, result);
+        }
       } catch (error) {
         console.error("Node execution failed:", error);
-        setOutputData({
+        const errorResult: TNodeExecuteResponse = {
           success: false,
           error: error instanceof Error ? error.message : "Execution failed",
           error_type: "ExecutionError",
-        });
+        };
+        setOutputData(errorResult);
+        
+        // Persist error result too
+        if (!isWorkflowMode) {
+          persistOutputData(node.identifier, errorResult);
+        }
       } finally {
         setIsExecuting(false);
       }
     },
-    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData, sessionId]
+    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData, sessionId, persistOutputData]
   );
 
   const getTypeBadgeColor = (type: string) => {

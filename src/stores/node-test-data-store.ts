@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
+import { TNodeExecuteResponse } from '@/types';
 
 // Data structure for each node's persisted test data
 interface NodeTestSession {
   inputData: Record<string, unknown>;
   formData: Record<string, string>;
+  outputData: TNodeExecuteResponse | null;
 }
 
 interface NodeTestDataState {
@@ -24,6 +26,10 @@ interface NodeTestDataActions {
   getFormData: (nodeIdentifier: string) => Record<string, string>;
   setFormData: (nodeIdentifier: string, data: Record<string, string>) => void;
   
+  // Output data
+  getOutputData: (nodeIdentifier: string) => TNodeExecuteResponse | null;
+  setOutputData: (nodeIdentifier: string, data: TNodeExecuteResponse | null) => void;
+  
   // Clear operations
   clearSession: (nodeIdentifier: string) => void;
   clearAllSessions: () => void;
@@ -34,6 +40,7 @@ type NodeTestDataStore = NodeTestDataState & NodeTestDataActions;
 const emptySession: NodeTestSession = {
   inputData: {},
   formData: {},
+  outputData: null,
 };
 
 const initialState: NodeTestDataState = {
@@ -82,6 +89,24 @@ export const useNodeTestDataStore = create<NodeTestDataStore>()(
                 ...emptySession,
                 ...state.sessions[nodeIdentifier],
                 formData: data,
+              },
+            },
+          }));
+        },
+
+        getOutputData: (nodeIdentifier: string) => {
+          const { sessions } = get();
+          return sessions[nodeIdentifier]?.outputData || null;
+        },
+
+        setOutputData: (nodeIdentifier: string, data: TNodeExecuteResponse | null) => {
+          set((state) => ({
+            sessions: {
+              ...state.sessions,
+              [nodeIdentifier]: {
+                ...emptySession,
+                ...state.sessions[nodeIdentifier],
+                outputData: data,
               },
             },
           }));

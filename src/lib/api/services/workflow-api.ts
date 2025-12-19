@@ -163,6 +163,7 @@ class WorkflowApiService {
     data: {
       form_values: Record<string, unknown>;
       input_data: Record<string, unknown>;
+      session_id?: string;
     }
   ): Promise<WorkflowNodeExecuteResponse> {
     return axiosApiClient.post<WorkflowNodeExecuteResponse>(
@@ -171,6 +172,7 @@ class WorkflowApiService {
         node_id: nodeId,
         form_values: data.form_values,
         input_data: data.input_data,
+        session_id: data.session_id,
       }
     );
   }
