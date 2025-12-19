@@ -52,37 +52,41 @@ export function TagsInput({
   return (
     <div className="space-y-2">
       {label && <Label htmlFor={id}>{label}</Label>}
-      <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-background min-h-[42px]">
-        {tags.map((tag, index) => (
-          <Badge
-            key={index}
-            variant="secondary"
-            className="flex items-center gap-1 px-2 py-1"
-          >
-            <span className="text-sm">{tag}</span>
-            {!disabled && (
-              <button
-                type="button"
-                onClick={() => removeTag(index)}
-                className="ml-1 hover:text-destructive focus:outline-none"
-                aria-label={`Remove ${tag}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </Badge>
-        ))}
-        <Input
-          id={id}
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={addTag}
-          placeholder={tags.length === 0 ? placeholder : ""}
-          disabled={disabled}
-          className="flex-1 min-w-[120px] border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
-        />
+      <div className="border rounded-md bg-background">
+        <div className="flex flex-wrap gap-2 p-2 max-h-[200px] overflow-y-auto">
+          {tags.map((tag, index) => (
+            <Badge
+              key={index}
+              variant="secondary"
+              className="flex items-center gap-1 px-2 py-1"
+            >
+              <span className="text-sm">{tag}</span>
+              {!disabled && (
+                <button
+                  type="button"
+                  onClick={() => removeTag(index)}
+                  className="ml-1 hover:text-destructive focus:outline-none"
+                  aria-label={`Remove ${tag}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </Badge>
+          ))}
+        </div>
+        <div className="border-t p-2">
+          <Input
+            id={id}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={addTag}
+            placeholder={tags.length === 0 ? placeholder : "Add more..."}
+            disabled={disabled}
+            className="border-0 shadow-none focus-visible:ring-0 p-0 h-auto"
+          />
+        </div>
       </div>
       {helpText && (
         <p className="text-sm text-muted-foreground">{helpText}</p>

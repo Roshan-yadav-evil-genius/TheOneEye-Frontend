@@ -21,12 +21,39 @@ export const BROWSER_INFO = {
   }
 } as const;
 
-// Default browser args for automation
+// Default browser args for automation (anti-bot mitigation)
 export const DEFAULT_BROWSER_ARGS = [
+  '--no-sandbox',
   '--disable-blink-features=AutomationControlled',
+  '--disable-dev-shm-usage',
+  '--disable-web-security',
+  '--disable-features=VizDisplayCompositor',
+  '--disable-plugins-discovery',
+  '--disable-default-apps',
   '--disable-background-timer-throttling',
   '--disable-backgrounding-occluded-windows',
-  '--disable-renderer-backgrounding'
+  '--disable-renderer-backgrounding',
+  '--disable-field-trial-config',
+  '--disable-back-forward-cache',
+  '--disable-ipc-flooding-protection',
+  '--no-first-run',
+  '--no-default-browser-check',
+  '--disable-component-extensions-with-background-pages',
+  '--disable-background-networking',
+  '--disable-sync',
+  '--metrics-recording-only',
+  '--no-report-upload',
+  '--disable-logging',
+  '--disable-gpu-logging',
+  '--silent',
+  '--disable-gpu',
+  '--disable-software-rasterizer',
+  '--disable-client-side-phishing-detection',
+  '--disable-hang-monitor',
+  '--disable-prompt-on-repost',
+  '--disable-domain-reliability',
+  '--disable-component-update',
+  '--disable-features=TranslateUI',
 ] as const;
 
 // Default user agents for each browser type
