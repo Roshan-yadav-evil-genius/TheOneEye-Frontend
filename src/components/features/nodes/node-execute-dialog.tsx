@@ -133,6 +133,7 @@ export function NodeExecuteDialog({
         // In standalone mode: load from local store
         setInputData(getInputData(node.identifier));
         setPersistedFormValues(getFormData(node.identifier));
+        setOutputData(null);  // Clear previous node's output
       }
     }
   }, [isOpen, node.identifier, isWorkflowMode, workflowContext, getInputData, getFormData]);
@@ -271,8 +272,6 @@ export function NodeExecuteDialog({
         }
         
         setOutputData(result);
-        // Switch to output tab to show result
-        setActiveOutputTab("schema");
       } catch (error) {
         console.error("Node execution failed:", error);
         setOutputData({
