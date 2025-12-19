@@ -19,3 +19,6 @@ export * from './contact';
 
 // Node Types
 export * from './node';
+
+// Google OAuth Types
+export * from './google-oauth';
