@@ -7,19 +7,21 @@ interface CustomNodeData {
   onDeleteNode?: (nodeId: string) => void;
   workflowId?: string;
   getConnectedNodeOutput?: (nodeId: string) => Record<string, unknown> | null;
+  highlightNodeOutputEdges?: (nodeId: string, route?: string) => void;
   isExecuting?: boolean;
   [key: string]: unknown;
 }
 
 const CustomNodeWrapper = memo((props: NodeProps) => {
   const { data, id, ...nodeProps } = props;
-  const { onDeleteNode, workflowId, getConnectedNodeOutput, isExecuting, ...nodeData } = (data || {}) as CustomNodeData;
+  const { onDeleteNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isExecuting, ...nodeData } = (data || {}) as CustomNodeData;
   
   // Build workflow context for the dialog
   const workflowContext = workflowId ? {
     workflowId,
     nodeInstanceId: id,
     getConnectedNodeOutput: getConnectedNodeOutput ? () => getConnectedNodeOutput(id) : undefined,
+    highlightNodeOutputEdges: highlightNodeOutputEdges ? (route?: string) => highlightNodeOutputEdges(id, route) : undefined,
   } : undefined;
   
   return (

@@ -24,12 +24,14 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     isSaving,
     error,
     isDragOver,
+    highlightedEdges,
     loadWorkflowCanvas,
     addNode,
     updateNodePosition,
     removeNode,
     addConnection,
     setDragOver,
+    highlightEdge,
   } = useWorkflowCanvasStore();
 
   // Get selection store actions (now separate from canvas store)
@@ -53,16 +55,24 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
 
   // Convert workflow connections to ReactFlow format
   const reactFlowEdges = useMemo(() => {
-    return workflowConnections.map((connection): Edge => ({
-      id: connection.id,
-      source: connection.source,
-      target: connection.target,
-      sourceHandle: connection.sourceHandle || 'default',
-      type: lineType,
-      animated: isRunning,
-      style: { stroke: '#3b82f6', strokeWidth: 2 },
-    }));
-  }, [workflowConnections, lineType, isRunning]);
+    return workflowConnections.map((connection): Edge => {
+      const isHighlighted = connection.id in highlightedEdges;
+      const highlightColor = highlightedEdges[connection.id];
+      
+      return {
+        id: connection.id,
+        source: connection.source,
+        target: connection.target,
+        sourceHandle: connection.sourceHandle || 'default',
+        type: lineType,
+        animated: isRunning,
+        style: { 
+          stroke: highlightColor || '#3b82f6', 
+          strokeWidth: isHighlighted ? 3 : 2,
+        },
+      };
+    });
+  }, [workflowConnections, lineType, isRunning, highlightedEdges]);
 
   // ReactFlow state management
   const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
@@ -155,6 +165,24 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     });
   }, [nodes, searchTerm, filters]);
 
+  // Highlight outgoing edges from a node (for visual feedback on execution)
+  const highlightNodeOutputEdges = useCallback((nodeId: string, route?: string) => {
+    // Find outgoing edges from this node
+    const outgoingEdges = edges.filter(edge => edge.source === nodeId);
+    
+    for (const edge of outgoingEdges) {
+      // If route is specified (conditional node), only highlight matching handle
+      if (route) {
+        if (edge.sourceHandle === route) {
+          highlightEdge(edge.id, '#22c55e', 1000); // Green for 2 seconds
+        }
+      } else {
+        // Regular node: highlight all outgoing edges
+        highlightEdge(edge.id, '#22c55e', 1000); // Green for 2 seconds
+      }
+    }
+  }, [edges, highlightEdge]);
+
   // Helper function to get connected node's output data
   const getConnectedNodeOutput = useCallback((nodeId: string): Record<string, unknown> | null => {
     // Find incoming edge to this node
@@ -192,10 +220,11 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         onDeleteNode: removeNode,
         workflowId: workflowId,
         getConnectedNodeOutput: getConnectedNodeOutput,
+        highlightNodeOutputEdges: highlightNodeOutputEdges,
         isExecuting: isRunning,
       },
     }));
-  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, isRunning]);
+  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isRunning]);
 
   return {
     nodes: updatedNodes,

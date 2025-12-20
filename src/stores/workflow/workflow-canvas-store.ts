@@ -36,6 +36,9 @@ interface WorkflowCanvasState {
   
   // UI State (drag only - selection is in separate store)
   isDragOver: boolean;
+  
+  // Edge highlight state for visual feedback
+  highlightedEdges: Record<string, string>; // edgeId -> color
 }
 
 // Workflow Canvas Actions Interface
@@ -66,6 +69,10 @@ interface WorkflowCanvasActions {
   setError: (error: string | null) => void;
   clearError: () => void;
   
+  // Edge Highlight Actions
+  highlightEdge: (edgeId: string, color: string, durationMs?: number) => void;
+  clearEdgeHighlight: (edgeId: string) => void;
+  
   // Utility Actions
   reset: () => void;
 }
@@ -81,6 +88,7 @@ const initialState: WorkflowCanvasState = {
   isSaving: false,
   error: null,
   isDragOver: false,
+  highlightedEdges: {},
 };
 
 export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
@@ -415,6 +423,24 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         clearError: () => {
           set((state) => {
             state.error = null;
+          });
+        },
+
+        // Edge Highlight Actions
+        highlightEdge: (edgeId: string, color: string, durationMs: number = 2000) => {
+          set((state) => {
+            state.highlightedEdges[edgeId] = color;
+          });
+          
+          // Auto-clear after duration
+          setTimeout(() => {
+            get().clearEdgeHighlight(edgeId);
+          }, durationMs);
+        },
+
+        clearEdgeHighlight: (edgeId: string) => {
+          set((state) => {
+            delete state.highlightedEdges[edgeId];
           });
         },
 

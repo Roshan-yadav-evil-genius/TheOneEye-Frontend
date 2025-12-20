@@ -16,6 +16,7 @@ export interface WorkflowNodeContext {
   workflowId: string;
   nodeInstanceId: string;
   getConnectedNodeOutput?: () => Record<string, unknown> | null;
+  highlightNodeOutputEdges?: (route?: string) => void;
 }
 
 interface CustomNodeProps {
@@ -103,6 +104,10 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
           input_data: inputData,
           output_data: outputData,
         });
+        
+        // Highlight outgoing edges to show data flow
+        const ifCondition = outputData?.if_condition as { route?: string } | undefined;
+        workflowContext.highlightNodeOutputEdges?.(ifCondition?.route);
       }
     } catch (error) {
       console.error("Node execution failed:", error);
