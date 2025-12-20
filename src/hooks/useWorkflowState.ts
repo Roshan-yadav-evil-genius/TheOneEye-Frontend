@@ -165,8 +165,21 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     const sourceNode = nodes.find(n => n.id === incomingEdge.source);
     if (!sourceNode) return null;
     
-    // Return the source node's output_data
-    return sourceNode.data?.output_data || null;
+    // Get the source node's output_data
+    const outputData = sourceNode.data?.output_data as Record<string, unknown> | null;
+    if (!outputData) return null;
+    
+    // Check if source is a conditional node with routing info
+    const ifCondition = outputData?.if_condition as { route?: string } | undefined;
+    if (ifCondition?.route) {
+      const edgeSourceHandle = incomingEdge.sourceHandle || 'default';
+      // Only return data if this edge comes from the active route
+      if (edgeSourceHandle !== ifCondition.route) {
+        return null; // This branch was not taken
+      }
+    }
+    
+    return outputData;
   }, [edges, nodes]);
 
   // Update node selection and add delete callback, workflow context, and execution state
