@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ExternalLink } from "lucide-react";
 import { BROWSER_TYPES, BROWSER_INFO } from "@/constants/browser-session";
 import { BrowserSessionFormData } from "@/types/browser-session";
 
@@ -54,20 +53,9 @@ export function BrowserTypeSection({
         </SelectContent>
       </Select>
       {browserTypeValue && BROWSER_INFO[browserTypeValue] && (
-        <div className="flex items-start gap-2 mt-1">
-          <p className="text-sm text-gray-600 flex-1">
-            {BROWSER_INFO[browserTypeValue].description}
-          </p>
-          <a
-            href={BROWSER_INFO[browserTypeValue].args_reference_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center mt-0.5"
-            aria-label="View browser args reference"
-          >
-            <ExternalLink className="w-4 h-4 text-gray-500 hover:text-gray-700" />
-          </a>
-        </div>
+        <p className="text-sm text-gray-600 mt-1">
+          {BROWSER_INFO[browserTypeValue].description}
+        </p>
       )}
       {errors.browser_type && (
         <p className="text-sm text-red-500">{errors.browser_type.message}</p>
@@ -75,8 +63,3 @@ export function BrowserTypeSection({
     </div>
   );
 }
-
-
-
-
-

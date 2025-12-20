@@ -2,7 +2,6 @@ import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ExternalLink } from "lucide-react";
-import { TagsInput } from "@/components/features/nodes";
 import { BrowserSessionFormData } from "@/types/browser-session";
 
 interface PlaywrightConfigSectionProps {
@@ -43,22 +42,6 @@ export function PlaywrightConfigSection({
           disabled={isSubmitting}
         />
       </div>
-
-      <div className="space-y-2">
-        <TagsInput
-          tags={playwrightConfig?.args || []}
-          onTagsChange={(args) =>
-            setValue("playwright_config.args", args.length > 0 ? args : undefined)
-          }
-          label="Args"
-          placeholder="Type an arg and press comma or enter"
-          helpText="Type args and press comma or enter to add them"
-          id="args"
-        />
-      </div>
     </div>
   );
 }
-
-
-

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
-import { DEFAULT_BROWSER_ARGS, DEFAULT_USER_AGENTS } from "@/constants/browser-session";
+import { useForm } from "react-hook-form";
+import { DEFAULT_USER_AGENTS } from "@/constants/browser-session";
 import { BrowserSessionFormData, BrowserSessionFormProps } from "@/types/browser-session";
 
 export function useBrowserSessionForm(
@@ -67,22 +67,11 @@ function getDefaultValues(initialData: Partial<BrowserSessionFormData> = {}) {
           user_agent:
             initialData.playwright_config.user_agent ||
             DEFAULT_USER_AGENTS[browserType],
-          args:
-            initialData.playwright_config.args &&
-            initialData.playwright_config.args.length > 0
-              ? initialData.playwright_config.args
-              : [...DEFAULT_BROWSER_ARGS],
         }
       : {
           user_agent: DEFAULT_USER_AGENTS[browserType],
-          args: [...DEFAULT_BROWSER_ARGS],
           timeout: 30000,
           slow_mo: 0,
         },
   };
 }
-
-
-
-
-
