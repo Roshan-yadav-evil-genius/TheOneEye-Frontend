@@ -37,10 +37,11 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
   // Get store method to update node execution data
   const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
   
-  // Subscribe to WebSocket-driven execution state
-  const executingNodes = useWorkflowExecutionStore(state => state.executingNodes);
+  // Subscribe to WebSocket-driven execution state - use selector to check specific node
   const nodeInstanceId = workflowContext?.nodeInstanceId || id;
-  const isWorkflowNodeExecuting = executingNodes.has(nodeInstanceId);
+  const isWorkflowNodeExecuting = useWorkflowExecutionStore(
+    state => nodeInstanceId in state.executingNodes
+  );
   
   // Combined execution state: either local (single node test) or workflow (WebSocket-driven)
   const isNodeExecuting = isLocalNodeExecuting || isWorkflowNodeExecuting;

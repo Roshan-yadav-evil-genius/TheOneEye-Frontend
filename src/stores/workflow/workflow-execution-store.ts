@@ -33,7 +33,8 @@ interface WorkflowExecutionState {
   currentNodeId: string | null;
   
   // Parallel node execution tracking (WebSocket-driven)
-  executingNodes: Map<string, NodeExecutionInfo>;
+  // Using Record instead of Map for immer compatibility
+  executingNodes: Record<string, NodeExecutionInfo>;
   
   // Results
   result: unknown;
@@ -58,7 +59,7 @@ interface WorkflowExecutionActions {
   stopPolling: () => void;
   
   // Parallel node execution tracking (WebSocket-driven)
-  setExecutingNodes: (nodes: Map<string, NodeExecutionInfo>) => void;
+  setExecutingNodes: (nodes: Record<string, NodeExecutionInfo>) => void;
   addExecutingNode: (nodeId: string, info: NodeExecutionInfo) => void;
   removeExecutingNode: (nodeId: string) => void;
   isNodeExecuting: (nodeId: string) => boolean;
@@ -81,7 +82,7 @@ const initialState: WorkflowExecutionState = {
   taskId: null,
   progress: 0,
   currentNodeId: null,
-  executingNodes: new Map<string, NodeExecutionInfo>(),
+  executingNodes: {},
   result: null,
   error: null,
   isStarting: false,
@@ -266,7 +267,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
       },
 
       // Parallel node execution tracking (WebSocket-driven)
-      setExecutingNodes: (nodes: Map<string, NodeExecutionInfo>) => {
+      setExecutingNodes: (nodes: Record<string, NodeExecutionInfo>) => {
         set((state) => {
           state.executingNodes = nodes;
         });
@@ -274,24 +275,18 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
 
       addExecutingNode: (nodeId: string, info: NodeExecutionInfo) => {
         set((state) => {
-          // Create a new Map to trigger reactivity
-          const newMap = new Map(state.executingNodes);
-          newMap.set(nodeId, info);
-          state.executingNodes = newMap;
+          state.executingNodes[nodeId] = info;
         });
       },
 
       removeExecutingNode: (nodeId: string) => {
         set((state) => {
-          // Create a new Map to trigger reactivity
-          const newMap = new Map(state.executingNodes);
-          newMap.delete(nodeId);
-          state.executingNodes = newMap;
+          delete state.executingNodes[nodeId];
         });
       },
 
       isNodeExecuting: (nodeId: string) => {
-        return get().executingNodes.has(nodeId);
+        return nodeId in get().executingNodes;
       },
 
       // State management
@@ -333,10 +328,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
 
       reset: () => {
         get().stopPolling();
-        set({
-          ...initialState,
-          executingNodes: new Map<string, NodeExecutionInfo>(),
-        });
+        set(initialState);
       },
     })),
     {
@@ -356,6 +348,6 @@ export const workflowExecutionSelectors = {
   isExecuting: (state: WorkflowExecutionStore) => 
     state.status === 'running' || state.isStarting,
   isNodeExecuting: (nodeId: string) => (state: WorkflowExecutionStore) =>
-    state.executingNodes.has(nodeId),
+    nodeId in state.executingNodes,
   getExecutingNodes: (state: WorkflowExecutionStore) => state.executingNodes,
 };
