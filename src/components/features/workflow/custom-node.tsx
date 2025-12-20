@@ -10,6 +10,7 @@ import { BackendWorkflowNode, TNodeMetadata } from "@/types";
 import { IconGripVertical, IconLoader2 } from "@tabler/icons-react";
 import { workflowApi } from "@/lib/api/services/workflow-api";
 import { useWorkflowCanvasStore } from "@/stores";
+import { useWorkflowExecutionStore } from "@/stores/workflow/workflow-execution-store";
 
 // Workflow context for the execute dialog
 export interface WorkflowNodeContext {
@@ -31,10 +32,18 @@ interface CustomNodeProps {
 export function CustomNode({ id, data, selected, onDelete, workflowContext, isExecuting = false }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isNodeExecuting, setIsNodeExecuting] = useState(false);
+  const [isLocalNodeExecuting, setIsLocalNodeExecuting] = useState(false);
   
   // Get store method to update node execution data
   const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
+  
+  // Subscribe to WebSocket-driven execution state
+  const executingNodes = useWorkflowExecutionStore(state => state.executingNodes);
+  const nodeInstanceId = workflowContext?.nodeInstanceId || id;
+  const isWorkflowNodeExecuting = executingNodes.has(nodeInstanceId);
+  
+  // Combined execution state: either local (single node test) or workflow (WebSocket-driven)
+  const isNodeExecuting = isLocalNodeExecuting || isWorkflowNodeExecuting;
   
   const colorClass = getNodeColor(data.node_type?.type || '');
 
@@ -70,7 +79,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     
     if (!workflowContext || isNodeExecuting) return;
     
-    setIsNodeExecuting(true);
+    setIsLocalNodeExecuting(true);
     
     try {
       // Get input data from connected nodes
@@ -112,7 +121,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     } catch (error) {
       console.error("Node execution failed:", error);
     } finally {
-      setIsNodeExecuting(false);
+      setIsLocalNodeExecuting(false);
     }
   }, [workflowContext, data.form_values, updateNodeExecutionData, isNodeExecuting]);
 

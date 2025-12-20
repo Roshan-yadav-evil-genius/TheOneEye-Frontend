@@ -13,6 +13,14 @@ import { toastSuccess, toastError, toastInfo } from '@/hooks/use-toast';
 // Execution status types
 export type ExecutionStatus = 'idle' | 'running' | 'paused' | 'completed' | 'failed';
 
+// Node execution info (for parallel tracking)
+export interface NodeExecutionInfo {
+  node_id: string;
+  node_type: string;
+  started_at: string;
+  duration_seconds: number;
+}
+
 // Execution State Interface
 interface WorkflowExecutionState {
   // Current execution state
@@ -23,6 +31,9 @@ interface WorkflowExecutionState {
   // Progress tracking
   progress: number;
   currentNodeId: string | null;
+  
+  // Parallel node execution tracking (WebSocket-driven)
+  executingNodes: Map<string, NodeExecutionInfo>;
   
   // Results
   result: unknown;
@@ -46,6 +57,12 @@ interface WorkflowExecutionActions {
   pollTaskStatus: (taskId: string) => Promise<void>;
   stopPolling: () => void;
   
+  // Parallel node execution tracking (WebSocket-driven)
+  setExecutingNodes: (nodes: Map<string, NodeExecutionInfo>) => void;
+  addExecutingNode: (nodeId: string, info: NodeExecutionInfo) => void;
+  removeExecutingNode: (nodeId: string) => void;
+  isNodeExecuting: (nodeId: string) => boolean;
+  
   // State management
   setWorkflowId: (workflowId: string | null) => void;
   setStatus: (status: ExecutionStatus) => void;
@@ -64,6 +81,7 @@ const initialState: WorkflowExecutionState = {
   taskId: null,
   progress: 0,
   currentNodeId: null,
+  executingNodes: new Map<string, NodeExecutionInfo>(),
   result: null,
   error: null,
   isStarting: false,
@@ -247,6 +265,35 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
         });
       },
 
+      // Parallel node execution tracking (WebSocket-driven)
+      setExecutingNodes: (nodes: Map<string, NodeExecutionInfo>) => {
+        set((state) => {
+          state.executingNodes = nodes;
+        });
+      },
+
+      addExecutingNode: (nodeId: string, info: NodeExecutionInfo) => {
+        set((state) => {
+          // Create a new Map to trigger reactivity
+          const newMap = new Map(state.executingNodes);
+          newMap.set(nodeId, info);
+          state.executingNodes = newMap;
+        });
+      },
+
+      removeExecutingNode: (nodeId: string) => {
+        set((state) => {
+          // Create a new Map to trigger reactivity
+          const newMap = new Map(state.executingNodes);
+          newMap.delete(nodeId);
+          state.executingNodes = newMap;
+        });
+      },
+
+      isNodeExecuting: (nodeId: string) => {
+        return get().executingNodes.has(nodeId);
+      },
+
       // State management
       setWorkflowId: (workflowId: string | null) => {
         set((state) => {
@@ -286,7 +333,10 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
 
       reset: () => {
         get().stopPolling();
-        set(initialState);
+        set({
+          ...initialState,
+          executingNodes: new Map<string, NodeExecutionInfo>(),
+        });
       },
     })),
     {
@@ -305,4 +355,7 @@ export const workflowExecutionSelectors = {
   hasError: (state: WorkflowExecutionStore) => state.error !== null,
   isExecuting: (state: WorkflowExecutionStore) => 
     state.status === 'running' || state.isStarting,
+  isNodeExecuting: (nodeId: string) => (state: WorkflowExecutionStore) =>
+    state.executingNodes.has(nodeId),
+  getExecutingNodes: (state: WorkflowExecutionStore) => state.executingNodes,
 };
