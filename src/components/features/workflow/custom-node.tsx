@@ -7,7 +7,9 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { getNodeColor } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode, TNodeMetadata } from "@/types";
-import { IconGripVertical } from "@tabler/icons-react";
+import { IconGripVertical, IconLoader2 } from "@tabler/icons-react";
+import { workflowApi } from "@/lib/api/services/workflow-api";
+import { useWorkflowCanvasStore } from "@/stores";
 
 // Workflow context for the execute dialog
 export interface WorkflowNodeContext {
@@ -28,6 +30,10 @@ interface CustomNodeProps {
 export function CustomNode({ id, data, selected, onDelete, workflowContext, isExecuting = false }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isNodeExecuting, setIsNodeExecuting] = useState(false);
+  
+  // Get store method to update node execution data
+  const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
   
   const colorClass = getNodeColor(data.node_type?.type || '');
 
@@ -57,11 +63,53 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     setIsEditDialogOpen(true);
   }, []);
 
-  // Placeholder handlers for future functionality
-  const handlePlay = useCallback((e: React.MouseEvent) => {
+  // Execute node silently and save result
+  const handlePlay = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement node execution
-  }, []);
+    
+    if (!workflowContext || isNodeExecuting) return;
+    
+    setIsNodeExecuting(true);
+    
+    try {
+      // Get input data from connected nodes
+      const inputData = workflowContext.getConnectedNodeOutput?.() || {};
+      
+      // Generate session ID for stateful execution
+      const sessionId = `${workflowContext.workflowId}_${workflowContext.nodeInstanceId}`;
+      
+      // Execute node with saved form values
+      const response = await workflowApi.executeAndSaveNode(
+        workflowContext.workflowId,
+        workflowContext.nodeInstanceId,
+        {
+          form_values: data.form_values || {},
+          input_data: inputData,
+          session_id: sessionId,
+        }
+      );
+      
+      // Update local store with execution results
+      if (response.success) {
+        const outputPayload = response.output;
+        let outputData: Record<string, unknown> = {};
+        if (outputPayload && typeof outputPayload === 'object' && 'data' in outputPayload) {
+          outputData = (outputPayload as { data: Record<string, unknown> }).data || {};
+        } else if (outputPayload && typeof outputPayload === 'object') {
+          outputData = outputPayload as Record<string, unknown>;
+        }
+        
+        updateNodeExecutionData(workflowContext.nodeInstanceId, {
+          input_data: inputData,
+          output_data: outputData,
+        });
+      }
+    } catch (error) {
+      console.error("Node execution failed:", error);
+    } finally {
+      setIsNodeExecuting(false);
+    }
+  }, [workflowContext, data.form_values, updateNodeExecutionData, isNodeExecuting]);
 
   const handlePause = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -125,7 +173,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
             onPlay={handlePlay}
             onPause={handlePause}
             onDelete={handleDelete}
-            isExecuting={false}
+            isExecuting={isNodeExecuting}
             isPolling={false}
           />
         )}
@@ -138,15 +186,19 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
           </div>
         )}
 
-        {/* Node Content - Just Icon */}
+        {/* Node Content - Icon or Loading Spinner */}
         <div className="flex items-center justify-center h-full">
-          <NodeLogo
-            node={{
-              name: data.node_type?.name || 'Unknown',
-              type: data.node_type?.type || 'unknown',
-            }}
-            size="lg"
-          />
+          {isNodeExecuting ? (
+            <IconLoader2 className="w-10 h-10 text-primary animate-spin" />
+          ) : (
+            <NodeLogo
+              node={{
+                name: data.node_type?.name || 'Unknown',
+                type: data.node_type?.type || 'unknown',
+              }}
+              size="lg"
+            />
+          )}
         </div>
       </div>
 
