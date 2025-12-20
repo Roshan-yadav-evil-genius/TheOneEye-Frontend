@@ -33,8 +33,6 @@ export interface BrowserSessionFormData {
   description: string;
   browser_type: 'chromium' | 'firefox' | 'webkit';
   playwright_config: {
-    user_agent?: string;
-    args?: string[];
     timeout?: number;
     slow_mo?: number;
   };
