@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { NodeFormField } from "./node-form-field";
 import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeFormData } from "@/types";
-import { IconPlayerPlay, IconLoader2 } from "@tabler/icons-react";
+import { IconPlayerPlay, IconLoader2, IconDeviceFloppy } from "@tabler/icons-react";
 
 interface NodeFormEditorProps {
   node: TNodeMetadata;
@@ -13,6 +13,12 @@ interface NodeFormEditorProps {
   isExecuting?: boolean;
   initialFormValues?: Record<string, string>;
   onFormValuesChange?: (formData: Record<string, string>) => void;
+  /** When false, hides the Execute button from the bottom of the form */
+  showExecuteButton?: boolean;
+  /** When provided, shows a Save button at the bottom of the form */
+  onSave?: () => void;
+  /** Loading state for the Save button */
+  isSaving?: boolean;
 }
 
 export function NodeFormEditor({
@@ -21,6 +27,9 @@ export function NodeFormEditor({
   isExecuting = false,
   initialFormValues,
   onFormValuesChange,
+  showExecuteButton = true,
+  onSave,
+  isSaving = false,
 }: NodeFormEditorProps) {
   const [formState, setFormState] = useState<TNodeFormData | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -248,26 +257,49 @@ export function NodeFormEditor({
         ))}
       </div>
 
-      {/* Execute Button */}
-      <div className="border-t border-gray-700 p-4 flex-shrink-0">
-        <Button
-          onClick={handleExecute}
-          disabled={isExecuting}
-          className="w-full"
-        >
-          {isExecuting ? (
-            <>
-              <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
-              Executing...
-            </>
-          ) : (
-            <>
-              <IconPlayerPlay className="h-4 w-4 mr-2" />
-              Execute Node
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Bottom Button Section - conditionally render Save or Execute */}
+      {(showExecuteButton || onSave) && (
+        <div className="border-t border-gray-700 p-4 flex-shrink-0">
+          {onSave ? (
+            <Button
+              onClick={onSave}
+              disabled={isSaving}
+              variant="secondary"
+              className="w-full"
+            >
+              {isSaving ? (
+                <>
+                  <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <IconDeviceFloppy className="h-4 w-4 mr-2" />
+                  Save
+                </>
+              )}
+            </Button>
+          ) : showExecuteButton ? (
+            <Button
+              onClick={handleExecute}
+              disabled={isExecuting}
+              className="w-full"
+            >
+              {isExecuting ? (
+                <>
+                  <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Executing...
+                </>
+              ) : (
+                <>
+                  <IconPlayerPlay className="h-4 w-4 mr-2" />
+                  Execute Node
+                </>
+              )}
+            </Button>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

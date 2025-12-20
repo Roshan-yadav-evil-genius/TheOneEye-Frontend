@@ -15,7 +15,7 @@ import { ApiService } from "@/lib/api/api-service";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Play, Loader2 } from "lucide-react";
 import { useNodeTestDataStore } from "@/stores/node-test-data-store";
 import { useWorkflowCanvasStore } from "@/stores";
 import { getBadgeStyles } from "@/constants/node-styles";
@@ -178,6 +178,7 @@ export function NodeExecuteDialog({
   }, [node.identifier, persistFormData, isWorkflowMode]);
   
   const [isExecuting, setIsExecuting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Drag state for overlay
   const [activeDragKey, setActiveDragKey] = useState<string | null>(null);
@@ -323,6 +324,33 @@ export function NodeExecuteDialog({
     [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData, sessionId, persistOutputData]
   );
 
+  // Save form values to DB (workflow mode only)
+  const handleSave = useCallback(async () => {
+    if (!isWorkflowMode || !workflowContext) return;
+    
+    setIsSaving(true);
+    try {
+      await workflowApi.updateNodeFormValues(
+        workflowContext.workflowId,
+        workflowContext.nodeInstanceId,
+        persistedFormValues
+      );
+      // Update local store
+      updateNodeExecutionData(workflowContext.nodeInstanceId, {
+        form_values: persistedFormValues,
+      });
+    } catch (error) {
+      console.error("Failed to save form values:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [isWorkflowMode, workflowContext, persistedFormValues, updateNodeExecutionData]);
+
+  // Wrapper to call handleExecute with current form values (for header button)
+  const handleExecuteClick = useCallback(() => {
+    handleExecute(persistedFormValues);
+  }, [handleExecute, persistedFormValues]);
+
   const getTypeBadgeColor = (type: string) => {
     const styles = getBadgeStyles(type);
     return `${styles.bg} ${styles.text}`;
@@ -356,17 +384,34 @@ export function NodeExecuteDialog({
                   </p>
                 </div>
               </div>
-              {/* Reset button - clears node state for fresh execution */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-                disabled={isExecuting}
-                className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Reset
-              </Button>
+              {/* Header action buttons */}
+              <div className="flex items-center gap-2">
+                {/* Execute button */}
+                <Button
+                  size="sm"
+                  onClick={handleExecuteClick}
+                  disabled={isExecuting || isSaving}
+                  className="flex items-center gap-1.5"
+                >
+                  {isExecuting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5" />
+                  )}
+                  {isExecuting ? "Executing..." : "Execute"}
+                </Button>
+                {/* Reset button - clears node state for fresh execution */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  disabled={isExecuting || isSaving}
+                  className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset
+                </Button>
+              </div>
             </div>
 
             {/* Main Content - 3 Panels */}
@@ -403,6 +448,9 @@ export function NodeExecuteDialog({
                     isExecuting={isExecuting}
                     initialFormValues={persistedFormValues}
                     onFormValuesChange={handleFormValuesChange}
+                    showExecuteButton={false}
+                    onSave={isWorkflowMode ? handleSave : undefined}
+                    isSaving={isSaving}
                   />
                 </div>
               </div>
