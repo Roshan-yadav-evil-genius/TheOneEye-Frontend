@@ -197,13 +197,19 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     const outputData = sourceNode.data?.output_data as Record<string, unknown> | null;
     if (!outputData) return null;
     
-    // Check if source is a conditional node with routing info
-    const ifCondition = outputData?.if_condition as { route?: string } | undefined;
-    if (ifCondition?.route) {
-      const edgeSourceHandle = incomingEdge.sourceHandle || 'default';
-      // Only return data if this edge comes from the active route
-      if (edgeSourceHandle !== ifCondition.route) {
-        return null; // This branch was not taken
+    // IMPORTANT: Only apply routing check if source is ACTUALLY a conditional node
+    // The if_condition data is passed through all downstream nodes, so we must check
+    // the source node's type, not just if the data contains if_condition
+    const isConditionalNode = sourceNode.data?.node_type?.identifier === 'if-condition';
+    
+    if (isConditionalNode) {
+      const ifCondition = outputData?.if_condition as { route?: string } | undefined;
+      if (ifCondition?.route) {
+        const edgeSourceHandle = incomingEdge.sourceHandle || 'default';
+        // Only return data if this edge comes from the active route
+        if (edgeSourceHandle !== ifCondition.route) {
+          return null; // This branch was not taken
+        }
       }
     }
     
