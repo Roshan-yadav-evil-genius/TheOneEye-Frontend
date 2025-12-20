@@ -120,6 +120,63 @@ export function NodeFormEditor({
     }
   }, [formValues, onFormValuesChange]);
 
+  // After form loads with persisted values, load options for dependent fields
+  useEffect(() => {
+    const loadDependentFieldOptions = async () => {
+      if (!formState?.dependencies || !initialFormValues || Object.keys(initialFormValues).length === 0) {
+        return;
+      }
+
+      // For each parent field that has a persisted value, load its dependent field options
+      for (const parentField of Object.keys(formState.dependencies)) {
+        const parentValue = initialFormValues[parentField];
+        if (!parentValue) continue;
+
+        const dependentFields = formState.dependencies[parentField];
+        
+        for (const dependentField of dependentFields) {
+          setLoadingFields((prev) => new Set(prev).add(dependentField));
+          
+          try {
+            const response = await ApiService.getNodeFieldOptions(node.identifier, {
+              parent_field: parentField,
+              parent_value: parentValue,
+              dependent_field: dependentField,
+              form_values: initialFormValues,
+            });
+
+            // Update the dependent field's options
+            setFormState((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                fields: prev.fields.map((field) => {
+                  if (field.name === dependentField) {
+                    return { ...field, options: response.options };
+                  }
+                  return field;
+                }),
+              };
+            });
+          } catch (error) {
+            console.error(`Failed to load initial options for ${dependentField}:`, error);
+          } finally {
+            setLoadingFields((prev) => {
+              const next = new Set(prev);
+              next.delete(dependentField);
+              return next;
+            });
+          }
+        }
+      }
+    };
+
+    if (!isLoadingForm && formState) {
+      loadDependentFieldOptions();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingForm, formState?.dependencies, node.identifier]);
+
   // Handle field value change with dynamic field updates
   const handleFieldChange = useCallback(
     async (fieldName: string, value: string) => {
