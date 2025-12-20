@@ -100,7 +100,6 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       setIsRunning(true);
       startPolling();
       
-      console.log('🚀 [Execution] Workflow started, WebSocket connected');
     } catch {
       workflowWsManager.disconnect();
     }
@@ -117,8 +116,12 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       setTaskStatus(null);
       setIsRunning(false);
       stopPolling();
+      
+      // Clear executing nodes from store to remove spinners
+      executionStoreRef.current.setExecutingNodes({});
+      executionStoreRef.current.setStatus('idle');
+      
       workflowWsManager.disconnect();
-      console.log('🛑 [Execution] Workflow stopped, WebSocket disconnected');
     } catch {
       // Error handling
     }
@@ -128,19 +131,19 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
   useEffect(() => {
     // Handler: Connected
     const handleConnected = () => {
-      console.log('✅ [Execution] WebSocket connected');
       setWsConnected(true);
     };
     
     // Handler: Disconnected
     const handleDisconnected = () => {
-      console.log('🔌 [Execution] WebSocket disconnected');
       setWsConnected(false);
+      
+      // Clear executing nodes to remove any stuck spinners
+      executionStoreRef.current.setExecutingNodes({});
     };
     
     // Handler: State sync (on initial connect or reconnect)
     const handleStateSync = (data: StateSyncData) => {
-      console.log('🔄 [Execution] State sync received:', data);
       
       const store = executionStoreRef.current;
       store.setExecutingNodes(data.executing_nodes || {});
@@ -159,8 +162,6 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     
     // Handler: Node started
     const handleNodeStarted = (data: NodeStartedData) => {
-      console.log('▶️ [Execution] Node started:', data.node_id);
-      
       const store = executionStoreRef.current;
       store.addExecutingNode(data.node_id, {
         node_id: data.node_id,
@@ -172,22 +173,20 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     
     // Handler: Node completed - update store and highlight edges
     const handleNodeCompleted = (data: NodeCompletedData) => {
-      console.log('✅ [Execution] Node completed:', data.node_id, 'route:', data.route);
-      
       // Update execution store
       const execStore = executionStoreRef.current;
       execStore.removeExecutingNode(data.node_id);
       
-      // Highlight edges
-      const canvasStore = canvasStoreRef.current;
-      const connections = canvasStore.connections;
-      const highlightEdge = canvasStore.highlightEdge;
+      // Highlight edges - get fresh state from store
+      const storeState = useWorkflowCanvasStore.getState();
+      const connections = storeState.connections;
+      const highlightEdge = storeState.highlightEdge;
       
-      const outgoingEdges = connections.filter(conn => conn.source_node_id === data.node_id);
+      const outgoingEdges = connections.filter(conn => conn.source === data.node_id);
       
       outgoingEdges.forEach(edge => {
         // For conditional nodes, only highlight the matching route
-        if (data.route && edge.source_handle !== data.route) {
+        if (data.route && edge.sourceHandle !== data.route) {
           return;
         }
         highlightEdge(edge.id, '#22c55e', 1500);
@@ -196,16 +195,12 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     
     // Handler: Node failed
     const handleNodeFailed = (data: { node_id: string }) => {
-      console.log('❌ [Execution] Node failed:', data.node_id);
-      
       const store = executionStoreRef.current;
       store.removeExecutingNode(data.node_id);
     };
     
     // Handler: Workflow completed
-    const handleWorkflowCompleted = (data: WorkflowCompletedData) => {
-      console.log('🎉 [Execution] Workflow completed:', data.status);
-      
+    const handleWorkflowCompleted = (_data: WorkflowCompletedData) => {
       setIsRunning(false);
       setTaskId(null);
       setTaskStatus(null);
@@ -218,9 +213,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     };
     
     // Handler: Workflow failed
-    const handleWorkflowFailed = (data: WorkflowFailedData) => {
-      console.log('💥 [Execution] Workflow failed:', data.error);
-      
+    const handleWorkflowFailed = (_data: WorkflowFailedData) => {
       setIsRunning(false);
       
       const store = executionStoreRef.current;
@@ -274,7 +267,6 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
             setIsRunning(true);
             // Connect WebSocket for real-time updates
             workflowWsManager.connect(workflowId);
-            console.log('🔄 [Execution] Workflow is running, connecting WebSocket');
             
             // Only start polling if still in PENDING state
             if (statusResponse.status === 'PENDING') {

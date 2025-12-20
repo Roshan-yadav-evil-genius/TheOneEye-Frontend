@@ -94,7 +94,6 @@ class WorkflowWebSocketManager {
   
   private constructor() {
     // Private constructor for singleton
-    console.log('🔧 [WsManager] Singleton instance created');
   }
   
   static getInstance(): WorkflowWebSocketManager {
@@ -131,13 +130,11 @@ class WorkflowWebSocketManager {
   connect(workflowId: string): void {
     // If already connected to the same workflow, do nothing
     if (this.workflowId === workflowId && this.isConnected()) {
-      console.log('🔌 [WsManager] Already connected to workflow:', workflowId);
       return;
     }
     
     // If connecting to a different workflow, disconnect first
     if (this.workflowId && this.workflowId !== workflowId) {
-      console.log('🔌 [WsManager] Switching workflow, disconnecting from:', this.workflowId);
       this.disconnect();
     }
     
@@ -152,7 +149,6 @@ class WorkflowWebSocketManager {
    * Disconnect from the WebSocket
    */
   disconnect(): void {
-    console.log('🔌 [WsManager] Disconnecting...');
     this.intentionalDisconnect = true;
     
     // Clear reconnect timeout
@@ -216,8 +212,8 @@ class WorkflowWebSocketManager {
       eventListeners.forEach(callback => {
         try {
           callback(data);
-        } catch (e) {
-          console.error(`[WsManager] Error in ${event} listener:`, e);
+        } catch {
+          // Silently handle listener errors
         }
       });
     }
@@ -242,13 +238,11 @@ class WorkflowWebSocketManager {
     this.status = 'connecting';
     
     const wsUrl = this.getWebSocketUrl(this.workflowId);
-    console.log('🔌 [WsManager] Connecting to:', wsUrl);
     
     try {
       this.ws = new WebSocket(wsUrl);
       
       this.ws.onopen = () => {
-        console.log('✅ [WsManager] Connected to:', this.workflowId);
         this.status = 'connected';
         this.reconnectAttempts = 0;
         this.emit('connected', { workflowId: this.workflowId });
@@ -258,13 +252,11 @@ class WorkflowWebSocketManager {
         this.handleMessage(event);
       };
       
-      this.ws.onerror = (error) => {
-        console.error('❌ [WsManager] WebSocket error:', error);
-        this.emit('error', { error });
+      this.ws.onerror = () => {
+        this.emit('error', { error: 'WebSocket error' });
       };
       
       this.ws.onclose = (event) => {
-        console.log('🔌 [WsManager] Connection closed:', { code: event.code, reason: event.reason });
         this.ws = null;
         
         // Don't reconnect if intentionally disconnected or normal close
@@ -276,7 +268,6 @@ class WorkflowWebSocketManager {
         // Attempt reconnection
         if (this.reconnectAttempts < this.maxReconnectAttempts) {
           this.reconnectAttempts++;
-          console.log(`🔄 [WsManager] Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
           
           this.reconnectTimeout = setTimeout(() => {
             if (!this.intentionalDisconnect && this.workflowId) {
@@ -284,15 +275,13 @@ class WorkflowWebSocketManager {
             }
           }, this.reconnectDelay);
         } else {
-          console.error('❌ [WsManager] Max reconnect attempts reached');
           this.status = 'error';
           this.emit('error', { error: 'Max reconnect attempts reached' });
         }
       };
-    } catch (error) {
-      console.error('❌ [WsManager] Failed to create WebSocket:', error);
+    } catch {
       this.status = 'error';
-      this.emit('error', { error });
+      this.emit('error', { error: 'Failed to create WebSocket' });
     }
   }
   
@@ -302,7 +291,6 @@ class WorkflowWebSocketManager {
   private handleMessage(event: MessageEvent): void {
     try {
       const message = JSON.parse(event.data);
-      console.log('📨 [WsManager] Received:', message.type, message);
       
       switch (message.type) {
         case 'state_sync':
@@ -353,10 +341,11 @@ class WorkflowWebSocketManager {
           break;
           
         default:
-          console.log('❓ [WsManager] Unknown message type:', message.type);
+          // Unknown message type - ignore
+          break;
       }
-    } catch (error) {
-      console.error('❌ [WsManager] Failed to parse message:', error);
+    } catch {
+      // Failed to parse message - ignore
     }
   }
   

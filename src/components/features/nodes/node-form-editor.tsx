@@ -60,17 +60,10 @@ export function NodeFormEditor({
     const loadForm = async () => {
       setIsLoadingForm(true);
       setFormError(null);
-      console.log("[NodeFormEditor] Loading form for:", node.identifier);
-      console.log("[NodeFormEditor] Node has_form:", node.has_form);
       try {
         const response = await ApiService.getNodeForm(node.identifier);
-        console.log("[NodeFormEditor] API Response:", response);
-        console.log("[NodeFormEditor] response.form:", response.form);
-        console.log("[NodeFormEditor] response.message:", response.message);
         
         if (response.form) {
-          console.log("[NodeFormEditor] Form fields:", response.form.fields);
-          console.log("[NodeFormEditor] Form dependencies:", response.form.dependencies);
           setFormState(response.form);
           
           // Initialize form values - prefer persisted values, fall back to defaults
@@ -93,7 +86,6 @@ export function NodeFormEditor({
             ? { ...defaultValues, ...initialFormValues }
             : defaultValues;
           
-          console.log("[NodeFormEditor] Initial values:", mergedValues);
           setFormValues(mergedValues);
         } else {
           console.warn("[NodeFormEditor] No form in response, message:", response.message);
@@ -108,10 +100,8 @@ export function NodeFormEditor({
     };
 
     if (node.has_form) {
-      console.log("[NodeFormEditor] Node has form, loading...");
       loadForm();
     } else {
-      console.log("[NodeFormEditor] Node does not have form flag set");
       setIsLoadingForm(false);
       setFormError("This node does not have a form");
     }
