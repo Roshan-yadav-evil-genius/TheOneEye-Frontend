@@ -1,31 +1,47 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
-// Canvas dimensions (internal resolution)
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
+// Default canvas dimensions (used until first frame with viewport info arrives)
+const DEFAULT_WIDTH = 1920;
+const DEFAULT_HEIGHT = 1080;
+
+// Header size in bytes (width: 4 bytes + height: 4 bytes)
+const VIEWPORT_HEADER_SIZE = 8;
 
 interface UseBrowserCanvasReturn {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   scaleCanvas: () => void;
   renderFrame: (frameData: Blob | ArrayBuffer) => void;
+  /** Current viewport width from the browser */
+  viewportWidth: number;
+  /** Current viewport height from the browser */
+  viewportHeight: number;
 }
 
 /**
- * Hook to manage browser canvas rendering.
+ * Hook to manage browser canvas rendering with dynamic viewport support.
  * Single responsibility: Canvas rendering and frame display only.
+ * 
+ * Frame format from backend: [width: 4 bytes][height: 4 bytes][JPEG data]
  */
 export function useBrowserCanvas(): UseBrowserCanvasReturn {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+  
+  // Track current viewport dimensions from the browser
+  const [viewportWidth, setViewportWidth] = useState(DEFAULT_WIDTH);
+  const [viewportHeight, setViewportHeight] = useState(DEFAULT_HEIGHT);
+  
+  // Use refs for dimensions to avoid stale closures in callbacks
+  const viewportRef = useRef({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT });
 
-  // Initialize canvas dimensions and context
+  // Initialize canvas context
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas internal size
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
+    // Set initial canvas internal size
+    canvas.width = DEFAULT_WIDTH;
+    canvas.height = DEFAULT_HEIGHT;
 
     // Get 2D context
     const ctx = canvas.getContext('2d');
@@ -37,8 +53,22 @@ export function useBrowserCanvas(): UseBrowserCanvasReturn {
   }, []);
 
   /**
+   * Update canvas internal dimensions when viewport changes.
+   */
+  const updateCanvasDimensions = useCallback((width: number, height: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // Only update if dimensions actually changed
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+  }, []);
+
+  /**
    * Scale canvas to fit container while maintaining aspect ratio.
-   * Dynamically measures container and sibling elements (tab bar, address bar).
+   * Uses current viewport dimensions for aspect ratio calculation.
    */
   const scaleCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -78,8 +108,9 @@ export function useBrowserCanvas(): UseBrowserCanvasReturn {
       return; // Not enough space, skip scaling
     }
 
-    // Calculate aspect ratio
-    const aspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+    // Calculate aspect ratio using current viewport dimensions
+    const { width: vpWidth, height: vpHeight } = viewportRef.current;
+    const aspectRatio = vpWidth / vpHeight;
 
     // Calculate display dimensions maintaining aspect ratio
     // Start with width-based calculation
@@ -137,39 +168,82 @@ export function useBrowserCanvas(): UseBrowserCanvasReturn {
     };
   }, [scaleCanvas]);
 
+  // Re-scale when viewport dimensions change
+  useEffect(() => {
+    scaleCanvas();
+  }, [viewportWidth, viewportHeight, scaleCanvas]);
+
   /**
-   * Render binary frame data (JPEG image) to canvas.
+   * Parse viewport dimensions from frame header.
+   * Frame format: [width: 4 bytes BE][height: 4 bytes BE][JPEG data]
+   */
+  const parseViewportHeader = useCallback((data: ArrayBuffer): { width: number; height: number; imageData: ArrayBuffer } => {
+    const view = new DataView(data);
+    const width = view.getUint32(0, false); // big-endian
+    const height = view.getUint32(4, false); // big-endian
+    const imageData = data.slice(VIEWPORT_HEADER_SIZE);
+    return { width, height, imageData };
+  }, []);
+
+  /**
+   * Render binary frame data (with viewport header) to canvas.
+   * Parses viewport dimensions from header and updates canvas accordingly.
    */
   const renderFrame = useCallback((frameData: Blob | ArrayBuffer) => {
     const ctx = contextRef.current;
     if (!ctx) return;
 
-    // Create Blob from binary data
-    const blob = frameData instanceof Blob
-      ? frameData
-      : new Blob([frameData], { type: 'image/jpeg' });
+    // Convert Blob to ArrayBuffer if needed
+    if (frameData instanceof Blob) {
+      frameData.arrayBuffer().then((buffer) => {
+        processFrame(buffer);
+      });
+    } else {
+      processFrame(frameData);
+    }
 
-    // Create object URL from blob
-    const imageUrl = URL.createObjectURL(blob);
+    function processFrame(data: ArrayBuffer) {
+      // Check if data has viewport header (at least 8 bytes + some image data)
+      if (data.byteLength < VIEWPORT_HEADER_SIZE + 100) {
+        console.warn('Frame data too small, skipping');
+        return;
+      }
 
-    // Create image and draw to canvas
-    const img = new Image();
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      // Revoke object URL to free memory
-      URL.revokeObjectURL(imageUrl);
-    };
-    img.onerror = () => {
-      console.error('❌ Error loading frame image');
-      URL.revokeObjectURL(imageUrl);
-    };
-    img.src = imageUrl;
-  }, []);
+      // Parse viewport dimensions from header
+      const { width, height, imageData } = parseViewportHeader(data);
+      
+      // Update viewport dimensions if changed
+      if (width !== viewportRef.current.width || height !== viewportRef.current.height) {
+        viewportRef.current = { width, height };
+        setViewportWidth(width);
+        setViewportHeight(height);
+        updateCanvasDimensions(width, height);
+      }
+
+      // Create Blob from image data (without header)
+      const blob = new Blob([imageData], { type: 'image/jpeg' });
+      const imageUrl = URL.createObjectURL(blob);
+
+      // Create image and draw to canvas
+      const img = new Image();
+      img.onload = () => {
+        // Draw at actual viewport dimensions
+        ctx.drawImage(img, 0, 0, width, height);
+        URL.revokeObjectURL(imageUrl);
+      };
+      img.onerror = () => {
+        console.error('❌ Error loading frame image');
+        URL.revokeObjectURL(imageUrl);
+      };
+      img.src = imageUrl;
+    }
+  }, [parseViewportHeader, updateCanvasDimensions]);
 
   return {
     canvasRef,
     scaleCanvas,
     renderFrame,
+    viewportWidth,
+    viewportHeight,
   };
 }
-

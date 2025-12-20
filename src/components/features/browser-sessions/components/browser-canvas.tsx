@@ -18,7 +18,7 @@ export function BrowserCanvas({
 	isStreaming,
 	setOnBinaryFrame,
 }: BrowserCanvasProps) {
-	const { canvasRef, renderFrame } = useBrowserCanvas();
+	const { canvasRef, renderFrame, viewportWidth, viewportHeight } = useBrowserCanvas();
 	const renderFrameRef = useRef(renderFrame);
 
 	// Update ref when renderFrame changes
@@ -33,11 +33,13 @@ export function BrowserCanvas({
 		});
 	}, [setOnBinaryFrame]);
 
-	// Setup mouse events
+	// Setup mouse events with dynamic viewport dimensions
 	useBrowserMouseEvents({
 		canvasRef,
 		sendMessage,
 		isStreaming,
+		viewportWidth,
+		viewportHeight,
 	});
 
 	// Setup keyboard events
@@ -60,4 +62,3 @@ export function BrowserCanvas({
 		</div>
 	);
 }
-

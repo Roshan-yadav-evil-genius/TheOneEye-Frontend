@@ -1,9 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-// Canvas dimensions (internal resolution)
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
-
 // Throttle mousemove events to avoid overwhelming backend
 const MOUSEMOVE_THROTTLE_MS = 16; // ~60fps for mouse movement
 
@@ -11,18 +7,35 @@ interface UseBrowserMouseEventsProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   sendMessage: (message: { type: string; [key: string]: unknown }) => void;
   isStreaming: boolean;
+  /** Current viewport width from the browser (dynamic) */
+  viewportWidth: number;
+  /** Current viewport height from the browser (dynamic) */
+  viewportHeight: number;
 }
 
 /**
  * Hook to handle mouse events for browser canvas.
  * Single responsibility: Mouse event handling only.
+ * 
+ * Uses dynamic viewport dimensions for accurate coordinate mapping,
+ * even when popup windows have different sizes than the main browser.
  */
 export function useBrowserMouseEvents({
   canvasRef,
   sendMessage,
   isStreaming,
+  viewportWidth,
+  viewportHeight,
 }: UseBrowserMouseEventsProps) {
   const mousemoveThrottleRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Use refs for viewport dimensions to avoid stale closures
+  const viewportRef = useRef({ width: viewportWidth, height: viewportHeight });
+  
+  // Update ref when viewport changes
+  useEffect(() => {
+    viewportRef.current = { width: viewportWidth, height: viewportHeight };
+  }, [viewportWidth, viewportHeight]);
 
   /**
    * Map mouse button number to button name.
@@ -37,7 +50,8 @@ export function useBrowserMouseEvents({
   }, []);
 
   /**
-   * Map coordinates from display to canvas internal resolution.
+   * Map coordinates from display to browser viewport resolution.
+   * Uses dynamic viewport dimensions for accurate mapping regardless of popup size.
    */
   const mapCoordinates = useCallback((clientX: number, clientY: number): { x: number; y: number } => {
     const canvas = canvasRef.current;
@@ -46,12 +60,19 @@ export function useBrowserMouseEvents({
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
+    
+    // Use canvas internal dimensions (which now match viewport)
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
+    
     const x = Math.round(clickX * scaleX);
     const y = Math.round(clickY * scaleY);
-    const boundedX = Math.max(0, Math.min(x, CANVAS_WIDTH - 1));
-    const boundedY = Math.max(0, Math.min(y, CANVAS_HEIGHT - 1));
+    
+    // Bound to current viewport dimensions
+    const { width, height } = viewportRef.current;
+    const boundedX = Math.max(0, Math.min(x, width - 1));
+    const boundedY = Math.max(0, Math.min(y, height - 1));
+    
     return { x: boundedX, y: boundedY };
   }, [canvasRef]);
 
@@ -154,4 +175,3 @@ export function useBrowserMouseEvents({
     };
   }, [canvasRef, isStreaming, sendMouseEvent]);
 }
-
