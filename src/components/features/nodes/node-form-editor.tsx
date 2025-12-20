@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { NodeFormField } from "./node-form-field";
 import { ApiService } from "@/lib/api/api-service";
@@ -36,6 +36,12 @@ export function NodeFormEditor({
   const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
   const [isLoadingForm, setIsLoadingForm] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
+  
+  // Ref to always get the latest formValues (avoids stale closure in callbacks)
+  const formValuesRef = useRef<Record<string, string>>(formValues);
+  useEffect(() => {
+    formValuesRef.current = formValues;
+  }, [formValues]);
 
   // Get all transitive dependent fields (recursive)
   const getAllDependentFields = useCallback(
@@ -141,11 +147,12 @@ export function NodeFormEditor({
           setLoadingFields((prev) => new Set(prev).add(dependentField));
 
           try {
+            // Use ref to get latest formValues (avoids stale closure)
             const response = await ApiService.getNodeFieldOptions(node.identifier, {
               parent_field: fieldName,
               parent_value: value,
               dependent_field: dependentField,
-              form_values: { ...formValues, [fieldName]: value },
+              form_values: { ...formValuesRef.current, [fieldName]: value },
             });
 
             // Update the dependent field's options
