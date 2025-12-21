@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TNodeMetadata } from "@/types";
-import { IconFileDescription, IconPlayerPlay, IconSettings } from "@tabler/icons-react";
+import { IconPlayerPlay, IconSettings } from "@tabler/icons-react";
+import { NodeLogo } from "@/components/common/node-logo";
 
 interface NodeCardProps {
   node: TNodeMetadata;
@@ -16,8 +17,9 @@ export function NodeCard({ node, onViewForm, onExecute }: NodeCardProps) {
   return (
     <Card className="group hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
+        <div className="flex items-start justify-between gap-3">
+          <NodeLogo node={node} size="md" />
+          <div className="flex-1 space-y-1">
             <CardTitle className="text-base font-semibold">
               {node.label || node.name}
             </CardTitle>

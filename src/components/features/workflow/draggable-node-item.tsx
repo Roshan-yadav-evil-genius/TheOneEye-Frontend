@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { TNodeMetadata } from '@/types';
-import { IconCube } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { getBadgeStyles } from '@/constants/node-styles';
+import { NodeLogo } from '@/components/common/node-logo';
 
 interface DraggableNodeItemProps {
   node: TNodeMetadata;
@@ -41,7 +41,7 @@ export function DraggableNodeItem({ node, className }: DraggableNodeItemProps) {
       {/* Left Icon */}
       <div className="flex-shrink-0 mt-0.5">
         <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-          <IconCube size={18} className="text-primary" />
+          <NodeLogo node={node} size="md" />
         </div>
       </div>
 

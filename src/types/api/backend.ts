@@ -16,6 +16,7 @@ export interface BackendNodeType {
   description?: string;
   has_form?: boolean;
   category?: string;
+  icon?: string;  // Auto-discovered icon path (e.g., "Store/icon.png")
   input_ports?: NodePort[];
   output_ports?: NodePort[];
 }

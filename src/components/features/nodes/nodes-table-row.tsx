@@ -18,6 +18,7 @@ import {
 } from "@tabler/icons-react";
 import { TNodeMetadata } from "@/types";
 import { getBadgeStyles } from "@/constants/node-styles";
+import { NodeLogo } from "@/components/common/node-logo";
 
 interface ColumnConfig {
   id: string;
@@ -76,10 +77,13 @@ export function NodesTableRow({
       </TableCell>
       {columns.find(col => col.id === "name")?.visible && (
         <TableCell>
-          <div>
-            <div className="font-medium">{node.label || node.name}</div>
-            <div className="text-sm text-muted-foreground font-mono">
-              {node.identifier}
+          <div className="flex items-center gap-3">
+            <NodeLogo node={node} size="sm" />
+            <div>
+              <div className="font-medium">{node.label || node.name}</div>
+              <div className="text-sm text-muted-foreground font-mono">
+                {node.identifier}
+              </div>
             </div>
           </div>
         </TableCell>

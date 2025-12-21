@@ -16,6 +16,7 @@ export interface TNodeMetadata {
   form_class?: string;
   file_path?: string;
   category?: string;
+  icon?: string;  // Auto-discovered icon path (e.g., "Store/icon.png")
 }
 
 /**

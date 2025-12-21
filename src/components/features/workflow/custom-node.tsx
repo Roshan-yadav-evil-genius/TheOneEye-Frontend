@@ -202,6 +202,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
               node={{
                 name: data.node_type?.name || 'Unknown',
                 type: data.node_type?.type || 'unknown',
+                icon: data.node_type?.icon,
               }}
               size="lg"
             />
