@@ -76,7 +76,7 @@ export const JinjaSyntaxHighlighter = React.forwardRef<HTMLTextAreaElement, Jinj
         rows={rows}
         id={id}
         className={cn(
-          "w-full bg-background text-foreground resize-none",
+          "w-full bg-background text-foreground resize-y min-h-[80px]",
           "font-mono text-sm leading-relaxed",
           "border border-input focus:border-primary/50",
           "placeholder:text-muted-foreground/60",

@@ -134,7 +134,7 @@ export function DroppableFormInput({
           rows={rows}
           className={cn(
             baseInputClasses,
-            "py-2 resize-none",
+            "py-2 resize-y min-h-[80px]",
             isOverInput && "border-pink-400 bg-pink-900/10",
             className
           )}
