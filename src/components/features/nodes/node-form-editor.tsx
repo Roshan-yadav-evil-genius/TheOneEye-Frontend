@@ -19,6 +19,8 @@ interface NodeFormEditorProps {
   onSave?: () => void;
   /** Loading state for the Save button */
   isSaving?: boolean;
+  /** Form state from execution errors (with validation errors) */
+  executionFormState?: TNodeFormData | null;
 }
 
 export function NodeFormEditor({
@@ -30,6 +32,7 @@ export function NodeFormEditor({
   showExecuteButton = true,
   onSave,
   isSaving = false,
+  executionFormState,
 }: NodeFormEditorProps) {
   const [formState, setFormState] = useState<TNodeFormData | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -119,6 +122,22 @@ export function NodeFormEditor({
       onFormValuesChange(formValues);
     }
   }, [formValues, onFormValuesChange]);
+
+  // Update formState when execution returns validation errors
+  useEffect(() => {
+    if (executionFormState) {
+      setFormState(executionFormState);
+      
+      // Update form values with rendered values from backend
+      const updatedValues: Record<string, string> = {};
+      executionFormState.fields?.forEach((field) => {
+        if (field.value !== undefined && field.value !== null) {
+          updatedValues[field.name] = String(field.value);
+        }
+      });
+      setFormValues(updatedValues);
+    }
+  }, [executionFormState]);
 
   // After form loads with persisted values, load options for dependent fields
   useEffect(() => {

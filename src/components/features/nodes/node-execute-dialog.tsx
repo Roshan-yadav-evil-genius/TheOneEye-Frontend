@@ -12,7 +12,8 @@ import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { JsonViewer } from "@/components/features/workflow/json-viewer";
 import { NodeFormEditor } from "./node-form-editor";
 import { ApiService } from "@/lib/api/api-service";
-import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
+import { TNodeMetadata, TNodeExecuteResponse, TNodeFormData } from "@/types";
+import { uiHelpers } from "@/stores/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Loader2 } from "lucide-react";
@@ -127,6 +128,16 @@ export function NodeExecuteDialog({
     // In standalone mode: load last output from store
     return getOutputData(node.identifier);
   });
+
+  // Form state from execution validation errors
+  const [executionFormState, setExecutionFormState] = useState<TNodeFormData | null>(null);
+
+  // Clear execution form state when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setExecutionFormState(null);
+    }
+  }, [isOpen]);
 
   // Load data when dialog opens or node changes
   useEffect(() => {
@@ -272,7 +283,23 @@ export function NodeExecuteDialog({
             output: response.output,
             error: response.error,
             error_type: response.error_type,
+            message: response.message,
+            form: response.form,
           };
+
+          // Handle form validation errors - show in form
+          if (!response.success && response.error_type === 'FormValidationError' && response.form) {
+            setExecutionFormState(response.form);
+          } else if (!response.success) {
+            // Show non-field errors in toast
+            uiHelpers.showError(
+              "Execution Failed",
+              response.error || response.message || "An error occurred during execution"
+            );
+            setExecutionFormState(null);
+          } else {
+            setExecutionFormState(null);
+          }
 
           // Update the local store with the execution data so it persists without page refresh
           if (response.success) {
@@ -298,6 +325,21 @@ export function NodeExecuteDialog({
             form_data: formData,
             session_id: sessionId,
           });
+
+          // Handle errors for standalone mode too
+          if (!result.success) {
+            if (result.error_type === 'FormValidationError' && result.form) {
+              setExecutionFormState(result.form);
+            } else {
+              uiHelpers.showError(
+                "Execution Failed",
+                result.error || result.message || "An error occurred during execution"
+              );
+              setExecutionFormState(null);
+            }
+          } else {
+            setExecutionFormState(null);
+          }
         }
 
         setOutputData(result);
@@ -492,6 +534,7 @@ export function NodeExecuteDialog({
                     showExecuteButton={false}
                     onSave={isWorkflowMode ? handleSave : undefined}
                     isSaving={isSaving}
+                    executionFormState={executionFormState}
                   />
                 </div>
               </div>

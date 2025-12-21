@@ -52,6 +52,8 @@ export interface BackendWorkflowNode {
   node_type: BackendNodeType;
 }
 
+import { TNodeFormData } from '../node';
+
 // Response from execute_and_save_node endpoint
 export interface WorkflowNodeExecuteResponse {
   success: boolean;
@@ -62,6 +64,8 @@ export interface WorkflowNodeExecuteResponse {
   output?: unknown;
   error?: string;
   error_type?: string;
+  message?: string;
+  form?: TNodeFormData;
 }
 
 // Represents a Connection between nodes in a workflow

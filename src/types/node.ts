@@ -117,6 +117,8 @@ export interface TNodeExecuteResponse {
   error?: string;
   error_type?: string;
   details?: string;
+  message?: string;
+  form?: TNodeFormData;
 }
 
 /**
