@@ -78,7 +78,7 @@ export function NodesTableRow({
       {columns.find(col => col.id === "name")?.visible && (
         <TableCell>
           <div className="flex items-center gap-3">
-            <NodeLogo node={node} size="sm" />
+            <NodeLogo node={node} size="md" />
             <div>
               <div className="font-medium">{node.label || node.name}</div>
               <div className="text-sm text-muted-foreground font-mono">

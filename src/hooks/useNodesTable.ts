@@ -49,12 +49,27 @@ export const useNodesTable = ({ nodes }: UseNodesTableProps) => {
   const typeFilter = filters.type || 'all';
   const categoryFilter = filters.category || 'all';
 
-  // Apply type and category filters
+  // Apply type and category filters, then sort by category
   const filteredNodes = useMemo(() => {
-    return filteredBySearch.filter((node) => {
+    const filtered = filteredBySearch.filter((node) => {
       const matchesType = typeFilter === 'all' || node.type === typeFilter;
       const matchesCategory = categoryFilter === 'all' || node.category === categoryFilter;
       return matchesType && matchesCategory;
+    });
+    
+    // Sort by category alphabetically, then by name within each category
+    return filtered.sort((a, b) => {
+      const categoryA = (a.category || 'Uncategorized').toLowerCase();
+      const categoryB = (b.category || 'Uncategorized').toLowerCase();
+      
+      if (categoryA !== categoryB) {
+        return categoryA.localeCompare(categoryB);
+      }
+      
+      // Within the same category, sort by name
+      const nameA = (a.label || a.name || '').toLowerCase();
+      const nameB = (b.label || b.name || '').toLowerCase();
+      return nameA.localeCompare(nameB);
     });
   }, [filteredBySearch, typeFilter, categoryFilter]);
 
