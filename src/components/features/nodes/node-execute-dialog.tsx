@@ -20,6 +20,7 @@ import { useNodeTestDataStore } from "@/stores/node-test-data-store";
 import { useWorkflowCanvasStore } from "@/stores";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { workflowApi } from "@/lib/api/services/workflow-api";
+import { NodeLogo } from "@/components/common/node-logo";
 
 // Get or create a single node execution ID (stored in localStorage)
 // Used to generate deterministic session IDs for standalone mode
@@ -82,7 +83,7 @@ export function NodeExecuteDialog({
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
   // Get persisted test data from store (for standalone mode)
-  const { 
+  const {
     getInputData, setInputData: persistInputData,
     getFormData, setFormData: persistFormData,
     getOutputData, setOutputData: persistOutputData,
@@ -137,7 +138,7 @@ export function NodeExecuteDialog({
         } else if (workflowContext?.savedInputData) {
           setInputData(workflowContext.savedInputData as Record<string, unknown>);
         }
-        
+
         if (workflowContext?.savedFormValues) {
           const formValues: Record<string, string> = {};
           for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
@@ -145,7 +146,7 @@ export function NodeExecuteDialog({
           }
           setPersistedFormValues(formValues);
         }
-        
+
         if (workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
           setOutputData({
             success: true,
@@ -176,7 +177,7 @@ export function NodeExecuteDialog({
       persistFormData(node.identifier, data);
     }
   }, [node.identifier, persistFormData, isWorkflowMode]);
-  
+
   const [isExecuting, setIsExecuting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -251,7 +252,7 @@ export function NodeExecuteDialog({
 
       try {
         let result: TNodeExecuteResponse;
-        
+
         if (isWorkflowMode && workflowContext) {
           // Workflow mode: use execute_and_save_node API (saves to DB)
           const response = await workflowApi.executeAndSaveNode(
@@ -263,7 +264,7 @@ export function NodeExecuteDialog({
               session_id: sessionId,
             }
           );
-          
+
           // Convert workflow response to standard format
           result = {
             success: response.success,
@@ -271,7 +272,7 @@ export function NodeExecuteDialog({
             error: response.error,
             error_type: response.error_type,
           };
-          
+
           // Update the local store with the execution data so it persists without page refresh
           if (response.success) {
             // Extract output_data from the response
@@ -282,7 +283,7 @@ export function NodeExecuteDialog({
             } else if (outputPayload && typeof outputPayload === 'object') {
               outputData = outputPayload as Record<string, unknown>;
             }
-            
+
             updateNodeExecutionData(workflowContext.nodeInstanceId, {
               form_values: formData,
               input_data: inputData,
@@ -297,9 +298,9 @@ export function NodeExecuteDialog({
             session_id: sessionId,
           });
         }
-        
+
         setOutputData(result);
-        
+
         // Persist output to store (standalone mode only)
         if (!isWorkflowMode) {
           persistOutputData(node.identifier, result);
@@ -312,7 +313,7 @@ export function NodeExecuteDialog({
           error_type: "ExecutionError",
         };
         setOutputData(errorResult);
-        
+
         // Persist error result too
         if (!isWorkflowMode) {
           persistOutputData(node.identifier, errorResult);
@@ -327,7 +328,7 @@ export function NodeExecuteDialog({
   // Save form values to DB (workflow mode only)
   const handleSave = useCallback(async () => {
     if (!isWorkflowMode || !workflowContext) return;
-    
+
     setIsSaving(true);
     try {
       await workflowApi.updateNodeFormValues(
@@ -357,8 +358,8 @@ export function NodeExecuteDialog({
   };
 
   return (
-    <DndContext 
-      onDragStart={handleDragStart} 
+    <DndContext
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       collisionDetection={pointerWithin}
     >
@@ -372,12 +373,15 @@ export function NodeExecuteDialog({
             {/* Header */}
             <div className="flex items-center justify-between px-5 pr-10 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
               <div className="flex items-center gap-3">
-                <Badge className={getTypeBadgeColor(node.type)}>
-                  {node.type}
-                </Badge>
+                <NodeLogo node={node} size="md" />
+
                 <div>
-                  <h2 className="text-sm font-semibold text-white">
-                    {node.label || node.name}
+                  <h2 className="text-sm font-semibold text-white space-x-2">
+                    <span>{node.label || node.name}</span>
+                                       
+                    <Badge className={getTypeBadgeColor(node.type)}>
+                      {node.type}
+                    </Badge>
                   </h2>
                   <p className="text-xs text-gray-400 font-mono">
                     {node.identifier}

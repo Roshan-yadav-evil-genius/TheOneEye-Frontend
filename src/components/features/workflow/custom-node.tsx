@@ -57,6 +57,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     description: data.node_type?.description,
     has_form: data.node_type?.has_form ?? false,
     category: data.node_type?.category,
+    icon: data.node_type?.icon,
   }), [data.node_type]);
 
   // Get port configurations with defaults
