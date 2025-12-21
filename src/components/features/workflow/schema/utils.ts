@@ -1,5 +1,5 @@
 import React from 'react';
-import { Hash, Type, Folder, FileText } from 'lucide-react';
+import { Hash, Type, Braces, Brackets, ToggleLeft } from 'lucide-react';
 import { SchemaField } from './types';
 
 /**
@@ -8,17 +8,17 @@ import { SchemaField } from './types';
 export function getTypeIcon(type: string): React.ReactNode {
   switch (type) {
     case 'number':
-      return React.createElement(Hash, { className: "w-3 h-3 text-blue-400" });
+      return React.createElement(Hash, { className: "w-3.5 h-3.5 text-blue-400" });
     case 'string':
-      return React.createElement(Type, { className: "w-3 h-3 text-green-400" });
+      return React.createElement(Type, { className: "w-3.5 h-3.5 text-green-400" });
     case 'boolean':
-      return React.createElement(Hash, { className: "w-3 h-3 text-blue-400" });
+      return React.createElement(ToggleLeft, { className: "w-3.5 h-3.5 text-orange-400" });
     case 'object':
-      return React.createElement(Folder, { className: "w-3 h-3 text-purple-400" });
+      return React.createElement(Braces, { className: "w-3.5 h-3.5 text-purple-400" });
     case 'array':
-      return React.createElement(FileText, { className: "w-3 h-3 text-purple-400" });
+      return React.createElement(Brackets, { className: "w-3.5 h-3.5 text-cyan-400" });
     default:
-      return React.createElement(Type, { className: "w-3 h-3 text-gray-400" });
+      return React.createElement(Type, { className: "w-3.5 h-3.5 text-gray-400" });
   }
 }
 

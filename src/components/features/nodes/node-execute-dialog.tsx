@@ -18,9 +18,10 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Loader2 } from "lucide-react";
 import { useNodeTestDataStore } from "@/stores/node-test-data-store";
 import { useWorkflowCanvasStore } from "@/stores";
-import { getBadgeStyles } from "@/constants/node-styles";
+import { getBadgeStyles, getIconColor } from "@/constants/node-styles";
 import { workflowApi } from "@/lib/api/services/workflow-api";
 import { NodeLogo } from "@/components/common/node-logo";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 // Get or create a single node execution ID (stored in localStorage)
 // Used to generate deterministic session IDs for standalone mode
@@ -357,6 +358,19 @@ export function NodeExecuteDialog({
     return `${styles.bg} ${styles.text}`;
   };
 
+  const getNodeTypeDescription = (type: string): string => {
+    switch (type) {
+      case 'BlockingNode':
+        return 'Blocking nodes pause workflow execution until they complete. The workflow waits for the result before proceeding to the next node.';
+      case 'NonBlockingNode':
+        return 'Non-blocking nodes execute asynchronously. The workflow continues immediately without waiting for completion.';
+      case 'ProducerNode':
+        return 'Producer nodes generate or fetch data that can be used by other nodes in the workflow.';
+      default:
+        return 'Standard node type with default execution behavior.';
+    }
+  };
+
   return (
     <DndContext
       onDragStart={handleDragStart}
@@ -364,45 +378,46 @@ export function NodeExecuteDialog({
       collisionDetection={pointerWithin}
     >
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="!max-w-[95vw] h-[90vh] bg-gray-900 border-gray-700 !p-0">
+        <DialogContent className="!max-w-[95vw] h-[90vh] bg-background border-border !p-0 shadow-2xl">
           <VisuallyHidden>
             <DialogTitle>Execute Node: {node.name}</DialogTitle>
           </VisuallyHidden>
 
           <div className="flex flex-col h-full overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pr-10 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <NodeLogo node={node} size="md" />
-
-                <div>
-                  <h2 className="text-sm font-semibold text-white space-x-2">
-                    <span>{node.label || node.name}</span>
-                                       
-                    <Badge className={getTypeBadgeColor(node.type)}>
-                      {node.type}
-                    </Badge>
-                  </h2>
-                  <p className="text-xs text-gray-400 font-mono">
-                    {node.identifier}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between px-4 pr-12 py-2.5 border-b border-border bg-card/95 backdrop-blur-sm shadow-md flex-shrink-0 transition-all duration-200">
+              <div className="flex items-center gap-2.5">
+                <NodeLogo node={node} size="sm" />
+                <h2 className="text-sm font-semibold text-foreground leading-tight">
+                  {node.label || node.name}
+                  <span className="text-muted-foreground font-normal ml-1">
+                    ({node.identifier})
+                  </span>
+                </h2>
               </div>
               {/* Header action buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 mr-2">
                 {/* Execute button */}
                 <Button
                   size="sm"
                   onClick={handleExecuteClick}
                   disabled={isExecuting || isSaving}
-                  className="flex items-center gap-1.5"
+                  className="relative flex items-center gap-2 px-4 py-2 font-medium shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95 disabled:hover:scale-100 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isExecuting ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Executing...</span>
+                    </>
                   ) : (
-                    <Play className="w-3.5 h-3.5" />
+                    <>
+                      <Play className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+                      <span>Execute</span>
+                    </>
                   )}
-                  {isExecuting ? "Executing..." : "Execute"}
+                  {!isExecuting && !isSaving && (
+                    <span className="absolute inset-0 rounded-md bg-primary/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300 -z-10"></span>
+                  )}
                 </Button>
                 {/* Reset button - clears node state for fresh execution */}
                 <Button
@@ -410,10 +425,10 @@ export function NodeExecuteDialog({
                   size="sm"
                   onClick={handleReset}
                   disabled={isExecuting || isSaving}
-                  className="flex items-center gap-1.5 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white"
+                  className="flex items-center gap-2 px-4 py-2 font-medium border-border/50 hover:border-border hover:bg-muted/50 transition-all duration-300 hover:scale-105 active:scale-95 disabled:hover:scale-100 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Reset
+                  <RotateCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                  <span>Reset</span>
                 </Button>
               </div>
             </div>
@@ -426,7 +441,7 @@ export function NodeExecuteDialog({
               className="flex-1 overflow-hidden"
             >
               {/* INPUT Panel */}
-              <div className="h-full flex flex-col overflow-hidden border-r border-gray-700">
+              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-blue-500/30 bg-background transition-all duration-200">
                 <JsonViewer
                   title="INPUT"
                   statusColor="bg-blue-500"
@@ -440,10 +455,32 @@ export function NodeExecuteDialog({
               </div>
 
               {/* FORM Panel */}
-              <div className="h-full flex flex-col overflow-hidden border-r border-gray-700 bg-gray-900">
-                <div className="flex items-center gap-2 p-2 border-b border-gray-700 bg-gray-800 flex-shrink-0">
-                  <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                  <h3 className="text-white font-medium text-sm">FORM</h3>
+              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-pink-500/30 bg-background transition-all duration-200">
+                <div className="flex items-center justify-between gap-2 px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 bg-pink-500 rounded-full shadow-[0_0_8px_rgba(236,72,153,0.6)] animate-pulse"></div>
+                    <h3 className="text-foreground font-medium text-sm tracking-wide">
+                      {isWorkflowMode && workflowContext 
+                        ? `Form(${workflowContext.nodeInstanceId})` 
+                        : 'FORM'}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* Node Type Badge with Tooltip */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge className={`${getTypeBadgeColor(node.type)} border transition-all duration-200 hover:scale-105 cursor-help text-xs font-medium px-2 py-0.5`}>
+                          {node.type}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <div className="space-y-1">
+                          <p className="font-semibold">{node.type}</p>
+                          <p className="text-xs opacity-90">{getNodeTypeDescription(node.type)}</p>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <NodeFormEditor
@@ -460,7 +497,13 @@ export function NodeExecuteDialog({
               </div>
 
               {/* OUTPUT Panel */}
-              <div className="h-full flex flex-col overflow-hidden">
+              <div className={`h-full flex flex-col overflow-hidden border-l-2 ${
+                outputData?.success 
+                  ? "border-l-green-500/30" 
+                  : outputData?.error 
+                  ? "border-l-red-500/30" 
+                  : "border-l-yellow-500/30"
+              } bg-background transition-all duration-200`}>
                 <JsonViewer
                   title="OUTPUT"
                   statusColor={outputData?.success ? "bg-green-500" : outputData?.error ? "bg-red-500" : "bg-yellow-500"}
