@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useDroppable, useDndMonitor } from '@dnd-kit/core';
-import { JinjaSyntaxHighlighter } from "./JinjaSyntaxHighlighter";
+import { Textarea } from "@/components/ui/textarea";
 import { isExpression, validateTemplate, convertPathToExpression } from "./expression-utils";
 import { cn } from "@/lib/utils";
 
@@ -129,18 +129,25 @@ export function TemplateInputField({
             isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
           )}
         >
-          <JinjaSyntaxHighlighter
+          <Textarea
             ref={textareaRef}
             value={value}
-            onChange={onChange}
+            onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={rows}
             id={id}
-            error={error}
             className={cn(
+              "w-full bg-background resize-y min-h-[80px]",
+              "font-mono text-sm leading-relaxed",
+              "border border-input focus:border-primary/50",
+              "placeholder:text-muted-foreground/60",
+              error && "border-red-500 focus:border-red-500",
               isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
             )}
           />
+          {error && (
+            <p className="text-sm text-red-500 mt-1">{error}</p>
+          )}
           
           {isOverInput && (
             <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none">
