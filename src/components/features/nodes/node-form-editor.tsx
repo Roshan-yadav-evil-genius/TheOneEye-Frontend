@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NodeFormField } from "./node-form-field";
-import { ApiService } from "@/lib/api/api-service";
-import { TNodeMetadata, TNodeFormData } from "@/types";
+import { TNodeMetadata } from "@/types";
 import { IconPlayerPlay, IconLoader2, IconDeviceFloppy } from "@tabler/icons-react";
+import { useFormLoader } from "@/hooks/useFormLoader";
+import { useFieldDependencies } from "@/hooks/useFieldDependencies";
+import { useDynamicFieldOptions } from "@/hooks/useDynamicFieldOptions";
+import { useFormState } from "@/hooks/useFormState";
 
 interface NodeFormEditorProps {
   node: TNodeMetadata;
@@ -34,110 +37,42 @@ export function NodeFormEditor({
   isSaving = false,
   executionFormState,
 }: NodeFormEditorProps) {
-  const [formState, setFormState] = useState<TNodeFormData | null>(null);
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
-  const [isLoadingForm, setIsLoadingForm] = useState(true);
-  const [formError, setFormError] = useState<string | null>(null);
-  
-  // Ref to always get the latest formValues (avoids stale closure in callbacks)
-  const formValuesRef = useRef<Record<string, string>>(formValues);
-  useEffect(() => {
-    formValuesRef.current = formValues;
-  }, [formValues]);
-
-  // Get all transitive dependent fields (recursive)
-  const getAllDependentFields = useCallback(
-    (fieldName: string, visited = new Set<string>()): string[] => {
-      if (!formState?.dependencies || visited.has(fieldName)) return [];
-      visited.add(fieldName);
-      
-      const directDependents = formState.dependencies[fieldName] || [];
-      const allDependents: string[] = [...directDependents];
-      
-      for (const dependent of directDependents) {
-        allDependents.push(...getAllDependentFields(dependent, visited));
-      }
-      
-      return allDependents;
-    },
-    [formState?.dependencies]
+  // Load form schema
+  const { formState: loadedFormState, isLoading: isLoadingForm, error: formError } = useFormLoader(
+    node.identifier,
+    node.has_form
   );
 
-  // Load form schema from API
-  useEffect(() => {
-    const loadForm = async () => {
-      setIsLoadingForm(true);
-      setFormError(null);
-      try {
-        const response = await ApiService.getNodeForm(node.identifier);
-        
-        if (response.form) {
-          setFormState(response.form);
-          
-          // Initialize form values - prefer persisted values, fall back to defaults
-          const defaultValues: Record<string, string> = {};
-          response.form.fields?.forEach((field) => {
-            if (field.value !== undefined && field.value !== null) {
-              defaultValues[field.name] = String(field.value);
-            } else if (field.options?.find((o) => o.selected)) {
-              const selected = field.options.find((o) => o.selected);
-              if (selected) {
-                defaultValues[field.name] = selected.value;
-              }
-            } else {
-              defaultValues[field.name] = "";
-            }
-          });
-          
-          // Merge persisted values with defaults (persisted takes precedence)
-          const mergedValues = initialFormValues && Object.keys(initialFormValues).length > 0
-            ? { ...defaultValues, ...initialFormValues }
-            : defaultValues;
-          
-          setFormValues(mergedValues);
-        } else {
-          console.warn("[NodeFormEditor] No form in response, message:", response.message);
-          setFormError(response.message || "This node does not have a form");
-        }
-      } catch (error) {
-        console.error("[NodeFormEditor] Failed to load node form:", error);
-        setFormError("Failed to load form");
-      } finally {
-        setIsLoadingForm(false);
-      }
-    };
+  // Manage form state with local state for updates
+  const [formState, setFormState] = useState(loadedFormState);
 
-    if (node.has_form) {
-      loadForm();
-    } else {
-      setIsLoadingForm(false);
-      setFormError("This node does not have a form");
-    }
-  }, [node.identifier, node.has_form]);
-
-  // Notify parent when form values change
+  // Update formState when loaded form changes
+  // Only update if formState actually changed to avoid unnecessary re-renders
   useEffect(() => {
-    if (onFormValuesChange && Object.keys(formValues).length > 0) {
-      onFormValuesChange(formValues);
+    if (loadedFormState) {
+      setFormState(loadedFormState);
     }
-  }, [formValues, onFormValuesChange]);
+  }, [loadedFormState]);
 
   // Update formState when execution returns validation errors
   useEffect(() => {
     if (executionFormState) {
       setFormState(executionFormState);
-      
-      // Update form values with rendered values from backend
-      const updatedValues: Record<string, string> = {};
-      executionFormState.fields?.forEach((field) => {
-        if (field.value !== undefined && field.value !== null) {
-          updatedValues[field.name] = String(field.value);
-        }
-      });
-      setFormValues(updatedValues);
     }
   }, [executionFormState]);
+
+  // Manage form state
+  const { formValues, setFormValues, updateFieldValue, formValuesRef } = useFormState(formState, {
+    initialFormValues,
+    executionFormState,
+    onFormValuesChange,
+  });
+
+  // Field dependencies
+  const { getAllDependentFields } = useFieldDependencies(formState);
+
+  // Dynamic field options
+  const { loadingFields, updateFieldOptions } = useDynamicFieldOptions(formState, setFormState);
 
   // After form loads with persisted values, load options for dependent fields
   useEffect(() => {
@@ -152,40 +87,15 @@ export function NodeFormEditor({
         if (!parentValue) continue;
 
         const dependentFields = formState.dependencies[parentField];
-        
-        for (const dependentField of dependentFields) {
-          setLoadingFields((prev) => new Set(prev).add(dependentField));
-          
-          try {
-            const response = await ApiService.getNodeFieldOptions(node.identifier, {
-              parent_field: parentField,
-              parent_value: parentValue,
-              dependent_field: dependentField,
-              form_values: initialFormValues,
-            });
 
-            // Update the dependent field's options
-            setFormState((prev) => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                fields: prev.fields.map((field) => {
-                  if (field.name === dependentField) {
-                    return { ...field, options: response.options };
-                  }
-                  return field;
-                }),
-              };
-            });
-          } catch (error) {
-            console.error(`Failed to load initial options for ${dependentField}:`, error);
-          } finally {
-            setLoadingFields((prev) => {
-              const next = new Set(prev);
-              next.delete(dependentField);
-              return next;
-            });
-          }
+        for (const dependentField of dependentFields) {
+          await updateFieldOptions(
+            node.identifier,
+            parentField,
+            parentValue,
+            dependentField,
+            initialFormValues
+          );
         }
       }
     };
@@ -193,14 +103,14 @@ export function NodeFormEditor({
     if (!isLoadingForm && formState) {
       loadDependentFieldOptions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingForm, formState?.dependencies, node.identifier]);
 
   // Handle field value change with dynamic field updates
   const handleFieldChange = useCallback(
     async (fieldName: string, value: string) => {
       // Update the field value
-      setFormValues((prev) => ({ ...prev, [fieldName]: value }));
+      updateFieldValue(fieldName, value);
 
       // Clear all transitive dependent field values immediately
       const allDependents = getAllDependentFields(fieldName);
@@ -220,49 +130,22 @@ export function NodeFormEditor({
 
         // Load options for each dependent field
         for (const dependentField of dependentFields) {
-          setLoadingFields((prev) => new Set(prev).add(dependentField));
+          // Use ref to get latest formValues (avoids stale closure)
+          const currentFormValues = { ...formValuesRef.current, [fieldName]: value };
+          await updateFieldOptions(
+            node.identifier,
+            fieldName,
+            value,
+            dependentField,
+            currentFormValues
+          );
 
-          try {
-            // Use ref to get latest formValues (avoids stale closure)
-            const response = await ApiService.getNodeFieldOptions(node.identifier, {
-              parent_field: fieldName,
-              parent_value: value,
-              dependent_field: dependentField,
-              form_values: { ...formValuesRef.current, [fieldName]: value },
-            });
-
-            // Update the dependent field's options
-            setFormState((prev) => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                fields: prev.fields.map((field) => {
-                  if (field.name === dependentField) {
-                    return {
-                      ...field,
-                      options: response.options,
-                    };
-                  }
-                  return field;
-                }),
-              };
-            });
-
-            // Clear the dependent field's value
-            setFormValues((prev) => ({ ...prev, [dependentField]: "" }));
-          } catch (error) {
-            console.error(`Failed to load options for ${dependentField}:`, error);
-          } finally {
-            setLoadingFields((prev) => {
-              const next = new Set(prev);
-              next.delete(dependentField);
-              return next;
-            });
-          }
+          // Clear the dependent field's value
+          setFormValues((prev) => ({ ...prev, [dependentField]: "" }));
         }
       }
     },
-    [formState?.dependencies, node.identifier, getAllDependentFields]
+    [formState?.dependencies, node.identifier, getAllDependentFields, updateFieldValue, setFormValues, updateFieldOptions, formValuesRef]
   );
 
   const handleExecute = () => {

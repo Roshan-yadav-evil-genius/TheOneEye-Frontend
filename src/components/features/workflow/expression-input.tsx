@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDroppable, useDndMonitor } from '@dnd-kit/core';
 import { convertPathToExpression } from './expression-utils';
 import { cn } from '@/lib/utils';
+import { ExpressionParser } from '@/services/expression/expression-parser';
+import { ExpressionHighlighter } from '@/services/expression/expression-highlighter';
+import { jinja2Parser } from '@/services/expression/jinja2-parser';
+import { defaultHighlighter } from '@/services/expression/default-highlighter';
 
 interface ExpressionInputProps {
   type?: 'text' | 'textarea';
@@ -14,30 +18,11 @@ interface ExpressionInputProps {
   id?: string;
   rows?: number;
   error?: string;
+  /** Custom expression parser (defaults to Jinja2) */
+  parser?: ExpressionParser;
+  /** Custom expression highlighter (defaults to default highlighter) */
+  highlighter?: ExpressionHighlighter;
 }
-
-// Extract all Jinja expressions from text
-const extractExpressions = (text: string): Array<{ start: number; end: number; expression: string }> => {
-  const expressions: Array<{ start: number; end: number; expression: string }> = [];
-  const regex = /\{\{[^}]+\}\}/g;
-  let match;
-  
-  while ((match = regex.exec(text)) !== null) {
-    expressions.push({
-      start: match.index,
-      end: match.index + match[0].length,
-      expression: match[0]
-    });
-  }
-  
-  return expressions;
-};
-
-// Check if cursor is inside an expression
-const getExpressionAtPosition = (text: string, position: number): { start: number; end: number; expression: string } | null => {
-  const expressions = extractExpressions(text);
-  return expressions.find(expr => position >= expr.start && position <= expr.end) || null;
-};
 
 export function ExpressionInput({
   type = 'text',
@@ -47,7 +32,9 @@ export function ExpressionInput({
   className,
   id,
   rows = 3,
-  error
+  error,
+  parser = jinja2Parser,
+  highlighter = defaultHighlighter,
 }: ExpressionInputProps) {
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const [isOverInput, setIsOverInput] = useState(false);
@@ -119,7 +106,7 @@ export function ExpressionInput({
         }
         
         // Check if cursor is at the start of an expression
-        const expression = getExpressionAtPosition(value, start);
+        const expression = parser.getExpressionAtPosition(value, start);
         if (expression && start === expression.start) {
           // Delete the entire expression
           e.preventDefault();
@@ -158,47 +145,11 @@ export function ExpressionInput({
     setIsFocused(false);
   };
 
-  // Render with highlighted expressions
+  // Render with highlighted expressions using the highlighter
   const renderWithHighlights = (text: string): React.ReactNode => {
     if (!text) return null;
-    
-    const expressions = extractExpressions(text);
-    if (expressions.length === 0) {
-      return <span>{text}</span>;
-    }
-    
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    
-    expressions.forEach((expr, idx) => {
-      // Add text before expression
-      if (expr.start > lastIndex) {
-        parts.push(
-          <span key={`text-${idx}`}>{text.slice(lastIndex, expr.start)}</span>
-        );
-      }
-      
-      // Add highlighted expression
-      parts.push(
-        <span
-          key={`expr-${idx}`}
-          className="bg-green-500/20 text-green-300 px-1 py-0.5 rounded font-mono"
-        >
-          {expr.expression}
-        </span>
-      );
-      
-      lastIndex = expr.end;
-    });
-    
-    // Add remaining text
-    if (lastIndex < text.length) {
-      parts.push(
-        <span key="text-end">{text.slice(lastIndex)}</span>
-      );
-    }
-    
-    return <>{parts}</>;
+    const expressions = parser.extractExpressions(text);
+    return highlighter.renderWithHighlights(text, expressions);
   };
 
   const isTextarea = type === 'textarea';

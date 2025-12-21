@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import {
   Dialog,
@@ -11,43 +11,16 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { JsonViewer } from "@/components/features/workflow/json-viewer";
 import { NodeFormEditor } from "./node-form-editor";
-import { ApiService } from "@/lib/api/api-service";
-import { TNodeMetadata, TNodeExecuteResponse, TNodeFormData } from "@/types";
-import { uiHelpers } from "@/stores/ui";
+import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Loader2 } from "lucide-react";
-import { useNodeTestDataStore } from "@/stores/node-test-data-store";
-import { useWorkflowCanvasStore } from "@/stores";
-import { getBadgeStyles, getIconColor } from "@/constants/node-styles";
-import { workflowApi } from "@/lib/api/services/workflow-api";
+import { getBadgeStyles } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-
-// Get or create a single node execution ID (stored in localStorage)
-// Used to generate deterministic session IDs for standalone mode
-function getSingleNodeExecutionId(): string {
-  const key = 'single_node_execution_id';
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = `sne_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    localStorage.setItem(key, id);
-  }
-  return id;
-}
-
-// Generate a deterministic session ID based on context
-function generateSessionId(
-  nodeIdentifier: string,
-  workflowContext?: { workflowId: string; nodeInstanceId: string }
-): string {
-  if (workflowContext) {
-    // Workflow mode: use workflow_id + node_instance_id
-    return `${workflowContext.workflowId}_${workflowContext.nodeInstanceId}`;
-  }
-  // Standalone mode: use single_node_execution_id + node_identifier
-  return `${getSingleNodeExecutionId()}_${nodeIdentifier}`;
-}
+import { useNodeSession } from "@/hooks/useNodeSession";
+import { useNodePersistence, WorkflowPersistenceContext } from "@/hooks/useNodePersistence";
+import { useNodeExecution } from "@/hooks/useNodeExecution";
 
 // Workflow context for DB persistence
 export interface WorkflowExecuteContext {
@@ -72,126 +45,62 @@ export function NodeExecuteDialog({
   node,
   workflowContext,
 }: NodeExecuteDialogProps) {
-  // Determine if we're in workflow mode (with DB persistence)
-  const isWorkflowMode = !!workflowContext;
+  // Session management
+  const { sessionId, isWorkflowMode } = useNodeSession(node.identifier, workflowContext);
 
-  // Deterministic session ID for stateful execution
-  // Standalone: sne_xxx_counter, Workflow: wf-123_node-456
-  const sessionId = generateSessionId(node.identifier, workflowContext);
-  const isResettingRef = useRef(false);
+  // Persistence management
+  const persistenceContext: WorkflowPersistenceContext | undefined = workflowContext
+    ? {
+        workflowId: workflowContext.workflowId,
+        nodeInstanceId: workflowContext.nodeInstanceId,
+        savedFormValues: workflowContext.savedFormValues,
+        savedInputData: workflowContext.savedInputData,
+        savedOutputData: workflowContext.savedOutputData,
+        getConnectedNodeOutput: workflowContext.getConnectedNodeOutput,
+      }
+    : undefined;
+
+  const {
+    inputData,
+    formValues: persistedFormValues,
+    outputData,
+    setInputData,
+    setFormValues: setPersistedFormValues,
+    setOutputData,
+  } = useNodePersistence(node.identifier, isWorkflowMode, persistenceContext, isOpen);
+
+  // Execution management
+  const {
+    execute,
+    reset: handleReset,
+    save: handleSave,
+    isExecuting,
+    isSaving,
+    executionFormState,
+    setExecutionFormState,
+  } = useNodeExecution({
+    nodeIdentifier: node.identifier,
+    sessionId,
+    isWorkflowMode,
+    workflowContext: workflowContext
+      ? {
+          workflowId: workflowContext.workflowId,
+          nodeInstanceId: workflowContext.nodeInstanceId,
+        }
+      : undefined,
+    onOutputChange: setOutputData,
+  });
 
   // Tab state
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
-
-  // Get persisted test data from store (for standalone mode)
-  const {
-    getInputData, setInputData: persistInputData,
-    getFormData, setFormData: persistFormData,
-    getOutputData, setOutputData: persistOutputData,
-  } = useNodeTestDataStore();
-
-  // Input JSON state - initialize from workflow context or persisted store
-  const [inputData, setInputData] = useState<Record<string, unknown>>(() => {
-    if (isWorkflowMode) {
-      // In workflow mode: prefer connected node's output, then saved input
-      const connectedOutput = workflowContext?.getConnectedNodeOutput?.();
-      if (connectedOutput && Object.keys(connectedOutput).length > 0) {
-        return connectedOutput;
-      }
-      return (workflowContext?.savedInputData as Record<string, unknown>) || {};
-    }
-    return getInputData(node.identifier);
-  });
-
-  // Form values state - initialize from workflow context or persisted store
-  const [persistedFormValues, setPersistedFormValues] = useState<Record<string, string>>(() => {
-    if (isWorkflowMode && workflowContext?.savedFormValues) {
-      // Convert Record<string, unknown> to Record<string, string>
-      const formValues: Record<string, string> = {};
-      for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
-        formValues[key] = String(value ?? '');
-      }
-      return formValues;
-    }
-    return getFormData(node.identifier);
-  });
-
-  // Output state - initialize from workflow context or persisted store
-  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(() => {
-    if (isWorkflowMode && workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
-      return {
-        success: true,
-        output: { data: workflowContext.savedOutputData },
-      };
-    }
-    // In standalone mode: load last output from store
-    return getOutputData(node.identifier);
-  });
-
-  // Form state from execution validation errors
-  const [executionFormState, setExecutionFormState] = useState<TNodeFormData | null>(null);
 
   // Clear execution form state when dialog closes
   useEffect(() => {
     if (!isOpen) {
       setExecutionFormState(null);
     }
-  }, [isOpen]);
-
-  // Load data when dialog opens or node changes
-  useEffect(() => {
-    if (isOpen) {
-      if (isWorkflowMode) {
-        // In workflow mode: load from workflow context
-        const connectedOutput = workflowContext?.getConnectedNodeOutput?.();
-        if (connectedOutput && Object.keys(connectedOutput).length > 0) {
-          setInputData(connectedOutput);
-        } else if (workflowContext?.savedInputData) {
-          setInputData(workflowContext.savedInputData as Record<string, unknown>);
-        }
-
-        if (workflowContext?.savedFormValues) {
-          const formValues: Record<string, string> = {};
-          for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
-            formValues[key] = String(value ?? '');
-          }
-          setPersistedFormValues(formValues);
-        }
-
-        if (workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
-          setOutputData({
-            success: true,
-            output: { data: workflowContext.savedOutputData },
-          });
-        }
-      } else {
-        // In standalone mode: load from local store
-        setInputData(getInputData(node.identifier));
-        setPersistedFormValues(getFormData(node.identifier));
-        setOutputData(getOutputData(node.identifier));  // Load last output
-      }
-    }
-  }, [isOpen, node.identifier, isWorkflowMode, workflowContext, getInputData, getFormData, getOutputData]);
-
-  // Persist input data whenever it changes (only in standalone mode)
-  const handleInputDataChange = useCallback((data: Record<string, unknown>) => {
-    setInputData(data);
-    if (!isWorkflowMode) {
-      persistInputData(node.identifier, data);
-    }
-  }, [node.identifier, persistInputData, isWorkflowMode]);
-
-  // Persist form data whenever it changes (only in standalone mode)
-  const handleFormValuesChange = useCallback((data: Record<string, string>) => {
-    setPersistedFormValues(data);
-    if (!isWorkflowMode) {
-      persistFormData(node.identifier, data);
-    }
-  }, [node.identifier, persistFormData, isWorkflowMode]);
-
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  }, [isOpen, setExecutionFormState]);
 
   // Drag state for overlay
   const [activeDragKey, setActiveDragKey] = useState<string | null>(null);
@@ -233,167 +142,10 @@ export function NodeExecuteDialog({
     return { message: "No data in output" };
   }, [outputData]);
 
-  // Get store method to update node execution data
-  const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
-
-  // Reset session - clears server-side state (keeps deterministic session_id)
-  const handleReset = useCallback(async () => {
-    if (isResettingRef.current) return;
-    isResettingRef.current = true;
-
-    try {
-      // Clear server-side session
-      await ApiService.resetNodeSession(node.identifier, { session_id: sessionId });
-    } catch (error) {
-      console.error("Failed to reset session:", error);
-    }
-
-    // Clear output (session_id stays the same - deterministic)
-    setOutputData(null);
-    if (!isWorkflowMode) {
-      persistOutputData(node.identifier, null);
-    }
-    isResettingRef.current = false;
-  }, [node.identifier, sessionId, isWorkflowMode, persistOutputData]);
-
-  // Execute node
-  const handleExecute = useCallback(
-    async (formData: Record<string, string>) => {
-      setIsExecuting(true);
-      setOutputData(null);
-
-      try {
-        let result: TNodeExecuteResponse;
-
-        if (isWorkflowMode && workflowContext) {
-          // Workflow mode: use execute_and_save_node API (saves to DB)
-          const response = await workflowApi.executeAndSaveNode(
-            workflowContext.workflowId,
-            workflowContext.nodeInstanceId,
-            {
-              form_values: formData,
-              input_data: inputData,
-              session_id: sessionId,
-            }
-          );
-
-          // Convert workflow response to standard format
-          result = {
-            success: response.success,
-            output: response.output,
-            error: response.error,
-            error_type: response.error_type,
-            message: response.message,
-            form: response.form,
-          };
-
-          // Handle form validation errors - show in form
-          if (!response.success && response.error_type === 'FormValidationError' && response.form) {
-            setExecutionFormState(response.form);
-          } else if (!response.success) {
-            // Show non-field errors in toast
-            uiHelpers.showError(
-              "Execution Failed",
-              response.error || response.message || "An error occurred during execution"
-            );
-            setExecutionFormState(null);
-          } else {
-            setExecutionFormState(null);
-          }
-
-          // Update the local store with the execution data so it persists without page refresh
-          if (response.success) {
-            // Extract output_data from the response
-            const outputPayload = response.output;
-            let outputData: Record<string, unknown> = {};
-            if (outputPayload && typeof outputPayload === 'object' && 'data' in outputPayload) {
-              outputData = (outputPayload as { data: Record<string, unknown> }).data || {};
-            } else if (outputPayload && typeof outputPayload === 'object') {
-              outputData = outputPayload as Record<string, unknown>;
-            }
-
-            updateNodeExecutionData(workflowContext.nodeInstanceId, {
-              form_values: formData,
-              input_data: inputData,
-              output_data: outputData,
-            });
-          }
-        } else {
-          // Standalone mode: use regular execute API with session_id for stateful execution
-          result = await ApiService.executeNode(node.identifier, {
-            input_data: inputData,
-            form_data: formData,
-            session_id: sessionId,
-          });
-
-          // Handle errors for standalone mode too
-          if (!result.success) {
-            if (result.error_type === 'FormValidationError' && result.form) {
-              setExecutionFormState(result.form);
-            } else {
-              uiHelpers.showError(
-                "Execution Failed",
-                result.error || result.message || "An error occurred during execution"
-              );
-              setExecutionFormState(null);
-            }
-          } else {
-            setExecutionFormState(null);
-          }
-        }
-
-        setOutputData(result);
-
-        // Persist output to store (standalone mode only)
-        if (!isWorkflowMode) {
-          persistOutputData(node.identifier, result);
-        }
-      } catch (error) {
-        console.error("Node execution failed:", error);
-        const errorResult: TNodeExecuteResponse = {
-          success: false,
-          error: error instanceof Error ? error.message : "Execution failed",
-          error_type: "ExecutionError",
-        };
-        setOutputData(errorResult);
-
-        // Persist error result too
-        if (!isWorkflowMode) {
-          persistOutputData(node.identifier, errorResult);
-        }
-      } finally {
-        setIsExecuting(false);
-      }
-    },
-    [node.identifier, inputData, isWorkflowMode, workflowContext, updateNodeExecutionData, sessionId, persistOutputData]
-  );
-
-  // Save form values to DB (workflow mode only)
-  const handleSave = useCallback(async () => {
-    if (!isWorkflowMode || !workflowContext) return;
-
-    setIsSaving(true);
-    try {
-      await workflowApi.updateNodeFormValues(
-        workflowContext.workflowId,
-        workflowContext.nodeInstanceId,
-        persistedFormValues
-      );
-      // Update local store
-      updateNodeExecutionData(workflowContext.nodeInstanceId, {
-        form_values: persistedFormValues,
-      });
-    } catch (error) {
-      console.error("Failed to save form values:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [isWorkflowMode, workflowContext, persistedFormValues, updateNodeExecutionData]);
-
-  // Wrapper to call handleExecute with current form values (for header button)
+  // Wrapper to call execute with current form values (for header button)
   const handleExecuteClick = useCallback(() => {
-    handleExecute(persistedFormValues);
-  }, [handleExecute, persistedFormValues]);
+    execute(persistedFormValues, inputData);
+  }, [execute, persistedFormValues, inputData]);
 
   const getTypeBadgeColor = (type: string) => {
     const styles = getBadgeStyles(type);
@@ -492,7 +244,7 @@ export function NodeExecuteDialog({
                   onTabChange={setActiveInputTab}
                   enableDragDrop={true}
                   editable={true}
-                  onJsonChange={handleInputDataChange}
+                  onJsonChange={setInputData}
                 />
               </div>
 
@@ -527,12 +279,12 @@ export function NodeExecuteDialog({
                 <div className="flex-1 overflow-hidden">
                   <NodeFormEditor
                     node={node}
-                    onExecute={handleExecute}
+                    onExecute={(formData) => execute(formData, inputData)}
                     isExecuting={isExecuting}
                     initialFormValues={persistedFormValues}
-                    onFormValuesChange={handleFormValuesChange}
+                    onFormValuesChange={setPersistedFormValues}
                     showExecuteButton={false}
-                    onSave={isWorkflowMode ? handleSave : undefined}
+                    onSave={isWorkflowMode ? () => handleSave(persistedFormValues) : undefined}
                     isSaving={isSaving}
                     executionFormState={executionFormState}
                   />
