@@ -70,8 +70,12 @@ export function WorkflowTableRow({
     );
   };
 
+  const handleDoubleClick = () => {
+    onEditWorkflow?.(workflow.id);
+  };
+
   return (
-    <TableRow>
+    <TableRow onDoubleClick={handleDoubleClick} className="cursor-pointer">
       <TableCell>
         <Checkbox
           checked={isSelected}
