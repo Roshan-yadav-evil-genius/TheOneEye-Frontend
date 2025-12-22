@@ -17,26 +17,52 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] sm:w-[150%] sm:h-[150%] lg:w-[100%] lg:h-[100%] rounded-full bg-blue-600/10 blur-[100px]" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <ScrollFadeInSection>
-          <div className="inline-block px-6 py-3 mb-4 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
-            <p className="text-sm font-bold text-slate-50 tracking-wide">For Scale-Ready Founders & Ops Leaders</p>
+          <div className="inline-block px-6 py-3 mb-6 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
+            <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Systems Architecture for Scaling Enterprises</p>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
-            <span className="block">Scale to $5M–$50M</span>
-            <span className="block text-primary">Without Doubling Your Headcount.</span>
+            <span className="block">Stop Managing Tasks.</span>
+            <span className="block text-primary">Start Scaling Systems.</span>
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-300">
-            We replace fragile, human-dependent processes with industrial-grade algorithmic infrastructure. Stop managing people to do what engines do better.
+          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed">
+            We replace human-dependent bottlenecks with autonomous algorithmic infrastructure. Reclaim 20+ hours of your leadership team's week while your business runs on autopilot.
           </p>
-          <div className="mt-8 max-w-2xl mx-auto">
-            <div className="relative bg-slate-800/30 border border-slate-700/50 rounded-xl p-8 backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-xl"></div>
+          <div className="mt-10 max-w-4xl mx-auto">
+            <div className="relative bg-slate-900/80 border-2 border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 rounded-xl"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-primary/70 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-primary/50 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-2xl font-bold text-primary mb-1">$5M+</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Revenue Scale</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-2xl font-bold text-primary mb-1">20+ hrs</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Reclaimed Weekly</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-2xl font-bold text-primary mb-1">0%</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Headcount Growth</div>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-400 font-mono">Architectural Diagram: LinkedIn Prospecting Engine</p>
+                <div className="mt-4 pt-4 border-t border-slate-700/50">
+                  <div className="flex items-center justify-center space-x-3 text-xs text-slate-400">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                      <span>Autonomous Infrastructure</span>
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                      <span>Enterprise Architecture</span>
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                      <span>Zero-Downtime Deployment</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -47,7 +73,10 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
             >
               Apply for a 7-Day Proof-of-Concept
             </button>
-            <p className="text-sm text-slate-400">Zero technical debt. Zero upfront cost.</p>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm text-slate-400">Zero technical debt. Zero upfront cost.</p>
+              <p className="text-xs font-semibold text-primary">Only 2 spots remaining for January Founding Partners.</p>
+            </div>
           </div>
         </ScrollFadeInSection>
       </div>
@@ -212,8 +241,11 @@ const CostOfDoingNothing: React.FC<HeroProps> = ({ onBookDemo }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Cost of Doing Nothing</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            You aren't just losing money on labor; you're losing the opportunity cost of your best minds.
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-slate-300">
+            Most businesses are built on <strong className="text-red-400">"Human Middleware"</strong>—fragile processes held together by stressed employees working late nights to fix mistakes. We replace that with <strong className="text-primary">Sovereign Infrastructure</strong> that runs without you.
+          </p>
+          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400">
+            Every day you delay, you're burning money on manual labor and lost opportunities. The question isn't whether you'll automate—it's whether you'll do it before your competitors do.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -283,8 +315,11 @@ const SystemStressTest: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The 3 Fracture Points We Fix First</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            Not sure if your business is ready for automation? We've audited dozens of workflows. Here are the 3 "Fracture Points" we look for first—and how they're costing you revenue.
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-slate-300">
+            Most businesses are built on <strong className="text-red-400">"Human Middleware"</strong>—fragile processes held together by stressed employees. We've audited dozens of workflows. Here are the 3 "Fracture Points" that are killing your margins right now.
+          </p>
+          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400 italic">
+            If your business depends on a "hero employee" working late to fix mistakes, you're one resignation away from collapse.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
