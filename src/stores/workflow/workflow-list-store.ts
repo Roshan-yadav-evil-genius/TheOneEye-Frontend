@@ -8,6 +8,11 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { workflowApi } from '@/lib/api/services/workflow-api';
 import { TWorkflow } from '../types';
+import {
+  transformBackendWorkflowsToFrontend,
+  transformFrontendWorkflowToBackend,
+  transformBackendWorkflowToFrontend,
+} from '@/lib/api/transformers/workflow-transformer';
 
 interface WorkflowListState {
   // Data
@@ -63,24 +68,8 @@ export const useWorkflowListStore = create<WorkflowListStore>()(
           
           logger.debug(`Received ${response.length} workflows from API`, { count: response.length }, 'workflow-list-store');
           
-          // Transform backend response to frontend format
-          const workflows: TWorkflow[] = response.map((workflow: Record<string, unknown>) => ({
-            id: workflow.id as string,
-            name: workflow.name as string,
-            description: workflow.description as string,
-            category: workflow.category as string,
-            nodes: [],
-            connections: [],
-            status: workflow.status as string,
-            lastRun: workflow.last_run as string | undefined,
-            nextRun: workflow.next_run as string | undefined,
-            runsCount: workflow.runs_count as number,
-            successRate: workflow.success_rate as number,
-            tags: (workflow.tags as string[]) || [],
-            createdAt: new Date(workflow.created_at as string),
-            updatedAt: new Date(workflow.updated_at as string),
-            createdBy: workflow.created_by as string,
-          }));
+          // Transform backend response to frontend format using transformer
+          const workflows = transformBackendWorkflowsToFrontend(response);
 
           logger.info(`Successfully loaded ${workflows.length} workflows`, { count: workflows.length }, 'workflow-list-store');
 
@@ -104,38 +93,13 @@ export const useWorkflowListStore = create<WorkflowListStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // Transform frontend data to backend format
-          const backendData = {
-            name: workflowData.name,
-            description: workflowData.description,
-            category: workflowData.category,
-            status: workflowData.status,
-            runs_count: workflowData.runsCount,
-            success_rate: workflowData.successRate,
-            tags: workflowData.tags,
-            created_by: workflowData.createdBy,
-          };
+          // Transform frontend data to backend format using transformer
+          const backendData = transformFrontendWorkflowToBackend(workflowData);
 
           const response = await workflowApi.createWorkflow(backendData);
           
-          // Transform backend response to frontend format
-          const newWorkflow: TWorkflow = {
-            id: response.id,
-            name: response.name,
-            description: response.description,
-            category: response.category,
-            nodes: [],
-            connections: [],
-            status: response.status,
-            lastRun: response.last_run,
-            nextRun: response.next_run,
-            runsCount: response.runs_count,
-            successRate: response.success_rate,
-            tags: response.tags || [],
-            createdAt: new Date(response.created_at),
-            updatedAt: new Date(response.updated_at),
-            createdBy: response.created_by,
-          };
+          // Transform backend response to frontend format using transformer
+          const newWorkflow = transformBackendWorkflowToFrontend(response);
 
           set((state) => ({
             workflows: [...state.workflows, newWorkflow],
@@ -157,38 +121,17 @@ export const useWorkflowListStore = create<WorkflowListStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          // Transform frontend data to backend format
-          const backendData = {
-            name: workflowData.name,
-            description: workflowData.description,
-            category: workflowData.category,
-            status: workflowData.status,
-            runs_count: workflowData.runsCount,
-            success_rate: workflowData.successRate,
-            tags: workflowData.tags,
-            created_by: workflowData.createdBy,
-          };
+          // Transform frontend data to backend format using transformer
+          const backendData = transformFrontendWorkflowToBackend(workflowData);
 
           const response = await workflowApi.updateWorkflow(id, backendData);
           
-          // Transform backend response to frontend format
-          const updatedWorkflow: TWorkflow = {
-            id: response.id,
-            name: response.name,
-            description: response.description,
-            category: response.category,
-            nodes: workflowData.nodes || [],
-            connections: workflowData.connections || [],
-            status: response.status,
-            lastRun: response.last_run,
-            nextRun: response.next_run,
-            runsCount: response.runs_count,
-            successRate: response.success_rate,
-            tags: response.tags || [],
-            createdAt: new Date(response.created_at),
-            updatedAt: new Date(response.updated_at),
-            createdBy: response.created_by,
-          };
+          // Transform backend response to frontend format using transformer
+          const updatedWorkflow = transformBackendWorkflowToFrontend(response);
+          
+          // Preserve nodes and connections from existing workflow data
+          updatedWorkflow.nodes = workflowData.nodes || [];
+          updatedWorkflow.connections = workflowData.connections || [];
 
           set((state) => ({
             workflows: state.workflows.map((workflow) =>

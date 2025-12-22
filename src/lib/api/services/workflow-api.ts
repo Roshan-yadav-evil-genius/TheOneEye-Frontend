@@ -10,6 +10,8 @@ import {
   BackendWorkflowConnection,
   WorkflowNodeExecuteResponse,
 } from '@/types';
+import { BackendWorkflow } from '../transformers/workflow-transformer';
+import { handleApiError } from '../../error-handling/api-error-handler';
 
 /**
  * Workflow API Service
@@ -20,33 +22,49 @@ class WorkflowApiService {
   private pendingRequests = new Map<string, Promise<unknown>>();
 
   // Workflow CRUD operations
-  async getWorkflows(): Promise<TWorkflow[]> {
-    const response = await axiosApiClient.get<{ results: TWorkflow[] } | TWorkflow[]>('/workflow/');
-    
-    // Handle paginated response (DRF returns { results: [...] }) or direct array
-    if (Array.isArray(response)) {
-      return response;
+  async getWorkflows(): Promise<BackendWorkflow[]> {
+    try {
+      const response = await axiosApiClient.get<{ results: BackendWorkflow[] } | BackendWorkflow[]>('/workflow/');
+      
+      // Handle paginated response (DRF returns { results: [...] }) or direct array
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // If it's a paginated response, return the results array
+      if (response && typeof response === 'object' && 'results' in response) {
+        return (response as { results: BackendWorkflow[] }).results;
+      }
+      
+      // Fallback: return empty array if unexpected format
+      return [];
+    } catch (error) {
+      throw handleApiError(error as any);
     }
-    
-    // If it's a paginated response, return the results array
-    if (response && typeof response === 'object' && 'results' in response) {
-      return (response as { results: TWorkflow[] }).results;
-    }
-    
-    // Fallback: return empty array if unexpected format
-    return [];
   }
 
-  async createWorkflow(workflowData: Partial<TWorkflow>): Promise<TWorkflow> {
-    return axiosApiClient.post<TWorkflow>('/workflow/', workflowData);
+  async createWorkflow(workflowData: Partial<BackendWorkflow>): Promise<BackendWorkflow> {
+    try {
+      return await axiosApiClient.post<BackendWorkflow>('/workflow/', workflowData);
+    } catch (error) {
+      throw handleApiError(error as any);
+    }
   }
 
-  async updateWorkflow(id: string, workflowData: Partial<TWorkflow>): Promise<TWorkflow> {
-    return axiosApiClient.put<TWorkflow>(`/workflow/${id}/`, workflowData);
+  async updateWorkflow(id: string, workflowData: Partial<BackendWorkflow>): Promise<BackendWorkflow> {
+    try {
+      return await axiosApiClient.put<BackendWorkflow>(`/workflow/${id}/`, workflowData);
+    } catch (error) {
+      throw handleApiError(error as any);
+    }
   }
 
   async deleteWorkflow(id: string): Promise<void> {
-    return axiosApiClient.delete<void>(`/workflow/${id}/`);
+    try {
+      return await axiosApiClient.delete<void>(`/workflow/${id}/`);
+    } catch (error) {
+      throw handleApiError(error as any);
+    }
   }
 
   // Workflow Canvas Operations

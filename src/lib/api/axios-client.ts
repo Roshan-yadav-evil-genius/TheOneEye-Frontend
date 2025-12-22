@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { TApiError } from '@/types';
 import { logger } from '@/lib/logging';
+import { getAuthToken, getRefreshToken, updateAuthToken, clearAuthData } from '@/lib/auth/token-manager';
+import { apiConfig } from '@/lib/config';
 
 // Axios-based API client with better error handling and interceptors
 class AxiosApiClient {
@@ -9,8 +11,8 @@ class AxiosApiClient {
   constructor() {
     // Create axios instance with base configuration
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api',
-      timeout: 30000, // 30 seconds timeout
+      baseURL: apiConfig.baseURL,
+      timeout: apiConfig.timeout,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -19,18 +21,11 @@ class AxiosApiClient {
     // Request interceptor for logging and auth
     this.client.interceptors.request.use(
       (config) => {
-        // Get token from auth store
-        const token = typeof window !== 'undefined' ? localStorage.getItem('auth-store') : null;
+        // Get token from token manager
+        const token = getAuthToken();
         
         if (token) {
-          try {
-            const authData = JSON.parse(token);
-            if (authData.state?.token) {
-              config.headers.Authorization = `Bearer ${authData.state.token}`;
-            }
-          } catch (error) {
-            logger.error('Error parsing auth token', error, 'axios-client');
-          }
+          config.headers.Authorization = `Bearer ${token}`;
         }
         
         logger.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`, undefined, 'axios-client');
@@ -56,37 +51,27 @@ class AxiosApiClient {
           originalRequest._retry = true;
           
           try {
-            // Try to refresh token
-            const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('auth-store') : null;
+            // Try to refresh token using token manager
+            const refreshToken = getRefreshToken();
             if (refreshToken) {
-              const authData = JSON.parse(refreshToken);
-              if (authData.state?.refreshToken) {
-                const response = await axios.post(`${this.client.defaults.baseURL}/auth/refresh/`, {
-                  refresh: authData.state.refreshToken,
-                });
-                
-                const { access } = response.data;
-                
-                // Update stored token
-                const updatedAuthData = {
-                  ...authData,
-                  state: {
-                    ...authData.state,
-                    token: access,
-                  },
-                };
-                localStorage.setItem('auth-store', JSON.stringify(updatedAuthData));
-                
-                // Retry original request with new token
-                originalRequest.headers = originalRequest.headers || {};
-                originalRequest.headers.Authorization = `Bearer ${access}`;
-                return this.client(originalRequest);
-              }
+              const response = await axios.post(`${this.client.defaults.baseURL}/auth/refresh/`, {
+                refresh: refreshToken,
+              });
+              
+              const { access } = response.data;
+              
+              // Update stored token using token manager
+              updateAuthToken(access);
+              
+              // Retry original request with new token
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers.Authorization = `Bearer ${access}`;
+              return this.client(originalRequest);
             }
           } catch (refreshError) {
-            // Refresh failed, redirect to login
+            // Refresh failed, clear auth data and redirect to login
+            clearAuthData();
             if (typeof window !== 'undefined') {
-              localStorage.removeItem('auth-store');
               window.location.href = '/login';
             }
           }

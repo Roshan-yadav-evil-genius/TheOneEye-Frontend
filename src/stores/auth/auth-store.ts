@@ -6,14 +6,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { authApi } from '@/lib/api/services/auth-api';
-
-interface TUser {
-  id: string;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
+import { TUser } from '@/types';
 
 interface TAuthState {
   user: TUser | null;
