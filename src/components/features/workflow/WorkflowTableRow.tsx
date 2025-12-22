@@ -17,7 +17,6 @@ import {
   IconPlayerStop,
   IconEdit,
   IconSettings,
-  IconEye,
   IconTrash,
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
@@ -32,7 +31,6 @@ interface WorkflowTableRowProps {
   onStop?: (id: string) => void;
   onEditInfo?: (workflow: TWorkflow) => void;
   onEditWorkflow?: (id: string) => void;
-  onView?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -45,7 +43,6 @@ export function WorkflowTableRow({
   onStop,
   onEditInfo,
   onEditWorkflow,
-  onView,
   onDelete,
 }: WorkflowTableRowProps) {
   const getStatusBadge = (status: "active" | "inactive" | "error") => {
@@ -134,10 +131,6 @@ export function WorkflowTableRow({
                 Run Now
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onClick={() => onView?.(workflow.id)}>
-              <IconEye className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEditInfo?.(workflow)}>
               <IconSettings className="mr-2 h-4 w-4" />
               Edit Info

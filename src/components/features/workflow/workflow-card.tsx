@@ -20,7 +20,6 @@ interface WorkflowCardProps {
   runsCount: number
   onRun?: (id: string) => void
   onEdit?: (id: string) => void
-  onView?: (id: string) => void
 }
 
 export function WorkflowCard({
@@ -33,7 +32,6 @@ export function WorkflowCard({
   runsCount,
   onRun,
   onEdit,
-  onView,
 }: WorkflowCardProps) {
   const router = useRouter()
 
@@ -114,17 +112,6 @@ export function WorkflowCard({
         </div>
 
         <div className="flex gap-3 w-full pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              onView?.(id)
-            }}
-            className="flex-1 h-9"
-          >
-            View Details
-          </Button>
           {status === "inactive" && (
             <Button
               size="sm"

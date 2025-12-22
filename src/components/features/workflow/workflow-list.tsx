@@ -28,7 +28,6 @@ export function WorkflowList({
     handleStop,
     handleEditInfo,
     handleEditWorkflow,
-    handleView,
     handleDelete,
     handleConfirmDelete,
     handleCancelDelete,
@@ -45,7 +44,6 @@ export function WorkflowList({
           onStop={handleStop}
           onEditInfo={handleEditInfo}
           onEditWorkflow={handleEditWorkflow}
-          onView={handleView}
           onDelete={handleDelete}
           onCreate={handleCreate}
         />

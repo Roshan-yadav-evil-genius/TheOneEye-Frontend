@@ -20,7 +20,6 @@ interface WorkflowTableProps {
   onStop?: (id: string) => void;
   onEditInfo?: (workflow: TWorkflow) => void;
   onEditWorkflow?: (id: string) => void;
-  onView?: (id: string) => void;
   onDelete?: (id: string) => void;
   onCreate?: () => void;
 }
@@ -31,7 +30,6 @@ export function WorkflowTable({
   onStop,
   onEditInfo,
   onEditWorkflow,
-  onView,
   onDelete,
   onCreate,
 }: WorkflowTableProps) {
@@ -111,7 +109,6 @@ export function WorkflowTable({
                 onStop={onStop}
                 onEditInfo={onEditInfo}
                 onEditWorkflow={onEditWorkflow}
-                onView={onView}
                 onDelete={onDelete}
               />
             ))}
