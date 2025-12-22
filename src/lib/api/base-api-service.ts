@@ -1,157 +1,136 @@
 /**
- * Base API Service Class
+ * Base API Service
  * 
- * Provides common patterns for API services including:
- * - CRUD operations
- * - Error handling
+ * Provides common functionality for all API services:
+ * - Standardized error handling
  * - Request deduplication
+ * - Common HTTP methods
+ * 
+ * Single responsibility: Base API service functionality
  */
+
+import { AxiosRequestConfig } from 'axios';
 import { axiosApiClient } from './axios-client';
 import { handleApiError } from '../error-handling/api-error-handler';
 
-export interface BaseApiServiceConfig {
-  basePath: string;
-  enableRequestDeduplication?: boolean;
-}
-
 /**
- * Base class for API services
- * Reduces duplication across API service implementations
+ * Base class for all API services.
+ * Provides common error handling and request deduplication.
  */
-export abstract class BaseApiService<TBackend, TFrontend = TBackend> {
-  protected basePath: string;
-  private pendingRequests: Map<string, Promise<unknown>>;
-  private enableDeduplication: boolean;
-
-  constructor(config: BaseApiServiceConfig) {
-    this.basePath = config.basePath;
-    this.enableDeduplication = config.enableRequestDeduplication ?? false;
-    this.pendingRequests = new Map();
-  }
+export abstract class BaseApiService {
+  // Request deduplication map to prevent duplicate API calls
+  private pendingRequests = new Map<string, Promise<unknown>>();
 
   /**
-   * Get all items
+   * Execute a request with error handling and optional deduplication.
+   * 
+   * @param requestKey - Unique key for request deduplication (optional)
+   * @param requestFn - Function that returns the API request promise
+   * @returns Promise with the response data
    */
-  protected async getAll<T = TBackend>(): Promise<T[]> {
-    try {
-      const response = await axiosApiClient.get<{ results: T[] } | T[]>(this.basePath);
-      
-      if (Array.isArray(response)) {
-        return response;
-      }
-      
-      if (response && typeof response === 'object' && 'results' in response) {
-        return (response as { results: T[] }).results;
-      }
-      
-      return [];
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Get item by ID
-   */
-  protected async getById<T = TBackend>(id: string, endpoint?: string): Promise<T> {
-    try {
-      const path = endpoint ? `${this.basePath}${endpoint}` : `${this.basePath}/${id}/`;
-      return await axiosApiClient.get<T>(path);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Create new item
-   */
-  protected async create<TRequest = Partial<TBackend>, TResponse = TBackend>(
-    data: TRequest,
-    endpoint?: string
-  ): Promise<TResponse> {
-    try {
-      const path = endpoint ? `${this.basePath}${endpoint}` : `${this.basePath}/`;
-      return await axiosApiClient.post<TResponse>(path, data);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Update item by ID
-   */
-  protected async update<TRequest = Partial<TBackend>, TResponse = TBackend>(
-    id: string,
-    data: TRequest,
-    endpoint?: string
-  ): Promise<TResponse> {
-    try {
-      const path = endpoint ? `${this.basePath}${endpoint}` : `${this.basePath}/${id}/`;
-      return await axiosApiClient.put<TResponse>(path, data);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Partially update item by ID
-   */
-  protected async patch<TRequest = Partial<TBackend>, TResponse = TBackend>(
-    id: string,
-    data: TRequest,
-    endpoint?: string
-  ): Promise<TResponse> {
-    try {
-      const path = endpoint ? `${this.basePath}${endpoint}` : `${this.basePath}/${id}/`;
-      return await axiosApiClient.patch<TResponse>(path, data);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Delete item by ID
-   */
-  protected async delete(id: string, endpoint?: string): Promise<void> {
-    try {
-      const path = endpoint ? `${this.basePath}${endpoint}` : `${this.basePath}/${id}/`;
-      return await axiosApiClient.delete<void>(path);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
-  }
-
-  /**
-   * Make a request with optional deduplication
-   */
-  protected async requestWithDeduplication<T>(
-    key: string,
+  protected async executeRequest<T>(
+    requestKey: string | null,
     requestFn: () => Promise<T>
   ): Promise<T> {
-    if (!this.enableDeduplication) {
-      return requestFn();
+    // If request key is provided, check for existing request
+    if (requestKey) {
+      const existingRequest = this.pendingRequests.get(requestKey);
+      if (existingRequest) {
+        return existingRequest as Promise<T>;
+      }
     }
 
-    if (this.pendingRequests.has(key)) {
-      return this.pendingRequests.get(key)! as Promise<T>;
+    // Create new request
+    const requestPromise = this.wrapWithErrorHandling(requestFn);
+
+    // Store for deduplication if key provided
+    if (requestKey) {
+      this.pendingRequests.set(requestKey, requestPromise);
+      
+      // Clean up after request completes
+      requestPromise
+        .finally(() => {
+          this.pendingRequests.delete(requestKey);
+        })
+        .catch(() => {
+          // Error already handled, just clean up
+        });
     }
 
-    const requestPromise = requestFn();
-    this.pendingRequests.set(key, requestPromise);
+    return requestPromise;
+  }
 
+  /**
+   * Wrap a request function with standardized error handling.
+   * 
+   * @param requestFn - Function that returns the API request promise
+   * @returns Promise with error handling applied
+   */
+  private async wrapWithErrorHandling<T>(requestFn: () => Promise<T>): Promise<T> {
     try {
-      const result = await requestPromise;
-      return result;
-    } finally {
-      this.pendingRequests.delete(key);
+      return await requestFn();
+    } catch (error) {
+      throw handleApiError(error as any);
     }
   }
 
   /**
-   * Clear pending requests cache
+   * GET request with error handling.
    */
-  protected clearPendingRequests(): void {
-    this.pendingRequests.clear();
+  protected async get<T>(url: string, config?: AxiosRequestConfig, requestKey?: string | null): Promise<T> {
+    return this.executeRequest(
+      requestKey ?? null,
+      () => axiosApiClient.get<T>(url, config)
+    );
+  }
+
+  /**
+   * POST request with error handling.
+   */
+  protected async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return this.executeRequest(
+      null, // POST requests are typically not deduplicated
+      () => axiosApiClient.post<T>(url, data, config)
+    );
+  }
+
+  /**
+   * PUT request with error handling.
+   */
+  protected async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return this.executeRequest(
+      null, // PUT requests are typically not deduplicated
+      () => axiosApiClient.put<T>(url, data, config)
+    );
+  }
+
+  /**
+   * PATCH request with error handling.
+   */
+  protected async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return this.executeRequest(
+      null, // PATCH requests are typically not deduplicated
+      () => axiosApiClient.patch<T>(url, data, config)
+    );
+  }
+
+  /**
+   * DELETE request with error handling.
+   */
+  protected async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return this.executeRequest(
+      null, // DELETE requests are typically not deduplicated
+      () => axiosApiClient.delete<T>(url, config)
+    );
+  }
+
+  /**
+   * File upload request with error handling.
+   */
+  protected async uploadFile<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<T> {
+    return this.executeRequest(
+      null, // File uploads are typically not deduplicated
+      () => axiosApiClient.uploadFile<T>(url, formData, config)
+    );
   }
 }
-

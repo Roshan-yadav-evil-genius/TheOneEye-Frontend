@@ -1,4 +1,4 @@
-import { axiosApiClient } from '../axios-client';
+import { BaseApiService } from '../base-api-service';
 import { 
   TWorkflow,
   TWorkflowConnection,
@@ -11,98 +11,68 @@ import {
   WorkflowNodeExecuteResponse,
 } from '@/types';
 import { BackendWorkflow } from '../transformers/workflow-transformer';
-import { handleApiError } from '../../error-handling/api-error-handler';
 
 /**
  * Workflow API Service
  * Handles all workflow-related API operations including CRUD, canvas, and execution
  */
-class WorkflowApiService {
-  // Request deduplication map to prevent duplicate API calls
-  private pendingRequests = new Map<string, Promise<unknown>>();
-
+class WorkflowApiService extends BaseApiService {
   // Workflow CRUD operations
   async getWorkflows(): Promise<BackendWorkflow[]> {
-    try {
-      const response = await axiosApiClient.get<{ results: BackendWorkflow[] } | BackendWorkflow[]>('/workflow/');
-      
-      // Handle paginated response (DRF returns { results: [...] }) or direct array
-      if (Array.isArray(response)) {
-        return response;
-      }
-      
-      // If it's a paginated response, return the results array
-      if (response && typeof response === 'object' && 'results' in response) {
-        return (response as { results: BackendWorkflow[] }).results;
-      }
-      
-      // Fallback: return empty array if unexpected format
-      return [];
-    } catch (error) {
-      throw handleApiError(error as any);
+    const response = await this.get<{ results: BackendWorkflow[] } | BackendWorkflow[]>('/workflow/');
+    
+    // Handle paginated response (DRF returns { results: [...] }) or direct array
+    if (Array.isArray(response)) {
+      return response;
     }
+    
+    // If it's a paginated response, return the results array
+    if (response && typeof response === 'object' && 'results' in response) {
+      return (response as { results: BackendWorkflow[] }).results;
+    }
+    
+    // Fallback: return empty array if unexpected format
+    return [];
   }
 
   async createWorkflow(workflowData: Partial<BackendWorkflow>): Promise<BackendWorkflow> {
-    try {
-      return await axiosApiClient.post<BackendWorkflow>('/workflow/', workflowData);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
+    return this.post<BackendWorkflow>('/workflow/', workflowData);
   }
 
   async updateWorkflow(id: string, workflowData: Partial<BackendWorkflow>): Promise<BackendWorkflow> {
-    try {
-      return await axiosApiClient.put<BackendWorkflow>(`/workflow/${id}/`, workflowData);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
+    return this.put<BackendWorkflow>(`/workflow/${id}/`, workflowData);
   }
 
   async deleteWorkflow(id: string): Promise<void> {
-    try {
-      return await axiosApiClient.delete<void>(`/workflow/${id}/`);
-    } catch (error) {
-      throw handleApiError(error as any);
-    }
+    return this.delete<void>(`/workflow/${id}/`);
   }
 
   // Workflow Canvas Operations
   async getWorkflowCanvasData(workflowId: string): Promise<TWorkflowCanvasData> {
     const requestKey = `workflow-canvas-${workflowId}`;
     
-    // Return existing promise if request is already in progress
-    if (this.pendingRequests.has(requestKey)) {
-      return this.pendingRequests.get(requestKey)! as Promise<TWorkflowCanvasData>;
-    }
-    
-    const requestPromise = this.makeWorkflowCanvasRequest(workflowId);
-    this.pendingRequests.set(requestKey, requestPromise);
-    
-    try {
-      const result = await requestPromise;
-      return result;
-    } finally {
-      this.pendingRequests.delete(requestKey);
-    }
-  }
-
-  private async makeWorkflowCanvasRequest(workflowId: string): Promise<TWorkflowCanvasData> {
-    const response = await axiosApiClient.get<BackendWorkflowCanvasResponse>(`/workflow/${workflowId}/canvas_data/`);
-    
-    // Transform the response to match our types
-    return {
-      nodes: response.nodes,
-      edges: response.edges,
-      workflow: response.workflow
-    };
+    return this.executeRequest(
+      requestKey,
+      async () => {
+        const response = await this.get<BackendWorkflowCanvasResponse>(
+          `/workflow/${workflowId}/canvas_data/`
+        );
+        
+        // Transform the response to match our types
+        return {
+          nodes: response.nodes,
+          edges: response.edges,
+          workflow: response.workflow
+        };
+      }
+    );
   }
 
   async addNodeToWorkflow(
     workflowId: string, 
     nodeData: TWorkflowNodeCreateRequest
   ): Promise<TWorkflowNodeCreateResponse> {
-    const response = await axiosApiClient.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/nodes/add/`, nodeData);
+    const response = await this.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/nodes/add/`, nodeData);
     
     return {
       id: response.id,
@@ -117,20 +87,20 @@ class WorkflowApiService {
     nodeId: string, 
     position: { x: number; y: number }
   ): Promise<void> {
-    await axiosApiClient.patch(`/workflow/${workflowId}/nodes/${nodeId}/position/`, {
+    return this.patch(`/workflow/${workflowId}/nodes/${nodeId}/position/`, {
       position
     });
   }
 
   async removeNodeFromWorkflow(workflowId: string, nodeId: string): Promise<void> {
-    await axiosApiClient.delete(`/workflow/${workflowId}/nodes/${nodeId}/remove/`);
+    return this.delete(`/workflow/${workflowId}/nodes/${nodeId}/remove/`);
   }
 
   async addConnectionToWorkflow(
     workflowId: string, 
     connectionData: TWorkflowConnectionCreateRequest
   ): Promise<TWorkflowConnection> {
-    const response = await axiosApiClient.post<BackendWorkflowConnection>(`/workflow/${workflowId}/connections/add/`, connectionData);
+    const response = await this.post<BackendWorkflowConnection>(`/workflow/${workflowId}/connections/add/`, connectionData);
     return {
       id: response.id,
       source: response.source_node,
@@ -140,7 +110,7 @@ class WorkflowApiService {
   }
 
   async removeConnectionFromWorkflow(workflowId: string, connectionId: string): Promise<void> {
-    await axiosApiClient.delete(`/workflow/${workflowId}/connections/${connectionId}/remove/`);
+    return this.delete(`/workflow/${workflowId}/connections/${connectionId}/remove/`);
   }
 
   async updateNodeFormValues(
@@ -148,35 +118,34 @@ class WorkflowApiService {
     nodeId: string, 
     formValues: Record<string, unknown>
   ): Promise<void> {
-    await axiosApiClient.patch(`/workflow/${workflowId}/nodes/${nodeId}/`, {
+    return this.patch(`/workflow/${workflowId}/nodes/${nodeId}/`, {
       form_values: formValues
     });
   }
 
   // Workflow Execution Operations
   async getTaskStatus(taskId: string): Promise<{ state: string; result?: unknown; error?: string; progress?: number }> {
-    const response = await axiosApiClient.get<{ state: string; result?: unknown; error?: string; progress?: number }>(`/celery/task/${taskId}/status/`);
-    return response;
+    return this.get<{ state: string; result?: unknown; error?: string; progress?: number }>(`/celery/task/${taskId}/status/`);
   }
 
   async startWorkflowExecution(workflowId: string): Promise<{ task_id: string; status: string }> {
-    return axiosApiClient.get(`/workflow/${workflowId}/start_execution/`);
+    return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/start_execution/`);
   }
 
   async stopWorkflowExecution(workflowId: string): Promise<{ task_id: string; status: string }> {
-    return axiosApiClient.get(`/workflow/${workflowId}/stop_execution/`);
+    return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/stop_execution/`);
   }
 
   async getWorkflowTaskStatus(workflowId: string): Promise<{ task_id: string; status: string }> {
-    return axiosApiClient.get(`/workflow/${workflowId}/task_status/`);
+    return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/task_status/`);
   }
 
   async getNodeInputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
-    return axiosApiClient.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/input/`);
+    return this.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/input/`);
   }
 
   async getNodeOutputData(workflowId: string, nodeId: string): Promise<Record<string, unknown>> {
-    return axiosApiClient.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/output/`);
+    return this.get<Record<string, unknown>>(`/workflow/${workflowId}/nodes/${nodeId}/output/`);
   }
 
   /**
@@ -197,7 +166,7 @@ class WorkflowApiService {
       session_id?: string;
     }
   ): Promise<WorkflowNodeExecuteResponse> {
-    return axiosApiClient.post<WorkflowNodeExecuteResponse>(
+    return this.post<WorkflowNodeExecuteResponse>(
       `/workflow/${workflowId}/execute_and_save_node/`,
       {
         node_id: nodeId,

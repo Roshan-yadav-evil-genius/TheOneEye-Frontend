@@ -1,25 +1,25 @@
-import { axiosApiClient } from '../axios-client';
+import { BaseApiService } from '../base-api-service';
 import { DemoRequest, DemoRequestCreateData } from '@/types';
 
 /**
  * Demo API Service
  * Handles all demo request-related API operations
  */
-class DemoApiService {
+class DemoApiService extends BaseApiService {
   async createDemoRequest(demoData: DemoRequestCreateData): Promise<DemoRequest> {
-    return axiosApiClient.post<DemoRequest>('/demo-requests/', demoData);
+    return this.post<DemoRequest>('/demo-requests/', demoData);
   }
 
   async getDemoRequests(): Promise<DemoRequest[]> {
-    return axiosApiClient.get<DemoRequest[]>('/demo-requests/');
+    return this.get<DemoRequest[]>('/demo-requests/');
   }
 
   async getDemoRequest(id: string): Promise<DemoRequest> {
-    return axiosApiClient.get<DemoRequest>(`/demo-requests/${id}/`);
+    return this.get<DemoRequest>(`/demo-requests/${id}/`);
   }
 
   async updateDemoRequestStatus(id: string, status: string, notes?: string): Promise<DemoRequest> {
-    return axiosApiClient.patch<DemoRequest>(`/demo-requests/${id}/update_status/`, {
+    return this.patch<DemoRequest>(`/demo-requests/${id}/update_status/`, {
       status,
       notes
     });

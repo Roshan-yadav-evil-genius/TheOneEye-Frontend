@@ -1,4 +1,4 @@
-import { axiosApiClient } from '../axios-client';
+import { BaseApiService } from '../base-api-service';
 import {
   TNodeMetadata,
   TNodeTree,
@@ -16,50 +16,50 @@ import {
  * Node API Service
  * Handles all node registry-related API operations
  */
-class NodeApiService {
+class NodeApiService extends BaseApiService {
   async getNodes(): Promise<TNodeTree> {
-    return axiosApiClient.get<TNodeTree>('/nodes/');
+    return this.get<TNodeTree>('/nodes/');
   }
 
   async getNodesFlat(): Promise<TNodeMetadata[]> {
-    return axiosApiClient.get<TNodeMetadata[]>('/nodes/flat/');
+    return this.get<TNodeMetadata[]>('/nodes/flat/');
   }
 
   async getNodesCount(): Promise<TNodeCount> {
-    return axiosApiClient.get<TNodeCount>('/nodes/count/');
+    return this.get<TNodeCount>('/nodes/count/');
   }
 
   async getNodeDetail(identifier: string): Promise<TNodeMetadata> {
-    return axiosApiClient.get<TNodeMetadata>(`/nodes/${identifier}/`);
+    return this.get<TNodeMetadata>(`/nodes/${identifier}/`);
   }
 
   async getNodeForm(identifier: string): Promise<TNodeForm> {
-    return axiosApiClient.get<TNodeForm>(`/nodes/${identifier}/form/`);
+    return this.get<TNodeForm>(`/nodes/${identifier}/form/`);
   }
 
   async executeNode(
     identifier: string, 
     data: TNodeExecuteRequest
   ): Promise<TNodeExecuteResponse> {
-    return axiosApiClient.post<TNodeExecuteResponse>(`/nodes/${identifier}/execute/`, data);
+    return this.post<TNodeExecuteResponse>(`/nodes/${identifier}/execute/`, data);
   }
 
   async getNodeFieldOptions(
     identifier: string, 
     data: TFieldOptionsRequest
   ): Promise<TFieldOptionsResponse> {
-    return axiosApiClient.post<TFieldOptionsResponse>(`/nodes/${identifier}/field-options/`, data);
+    return this.post<TFieldOptionsResponse>(`/nodes/${identifier}/field-options/`, data);
   }
 
   async refreshNodeCache(): Promise<{ message: string }> {
-    return axiosApiClient.post<{ message: string }>('/nodes/refresh/');
+    return this.post<{ message: string }>('/nodes/refresh/');
   }
 
   async resetNodeSession(
     identifier: string,
     data: TNodeResetSessionRequest
   ): Promise<TNodeResetSessionResponse> {
-    return axiosApiClient.post<TNodeResetSessionResponse>(
+    return this.post<TNodeResetSessionResponse>(
       `/nodes/${identifier}/reset-session/`,
       data
     );

@@ -8,7 +8,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { workflowApi } from '@/lib/api/services/workflow-api';
-import { toastSuccess, toastError, toastInfo } from '@/hooks/use-toast';
+import { toastService } from '@/lib/services/toast-service';
 
 // Execution status types
 export type ExecutionStatus = 'idle' | 'running' | 'paused' | 'completed' | 'failed';
@@ -115,7 +115,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
             state.isStarting = false;
           });
 
-          toastSuccess('Workflow execution started!');
+          toastService.success('Workflow execution started!');
           
           // Start polling for task status
           get().pollTaskStatus(response.task_id);
@@ -130,7 +130,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
             state.error = errorMessage;
           });
 
-          toastError('Failed to start execution', {
+          toastService.error('Failed to start execution', {
             description: errorMessage,
           });
         }
@@ -157,7 +157,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
             state.currentNodeId = null;
           });
 
-          toastInfo('Workflow execution stopped');
+          toastService.info('Workflow execution stopped');
         } catch (error) {
           const errorMessage = error instanceof Error 
             ? error.message 
@@ -168,7 +168,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
             state.error = errorMessage;
           });
 
-          toastError('Failed to stop execution', {
+          toastService.error('Failed to stop execution', {
             description: errorMessage,
           });
         }
@@ -182,7 +182,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
           state.status = 'paused';
         });
 
-        toastInfo('Workflow execution paused');
+        toastService.info('Workflow execution paused');
       },
 
       resumeExecution: async () => {
@@ -196,7 +196,7 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
         // Resume polling
         get().pollTaskStatus(taskId);
         
-        toastInfo('Workflow execution resumed');
+        toastService.info('Workflow execution resumed');
       },
 
       // Task status polling
@@ -223,13 +223,13 @@ export const useWorkflowExecutionStore = create<WorkflowExecutionStore>()(
                 state.result = status.result;
                 state.isPolling = false;
                 get().stopPolling();
-                toastSuccess('Workflow completed successfully!');
+                toastService.success('Workflow completed successfully!');
               } else if (status.state === 'FAILURE') {
                 state.status = 'failed';
                 state.error = status.error || 'Execution failed';
                 state.isPolling = false;
                 get().stopPolling();
-                toastError('Workflow execution failed', {
+                toastService.error('Workflow execution failed', {
                   description: status.error,
                 });
               } else if (status.state === 'PENDING' || status.state === 'STARTED') {

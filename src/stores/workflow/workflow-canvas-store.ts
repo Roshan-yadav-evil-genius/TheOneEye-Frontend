@@ -14,7 +14,7 @@ import {
   TWorkflowConnectionCreateRequest
 } from '@/types/api/requests';
 import { workflowApi } from '@/lib/api/services/workflow-api';
-import { toastSuccess, toastError, toastInfo } from '@/hooks/use-toast';
+import { toastService } from '@/lib/services/toast-service';
 
 // Workflow Canvas State Interface
 interface WorkflowCanvasState {
@@ -133,7 +133,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = null;
             });
 
-            toastInfo(`Workflow "${canvasData.workflow.name}" loaded`, {
+            toastService.info(`Workflow "${canvasData.workflow.name}" loaded`, {
               description: `Found ${canvasData.nodes.length} nodes and ${canvasData.edges.length} connections.`,
             });
           } catch (error) {
@@ -146,7 +146,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = errorMessage;
             });
 
-            toastError('Failed to load workflow', {
+            toastService.error('Failed to load workflow', {
               description: errorMessage,
             });
           }
@@ -168,7 +168,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         addNode: async (nodeData: TWorkflowNodeCreateRequest) => {
           const { workflowId } = get();
           if (!workflowId) {
-            toastError('No workflow selected');
+            toastService.error('No workflow selected');
             return null;
           }
 
@@ -188,7 +188,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = null;
             });
 
-            toastSuccess('Node added successfully!', {
+            toastService.success('Node added successfully!', {
               description: `"${response.node_type?.name || 'Node'}" has been added to the workflow.`,
             });
 
@@ -203,7 +203,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = errorMessage;
             });
 
-            toastError('Failed to add node', {
+            toastService.error('Failed to add node', {
               description: errorMessage,
             });
             
@@ -235,7 +235,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               ? error.message 
               : 'Failed to update node position';
 
-            toastError('Failed to update node position', {
+            toastService.error('Failed to update node position', {
               description: errorMessage,
             });
           }
@@ -244,7 +244,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         updateNodeFormValues: async (nodeId: string, formValues: Record<string, unknown>) => {
           const { workflowId } = get();
           if (!workflowId) {
-            toastError('No workflow selected');
+            toastService.error('No workflow selected');
             return;
           }
 
@@ -258,7 +258,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
 
           try {
             await workflowApi.updateNodeFormValues(workflowId, nodeId, formValues);
-            toastSuccess('Form values saved successfully!');
+            toastService.success('Form values saved successfully!');
           } catch (error) {
             // Revert optimistic update on error
             await get().refreshWorkflowCanvas();
@@ -267,7 +267,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               ? error.message 
               : 'Failed to save form values';
 
-            toastError('Failed to save form values', {
+            toastService.error('Failed to save form values', {
               description: errorMessage,
             });
           }
@@ -308,7 +308,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
           try {
             await workflowApi.removeNodeFromWorkflow(workflowId, nodeId);
             
-            toastSuccess('Node removed successfully!', {
+            toastService.success('Node removed successfully!', {
               description: `"${nodeName}" has been removed from the workflow.`,
             });
           } catch (error) {
@@ -319,7 +319,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               ? error.message 
               : 'Failed to remove node';
 
-            toastError('Failed to remove node', {
+            toastService.error('Failed to remove node', {
               description: errorMessage,
             });
           }
@@ -329,7 +329,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         addConnection: async (connectionData: TWorkflowConnectionCreateRequest) => {
           const { workflowId } = get();
           if (!workflowId) {
-            toastError('No workflow selected');
+            toastService.error('No workflow selected');
             return null;
           }
 
@@ -347,7 +347,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = null;
             });
 
-            toastSuccess('Connection added successfully!');
+            toastService.success('Connection added successfully!');
             return newConnection;
           } catch (error) {
             const errorMessage = error instanceof Error 
@@ -359,7 +359,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = errorMessage;
             });
 
-            toastError('Failed to add connection', {
+            toastService.error('Failed to add connection', {
               description: errorMessage,
             });
             
@@ -380,7 +380,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
 
           try {
             await workflowApi.removeConnectionFromWorkflow(workflowId, connectionId);
-            toastSuccess('Connection removed successfully!');
+            toastService.success('Connection removed successfully!');
           } catch (error) {
             // Revert optimistic update on error
             await get().refreshWorkflowCanvas();
@@ -389,7 +389,7 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               ? error.message 
               : 'Failed to remove connection';
 
-            toastError('Failed to remove connection', {
+            toastService.error('Failed to remove connection', {
               description: errorMessage,
             });
           }

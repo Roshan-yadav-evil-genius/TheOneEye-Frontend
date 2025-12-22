@@ -5,7 +5,7 @@
  * Single responsibility: API communication for Google OAuth.
  */
 
-import { axiosApiClient } from '../axios-client';
+import { BaseApiService } from '../base-api-service';
 import {
   TGoogleConnectedAccount,
   TGoogleOAuthInitiateRequest,
@@ -13,12 +13,12 @@ import {
   TGoogleOAuthCallbackRequest,
 } from '@/types';
 
-class GoogleOAuthApiService {
+class GoogleOAuthApiService extends BaseApiService {
   /**
    * Get all connected Google accounts for the current user.
    */
   async getAccounts(): Promise<TGoogleConnectedAccount[]> {
-    return axiosApiClient.get<TGoogleConnectedAccount[]>('/auth/google/accounts/');
+    return this.get<TGoogleConnectedAccount[]>('/auth/google/accounts/');
   }
 
   /**
@@ -26,21 +26,21 @@ class GoogleOAuthApiService {
    * Returns the authorization URL to redirect the user to.
    */
   async initiateOAuth(data: TGoogleOAuthInitiateRequest): Promise<TGoogleOAuthInitiateResponse> {
-    return axiosApiClient.post<TGoogleOAuthInitiateResponse>('/auth/google/initiate/', data);
+    return this.post<TGoogleOAuthInitiateResponse>('/auth/google/initiate/', data);
   }
 
   /**
    * Handle OAuth callback - exchange code for tokens.
    */
   async handleCallback(data: TGoogleOAuthCallbackRequest): Promise<TGoogleConnectedAccount> {
-    return axiosApiClient.post<TGoogleConnectedAccount>('/auth/google/callback/', data);
+    return this.post<TGoogleConnectedAccount>('/auth/google/callback/', data);
   }
 
   /**
    * Delete/disconnect a Google account.
    */
   async deleteAccount(accountId: string): Promise<void> {
-    await axiosApiClient.delete(`/auth/google/accounts/${accountId}/`);
+    return this.delete(`/auth/google/accounts/${accountId}/`);
   }
 }
 
