@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NavBar from "@/components/global/NavBar";
 import { HiOutlineUserGroup, HiOutlineCog, HiOutlineSpeakerphone, HiOutlineSupport } from "react-icons/hi";
 import ScrollFadeInSection from '@/components/common/ScrollFadeInSection';
-import { CheckCircleIcon, CheckIcon } from 'lucide-react';
+import { CheckCircleIcon, CheckIcon, Zap, Shield, TrendingUp, Building2 } from 'lucide-react';
 import DemoModal from '@/components/common/DemoModal';
 
 interface HeroProps {
@@ -17,6 +17,9 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] sm:w-[150%] sm:h-[150%] lg:w-[100%] lg:h-[100%] rounded-full bg-blue-600/10 blur-[100px]" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <ScrollFadeInSection>
+          <div className="inline-block px-6 py-3 mb-4 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
+            <p className="text-sm font-bold text-slate-50 tracking-wide">For Scale-Ready Founders & Ops Leaders</p>
+          </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
             <span className="block">Scale to $5M–$50M</span>
             <span className="block text-primary">Without Doubling Your Headcount.</span>
@@ -24,13 +27,27 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
           <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-300">
             We replace fragile, human-dependent processes with industrial-grade algorithmic infrastructure. Stop managing people to do what engines do better.
           </p>
-              <div className="mt-10 flex justify-center gap-4">
+          <div className="mt-8 max-w-2xl mx-auto">
+            <div className="relative bg-slate-800/30 border border-slate-700/50 rounded-xl p-8 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-primary/70 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-primary/50 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+                <p className="text-xs text-slate-400 font-mono">Architectural Diagram: LinkedIn Prospecting Engine</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col items-center gap-3">
             <button
               onClick={onBookDemo}
               className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary"
             >
               Apply for a 7-Day Proof-of-Concept
             </button>
+            <p className="text-sm text-slate-400">Zero technical debt. Zero upfront cost.</p>
           </div>
         </ScrollFadeInSection>
       </div>
@@ -63,7 +80,7 @@ const Process: React.FC = () => {
   ];
 
   return (
-    <section id="process" className="py-20 md:py-28">
+    <section id="process" className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The OneEye Integration Protocol</h2>
@@ -117,7 +134,7 @@ const Services: React.FC = () => {
   ];
 
   return (
-      <section id="services" className="py-20 md:py-28 bg-slate-900/50">
+      <section id="services" className="py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollFadeInSection className="text-center">
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Industrial-Grade Infrastructure</h2>
@@ -154,12 +171,15 @@ const Services: React.FC = () => {
 
 const PlatformAuthority: React.FC = () => {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Built on Industry-Standard Infrastructure</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Powered by Enterprise-Grade Infrastructure</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
             We leverage the world's most advanced algorithmic models from OpenAI and Anthropic to build your infrastructure. We don't experiment with unproven tech; we deploy industry-standard power.
+          </p>
+          <p className="mt-2 max-w-2xl mx-auto text-base text-slate-400 italic">
+            We aren't building this in your basement with "no-name" tools.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 flex flex-wrap justify-center items-center gap-8 md:gap-12">
@@ -188,7 +208,7 @@ const PlatformAuthority: React.FC = () => {
 
 const CostOfDoingNothing: React.FC<HeroProps> = ({ onBookDemo }) => {
   return (
-    <section className="py-20 md:py-28 bg-slate-900/50">
+    <section className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Cost of Doing Nothing</h2>
@@ -259,12 +279,12 @@ const SystemStressTest: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The 3 Fracture Points We Fix First</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            Not sure if your business is ready for automation? We've audited dozens of workflows. Here are the 3 'Fracture Points' we look for first...
+            Not sure if your business is ready for automation? We've audited dozens of workflows. Here are the 3 "Fracture Points" we look for first—and how they're costing you revenue.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -287,7 +307,7 @@ const SystemStressTest: React.FC = () => {
 
 const BeforeAfter: React.FC = () => {
   return (
-    <section className="py-20 md:py-28 bg-slate-900/50">
+    <section className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Hero Culture vs. The Sovereign System</h2>
@@ -352,10 +372,10 @@ const BeforeAfter: React.FC = () => {
 
 const Benefits: React.FC = () => {
   const whyChooseUs = [
-      { title: "Eliminate the Human Bottleneck", description: "We remove the dependency on people for repetitive tasks. Your team focuses on strategy, not data entry." },
-      { title: "Guaranteed Outcomes", description: "We deliver measurable ROI, not promises. 99.9% uptime with $0 marginal cost per transaction." },
-      { title: "Self-Healing Infrastructure", description: "Our systems adapt and repair automatically. No manual intervention required as your business scales." },
-      { title: "Architectural Integrity", description: "We build infrastructure that doesn't break. Industrial-grade systems designed for enterprise scale." }
+      { icon: <Zap className="w-6 h-6" />, title: "Eliminate the Human Bottleneck", description: "We remove the dependency on people for repetitive tasks. Your team focuses on strategy, not data entry." },
+      { icon: <Shield className="w-6 h-6" />, title: "Guaranteed Outcomes", description: "We deliver measurable ROI, not promises. 99.9% uptime with $0 marginal cost per transaction." },
+      { icon: <TrendingUp className="w-6 h-6" />, title: "Self-Healing Infrastructure", description: "Our systems adapt and repair automatically. No manual intervention required as your business scales." },
+      { icon: <Building2 className="w-6 h-6" />, title: "Architectural Integrity", description: "We build infrastructure that doesn't break. Industrial-grade systems designed for enterprise scale." }
   ];
 
   const businessBenefits = [
@@ -367,7 +387,7 @@ const Benefits: React.FC = () => {
   ];
 
   return (
-      <section id="benefits" className="py-20 md:py-28">
+      <section id="benefits" className="py-20 md:py-28 bg-slate-900/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                   <ScrollFadeInSection>
@@ -376,9 +396,14 @@ const Benefits: React.FC = () => {
                           <p className="mt-4 text-lg text-slate-300">We don't automate tasks—we architect infrastructure that eliminates the need for human intervention in repetitive processes.</p>
                           <div className="mt-8 space-y-6">
                               {whyChooseUs.map((item, index) => (
-                                  <div key={index} className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                                  <div key={index} className="flex items-start space-x-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                                      <div className="flex-shrink-0 bg-primary/10 text-primary p-3 rounded-lg">
+                                          {item.icon}
+                                      </div>
+                                      <div>
                                       <h3 className="font-semibold text-primary">{item.title}</h3>
                                       <p className="text-slate-400">{item.description}</p>
+                                      </div>
                                   </div>
                               ))}
                           </div>
@@ -406,7 +431,7 @@ const Benefits: React.FC = () => {
 
 const ROIBlueprint: React.FC = () => {
   return (
-    <section id="roi-blueprint" className="py-20 md:py-28 bg-slate-900/50">
+    <section id="roi-blueprint" className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The ROI Blueprint: How We Architect $X Million Operations</h2>
@@ -468,12 +493,12 @@ const ROIBlueprint: React.FC = () => {
   );
 };
 
-const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
+const SevenDaySprint: React.FC<HeroProps> = ({ onBookDemo }) => {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Proof of Concept Protocol</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The 7-Day Proof-of-Concept Sprint</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
             Your First Engine is on Us.
           </p>
@@ -481,11 +506,6 @@ const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
         <div className="mt-12 max-w-3xl mx-auto">
           <ScrollFadeInSection>
             <div className="p-8 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/50 rounded-xl">
-              <div className="text-center mb-6">
-                <div className="inline-block px-6 py-2 bg-primary/20 border border-primary/50 rounded-full">
-                  <span className="text-2xl font-bold text-primary">3 of 5 spots remaining</span>
-                </div>
-              </div>
               <div className="space-y-4 text-slate-300">
                 <p className="text-lg text-center">
                   <strong className="text-slate-50">We don't do 'demos' with slide decks. We do demos with production-ready infrastructure.</strong>
@@ -507,14 +527,55 @@ const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
                     ⚠️ We only offer the 7-Day Sprint to companies that have the potential to reclaim 500+ hours a year. We need 30 minutes with your Ops Lead to identify the 'Fracture Point' where we can have the most immediate financial impact.
                   </p>
                 </div>
+              </div>
+              <div className="mt-8 text-center">
+                <button
+                  onClick={onBookDemo}
+                  className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300"
+                >
+                  Apply for the 7-Day Sprint
+                </button>
+              </div>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
+  return (
+    <section className="py-20 md:py-28 bg-slate-900/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection className="text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Founding Partner Program</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
+            Because we are currently selecting our first 5 foundational partners for 2024, you aren't getting a junior account manager.
+          </p>
+        </ScrollFadeInSection>
+        <div className="mt-12 max-w-3xl mx-auto">
+          <ScrollFadeInSection>
+            <div className="p-8 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/50 rounded-xl">
+              <div className="text-center mb-6">
+                <div className="inline-block px-6 py-2 bg-primary/20 border border-primary/50 rounded-full">
+                  <span className="text-2xl font-bold text-primary">3 of 5 spots remaining</span>
+                </div>
+              </div>
+              <div className="space-y-4 text-slate-300">
+                <p className="text-lg text-center">
+                  <strong className="text-slate-50">You are getting the Founders—the architects themselves—building your system.</strong>
+                </p>
+                <p className="text-center">
+                  Once we hit capacity, the price triples and the access decreases. This is your opportunity to work directly with the team that designed the protocol.
+                </p>
                 <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
-                  <p className="text-slate-50 font-semibold mb-2">Founding Partner Benefits (After Sprint):</p>
+                  <p className="text-slate-50 font-semibold mb-2">Founding Partner Benefits:</p>
                   <ul className="space-y-2 text-slate-300">
                     <li>✓ Direct access to founders and architects</li>
                     <li>✓ Custom system design (not template-based)</li>
                     <li>✓ Locked-in pricing (no future increases)</li>
                     <li>✓ Priority support and optimization</li>
-                    <li>✓ Once we hit capacity, the price triples and the access decreases</li>
                   </ul>
                 </div>
               </div>
@@ -523,7 +584,7 @@ const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
                   onClick={onBookDemo}
                   className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300"
                 >
-                  Apply for the 7-Day Sprint
+                  Reserve Your Founding Partner Spot
                 </button>
               </div>
             </div>
@@ -585,7 +646,7 @@ const RiskReversal: React.FC = () => {
 
 const ConsultantVsVendor: React.FC = () => {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Consultant vs. Vendor: Why We're Not Another SaaS</h2>
@@ -655,6 +716,32 @@ const ConsultantVsVendor: React.FC = () => {
 };
 
 
+const FoundersNote: React.FC = () => {
+  return (
+    <section className="py-20 md:py-28 bg-slate-900/50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection>
+          <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">Why We Build</h2>
+            <p className="text-slate-300 text-lg leading-relaxed mb-4">
+              In a startup, you're not just buying automation—you're buying <strong>the founders' vision</strong>. We built TheOneEye because we watched too many founders burn out managing people to do what machines do better.
+            </p>
+            <p className="text-slate-300 text-lg leading-relaxed mb-4">
+              Every system we architect is built with one question in mind: <strong>"Can this business run without the founder?"</strong> If the answer is no, we haven't done our job.
+            </p>
+            <p className="text-slate-300 text-lg leading-relaxed">
+              We're not here to sell you tools. We're here to build infrastructure that makes your business <strong>sovereign, scalable, and sellable</strong>—whether you're in the office or on a beach.
+            </p>
+            <p className="mt-6 text-slate-400 italic">
+              — The OneEye Team
+            </p>
+          </div>
+        </ScrollFadeInSection>
+      </div>
+    </section>
+  );
+};
+
 const About: React.FC = () => {
   const missionPoints = [
     "Architect industrial-grade infrastructure, not fragile task automation.",
@@ -665,7 +752,7 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="py-20 md:py-28">
+    <section id="about" className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <ScrollFadeInSection>
@@ -773,7 +860,7 @@ const Faq: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-20 md:py-28">
+    <section id="faq" className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Frequently Asked Questions</h2>
@@ -826,8 +913,46 @@ const Cta: React.FC<CtaProps> = ({ onBookDemo }) => {
 const Footer: React.FC = () => {
   return (
       <footer className="bg-slate-900 border-t border-slate-800">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-400">
+          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                  <div>
+                      <h3 className="text-slate-50 font-semibold mb-4">TheOneEye</h3>
+                      <p className="text-slate-400 text-sm">
+                          Industrial-grade automation infrastructure for scale-ready businesses.
+                      </p>
+                  </div>
+                  <div>
+                      <h3 className="text-slate-50 font-semibold mb-4">Legal</h3>
+                      <ul className="space-y-2 text-sm">
+                          <li><Link href="/privacy" className="text-slate-400 hover:text-primary transition-colors">Privacy Policy</Link></li>
+                          <li><Link href="/terms" className="text-slate-400 hover:text-primary transition-colors">Terms of Service</Link></li>
+                      </ul>
+                  </div>
+                  <div>
+                      <h3 className="text-slate-50 font-semibold mb-4">Company</h3>
+                      <ul className="space-y-2 text-sm">
+                          <li><Link href="/about" className="text-slate-400 hover:text-primary transition-colors">About</Link></li>
+                          <li><Link href="/contact" className="text-slate-400 hover:text-primary transition-colors">Contact</Link></li>
+                      </ul>
+                  </div>
+                  <div>
+                      <h3 className="text-slate-50 font-semibold mb-4">Connect</h3>
+                      <div className="flex gap-4">
+                          <a href="#" className="text-slate-400 hover:text-primary transition-colors" aria-label="LinkedIn">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                          </a>
+                          <a href="#" className="text-slate-400 hover:text-primary transition-colors" aria-label="Twitter">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                          </a>
+                          <a href="#" className="text-slate-400 hover:text-primary transition-colors" aria-label="GitHub">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+              <div className="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
               <p>&copy; {new Date().getFullYear()} TheOneEye. All rights reserved.</p>
+              </div>
           </div>
       </footer>
   );
@@ -841,22 +966,23 @@ export default function Home() {
 
   return (
     <main className="flex flex-col gap-10">
-      <NavBar />
+      <NavBar onBookDemo={handleOpenModal} />
       <main>
         <HeroSection onBookDemo={handleOpenModal} />
-        <Process />
-        <Services />
-        <PlatformAuthority />
+        <SevenDaySprint onBookDemo={handleOpenModal} />
         <CostOfDoingNothing onBookDemo={handleOpenModal} />
         <SystemStressTest />
-        <BeforeAfter />
-        <Benefits />
         <ROIBlueprint />
-        <FoundingPartner onBookDemo={handleOpenModal} />
+        <BeforeAfter />
+        <Services />
+        <Process />
+        <PlatformAuthority />
         <RiskReversal />
         <ConsultantVsVendor />
         <Faq />
+        <FoundingPartner onBookDemo={handleOpenModal} />
         <Cta onBookDemo={handleOpenModal} />
+        <FoundersNote />
         <About />
       </main>
       <Footer />
