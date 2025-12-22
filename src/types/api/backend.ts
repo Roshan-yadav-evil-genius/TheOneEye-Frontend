@@ -36,6 +36,8 @@ export interface BackendWorkflowCanvasResponse {
     name: string;
     description: string;
     status: string;
+    runs_count: number;
+    last_run?: string | null;
   };
 }
 

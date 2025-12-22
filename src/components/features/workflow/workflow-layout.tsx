@@ -6,6 +6,7 @@ import { WorkflowStatsHeader } from "./workflow-stats-header";
 import { WorkflowCanvas } from "./workflow-canvas";
 import { useWorkflowLayout } from "@/hooks/useWorkflowLayout";
 import { useWorkflowExecution } from "@/hooks/useWorkflowExecution";
+import { useWorkflowCanvasStore } from "@/stores";
 import { cn } from "@/lib/utils";
 
 interface WorkflowLayoutProps {
@@ -36,6 +37,9 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
     startExecution,
     stopExecution,
   } = useWorkflowExecution({ workflowId });
+
+  // Get workflow data from canvas store
+  const { workflow } = useWorkflowCanvasStore();
 
   // Sidebar resize state
   const [sidebarWidth, setSidebarWidth] = useState(MIN_SIDEBAR_WIDTH);
@@ -129,6 +133,7 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             showMinimap={showMinimap}
             onMinimapToggle={handleMinimapToggle}
             workflowId={workflowId}
+            workflow={workflow}
           />
         </div>
 

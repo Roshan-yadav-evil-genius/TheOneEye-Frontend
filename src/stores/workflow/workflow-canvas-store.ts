@@ -27,6 +27,8 @@ interface WorkflowCanvasState {
     name: string;
     description: string;
     status: string;
+    runs_count: number;
+    last_run?: string | null;
   } | null;
   
   // Loading and Error States

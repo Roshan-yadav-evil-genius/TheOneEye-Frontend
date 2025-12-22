@@ -22,6 +22,7 @@ import {
   IconMap,
   IconMapOff
 } from "@tabler/icons-react";
+import { formatRelativeDate } from "@/lib/dates";
 
 interface WorkflowStatsHeaderProps {
   isRunning: boolean;
@@ -34,17 +35,12 @@ interface WorkflowStatsHeaderProps {
   showMinimap: boolean;
   onMinimapToggle: () => void;
   workflowId?: string;
+  workflow?: {
+    runs_count: number;
+    last_run?: string | null;
+    status: string;
+  } | null;
 }
-
-// Mock stats data - in a real app this would come from props or API
-const mockStats = {
-  totalRuns: 1247,
-  successRate: 94.2,
-  avgExecutionTime: "2.3s",
-  activeWorkflows: 8,
-  lastRun: "2 minutes ago",
-  nextScheduled: "in 1 hour",
-};
 
 const lineTypeOptions = [
   { value: 'straight', label: 'Straight', icon: IconMinus, description: 'Direct lines' },
@@ -53,7 +49,61 @@ const lineTypeOptions = [
   { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
 ];
 
-export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle }: WorkflowStatsHeaderProps) {
+export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflow }: WorkflowStatsHeaderProps) {
+  // Get status badge based on workflow status
+  const getStatusBadge = () => {
+    if (isRunning) {
+      return (
+        <>
+          <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
+          <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
+            Running
+          </Badge>
+        </>
+      );
+    }
+    
+    if (!workflow) {
+      return (
+        <>
+          <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
+          <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
+            Stopped
+          </Badge>
+        </>
+      );
+    }
+    
+    const status = workflow.status;
+    if (status === 'active') {
+      return (
+        <>
+          <div className="h-1.5 w-1.5 bg-green-500 rounded-full"></div>
+          <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
+            Active
+          </Badge>
+        </>
+      );
+    }
+    if (status === 'error') {
+      return (
+        <>
+          <div className="h-1.5 w-1.5 bg-red-500 rounded-full"></div>
+          <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 text-xs px-2 py-0.5">
+            Error
+          </Badge>
+        </>
+      );
+    }
+    return (
+      <>
+        <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
+          Inactive
+        </Badge>
+      </>
+    );
+  };
   return (
     <div className="px-3 py-2">
       <div className="flex items-center justify-between">
@@ -77,30 +127,12 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
 
           <div className="flex items-center gap-4">
             {/* Total Runs */}
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold">{mockStats.totalRuns.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">Runs</div>
-            </div>
-
-            {/* Success Rate */}
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold text-green-600 dark:text-green-400">
-                {mockStats.successRate}%
+            {workflow && (
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-semibold">{workflow.runs_count.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Runs</div>
               </div>
-              <div className="text-xs text-muted-foreground">Success</div>
-            </div>
-
-            {/* Avg Execution Time */}
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold">{mockStats.avgExecutionTime}</div>
-              <div className="text-xs text-muted-foreground">Avg Time</div>
-            </div>
-
-            {/* Active Workflows */}
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold">{mockStats.activeWorkflows}</div>
-              <div className="text-xs text-muted-foreground">Active</div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -108,28 +140,16 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
         <div className="flex items-center gap-2">
           {/* Status Badge */}
           <div className="flex items-center gap-1">
-            {isRunning ? (
-              <>
-                <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
-                  Running
-                </Badge>
-              </>
-            ) : (
-              <>
-                <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
-                <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
-                  Stopped
-                </Badge>
-              </>
-            )}
+            {getStatusBadge()}
           </div>
 
-          {/* Last Run Info */}
-          <div className="text-xs text-muted-foreground flex items-center gap-1">
-            <IconClock className="h-3 w-3" />
-            <span>Last: {mockStats.lastRun}</span>
-          </div>
+          {/* Last Run Info - Hide when workflow is active or running */}
+          {workflow && !isRunning && workflow.status !== 'active' && (
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <IconClock className="h-3 w-3" />
+              <span>Last: {workflow.last_run ? formatRelativeDate(workflow.last_run) : "Never"}</span>
+            </div>
+          )}
 
           {/* Line Type Selector */}
           <DropdownMenu>
@@ -202,22 +222,6 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
           </div>
         </div>
       </div>
-
-      {/* Progress Bar (shown when running) */}
-      {isRunning && (
-        <div className="mt-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-            <span>Execution Progress</span>
-            <span>Step 3 of 7</span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
-            <div 
-              className="bg-primary h-1 rounded-full transition-all duration-300"
-              style={{ width: "43%" }}
-            ></div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
