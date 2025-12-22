@@ -73,10 +73,6 @@ export function WorkflowTableRow({
     );
   };
 
-  const formatSuccessRate = (rate: number) => {
-    return `${rate.toFixed(1)}%`;
-  };
-
   return (
     <TableRow>
       <TableCell>
@@ -116,11 +112,6 @@ export function WorkflowTableRow({
       {columns.find(col => col.id === "runsCount")?.visible && (
         <TableCell className="text-sm">
           {workflow.runsCount.toLocaleString()}
-        </TableCell>
-      )}
-      {columns.find(col => col.id === "successRate")?.visible && (
-        <TableCell className="text-sm">
-          {formatSuccessRate(workflow.successRate)}
         </TableCell>
       )}
       <TableCell>

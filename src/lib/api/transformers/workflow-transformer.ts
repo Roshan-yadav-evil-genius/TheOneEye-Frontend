@@ -19,7 +19,6 @@ export interface BackendWorkflow {
   last_run?: string;
   next_run?: string;
   runs_count: number;
-  success_rate: number;
   tags: string[];
   created_at: string;
   updated_at: string;
@@ -44,7 +43,6 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       lastRun: backend.last_run,
       nextRun: backend.next_run,
       runsCount: backend.runs_count,
-      successRate: backend.success_rate,
       tags: backend.tags || [],
       createdAt: backend.created_at,
       updatedAt: backend.updated_at,
@@ -60,7 +58,6 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       category: frontend.category,
       status: frontend.status,
       runs_count: frontend.runsCount,
-      success_rate: frontend.successRate,
       tags: frontend.tags,
       created_by: frontend.createdBy,
     };

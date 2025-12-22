@@ -86,7 +86,6 @@ const defaultColumnConfigs: ColumnConfig[] = [
   { id: "lastRun", label: "Last Run", visible: true },
   { id: "nextRun", label: "Next Run", visible: true },
   { id: "runsCount", label: "Runs Count", visible: true },
-  { id: "successRate", label: "Success Rate", visible: true },
 ];
 
 const defaultTableState: WorkflowTableState = {
@@ -399,10 +398,6 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
         case 'runsCount':
           aValue = a.runs_count || 0;
           bValue = b.runs_count || 0;
-          break;
-        case 'successRate':
-          aValue = a.success_rate || 0;
-          bValue = b.success_rate || 0;
           break;
         default:
           aValue = a.name.toLowerCase();

@@ -18,7 +18,6 @@ interface WorkflowCardProps {
   lastRun?: string
   nextRun?: string
   runsCount: number
-  successRate: number
   onRun?: (id: string) => void
   onEdit?: (id: string) => void
   onView?: (id: string) => void
@@ -32,7 +31,6 @@ export function WorkflowCard({
   lastRun,
   nextRun,
   runsCount,
-  successRate,
   onRun,
   onEdit,
   onView,
@@ -51,12 +49,6 @@ export function WorkflowCard({
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
     }
-  }
-
-  const getSuccessRateColor = (rate: number) => {
-    if (rate >= 90) return "text-green-600 dark:text-green-400"
-    if (rate >= 70) return "text-yellow-600 dark:text-yellow-400"
-    return "text-red-600 dark:text-red-400"
   }
 
   return (
@@ -117,12 +109,6 @@ export function WorkflowCard({
                 <IconPray className="h-3 w-3" />
                 runs
               </span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className={`font-semibold text-base ${getSuccessRateColor(successRate)}`}>
-                {successRate}%
-              </span>
-              <span className="text-muted-foreground text-xs">success</span>
             </div>
           </div>
         </div>

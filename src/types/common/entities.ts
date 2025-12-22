@@ -34,7 +34,6 @@ export interface TWorkflow {
   last_run?: string;  // ✅ Match backend
   next_run?: string;  // ✅ Match backend
   runs_count: number;  // ✅ Match backend
-  success_rate: number;  // ✅ Match backend
   tags: string[];
   created_by?: string;  // ✅ Match backend
   created_at: string;  // ✅ Match backend

@@ -29,7 +29,6 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         connections: [],
         status: 'inactive' as const,
         runsCount: 0,
-        successRate: 0,
         tags: [],
         createdAt: new Date(),
         updatedAt: new Date(),
