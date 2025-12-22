@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ApiService } from '@/lib/api/api-service';
+import { demoApi } from '@/lib/api/services/demo-api';
 
 interface DemoModalProps {
   isOpen: boolean;
@@ -45,7 +45,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
 
     try {
       // Submit to backend API
-      await ApiService.createDemoRequest({
+      await demoApi.createDemoRequest({
         full_name: formData.fullName,
         company_name: formData.companyName,
         work_email: formData.workEmail,

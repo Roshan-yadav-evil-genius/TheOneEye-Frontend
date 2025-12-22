@@ -56,7 +56,12 @@ export const useWorkflowListStore = create<WorkflowListStore>()(
         set({ isLoading: true, error: null });
         
         try {
+          const { logger } = await import('@/lib/logging');
+          logger.debug('Loading workflows from API', undefined, 'workflow-list-store');
+          
           const response = await workflowApi.getWorkflows();
+          
+          logger.debug(`Received ${response.length} workflows from API`, { count: response.length }, 'workflow-list-store');
           
           // Transform backend response to frontend format
           const workflows: TWorkflow[] = response.map((workflow: Record<string, unknown>) => ({
@@ -77,12 +82,17 @@ export const useWorkflowListStore = create<WorkflowListStore>()(
             createdBy: workflow.created_by as string,
           }));
 
+          logger.info(`Successfully loaded ${workflows.length} workflows`, { count: workflows.length }, 'workflow-list-store');
+
           set({
             workflows,
             isLoading: false,
             error: null,
           });
         } catch (error) {
+          const { logger } = await import('@/lib/logging');
+          logger.error('Failed to load workflows', error, 'workflow-list-store');
+          
           set({
             isLoading: false,
             error: error instanceof Error ? error.message : 'Failed to load workflows',

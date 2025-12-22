@@ -21,7 +21,20 @@ class WorkflowApiService {
 
   // Workflow CRUD operations
   async getWorkflows(): Promise<TWorkflow[]> {
-    return axiosApiClient.get<TWorkflow[]>('/workflow/');
+    const response = await axiosApiClient.get<{ results: TWorkflow[] } | TWorkflow[]>('/workflow/');
+    
+    // Handle paginated response (DRF returns { results: [...] }) or direct array
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // If it's a paginated response, return the results array
+    if (response && typeof response === 'object' && 'results' in response) {
+      return (response as { results: TWorkflow[] }).results;
+    }
+    
+    // Fallback: return empty array if unexpected format
+    return [];
   }
 
   async createWorkflow(workflowData: Partial<TWorkflow>): Promise<TWorkflow> {

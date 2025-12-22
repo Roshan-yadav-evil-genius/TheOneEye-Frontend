@@ -70,7 +70,11 @@ export const initializeStores = async () => {
   try {
     await loadWorkflows();
   } catch (error) {
-    console.error('Failed to initialize stores:', error);
+    // Use logger if available, fallback to console
+    if (typeof window !== 'undefined') {
+      const { logger } = await import('@/lib/logging');
+      logger.error('Failed to initialize stores', error, 'store-initialization');
+    }
   }
 };
 

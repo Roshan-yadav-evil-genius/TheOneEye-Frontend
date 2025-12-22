@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { TUser, TUserState } from './types';
+import { authApi } from '@/lib/api/services/auth-api';
+import { logger } from '@/lib/logging';
 
 interface TUserActions {
   // Authentication actions
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   register: (userData: Partial<TUser> & { password: string }) => Promise<void>;
   
   // TUser data actions
@@ -38,29 +40,30 @@ export const useUserStore = create<TUserStore>()(
           set({ isLoading: true, error: null });
           
           try {
-            // TODO: Replace with actual API call
-            // const response = await authApi.login(email, password);
+            const response = await authApi.login({ username: email, password });
             
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Mock user data - replace with actual response
-            const user: TUser = {
-              id: '1',
-              name: 'Roshan Yadav',
-              email: 'roshan.yadav@12thwonder.com',
-              avatar: '/avatars/shadcn.jpg',
-              role: 'admin',
-              permissions: ['read', 'write', 'admin'],
-            };
+            // Store tokens in auth store (handled by auth store)
+            if (typeof window !== 'undefined') {
+              const authStore = localStorage.getItem('auth-store');
+              if (authStore) {
+                const authData = JSON.parse(authStore);
+                authData.state = {
+                  ...authData.state,
+                  token: response.access,
+                  refreshToken: response.refresh,
+                };
+                localStorage.setItem('auth-store', JSON.stringify(authData));
+              }
+            }
 
             set({
-              user,
+              user: response.user,
               isAuthenticated: true,
               isLoading: false,
               error: null,
             });
           } catch (error) {
+            logger.error('Login failed', error, 'user-store');
             set({
               user: null,
               isAuthenticated: false,
@@ -70,41 +73,67 @@ export const useUserStore = create<TUserStore>()(
           }
         },
 
-        logout: () => {
-          set({
-            user: null,
-            isAuthenticated: false,
-            error: null,
-          });
+        logout: async () => {
+          try {
+            // Get refresh token from localStorage
+            if (typeof window !== 'undefined') {
+              const authStore = localStorage.getItem('auth-store');
+              if (authStore) {
+                const authData = JSON.parse(authStore);
+                if (authData.state?.refreshToken) {
+                  await authApi.logout(authData.state.refreshToken);
+                }
+              }
+            }
+          } catch (error) {
+            logger.error('Logout error', error, 'user-store');
+          } finally {
+            set({
+              user: null,
+              isAuthenticated: false,
+              error: null,
+            });
+          }
         },
 
         register: async (userData: Partial<TUser> & { password: string }) => {
           set({ isLoading: true, error: null });
           
           try {
-            // TODO: Replace with actual API call
-            // const response = await authApi.register(userData);
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Mock user data - replace with actual response
-            const user: TUser = {
-              id: Date.now().toString(),
-              name: userData.name || 'New TUser',
+            // Map userData to API format
+            const registerData = {
+              username: userData.email || '',
               email: userData.email || '',
-              avatar: userData.avatar,
-              role: 'user',
-              permissions: ['read'],
+              first_name: userData.name?.split(' ')[0] || '',
+              last_name: userData.name?.split(' ').slice(1).join(' ') || '',
+              password: userData.password,
+              password_confirm: userData.password,
             };
 
+            const response = await authApi.register(registerData);
+            
+            // Store tokens in auth store
+            if (typeof window !== 'undefined') {
+              const authStore = localStorage.getItem('auth-store');
+              if (authStore) {
+                const authData = JSON.parse(authStore);
+                authData.state = {
+                  ...authData.state,
+                  token: response.access,
+                  refreshToken: response.refresh,
+                };
+                localStorage.setItem('auth-store', JSON.stringify(authData));
+              }
+            }
+
             set({
-              user,
+              user: response.user,
               isAuthenticated: true,
               isLoading: false,
               error: null,
             });
           } catch (error) {
+            logger.error('Registration failed', error, 'user-store');
             set({
               user: null,
               isAuthenticated: false,
@@ -122,12 +151,9 @@ export const useUserStore = create<TUserStore>()(
           set({ isLoading: true, error: null });
           
           try {
-            // TODO: Replace with actual API call
-            // const response = await userApi.updateTUser(user.id, userData);
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
+            // Note: Update user endpoint may not exist yet
+            // For now, update local state only
+            // TODO: Implement user update endpoint in backend if needed
             const updatedTUser = { ...user, ...userData };
             
             set({
@@ -136,6 +162,7 @@ export const useUserStore = create<TUserStore>()(
               error: null,
             });
           } catch (error) {
+            logger.error('Update user failed', error, 'user-store');
             set({
               isLoading: false,
               error: error instanceof Error ? error.message : 'Update failed',
@@ -144,24 +171,28 @@ export const useUserStore = create<TUserStore>()(
         },
 
         refreshTUser: async () => {
-          const { user } = get();
-          if (!user) return;
-
           set({ isLoading: true, error: null });
           
           try {
-            // TODO: Replace with actual API call
-            // const response = await userApi.getTUser(user.id);
+            const currentUser = await authApi.getCurrentUser();
             
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // For now, just clear loading state
-            set({
-              isLoading: false,
-              error: null,
-            });
+            if (currentUser) {
+              set({
+                user: currentUser,
+                isAuthenticated: true,
+                isLoading: false,
+                error: null,
+              });
+            } else {
+              set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null,
+              });
+            }
           } catch (error) {
+            logger.error('Refresh user failed', error, 'user-store');
             set({
               isLoading: false,
               error: error instanceof Error ? error.message : 'Refresh failed',

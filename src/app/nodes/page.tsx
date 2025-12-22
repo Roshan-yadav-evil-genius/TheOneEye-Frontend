@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { NodesTable, NodeExecuteDialog } from "@/components/features/nodes";
-import { ApiService } from "@/lib/api/api-service";
+import { nodeApi } from "@/lib/api/services/node-api";
+import { logger } from "@/lib/logging";
 import { TNodeMetadata } from "@/types";
 
 export default function NodesPage() {
@@ -17,10 +18,10 @@ export default function NodesPage() {
   const fetchNodes = async () => {
     setIsLoading(true);
     try {
-      const data = await ApiService.getNodesFlat();
+      const data = await nodeApi.getNodesFlat();
       setNodes(data);
     } catch (error) {
-      console.error("Failed to fetch nodes:", error);
+      logger.error("Failed to fetch nodes", error, "nodes-page");
       setNodes([]);
     } finally {
       setIsLoading(false);
@@ -29,10 +30,10 @@ export default function NodesPage() {
 
   const handleRefresh = async () => {
     try {
-      await ApiService.refreshNodeCache();
+      await nodeApi.refreshNodeCache();
       await fetchNodes();
     } catch (error) {
-      console.error("Failed to refresh nodes:", error);
+      logger.error("Failed to refresh nodes", error, "nodes-page");
     }
   };
 

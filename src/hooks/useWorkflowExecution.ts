@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ApiService } from "@/lib/api/api-service";
+import { workflowApi } from "@/lib/api/services/workflow-api";
 import { 
   workflowWsManager, 
   type NodeCompletedData, 
@@ -51,7 +51,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       if (!workflowId || !taskId) return;
       
       try {
-        const response = await ApiService.getWorkflowTaskStatus(workflowId);
+        const response = await workflowApi.getWorkflowTaskStatus(workflowId);
         setTaskStatus(response.status);
         
         // Update isRunning based on status
@@ -94,7 +94,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       // Connect WebSocket via singleton manager
       workflowWsManager.connect(workflowId);
       
-      const response = await ApiService.startWorkflowExecution(workflowId);
+      const response = await workflowApi.startWorkflowExecution(workflowId);
       setTaskId(response.task_id);
       setTaskStatus(response.status);
       setIsRunning(true);
@@ -111,7 +111,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     }
 
     try {
-      await ApiService.stopWorkflowExecution(workflowId);
+      await workflowApi.stopWorkflowExecution(workflowId);
       setTaskId(null);
       setTaskStatus(null);
       setIsRunning(false);
@@ -253,13 +253,13 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       
       try {
         // Fetch workflow to get task_id
-        const workflows = await ApiService.getWorkflows();
+        const workflows = await workflowApi.getWorkflows();
         const workflow = workflows.find(w => w.id === workflowId);
         
         if (workflow?.task_id) {
           setTaskId(workflow.task_id);
           // Check current status
-          const statusResponse = await ApiService.getWorkflowTaskStatus(workflowId);
+          const statusResponse = await workflowApi.getWorkflowTaskStatus(workflowId);
           setTaskStatus(statusResponse.status);
           
           const runningStates = ['PENDING', 'STARTED', 'RETRY'];

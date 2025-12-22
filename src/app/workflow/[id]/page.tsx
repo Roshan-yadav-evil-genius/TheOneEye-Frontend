@@ -6,7 +6,7 @@ import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { WorkflowLayout } from "@/components/features/workflow/workflow-layout";
-import { ApiService } from "@/lib/api/api-service";
+import { workflowApi } from "@/lib/api/services/workflow-api";
 import { TWorkflow } from "@/types";
 import { WorkflowsStoreInitializer } from "@/components/common/workflows-store-initializer";
 
@@ -30,7 +30,7 @@ export default function Page({ params }: WorkflowDetailPageProps) {
         setError(null);
         
         // Try to load the workflow
-        const workflowData = await ApiService.getWorkflows();
+        const workflowData = await workflowApi.getWorkflows();
         const foundWorkflow = workflowData.find(w => w.id === workflowId);
         
         if (foundWorkflow) {

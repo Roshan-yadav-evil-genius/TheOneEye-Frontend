@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { TApiError } from '@/types';
+import { logger } from '@/lib/logging';
 
 // Axios-based API client with better error handling and interceptors
 class AxiosApiClient {
@@ -28,15 +29,15 @@ class AxiosApiClient {
               config.headers.Authorization = `Bearer ${authData.state.token}`;
             }
           } catch (error) {
-            console.error('Error parsing auth token:', error);
+            logger.error('Error parsing auth token', error, 'axios-client');
           }
         }
         
-        console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        logger.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`, undefined, 'axios-client');
         return config;
       },
       (error) => {
-        console.error('❌ Request Error:', error);
+        logger.error('Request Error', error, 'axios-client');
         return Promise.reject(error);
       }
     );
@@ -44,7 +45,7 @@ class AxiosApiClient {
     // Response interceptor for error handling and token refresh
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
-        console.log(`✅ API Response: ${response.status} ${response.config.url}`);
+        logger.debug(`API Response: ${response.status} ${response.config.url}`, undefined, 'axios-client');
         return response;
       },
       async (error: AxiosError) => {
@@ -91,7 +92,11 @@ class AxiosApiClient {
           }
         }
         
-        console.error('❌ API Error:', error.response?.status, error.message);
+        logger.error(
+          `API Error: ${error.response?.status || 'No status'} - ${error.message}`,
+          error,
+          'axios-client'
+        );
         
         // Transform axios error to our custom TApiError
         if (error.response) {

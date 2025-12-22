@@ -142,8 +142,27 @@ export class ErrorHandler {
    * Report to external service (e.g., Sentry, LogRocket)
    */
   private reportToExternalService(errorReport: ErrorReport): void {
-    // TODO: Implement external error reporting
-    // Example: Sentry.captureException(errorReport.error, { extra: errorReport.context });
+    // Check if Sentry is configured
+    if (typeof window !== 'undefined' && (window as any).Sentry) {
+      try {
+        (window as any).Sentry.captureException(errorReport.error, {
+          extra: errorReport.context,
+          tags: {
+            severity: errorReport.severity,
+            category: errorReport.category,
+          },
+        });
+      } catch (sentryError) {
+        // Fallback to console if Sentry fails
+        console.error('Failed to report to Sentry:', sentryError);
+      }
+    }
+    
+    // You can add other error tracking services here:
+    // - LogRocket
+    // - Bugsnag
+    // - Rollbar
+    // etc.
   }
 
   /**
