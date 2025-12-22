@@ -18,14 +18,17 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <ScrollFadeInSection>
           <div className="inline-block px-6 py-3 mb-6 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
-            <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Systems Architecture for Scaling Enterprises</p>
+            <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Done-for-You Automation for Founders</p>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
             <span className="block">Stop Managing Tasks.</span>
-            <span className="block text-primary">Start Scaling Systems.</span>
+            <span className="block text-primary">Let Systems Run Your Business.</span>
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed">
-            We replace human-dependent bottlenecks with autonomous algorithmic infrastructure. Reclaim 20+ hours of your leadership team's week while your business runs on autopilot.
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed">
+            We design, run, and maintain automations so founders never touch tools, workflows, or fixes.
+          </p>
+          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400">
+            If something breaks, we fix it before you even notice — you never touch tools or workflows.
           </p>
           <div className="mt-10 max-w-4xl mx-auto">
             <div className="relative bg-slate-900/80 border-2 border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
@@ -49,17 +52,17 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
                   <div className="flex items-center justify-center space-x-3 text-xs text-slate-400">
                     <div className="flex items-center space-x-1">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                      <span>Autonomous Infrastructure</span>
+                      <span>Runs Without You</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center space-x-1">
                       <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                      <span>Enterprise Architecture</span>
+                      <span>No Manual Work</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center space-x-1">
                       <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
-                      <span>Zero-Downtime Deployment</span>
+                      <span>Self-Monitoring</span>
                     </div>
                   </div>
                 </div>
@@ -71,13 +74,152 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
               onClick={onBookDemo}
               className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary"
             >
-              Apply for a 7-Day Proof-of-Concept
+              See if Automation Fits Your Business
             </button>
             <div className="flex flex-col items-center gap-1">
-              <p className="text-sm text-slate-400">Zero technical debt. Zero upfront cost.</p>
+              <p className="text-sm text-slate-400">No commitment. No credit card.</p>
               <p className="text-xs font-semibold text-primary">Only 2 spots remaining for January Founding Partners.</p>
             </div>
           </div>
+        </ScrollFadeInSection>
+      </div>
+    </section>
+  );
+};
+
+const LightSocialProof: React.FC = () => {
+  return (
+    <div className="text-center py-8 border-y border-slate-700/50 bg-slate-900/30">
+      <p className="text-base text-slate-300 font-medium mb-2">
+        Founder-built systems running in production • No templates • No outsourcing
+      </p>
+      <p className="text-sm text-slate-400">
+        Used across sales, ops, and growth workflows • Processing 10M+ events/month
+      </p>
+    </div>
+  );
+};
+
+const QuickLinks: React.FC = () => {
+  return (
+    <section className="py-8 bg-slate-900/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap justify-center gap-4">
+          <button
+            onClick={() => {
+              const element = document.getElementById('workflow-example');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 text-sm text-slate-300 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            How it works in 60 seconds
+          </button>
+          <button
+            onClick={() => {
+              const element = document.getElementById('workflow-example');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 text-sm text-slate-300 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            Skip to a real example
+          </button>
+          <button
+            onClick={() => {
+              const element = document.getElementById('what-we-handle');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 text-sm text-slate-300 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            What we handle vs what you don't
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const DailyLifeFit: React.FC = () => {
+  return (
+    <section className="py-20 md:py-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection className="text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">
+            Where TheOneEye Works in Your Business
+          </h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
+            We replace the manual work you do every day with systems that run automatically.
+          </p>
+        </ScrollFadeInSection>
+        
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">Lead capture & follow-ups</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">CRM updates & data sync</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">Sales outreach (LinkedIn / Email)</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">Ops approvals & notifications</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">Reporting & alerts</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
+              <p className="text-slate-300 font-medium">AI-based decision triggers</p>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+        
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ScrollFadeInSection>
+            <div className="p-6 bg-red-900/10 border-2 border-red-800/50 rounded-xl">
+              <h3 className="text-xl font-bold text-red-400 mb-4">Before</h3>
+              <p className="text-slate-300">Leads checked once a day</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-green-900/10 border-2 border-green-800/50 rounded-xl">
+              <h3 className="text-xl font-bold text-green-400 mb-4">After</h3>
+              <p className="text-slate-300">Leads followed up in 60 seconds</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-red-900/10 border-2 border-red-800/50 rounded-xl">
+              <h3 className="text-xl font-bold text-red-400 mb-4">Before</h3>
+              <p className="text-slate-300">Ops depends on one person</p>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-6 bg-green-900/10 border-2 border-green-800/50 rounded-xl">
+              <h3 className="text-xl font-bold text-green-400 mb-4">After</h3>
+              <p className="text-slate-300">Ops runs even if they're offline</p>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+        <ScrollFadeInSection className="mt-10 text-center">
+          <button
+            onClick={() => {
+              const element = document.getElementById('workflow-example');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            See if automation fits your business
+          </button>
         </ScrollFadeInSection>
       </div>
     </section>
@@ -89,22 +231,22 @@ const Process: React.FC = () => {
     {
       number: '01',
       title: 'Systemic Leak Detection',
-      description: 'Identify hidden costs and inefficiencies that drain your revenue. We audit your operations like finding a hole in a gold mine—urgent, precise, and profit-focused.'
+      description: 'This removes hidden costs draining your revenue. We find what\'s wasting your money.'
     },
     {
       number: '02',
-      title: 'Architectural Design',
-      description: 'Build industrial-grade infrastructure, not fragile connections. We design systems with architectural integrity that scale without breaking.'
+      title: 'System Design',
+      description: 'This removes fragile connections that break. We build systems that don\'t break.'
     },
     {
       number: '03',
       title: 'Seamless Integration',
-      description: 'Zero-downtime deployment with self-healing error handling. Your business continues operating while we integrate—no disruption, no risk.'
+      description: 'This removes disruption to your business. Everything keeps running while we integrate.'
     },
     {
       number: '04',
       title: 'Guaranteed Outcomes',
-      description: 'Measurable results with 99.9% uptime and $0 marginal cost per transaction. We deliver predictable ROI, not promises.'
+      description: 'This removes uncertainty. You get measurable results with 99.9% uptime.'
     }
   ];
 
@@ -112,9 +254,9 @@ const Process: React.FC = () => {
     <section id="process" className="py-20 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The OneEye Integration Protocol</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">How We Build Your Systems</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            A proven framework for building industrial-grade automation infrastructure that scales without headcount.
+            A proven framework that scales your operations without adding headcount.
           </p>
         </ScrollFadeInSection>
 
@@ -143,22 +285,22 @@ const Services: React.FC = () => {
       { 
         icon: <HiOutlineUserGroup className="text-3xl" />, 
         title: "Zero-Leak Sales Pipelines", 
-        description: "Industrial-grade lead infrastructure that captures, qualifies, and converts every opportunity with 0% human input. Eliminate revenue leakage from manual entry errors." 
+        description: "This removes manual lead entry and missed follow-ups. Every lead is captured, qualified, and converted automatically—no human input needed." 
       },
       { 
         icon: <HiOutlineCog className="text-3xl" />, 
         title: "Human Bottleneck Elimination", 
-        description: "Self-healing operational architecture that synchronizes data, manages approvals, and generates reports without human intervention. Scale operations without scaling headcount." 
+        description: "This removes the need for people to sync data, manage approvals, or generate reports. Operations scale without scaling headcount." 
       },
       { 
         icon: <HiOutlineSpeakerphone className="text-3xl" />, 
         title: "Automated Revenue Acceleration", 
-        description: "Algorithmic marketing infrastructure that segments audiences, personalizes campaigns, and tracks performance at scale. Generate revenue while you sleep." 
+        description: "This removes manual marketing work. Audiences are segmented, campaigns personalized, and performance tracked automatically." 
       },
       { 
         icon: <HiOutlineSupport className="text-3xl" />, 
         title: "24/7 Resolution Engines", 
-        description: "Intelligent support infrastructure that routes, responds, and resolves tickets automatically. Never lose a customer to delayed response times again." 
+        description: "This removes delayed customer responses. Tickets are routed, responded to, and resolved automatically—never lose a customer to slow support." 
       }
   ];
 
@@ -166,9 +308,9 @@ const Services: React.FC = () => {
       <section id="services" className="py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollFadeInSection className="text-center">
-                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Industrial-Grade Infrastructure</h2>
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Production-Ready Infrastructure</h2>
                   <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-                      We build engines, not tools. Self-healing systems designed for 99.9% uptime and zero marginal cost per transaction.
+                      We build systems designed for 99.9% uptime and zero marginal cost per transaction.
                   </p>
               </ScrollFadeInSection>
               <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -186,13 +328,6 @@ const Services: React.FC = () => {
                       </ScrollFadeInSection>
                   ))}
               </div>
-              <ScrollFadeInSection className="mt-12 text-center">
-                  <blockquote className="max-w-3xl mx-auto p-6 border-l-4 border-primary bg-slate-800/50 rounded-r-lg">
-                      <p className="text-lg italic text-slate-300">
-                          "We don't build tools. We architect infrastructure. A tool breaks; an engine heals itself."
-                      </p>
-                  </blockquote>
-              </ScrollFadeInSection>
           </div>
       </section>
   );
@@ -205,7 +340,7 @@ const PlatformAuthority: React.FC = () => {
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Powered by Enterprise-Grade Infrastructure</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            We leverage the world's most advanced algorithmic models from OpenAI and Anthropic to build your infrastructure. We don't experiment with unproven tech; we deploy industry-standard power.
+            This means you don't have to worry about unreliable tools. We use OpenAI and Anthropic—industry-standard power, not experimental tech.
           </p>
           <p className="mt-2 max-w-2xl mx-auto text-base text-slate-400 italic">
             We aren't building this in your basement with "no-name" tools.
@@ -227,8 +362,71 @@ const PlatformAuthority: React.FC = () => {
         </div>
         <ScrollFadeInSection className="mt-8 text-center">
           <p className="text-slate-400 italic">
-            Certified Architects of enterprise-grade algorithmic infrastructure
+            Certified Architects of enterprise-grade automation infrastructure
           </p>
+        </ScrollFadeInSection>
+      </div>
+    </section>
+  );
+};
+
+const SimpleWorkflowExample: React.FC<HeroProps> = ({ onBookDemo }) => {
+  return (
+    <section id="workflow-example" className="py-20 md:py-28 bg-slate-900/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection className="text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">How It Works: A Simple Example</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
+            Here's what happens when a lead comes in—automatically, without you touching anything.
+          </p>
+        </ScrollFadeInSection>
+        <div className="mt-12 max-w-4xl mx-auto">
+          <ScrollFadeInSection>
+            <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-slate-300">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">1</div>
+                  <p className="font-semibold">Lead</p>
+                  <p className="text-sm text-slate-400 mt-1">Captured</p>
+                </div>
+                <div className="text-primary text-2xl">→</div>
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">2</div>
+                  <p className="font-semibold">Enriched</p>
+                  <p className="text-sm text-slate-400 mt-1">Data added</p>
+                </div>
+                <div className="text-primary text-2xl">→</div>
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">3</div>
+                  <p className="font-semibold">Message Sent</p>
+                  <p className="text-sm text-slate-400 mt-1">Personalized</p>
+                </div>
+                <div className="text-primary text-2xl">→</div>
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">4</div>
+                  <p className="font-semibold">CRM Updated</p>
+                  <p className="text-sm text-slate-400 mt-1">Automatically</p>
+                </div>
+                <div className="text-primary text-2xl">→</div>
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">5</div>
+                  <p className="font-semibold">Report Generated</p>
+                  <p className="text-sm text-slate-400 mt-1">Daily summary</p>
+                </div>
+              </div>
+              <p className="mt-6 text-center text-sm text-slate-400 italic">
+                This is a real production workflow running autonomously—monitoring, retrying, and updating data without human input.
+              </p>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+        <ScrollFadeInSection className="mt-10 text-center">
+          <button
+            onClick={onBookDemo}
+            className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            View one real system
+          </button>
         </ScrollFadeInSection>
       </div>
     </section>
@@ -242,10 +440,7 @@ const CostOfDoingNothing: React.FC<HeroProps> = ({ onBookDemo }) => {
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Cost of Doing Nothing</h2>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-slate-300">
-            Most businesses are built on <strong className="text-red-400">"Human Middleware"</strong>—fragile processes held together by stressed employees working late nights to fix mistakes. We replace that with <strong className="text-primary">Sovereign Infrastructure</strong> that runs without you.
-          </p>
-          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400">
-            Every day you delay, you're burning money on manual labor and lost opportunities. The question isn't whether you'll automate—it's whether you'll do it before your competitors do.
+            Most businesses are built on <strong className="text-red-400">manual work done by people</strong>—fragile processes held together by stressed employees. We replace that with <strong className="text-primary">systems that run without you</strong>.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -291,22 +486,22 @@ const CostOfDoingNothing: React.FC<HeroProps> = ({ onBookDemo }) => {
   );
 };
 
-const SystemStressTest: React.FC = () => {
+const SystemStressTest: React.FC<HeroProps> = ({ onBookDemo }) => {
   const fracturePoints = [
     {
       title: "Lead Lag",
-      description: "Delayed response times kill conversion rates. Every hour a lead sits unqualified costs you revenue. We eliminate the lag with instant algorithmic triage.",
-      impact: "48-hour response time on a LinkedIn connection → 0% conversion. Our system ensures the moment they accept, they receive a personalized follow-up."
+      description: "This removes the delay between when a lead comes in and when they get a response. No more checking leads once a day—they're followed up in 60 seconds.",
+      impact: "48-hour response time → 0% conversion. Our system responds the moment they accept."
     },
     {
       title: "Manual Data Entry",
-      description: "Human error accumulates exponentially. One typo in a CRM becomes a lost deal. We eliminate manual entry with self-healing data pipelines.",
-      impact: "5% error rate → $50k in lost revenue"
+      description: "This removes manual typing into your CRM. No more typos, no more lost deals from data errors.",
+      impact: "5% error rate → $50k in lost revenue. Eliminated."
     },
     {
       title: "Hero Dependency",
-      description: "Your business breaks when your top performer is unavailable. We build systems that run identically whether your star employee is there or on vacation.",
-      impact: "Single point of failure → business risk"
+      description: "This removes your business breaking when one person is unavailable. Systems run the same whether your star employee is there or on vacation.",
+      impact: "Single point of failure → business risk. Eliminated."
     }
   ];
 
@@ -316,10 +511,7 @@ const SystemStressTest: React.FC = () => {
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The 3 Fracture Points We Fix First</h2>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-slate-300">
-            Most businesses are built on <strong className="text-red-400">"Human Middleware"</strong>—fragile processes held together by stressed employees. We've audited dozens of workflows. Here are the 3 "Fracture Points" that are killing your margins right now.
-          </p>
-          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400 italic">
-            If your business depends on a "hero employee" working late to fix mistakes, you're one resignation away from collapse.
+            We've audited dozens of workflows. Here are the 3 "Fracture Points" that are killing your margins right now.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -335,6 +527,14 @@ const SystemStressTest: React.FC = () => {
             </ScrollFadeInSection>
           ))}
         </div>
+        <ScrollFadeInSection className="mt-10 text-center">
+          <button
+            onClick={onBookDemo}
+            className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            Find my biggest bottleneck
+          </button>
+        </ScrollFadeInSection>
       </div>
     </section>
   );
@@ -345,9 +545,9 @@ const BeforeAfter: React.FC = () => {
     <section className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Hero Culture vs. The Sovereign System</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The Hero Culture vs. The Automated System</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            High-ticket buyers don't buy automation—they buy peace of mind and sellability.
+            You don't buy automation—you buy peace of mind and a sellable business.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -357,11 +557,11 @@ const BeforeAfter: React.FC = () => {
               <ul className="space-y-3 text-slate-300 flex-grow">
                 <li className="flex items-start">
                   <span className="text-red-400 mr-2">✗</span>
-                  <span>Everything relies on a 'hero' employee working late to fix mistakes</span>
+                  <span>One person works late to fix mistakes</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-red-400 mr-2">✗</span>
-                  <span>Manual Lead Entry → Human Error → 48-hour response time → Lost Revenue</span>
+                  <span>Manual entry → errors → slow responses → lost revenue</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-red-400 mr-2">✗</span>
@@ -369,30 +569,30 @@ const BeforeAfter: React.FC = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-red-400 mr-2">✗</span>
-                  <span>Unpredictable, dependent on individual heroics</span>
+                  <span>Unpredictable, depends on one person</span>
                 </li>
               </ul>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-green-900/10 border-2 border-green-800/50 rounded-xl h-full flex flex-col">
-              <h3 className="text-2xl font-bold text-green-400 mb-4">The Sovereign System</h3>
+              <h3 className="text-2xl font-bold text-green-400 mb-4">The Automated System</h3>
               <ul className="space-y-3 text-slate-300 flex-grow">
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">✓</span>
-                  <span>Business runs exactly the same whether top performer is there or on vacation</span>
+                  <span>Runs the same whether top performer is there or on vacation</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">✓</span>
-                  <span>Algorithmic Lead Triage → Instant Personalized Response → Booked Meeting → $0 Manual Effort</span>
+                  <span>Automated triage → instant response → booked meeting → zero manual work</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">✓</span>
-                  <span>Predictable, reliable, independent of individual heroics</span>
+                  <span>Predictable, reliable, independent of one person</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">✓</span>
-                  <span>Your business can run without you—true sellability</span>
+                  <span>Your business runs without you—truly sellable</span>
                 </li>
               </ul>
             </div>
@@ -407,18 +607,18 @@ const BeforeAfter: React.FC = () => {
 
 const Benefits: React.FC = () => {
   const whyChooseUs = [
-      { icon: <Zap className="w-6 h-6" />, title: "Eliminate the Human Bottleneck", description: "We remove the dependency on people for repetitive tasks. Your team focuses on strategy, not data entry." },
-      { icon: <Shield className="w-6 h-6" />, title: "Guaranteed Outcomes", description: "We deliver measurable ROI, not promises. 99.9% uptime with $0 marginal cost per transaction." },
-      { icon: <TrendingUp className="w-6 h-6" />, title: "Self-Healing Infrastructure", description: "Our systems adapt and repair automatically. No manual intervention required as your business scales." },
-      { icon: <Building2 className="w-6 h-6" />, title: "Architectural Integrity", description: "We build infrastructure that doesn't break. Industrial-grade systems designed for enterprise scale." }
+      { icon: <Zap className="w-6 h-6" />, title: "Eliminate the Human Bottleneck", description: "You no longer need people for repetitive tasks. Your team focuses on strategy, not data entry." },
+      { icon: <Shield className="w-6 h-6" />, title: "Guaranteed Outcomes", description: "You no longer need to guess if automation works. 99.9% uptime with measurable ROI." },
+      { icon: <TrendingUp className="w-6 h-6" />, title: "Self-Healing Systems", description: "You no longer need to fix broken workflows. Systems repair themselves automatically." },
+      { icon: <Building2 className="w-6 h-6" />, title: "Systems That Don't Break", description: "You no longer need to worry about fragile connections. We build systems that scale reliably." }
   ];
 
   const businessBenefits = [
-      "Reclaim 20+ hours/week: Your leadership team focuses on growth, not admin.",
-      "Zero human error: Self-healing systems eliminate manual mistakes that cost revenue.",
-      "Infinite scalability: Operations grow without proportional headcount increases.",
-      "Predictable performance: 99.9% uptime guarantees consistent revenue generation.",
-      "Sellable business: Your company runs independently—true exit value."
+      "You no longer spend 20+ hours/week on admin—reclaim that time for growth.",
+      "You no longer lose revenue to manual errors—systems eliminate mistakes.",
+      "You no longer need to hire more people as you grow—operations scale automatically.",
+      "You no longer worry about downtime—99.9% uptime guarantees consistent revenue.",
+      "You no longer need to be present for operations—your business runs independently."
   ];
 
   return (
@@ -427,8 +627,8 @@ const Benefits: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                   <ScrollFadeInSection>
                       <div>
-                          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Eliminate the Human Bottleneck</h2>
-                          <p className="mt-4 text-lg text-slate-300">We don't automate tasks—we architect infrastructure that eliminates the need for human intervention in repetitive processes.</p>
+                          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">What You No Longer Need to Do</h2>
+                          <p className="mt-4 text-lg text-slate-300">This removes repetitive work from your day. Your team focuses on growth, not manual tasks.</p>
                           <div className="mt-8 space-y-6">
                               {whyChooseUs.map((item, index) => (
                                   <div key={index} className="flex items-start space-x-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
@@ -469,60 +669,62 @@ const ROIBlueprint: React.FC = () => {
     <section id="roi-blueprint" className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFadeInSection className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">The ROI Blueprint: How We Architect $X Million Operations</h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Real Examples: What This Eliminates</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            Our Architectural Standard: We build systems designed for 99.9% uptime and $0 marginal cost per lead.
+            Here's what gets removed from your daily work—with real numbers.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 max-w-4xl mx-auto space-y-8">
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
-              <h3 className="text-2xl font-bold text-primary mb-4">Example: Autonomous Prospecting Engine (LinkedIn)</h3>
+              <h3 className="text-2xl font-bold text-primary mb-4">Example: LinkedIn Prospecting</h3>
               <div className="space-y-4 text-slate-300">
                 <p>
-                  <strong className="text-slate-50">System Logic:</strong> While your competitors are manually clicking through LinkedIn profiles, your engine has already filtered 1,000 prospects and sent 50 targeted requests before your morning coffee is cold.
+                  <strong className="text-slate-50">This eliminates:</strong> Manual LinkedIn prospecting. While competitors click through profiles, your system filters 1,000 prospects and sends 50 targeted requests automatically.
                 </p>
                 <p>
-                  <strong className="text-slate-50">The Math:</strong> A human SDR takes 4 minutes to qualify and message one LinkedIn lead. At 100 leads a day, that's 6.6 hours of manual labor. Our engine does this in seconds for $0 marginal cost.
+                  <strong className="text-slate-50">The math:</strong> A human takes 4 minutes per lead. At 100 leads/day, that's 6.6 hours of manual work. Eliminated.
                 </p>
-                <div className="mt-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-                  <p className="text-slate-50 font-semibold">Architectural Components:</p>
-                  <ul className="mt-2 space-y-2 text-slate-300">
-                    <li>• Heuristic Filtering: Automatically filters prospects by 300+ connections and industry criteria</li>
-                    <li>• Algorithmic Qualification: Instant lead scoring and routing</li>
-                    <li>• Personalized Messaging: Context-aware responses in &lt;60 seconds</li>
-                    <li>• Self-Healing Workflows: System adapts when LinkedIn changes its interface</li>
-                  </ul>
-                </div>
               </div>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
-              <h3 className="text-2xl font-bold text-primary mb-4">Example: Real Estate Lead Processing System</h3>
+              <h3 className="text-2xl font-bold text-primary mb-4">Example: Real Estate Lead Processing</h3>
               <div className="space-y-4 text-slate-300">
                 <p>
-                  <strong className="text-slate-50">System Logic:</strong> We designed this infrastructure to handle 500 leads/day with 0% human input.
+                  <strong className="text-slate-50">This eliminates:</strong> Manual lead processing. Handles 500 leads/day with 0% human input.
                 </p>
                 <p>
-                  <strong className="text-slate-50">The Math:</strong> At $25/hour for a human admin working 8 hours/day, this system generates $12,000 in monthly savings.
+                  <strong className="text-slate-50">The math:</strong> Saves $12,000/month by removing the need for a full-time admin.
                 </p>
-                <div className="mt-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-                  <p className="text-slate-50 font-semibold">Architectural Components:</p>
-                  <ul className="mt-2 space-y-2 text-slate-300">
-                    <li>• Algorithmic Lead Triage: Instant qualification and routing</li>
-                    <li>• CRM Auto-Population: Zero manual data entry</li>
-                    <li>• Personalized Follow-up: Context-aware responses in &lt;60 seconds</li>
-                    <li>• Self-Healing Error Handling: System repairs itself automatically</li>
-                  </ul>
-                </div>
               </div>
             </div>
           </ScrollFadeInSection>
           <p className="text-center text-slate-400 italic">
-            This is the architecture we build. Not a tool you configure—an infrastructure that runs your business.
+            These are real systems running in production—removing manual work every day.
           </p>
         </div>
+      </div>
+    </section>
+  );
+};
+
+const SoftCtaSection: React.FC<HeroProps> = ({ onBookDemo }) => {
+  return (
+    <section className="py-16 bg-slate-900/30">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <ScrollFadeInSection>
+          <button
+            onClick={onBookDemo}
+            className="inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-800/50 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            Find your biggest automation bottleneck
+          </button>
+          <p className="mt-3 text-sm text-slate-400">
+            Takes 2 minutes. No commitment.
+          </p>
+        </ScrollFadeInSection>
       </div>
     </section>
   );
@@ -543,23 +745,22 @@ const SevenDaySprint: React.FC<HeroProps> = ({ onBookDemo }) => {
             <div className="p-8 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/50 rounded-xl">
               <div className="space-y-4 text-slate-300">
                 <p className="text-lg text-center">
-                  <strong className="text-slate-50">We don't do 'demos' with slide decks. We do demos with production-ready infrastructure.</strong>
+                  <strong className="text-slate-50">We don't do slide decks. We build real systems.</strong>
                 </p>
                 <p className="text-center">
-                  Give us your most painful manual workflow today, and in 7 days, we will show you the engine running in your environment—at our own expense.
+                  Give us your most painful manual workflow. In 7 days, we'll show you it running automatically—at our expense.
                 </p>
                 <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
-                  <p className="text-slate-50 font-semibold mb-2">The 7-Day Rapid Prototype Sprint:</p>
+                  <p className="text-slate-50 font-semibold mb-2">The 7-Day Sprint:</p>
                   <ul className="space-y-2 text-slate-300">
-                    <li>✓ We automate your first manual bottleneck in 7 days</li>
-                    <li>✓ No fee. No commitment. We let the infrastructure speak for itself</li>
-                    <li>✓ Whether it's an <strong className="text-slate-50">Autonomous Prospecting Engine</strong> that scrapes and qualifies 1,000 LinkedIn leads or a <strong className="text-slate-50">Zero-Leak Billing Pipeline</strong></li>
-                    <li>✓ You see the ROI before you invest a dollar</li>
+                    <li>✓ We automate your first bottleneck in 7 days</li>
+                    <li>✓ No fee. No commitment.</li>
+                    <li>✓ You see the ROI before investing</li>
                   </ul>
                 </div>
                 <div className="mt-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg">
                   <p className="text-sm text-red-300 font-semibold text-center">
-                    ⚠️ We only offer the 7-Day Sprint to companies that have the potential to reclaim 500+ hours a year. We need 30 minutes with your Ops Lead to identify the 'Fracture Point' where we can have the most immediate financial impact.
+                    ⚠️ For companies that can reclaim 500+ hours/year. 30 minutes with your Ops Lead to find the biggest impact.
                   </p>
                 </div>
               </div>
@@ -570,6 +771,7 @@ const SevenDaySprint: React.FC<HeroProps> = ({ onBookDemo }) => {
                 >
                   Apply for the 7-Day Sprint
                 </button>
+                <p className="mt-3 text-sm text-slate-400">No commitment. No credit card.</p>
               </div>
             </div>
           </ScrollFadeInSection>
@@ -621,6 +823,7 @@ const FoundingPartner: React.FC<HeroProps> = ({ onBookDemo }) => {
                 >
                   Reserve Your Founding Partner Spot
                 </button>
+                <p className="mt-3 text-sm text-slate-400">No commitment. No credit card.</p>
               </div>
             </div>
           </ScrollFadeInSection>
@@ -653,15 +856,15 @@ const RiskReversal: React.FC = () => {
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
               <h3 className="text-xl font-bold text-primary mb-3">No Vendor Lock-In + Data Ownership</h3>
               <p className="text-slate-300">
-                Every automation we build comes with a 'Standard Operating Procedure' for your infrastructure. Every prospect your engine qualifies is synced directly to your private CRM. You own the assets; we just build the engine that mines them. If you ever leave us, you own the keys, the manual, and all your data.
+                You own everything. Every automation comes with complete documentation. If you leave, you take the keys, the manual, and all your data.
               </p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
-              <h3 className="text-xl font-bold text-primary mb-3">Architectural Integrity</h3>
+              <h3 className="text-xl font-bold text-primary mb-3">Systems That Don't Break</h3>
               <p className="text-slate-300">
-                We build systems that integrate seamlessly with your existing infrastructure. No breaking changes, no technical debt. LinkedIn changes its interface often—our self-healing infrastructure adapts automatically while cheap Zapier setups break.
+                This removes worry about fragile connections. We build systems that adapt when tools change—no breaking, no fixing needed.
               </p>
             </div>
           </ScrollFadeInSection>
@@ -686,7 +889,7 @@ const ConsultantVsVendor: React.FC = () => {
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Consultant vs. Vendor: Why We're Not Another SaaS</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            Zapier is a tool. We build Engines. A tool in the hands of an amateur creates a mess; an engine built by an architect creates a fortune.
+            Zapier is a tool you configure. We build systems that run. Tools break when apps change; our systems adapt automatically.
           </p>
         </ScrollFadeInSection>
         <div className="mt-12 max-w-5xl mx-auto">
@@ -723,19 +926,19 @@ const ConsultantVsVendor: React.FC = () => {
                 <ul className="space-y-3 text-slate-300 flex-grow">
                   <li className="flex items-start">
                     <span className="text-green-400 mr-2">✓</span>
-                    <span><strong>Infrastructure:</strong> Self-healing systems that adapt to changes</span>
+                    <span><strong>Self-healing:</strong> Systems adapt when tools change</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-400 mr-2">✓</span>
-                    <span><strong>Architectural design:</strong> Error-handling logic that heals itself</span>
+                    <span><strong>Error handling:</strong> Systems repair themselves</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-400 mr-2">✓</span>
-                    <span><strong>Zero maintenance:</strong> Systems monitor and repair automatically</span>
+                    <span><strong>Zero maintenance:</strong> You don't fix anything</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-400 mr-2">✓</span>
-                    <span><strong>Ongoing optimization:</strong> Continuous improvement included</span>
+                    <span><strong>Ongoing improvement:</strong> We optimize continuously</span>
                   </li>
                 </ul>
                 <div className="mt-4 p-3 bg-green-900/20 rounded-lg">
@@ -751,6 +954,88 @@ const ConsultantVsVendor: React.FC = () => {
 };
 
 
+const WhatWeHandleVsYouDont: React.FC<HeroProps> = ({ onBookDemo }) => {
+  return (
+    <section id="what-we-handle" className="py-20 md:py-28 bg-slate-900/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection className="text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">
+            What We Handle vs. What You Don't
+          </h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
+            We are not a SaaS tool and not a consulting deck. We are a done-for-you automation partner that owns your systems end-to-end.
+          </p>
+        </ScrollFadeInSection>
+        
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ScrollFadeInSection>
+            <div className="p-8 bg-red-900/10 border-2 border-red-800/50 rounded-xl h-full">
+              <h3 className="text-2xl font-bold text-red-400 mb-6">You Don't</h3>
+              <ul className="space-y-3 text-slate-300">
+                <li className="flex items-start">
+                  <span className="text-red-400 mr-2">✗</span>
+                  <span>Learn tools</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-400 mr-2">✗</span>
+                  <span>Fix broken workflows</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-400 mr-2">✗</span>
+                  <span>Maintain scripts</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-400 mr-2">✗</span>
+                  <span>Monitor failures</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-400 mr-2">✗</span>
+                  <span>Update logic</span>
+                </li>
+              </ul>
+            </div>
+          </ScrollFadeInSection>
+          <ScrollFadeInSection>
+            <div className="p-8 bg-green-900/10 border-2 border-green-800/50 rounded-xl h-full">
+              <h3 className="text-2xl font-bold text-green-400 mb-6">We Do</h3>
+              <ul className="space-y-3 text-slate-300">
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Design workflows</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Build automation</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Monitor & fix</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Improve continuously</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Handle failures</span>
+                </li>
+              </ul>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+        <div className="mt-12 text-center">
+          <button
+            onClick={onBookDemo}
+            className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-800/50 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            See if automation makes sense for your business
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const FoundersNote: React.FC = () => {
   return (
     <section className="py-20 md:py-28 bg-slate-900/50">
@@ -762,10 +1047,10 @@ const FoundersNote: React.FC = () => {
               In a startup, you're not just buying automation—you're buying <strong>the founders' vision</strong>. We built TheOneEye because we watched too many founders burn out managing people to do what machines do better.
             </p>
             <p className="text-slate-300 text-lg leading-relaxed mb-4">
-              Every system we architect is built with one question in mind: <strong>"Can this business run without the founder?"</strong> If the answer is no, we haven't done our job.
+              Every system we build is designed with one question in mind: <strong>"Can this business run without the founder?"</strong> If the answer is no, we haven't done our job.
             </p>
             <p className="text-slate-300 text-lg leading-relaxed">
-              We're not here to sell you tools. We're here to build infrastructure that makes your business <strong>sovereign, scalable, and sellable</strong>—whether you're in the office or on a beach.
+              We're not here to sell you tools. We're here to build infrastructure that makes your business <strong>independent, scalable, and sellable</strong>—whether you're in the office or on a beach.
             </p>
             <p className="mt-6 text-slate-400 italic">
               — The OneEye Team
@@ -779,7 +1064,7 @@ const FoundersNote: React.FC = () => {
 
 const About: React.FC = () => {
   const missionPoints = [
-    "Architect industrial-grade infrastructure, not fragile task automation.",
+    "Build industrial-grade infrastructure, not fragile task automation.",
     "Eliminate the human bottleneck through self-healing systems.",
     "Deliver measurable ROI with 99.9% uptime guarantees.",
     "Build systems you own, not rent—no vendor lock-in.",
@@ -794,13 +1079,13 @@ const About: React.FC = () => {
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">About TheOneEye</h2>
               <p className="text-slate-300 text-lg leading-relaxed">
-                At <strong>TheOneEye</strong>, we are <strong>consultants, not vendors</strong>. We don't sell automation tools—we architect <strong>industrial-grade algorithmic infrastructure</strong> that eliminates the human bottleneck in your operations.
+                At <strong>TheOneEye</strong>, we are <strong>consultants, not vendors</strong>. We don't sell automation tools—we build <strong>industrial-grade automation systems</strong> that eliminate the human bottleneck in your operations.
               </p>
               <p className="text-slate-300 text-lg leading-relaxed">
                 We replace fragile, human-dependent processes with <strong>self-healing systems</strong> designed for enterprise scale. Our infrastructure delivers <strong>99.9% uptime</strong> with <strong>$0 marginal cost per transaction</strong>—enabling you to scale revenue without scaling headcount.
               </p>
               <p className="text-slate-300 text-lg leading-relaxed">
-                We build systems you <strong>own, not rent</strong>. Every automation comes with complete documentation and Standard Operating Procedures. No vendor lock-in. Just architectural integrity and guaranteed outcomes.
+                We build systems you <strong>own, not rent</strong>. Every automation comes with complete documentation and Standard Operating Procedures. No vendor lock-in. Just systems that don't break and guaranteed outcomes.
               </p>
             </div>
           </ScrollFadeInSection>
@@ -810,7 +1095,7 @@ const About: React.FC = () => {
               <div className="space-y-4 p-6 bg-slate-800/50 border border-slate-700 rounded-xl shadow-lg">
                 <h3 className="text-2xl font-bold text-primary">Our Vision</h3>
                 <p className="text-slate-300">
-                  Our vision is to make business operations <strong>sovereign and independent</strong>—where companies can scale to $50M+ without doubling headcount. We envision a world where founders can exit their businesses knowing operations run perfectly without them, where <strong>architectural integrity</strong> replaces task automation, and where <strong>self-healing infrastructure</strong> eliminates the human bottleneck forever.
+                  Our vision is to make business operations <strong>independent and automated</strong>—where companies can scale to $50M+ without doubling headcount. We envision a world where founders can exit their businesses knowing operations run perfectly without them, where <strong>reliable systems</strong> replace task automation, and where <strong>self-healing infrastructure</strong> eliminates the human bottleneck forever.
                 </p>
               </div>
             </ScrollFadeInSection>
@@ -870,11 +1155,11 @@ const Faq: React.FC = () => {
   const faqData = [
     { 
       question: "Why should I pay for a custom build vs. a $500 Zapier setup?", 
-      answer: "Zapier is a tool that connects apps—it breaks when apps change. We build engines with self-healing error handling and architectural integrity. Most $500 automations break within 30 days. Our systems monitor and repair themselves automatically. The difference? Tools require maintenance; infrastructure runs itself. See our 'Consultant vs. Vendor' section for a detailed comparison." 
+      answer: "Zapier is a tool that connects apps—it breaks when apps change. We build engines with self-healing error handling and systems that don't break. Most $500 automations break within 30 days. Our systems monitor and repair themselves automatically. The difference? Tools require maintenance; infrastructure runs itself. See our 'Consultant vs. Vendor' section for a detailed comparison." 
     },
     { 
       question: "Do clients need technical knowledge to use TheOneEye?", 
-      answer: "No. Clients only define the outcomes they want; we handle everything else. You don't need to understand the architecture—you just need to know what results you want. We build, deploy, and maintain the entire system." 
+      answer: "No. Clients only define the outcomes they want; we handle everything else. You don't need to understand how it's built—you just need to know what results you want. We build, deploy, and maintain the entire system." 
     },
     { 
       question: "What if a workflow breaks?", 
@@ -882,7 +1167,7 @@ const Faq: React.FC = () => {
     },
     { 
       question: "Can TheOneEye handle complex, multi-step workflows?", 
-      answer: "Yes. We specialize in designing end-to-end automation infrastructure that combines multiple systems, AI models, and processes. We don't just connect tools—we architect industrial-grade systems that scale with your business." 
+      answer: "Yes. We specialize in designing end-to-end automation infrastructure that combines multiple systems, AI models, and processes. We don't just connect tools—we build industrial-grade systems that scale with your business." 
     },
     { 
       question: "What if I want to leave? Do I lose everything?", 
@@ -1004,20 +1289,26 @@ export default function Home() {
       <NavBar onBookDemo={handleOpenModal} />
       <main>
         <HeroSection onBookDemo={handleOpenModal} />
-        <SevenDaySprint onBookDemo={handleOpenModal} />
+        <LightSocialProof />
+        <QuickLinks />
+        <DailyLifeFit />
+        <SystemStressTest onBookDemo={handleOpenModal} />
+        <SimpleWorkflowExample onBookDemo={handleOpenModal} />
         <CostOfDoingNothing onBookDemo={handleOpenModal} />
-        <SystemStressTest />
-        <ROIBlueprint />
         <BeforeAfter />
         <Services />
         <Process />
+        <ROIBlueprint />
         <PlatformAuthority />
         <RiskReversal />
         <ConsultantVsVendor />
+        <WhatWeHandleVsYouDont onBookDemo={handleOpenModal} />
+        <FoundersNote />
         <Faq />
+        <SoftCtaSection onBookDemo={handleOpenModal} />
+        <SevenDaySprint onBookDemo={handleOpenModal} />
         <FoundingPartner onBookDemo={handleOpenModal} />
         <Cta onBookDemo={handleOpenModal} />
-        <FoundersNote />
         <About />
       </main>
       <Footer />
