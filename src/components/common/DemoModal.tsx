@@ -53,7 +53,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
       });
 
       // Show success toast
-      toast.success('Demo request submitted successfully! We\'ll be in touch soon.', {
+      toast.success('Systems audit request submitted successfully! We\'ll be in touch soon.', {
         duration: 4000,
       });
 
@@ -67,7 +67,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       console.error('Error submitting demo request:', error);
-      toast.error('Failed to submit demo request. Please try again.', {
+      toast.error('Failed to submit systems audit request. Please try again.', {
         duration: 4000,
       });
     } finally {
@@ -80,10 +80,10 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[500px] bg-slate-800 border-slate-700">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-slate-50">
-            Book a Demo
+            Apply for a Systems Audit
           </DialogTitle>
           <DialogDescription className="text-slate-300">
-            Tell us about your needs, and we'll prepare a tailored demo for you.
+            Tell us about your operations, and we'll prepare a comprehensive systems audit for you.
           </DialogDescription>
         </DialogHeader>
 
@@ -156,7 +156,7 @@ const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
             disabled={isSubmitting}
             className="bg-primary w-full hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
           >
-            {isSubmitting ? 'Submitting...' : 'Request Demo'}
+            {isSubmitting ? 'Submitting...' : 'Apply for Systems Audit'}
           </Button>
 
         </form>
