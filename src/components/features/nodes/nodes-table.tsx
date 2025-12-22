@@ -21,7 +21,6 @@ interface NodesTableProps {
   onRefresh?: () => void;
   onViewForm?: (node: TNodeMetadata) => void;
   onExecute?: (node: TNodeMetadata) => void;
-  onViewDetails?: (node: TNodeMetadata) => void;
 }
 
 export function NodesTable({
@@ -30,7 +29,6 @@ export function NodesTable({
   onRefresh,
   onViewForm,
   onExecute,
-  onViewDetails,
 }: NodesTableProps) {
   const {
     selectedRows,
@@ -103,13 +101,12 @@ export function NodesTable({
               {columns.find(col => col.id === "category")?.visible && <TableHead>Category</TableHead>}
               {columns.find(col => col.id === "hasForm")?.visible && <TableHead>Has Form</TableHead>}
               {columns.find(col => col.id === "description")?.visible && <TableHead>Description</TableHead>}
-              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentNodes.length === 0 ? (
               <TableRow>
-                <td colSpan={columns.filter(c => c.visible).length + 2} className="h-24 text-center">
+                <td colSpan={columns.filter(c => c.visible).length + 1} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <IconSearch className="h-8 w-8 text-muted-foreground mb-2" />
                     <span className="text-muted-foreground">No nodes found</span>
@@ -126,7 +123,6 @@ export function NodesTable({
                   onSelect={(checked) => handleSelectRow(node.identifier, checked)}
                   onViewForm={onViewForm}
                   onExecute={onExecute}
-                  onViewDetails={onViewDetails}
                 />
               ))
             )}

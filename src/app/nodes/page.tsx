@@ -49,11 +49,6 @@ export default function NodesPage() {
     setExecuteDialogOpen(true);
   };
 
-  const handleViewDetails = (node: TNodeMetadata) => {
-    console.log("View details for node:", node);
-    // TODO: Open details modal/dialog
-  };
-
   useEffect(() => {
     fetchNodes();
   }, []);
@@ -67,7 +62,6 @@ export default function NodesPage() {
           onRefresh={handleRefresh}
           onViewForm={handleViewForm}
           onExecute={handleExecute}
-          onViewDetails={handleViewDetails}
         />
       </div>
 

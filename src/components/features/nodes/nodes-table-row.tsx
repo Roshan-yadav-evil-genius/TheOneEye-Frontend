@@ -1,21 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  IconDots,
-  IconPlayerPlay,
-  IconSettings,
-  IconEye,
-} from "@tabler/icons-react";
 import { TNodeMetadata } from "@/types";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
@@ -33,7 +20,6 @@ interface NodesTableRowProps {
   onSelect: (checked: boolean) => void;
   onViewForm?: (node: TNodeMetadata) => void;
   onExecute?: (node: TNodeMetadata) => void;
-  onViewDetails?: (node: TNodeMetadata) => void;
 }
 
 export function NodesTableRow({
@@ -43,7 +29,6 @@ export function NodesTableRow({
   onSelect,
   onViewForm,
   onExecute,
-  onViewDetails,
 }: NodesTableRowProps) {
   const getTypeBadge = (type: string) => {
     const styles = getBadgeStyles(type);
@@ -67,8 +52,16 @@ export function NodesTableRow({
     );
   };
 
+  const handleDoubleClick = () => {
+    if (node.has_form) {
+      onViewForm?.(node);
+    } else {
+      onExecute?.(node);
+    }
+  };
+
   return (
-    <TableRow>
+    <TableRow onDoubleClick={handleDoubleClick} className="cursor-pointer">
       <TableCell>
         <Checkbox
           checked={isSelected}
@@ -106,31 +99,6 @@ export function NodesTableRow({
           {node.description || "-"}
         </TableCell>
       )}
-      <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <IconDots className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {node.has_form && (
-              <DropdownMenuItem onClick={() => onViewForm?.(node)}>
-                <IconSettings className="mr-2 h-4 w-4" />
-                View Form
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => onExecute?.(node)}>
-              <IconPlayerPlay className="mr-2 h-4 w-4" />
-              Execute
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onViewDetails?.(node)}>
-              <IconEye className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
     </TableRow>
   );
 }
