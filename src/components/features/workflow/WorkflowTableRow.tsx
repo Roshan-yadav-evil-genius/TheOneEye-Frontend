@@ -21,6 +21,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
+import { formatRelativeDate } from "@/lib/dates";
 
 interface WorkflowTableRowProps {
   workflow: TWorkflow;
@@ -104,7 +105,7 @@ export function WorkflowTableRow({
       )}
       {columns.find(col => col.id === "lastRun")?.visible && (
         <TableCell className="text-sm text-muted-foreground">
-          {workflow.lastRun || "Never"}
+          {formatRelativeDate(workflow.lastRun)}
         </TableCell>
       )}
       {columns.find(col => col.id === "nextRun")?.visible && (

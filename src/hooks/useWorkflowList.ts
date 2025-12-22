@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TWorkflow } from "@/types";
 import { useUIStore, uiHelpers, useWorkflowListStore } from "@/stores";
+import { workflowApi } from "@/lib/api/services/workflow-api";
 
 interface UseWorkflowListProps {
   workflows: TWorkflow[];
@@ -10,7 +11,7 @@ interface UseWorkflowListProps {
 export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
   const router = useRouter();
   const { modals } = useUIStore();
-  const { deleteWorkflow } = useWorkflowListStore();
+  const { deleteWorkflow, loadWorkflows } = useWorkflowListStore();
   
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -21,14 +22,40 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [workflowToEdit, setWorkflowToEdit] = useState<TWorkflow | null>(null);
 
-  const handleRun = (id: string) => {
-    // TODO: Implement workflow execution
-    console.log('Run workflow:', id);
+  const handleRun = async (id: string) => {
+    try {
+      await workflowApi.startWorkflowExecution(id);
+      uiHelpers.showSuccess(
+        "Workflow Started",
+        "Workflow execution has been started successfully."
+      );
+      // Refresh workflow list to show updated status
+      await loadWorkflows();
+    } catch (error) {
+      console.error("Failed to start workflow:", error);
+      uiHelpers.showError(
+        "Execution Failed",
+        "Failed to start workflow execution. Please try again."
+      );
+    }
   };
 
-  const handleStop = (id: string) => {
-    // TODO: Implement workflow stop
-    console.log('Stop workflow:', id);
+  const handleStop = async (id: string) => {
+    try {
+      await workflowApi.stopWorkflowExecution(id);
+      uiHelpers.showSuccess(
+        "Workflow Stopped",
+        "Workflow execution has been stopped successfully."
+      );
+      // Refresh workflow list to show updated status
+      await loadWorkflows();
+    } catch (error) {
+      console.error("Failed to stop workflow:", error);
+      uiHelpers.showError(
+        "Stop Failed",
+        "Failed to stop workflow execution. Please try again."
+      );
+    }
   };
 
   const handleEditInfo = (workflow: TWorkflow) => {
