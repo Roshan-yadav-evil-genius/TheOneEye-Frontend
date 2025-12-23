@@ -111,7 +111,7 @@ export function NodeFormField({
     );
   }
 
-  // Render textarea field - supports drag-drop
+  // Render textarea field - supports drag-drop and JSON mode
   if (field.tag === "textarea") {
     return (
       <div className="space-y-2">
@@ -128,6 +128,7 @@ export function NodeFormField({
           rows={3}
           error={errorMessage}
           className="bg-gray-800 border-gray-600 text-gray-200"
+          jsonMode={field.json_mode || false}
         />
       </div>
     );

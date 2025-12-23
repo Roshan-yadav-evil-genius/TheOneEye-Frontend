@@ -54,6 +54,7 @@ export interface TNodeFormField {
   placeholder?: string;
   disabled?: boolean;
   errors?: string[];
+  json_mode?: boolean; // Indicates JSON editor mode from backend (for textarea fields)
 }
 
 /**
