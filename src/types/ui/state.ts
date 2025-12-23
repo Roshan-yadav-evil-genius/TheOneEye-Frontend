@@ -63,5 +63,6 @@ export interface TUIStoreState {
   };
   mobileMenuOpen: boolean;
   expandedNodeGroups: Set<string>;
+  nodesViewMode: 'tree' | 'flat';
   hasHydrated: boolean;
 }

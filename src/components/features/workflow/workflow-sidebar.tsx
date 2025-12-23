@@ -6,6 +6,7 @@ import { useNodeTree, ViewMode } from "@/hooks/useNodeTree";
 import { NodeCategoryTree } from "./node-category-tree";
 import { DraggableNodeItem } from "./draggable-node-item";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/stores";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -28,18 +29,19 @@ export function WorkflowSidebar({
   onNodeSelect,
   isExecuting = false,
 }: WorkflowSidebarProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('tree');
+  const nodesViewMode = useUIStore((state) => state.nodesViewMode);
+  const setNodesViewMode = useUIStore((state) => state.setNodesViewMode);
   const [showFilters, setShowFilters] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('');
   
   const { nodeTree, flatNodes, categories, isLoading, error, refresh } = useNodeTree({ 
     searchTerm, 
-    viewMode,
+    viewMode: nodesViewMode,
     categoryFilter,
   });
 
   const toggleViewMode = () => {
-    setViewMode(viewMode === 'tree' ? 'flat' : 'tree');
+    setNodesViewMode(nodesViewMode === 'tree' ? 'flat' : 'tree');
   };
 
   return (
@@ -75,9 +77,9 @@ export function WorkflowSidebar({
               "hover:bg-muted transition-colors",
               "bg-background"
             )}
-            title={viewMode === 'tree' ? 'Switch to flat view' : 'Switch to tree view'}
+            title={nodesViewMode === 'tree' ? 'Switch to flat view' : 'Switch to tree view'}
           >
-            {viewMode === 'tree' ? (
+            {nodesViewMode === 'tree' ? (
               <IconFolders size={16} className="text-primary" />
             ) : (
               <IconList size={16} className="text-primary" />
@@ -163,7 +165,7 @@ export function WorkflowSidebar({
               Retry
             </button>
           </div>
-        ) : viewMode === 'tree' ? (
+        ) : nodesViewMode === 'tree' ? (
           <NodeCategoryTree nodeTree={nodeTree} searchTerm={searchTerm} />
         ) : (
           /* Flat List View */

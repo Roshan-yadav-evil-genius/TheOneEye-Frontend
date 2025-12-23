@@ -12,6 +12,9 @@ interface UIActions {
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   
+  // Nodes view mode management
+  setNodesViewMode: (mode: 'tree' | 'flat') => void;
+  
   // Mobile menu management
   toggleMobileMenu: () => void;
   setMobileMenuOpen: (open: boolean) => void;
@@ -68,6 +71,7 @@ const initialState: TUIStoreState = {
   },
   mobileMenuOpen: false,
   expandedNodeGroups: new Set<string>(),
+  nodesViewMode: 'tree',
   hasHydrated: false,
 };
 
@@ -86,6 +90,11 @@ export const useUIStore = create<UIStore>()(
 
         setSidebarOpen: (open: boolean) => {
           set({ sidebarOpen: open });
+        },
+
+        // Nodes view mode management
+        setNodesViewMode: (mode: 'tree' | 'flat') => {
+          set({ nodesViewMode: mode });
         },
 
         // Mobile menu management
@@ -287,6 +296,7 @@ export const useUIStore = create<UIStore>()(
           sidebarOpen: state.sidebarOpen,
           theme: state.theme,
           expandedNodeGroups: Array.from(state.expandedNodeGroups), // Convert Set to Array for persistence
+          nodesViewMode: state.nodesViewMode,
           // Don't persist activePage, mobileMenuOpen, or hasHydrated as they should reset on app start
         }),
         // Add version for future migrations
