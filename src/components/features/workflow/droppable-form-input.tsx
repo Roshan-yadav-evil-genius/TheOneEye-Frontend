@@ -34,6 +34,7 @@ export function DroppableFormInput({
 }: DroppableFormInputProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const resizeRef = useRef<HTMLDivElement>(null);
   
   const { setNodeRef } = useDroppable({
     id: id || 'droppable-form-input',
@@ -46,6 +47,8 @@ export function DroppableFormInput({
   // Check if the drag is exactly over the input field
   const [isOverInput, setIsOverInput] = useState(false);
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [editorHeight, setEditorHeight] = useState<number>(rows * 20 + 40);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Validate JSON when in JSON mode
   useEffect(() => {
@@ -60,6 +63,14 @@ export function DroppableFormInput({
       setJsonError(null);
     }
   }, [value, jsonMode]);
+
+  // Update editor height when rows prop changes
+  useEffect(() => {
+    if (jsonMode && type === 'textarea') {
+      const newHeight = rows * 20 + 40;
+      setEditorHeight(newHeight);
+    }
+  }, [rows, jsonMode, type]);
 
   // Setup Monaco autocomplete for JSON and variables
   useEffect(() => {
@@ -121,6 +132,43 @@ export function DroppableFormInput({
       disposable.dispose();
     };
   }, [jsonMode, availableVariables]);
+
+  // Handle resize functionality for Monaco Editor
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (resizeRef.current) {
+        const container = resizeRef.current.closest('.relative');
+        if (container) {
+          const rect = container.getBoundingClientRect();
+          const newHeight = e.clientY - rect.top;
+          const minHeight = rows * 20 + 40;
+          if (newHeight >= minHeight) {
+            setEditorHeight(newHeight);
+          }
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, rows]);
 
   // Monitor drag events to handle drops
   useDndMonitor({
@@ -222,13 +270,17 @@ export function DroppableFormInput({
         )}
         style={{ minHeight: `${rows * 20 + 40}px` }}
       >
-        <div className={cn(
-          "border rounded-lg overflow-hidden",
-          error || jsonError ? "border-red-500" : "border-input",
-          isOverInput && "border-pink-400 bg-pink-900/10"
-        )}>
+        <div 
+          ref={resizeRef}
+          className={cn(
+            "border rounded-lg overflow-hidden relative",
+            error || jsonError ? "border-red-500" : "border-input",
+            isOverInput && "border-pink-400 bg-pink-900/10"
+          )}
+          style={{ height: `${editorHeight}px` }}
+        >
           <Editor
-            height={`${rows * 20 + 40}px`}
+            height={`${editorHeight}px`}
             language="json"
             value={value}
             onChange={handleEditorChange}
@@ -253,6 +305,18 @@ export function DroppableFormInput({
               insertSpaces: true,
             }}
           />
+          {/* Resize handle */}
+          <div
+            onMouseDown={handleResizeStart}
+            className={cn(
+              "absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-primary/20 transition-colors",
+              "flex items-center justify-center group",
+              isResizing && "bg-primary/30"
+            )}
+            style={{ zIndex: 10 }}
+          >
+            <div className="w-12 h-0.5 bg-border group-hover:bg-primary/50 rounded transition-colors" />
+          </div>
         </div>
         
         {isOverInput && (

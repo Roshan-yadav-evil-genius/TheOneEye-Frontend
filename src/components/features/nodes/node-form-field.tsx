@@ -125,7 +125,7 @@ export function NodeFormField({
           value={value}
           onChange={onChange}
           placeholder={field.placeholder || `Enter ${field.label}`}
-          rows={3}
+          rows={6}
           error={errorMessage}
           className="bg-gray-800 border-gray-600 text-gray-200"
           jsonMode={field.json_mode || false}
