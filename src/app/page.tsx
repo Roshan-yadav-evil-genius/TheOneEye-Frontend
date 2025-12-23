@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import NavBar from "@/components/global/NavBar";
 import { HiOutlineUserGroup, HiOutlineCog, HiOutlineSpeakerphone, HiOutlineSupport } from "react-icons/hi";
@@ -11,6 +11,40 @@ interface HeroProps {
   onBookDemo: () => void;
 }
 
+const StickyCTA: React.FC<HeroProps> = ({ onBookDemo }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsVisible(scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 border-t border-slate-700 shadow-lg backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="flex items-center justify-between">
+          <div className="hidden md:block">
+            <p className="text-sm text-slate-300">Ready to eliminate manual work?</p>
+          </div>
+          <button
+            onClick={onBookDemo}
+            className="w-full md:w-auto inline-block px-6 py-2 text-sm font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all duration-300"
+          >
+            Book a Systems Audit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
   return (
     <section className="relative py-24 md:py-32 lg:py-40 overflow-hidden">
@@ -18,7 +52,7 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <ScrollFadeInSection>
           <div className="inline-block px-6 py-3 mb-6 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
-            <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Done-for-You Automation for Founders</p>
+            <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Managed Automation for Scalable Businesses</p>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
             <span className="block">Stop Managing Tasks.</span>
@@ -36,16 +70,16 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
               <div className="relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                    <div className="text-2xl font-bold text-primary mb-1">$5M+</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Revenue Scale</div>
-                  </div>
-                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
                     <div className="text-2xl font-bold text-primary mb-1">20+ hrs</div>
                     <div className="text-xs text-slate-400 uppercase tracking-wide">Reclaimed Weekly</div>
                   </div>
                   <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                    <div className="text-2xl font-bold text-primary mb-1">0%</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Headcount Growth</div>
+                    <div className="text-2xl font-bold text-primary mb-1">10M+</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Events/Month</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-2xl font-bold text-primary mb-1">99.9%</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Uptime</div>
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-700/50">
@@ -74,7 +108,7 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
               onClick={onBookDemo}
               className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary"
             >
-              See if Automation Fits Your Business
+              Book a Systems Audit
             </button>
             <div className="flex flex-col items-center gap-1">
               <p className="text-sm text-slate-400">No commitment. No credit card.</p>
@@ -93,9 +127,16 @@ const LightSocialProof: React.FC = () => {
       <p className="text-base text-slate-300 font-medium mb-2">
         Founder-built systems running in production • No templates • No outsourcing
       </p>
-      <p className="text-sm text-slate-400">
-        Used across sales, ops, and growth workflows • Processing 10M+ events/month
+      <p className="text-sm text-slate-400 mb-3">
+        Processing 10M+ events/month • AI/ML models deployed across workflows • 99.9% uptime
       </p>
+      <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500">
+        <span>Node-based execution platform</span>
+        <span>•</span>
+        <span>API, browser, AI/ML, data processing</span>
+        <span>•</span>
+        <span>Enterprise-grade infrastructure</span>
+      </div>
     </div>
   );
 };
@@ -154,32 +195,32 @@ const DailyLifeFit: React.FC = () => {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">Lead capture & follow-ups</p>
+              <p className="text-slate-300 font-medium">AI-powered lead scoring & routing</p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">CRM updates & data sync</p>
+              <p className="text-slate-300 font-medium">Data processing & transformation</p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">Sales outreach (LinkedIn / Email)</p>
+              <p className="text-slate-300 font-medium">Decision logic & conditional flows</p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">Ops approvals & notifications</p>
+              <p className="text-slate-300 font-medium">API integrations & web automation</p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">Reporting & alerts</p>
+              <p className="text-slate-300 font-medium">ML classification & extraction</p>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl text-center">
-              <p className="text-slate-300 font-medium">AI-based decision triggers</p>
+              <p className="text-slate-300 font-medium">Validation & quality checks</p>
             </div>
           </ScrollFadeInSection>
         </div>
@@ -218,7 +259,7 @@ const DailyLifeFit: React.FC = () => {
             }}
             className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            See if automation fits your business
+            Learn More
           </button>
         </ScrollFadeInSection>
       </div>
@@ -278,29 +319,78 @@ const Process: React.FC = () => {
   );
 };
 
+const OwnershipSection: React.FC = () => {
+  return (
+    <section className="py-20 md:py-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollFadeInSection className="text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">We Own the Outcome</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
+            This is the most important part. TheOneEye owns the failure—you don't.
+          </p>
+        </ScrollFadeInSection>
+        <div className="mt-12 max-w-4xl mx-auto">
+          <ScrollFadeInSection>
+            <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
+              <div className="space-y-6 text-slate-300">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-50 mb-2">Every Workflow Has a Designated Owner</h3>
+                    <p>Every system has a designated owner within our team who monitors and maintains it continuously.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-50 mb-2">We Fix It Before You Notice</h3>
+                    <p>When a workflow fails or behaves unexpectedly, the responsible person is notified immediately. The team investigates and fixes the issue—you're not expected to debug, retry, or monitor.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-50 mb-2">You Are Not the Emergency Contact</h3>
+                    <p>Automated notification and escalation systems ensure accountability at the human level. You focus on strategy—we handle the systems.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollFadeInSection>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const Services: React.FC = () => {
 
   const services = [
       { 
         icon: <HiOutlineUserGroup className="text-3xl" />, 
-        title: "Zero-Leak Sales Pipelines", 
-        description: "This removes manual lead entry and missed follow-ups. Every lead is captured, qualified, and converted automatically—no human input needed." 
+        title: "Reclaim 20+ Hours Weekly", 
+        description: "Eliminate manual lead entry and missed follow-ups. Every lead is captured, AI-qualified, and routed automatically—reclaim time for strategy." 
       },
       { 
         icon: <HiOutlineCog className="text-3xl" />, 
-        title: "Human Bottleneck Elimination", 
-        description: "This removes the need for people to sync data, manage approvals, or generate reports. Operations scale without scaling headcount." 
+        title: "Scale Revenue Without Headcount", 
+        description: "Remove human bottlenecks in data sync, approvals, and reporting. Operations scale automatically—no hiring needed." 
       },
       { 
         icon: <HiOutlineSpeakerphone className="text-3xl" />, 
-        title: "Automated Revenue Acceleration", 
-        description: "This removes manual marketing work. Audiences are segmented, campaigns personalized, and performance tracked automatically." 
+        title: "AI-Powered Decision Making", 
+        description: "Use AI/ML for predictive scoring, classification, and intelligent routing. Make data-driven decisions automatically—no manual analysis." 
       },
       { 
         icon: <HiOutlineSupport className="text-3xl" />, 
-        title: "24/7 Resolution Engines", 
-        description: "This removes delayed customer responses. Tickets are routed, responded to, and resolved automatically—never lose a customer to slow support." 
+        title: "Eliminate Human Error", 
+        description: "Automated processing, validation, and quality checks. Reduce errors in lead processing, data entry, and workflows—zero manual mistakes." 
       }
   ];
 
@@ -308,9 +398,9 @@ const Services: React.FC = () => {
       <section id="services" className="py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollFadeInSection className="text-center">
-                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">Production-Ready Infrastructure</h2>
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">What We Execute</h2>
                   <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-                      We build systems designed for 99.9% uptime and zero marginal cost per transaction.
+                      Our node-based platform handles API calls, browser automation, AI/ML inference, data processing, and decision logic—ensuring outcomes, not just connections.
                   </p>
               </ScrollFadeInSection>
               <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -377,45 +467,41 @@ const SimpleWorkflowExample: React.FC<HeroProps> = ({ onBookDemo }) => {
         <ScrollFadeInSection className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">How It Works: A Simple Example</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-300">
-            Here's what happens when a lead comes in—automatically, without you touching anything.
+            Here's what happens when a lead comes in—using AI/ML, data processing, and decision logic, automatically.
           </p>
         </ScrollFadeInSection>
-        <div className="mt-12 max-w-4xl mx-auto">
+        <div className="mt-12 max-w-5xl mx-auto">
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-slate-300">
-                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-slate-300">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary mb-2">1</div>
-                  <p className="font-semibold">Lead</p>
-                  <p className="text-sm text-slate-400 mt-1">Captured</p>
+                  <p className="font-semibold text-sm">Lead Captured</p>
+                  <p className="text-xs text-slate-400 mt-1">API/Browser</p>
                 </div>
-                <div className="text-primary text-2xl">→</div>
-                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary mb-2">2</div>
-                  <p className="font-semibold">Enriched</p>
-                  <p className="text-sm text-slate-400 mt-1">Data added</p>
+                  <p className="font-semibold text-sm">AI Scoring</p>
+                  <p className="text-xs text-slate-400 mt-1">ML Model</p>
                 </div>
-                <div className="text-primary text-2xl">→</div>
-                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary mb-2">3</div>
-                  <p className="font-semibold">Message Sent</p>
-                  <p className="text-sm text-slate-400 mt-1">Personalized</p>
+                  <p className="font-semibold text-sm">Decision Logic</p>
+                  <p className="text-xs text-slate-400 mt-1">Route/Filter</p>
                 </div>
-                <div className="text-primary text-2xl">→</div>
-                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary mb-2">4</div>
-                  <p className="font-semibold">CRM Updated</p>
-                  <p className="text-sm text-slate-400 mt-1">Automatically</p>
+                  <p className="font-semibold text-sm">Data Processed</p>
+                  <p className="text-xs text-slate-400 mt-1">Transform</p>
                 </div>
-                <div className="text-primary text-2xl">→</div>
-                <div className="text-center p-4 bg-slate-700/50 rounded-lg flex-1">
+                <div className="text-center p-4 bg-slate-700/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary mb-2">5</div>
-                  <p className="font-semibold">Report Generated</p>
-                  <p className="text-sm text-slate-400 mt-1">Daily summary</p>
+                  <p className="font-semibold text-sm">CRM Updated</p>
+                  <p className="text-xs text-slate-400 mt-1">API Sync</p>
                 </div>
               </div>
               <p className="mt-6 text-center text-sm text-slate-400 italic">
-                This is a real production workflow running autonomously—monitoring, retrying, and updating data without human input.
+                This workflow combines API calls, AI/ML inference, data processing, and decision logic—all running autonomously with monitoring and self-healing.
               </p>
             </div>
           </ScrollFadeInSection>
@@ -425,7 +511,7 @@ const SimpleWorkflowExample: React.FC<HeroProps> = ({ onBookDemo }) => {
             onClick={onBookDemo}
             className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            View one real system
+            Learn More
           </button>
         </ScrollFadeInSection>
       </div>
@@ -478,7 +564,7 @@ const CostOfDoingNothing: React.FC<HeroProps> = ({ onBookDemo }) => {
             onClick={onBookDemo}
             className="inline-block px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-1 transition-all duration-300"
           >
-            Calculate Your Hidden Costs
+            Book a Systems Audit
           </button>
         </ScrollFadeInSection>
       </div>
@@ -532,7 +618,7 @@ const SystemStressTest: React.FC<HeroProps> = ({ onBookDemo }) => {
             onClick={onBookDemo}
             className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            Find my biggest bottleneck
+            Learn More
           </button>
         </ScrollFadeInSection>
       </div>
@@ -719,7 +805,7 @@ const SoftCtaSection: React.FC<HeroProps> = ({ onBookDemo }) => {
             onClick={onBookDemo}
             className="inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-800/50 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            Find your biggest automation bottleneck
+            Book a Systems Audit
           </button>
           <p className="mt-3 text-sm text-slate-400">
             Takes 2 minutes. No commitment.
@@ -847,36 +933,62 @@ const RiskReversal: React.FC = () => {
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
               <h3 className="text-xl font-bold text-primary mb-3">Zero-Downtime Commitment</h3>
-              <p className="text-slate-300">
+              <p className="text-slate-300 mb-3">
                 We deploy with zero disruption to your existing operations. Your business continues running while we integrate—no downtime, no risk.
               </p>
+              <div className="p-3 bg-green-900/20 border border-green-800/50 rounded-lg">
+                <p className="text-sm text-green-300 font-semibold">Impact: $0 revenue loss during integration vs. typical 2-3 day downtime</p>
+              </div>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
               <h3 className="text-xl font-bold text-primary mb-3">No Vendor Lock-In + Data Ownership</h3>
-              <p className="text-slate-300">
+              <p className="text-slate-300 mb-3">
                 You own everything. Every automation comes with complete documentation. If you leave, you take the keys, the manual, and all your data.
               </p>
+              <div className="p-3 bg-green-900/20 border border-green-800/50 rounded-lg">
+                <p className="text-sm text-green-300 font-semibold">Impact: No migration costs, no data loss, full system portability</p>
+              </div>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
               <h3 className="text-xl font-bold text-primary mb-3">Systems That Don't Break</h3>
-              <p className="text-slate-300">
+              <p className="text-slate-300 mb-3">
                 This removes worry about fragile connections. We build systems that adapt when tools change—no breaking, no fixing needed.
               </p>
+              <div className="p-3 bg-green-900/20 border border-green-800/50 rounded-lg">
+                <p className="text-sm text-green-300 font-semibold">Impact: 99.9% uptime = $50k+ saved annually vs. typical 5% failure rate</p>
+              </div>
             </div>
           </ScrollFadeInSection>
           <ScrollFadeInSection>
             <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-xl h-full">
               <h3 className="text-xl font-bold text-primary mb-3">Ongoing Optimization</h3>
-              <p className="text-slate-300">
+              <p className="text-slate-300 mb-3">
                 We don't just deploy and disappear. We monitor, optimize, and improve your systems continuously—included in your partnership.
               </p>
+              <div className="p-3 bg-green-900/20 border border-green-800/50 rounded-lg">
+                <p className="text-sm text-green-300 font-semibold">Impact: 20-30% efficiency gains over time through continuous improvement</p>
+              </div>
             </div>
           </ScrollFadeInSection>
         </div>
+        <ScrollFadeInSection className="mt-12 max-w-3xl mx-auto">
+          <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-xl">
+            <h3 className="text-lg font-bold text-primary mb-3">Real Example: Real Estate Lead Processing</h3>
+            <p className="text-slate-300 text-sm mb-2">
+              <strong>Challenge:</strong> Manual processing of 500 leads/day with 5% error rate costing $12k/month in admin time.
+            </p>
+            <p className="text-slate-300 text-sm mb-2">
+              <strong>Solution:</strong> Automated AI-powered classification, data extraction, and routing with validation checks.
+            </p>
+            <p className="text-slate-300 text-sm">
+              <strong>Result:</strong> 0% error rate, $12k/month saved, 100% automated—system runs 24/7 without human input.
+            </p>
+          </div>
+        </ScrollFadeInSection>
       </div>
     </section>
   );
@@ -1028,7 +1140,7 @@ const WhatWeHandleVsYouDont: React.FC<HeroProps> = ({ onBookDemo }) => {
             onClick={onBookDemo}
             className="inline-block px-6 py-3 text-base font-semibold text-slate-50 bg-slate-800/50 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            See if automation makes sense for your business
+            Learn More
           </button>
         </div>
       </div>
@@ -1298,6 +1410,7 @@ export default function Home() {
         <BeforeAfter />
         <Services />
         <Process />
+        <OwnershipSection />
         <ROIBlueprint />
         <PlatformAuthority />
         <RiskReversal />
@@ -1312,6 +1425,7 @@ export default function Home() {
         <About />
       </main>
       <Footer />
+      <StickyCTA onBookDemo={handleOpenModal} />
       <DemoModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </main>
   );
