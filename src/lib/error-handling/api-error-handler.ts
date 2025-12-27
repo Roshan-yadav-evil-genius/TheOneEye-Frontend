@@ -3,6 +3,7 @@ import { AppError, NetworkError, TimeoutError, AuthenticationError, Authorizatio
 import { errorHandler } from './error-handler';
 import { ErrorSeverity, ErrorCategory } from './error-types';
 import { ERROR_MESSAGES } from '@/constants';
+import { TApiError } from '@/types';
 
 /**
  * API Error Handler for handling HTTP errors
@@ -156,6 +157,14 @@ export class ApiErrorHandler {
     }
 
     if (data && typeof data === 'object') {
+      // If error is generic, prefer detail field which usually has the actual error message
+      if (data.error && data.detail) {
+        const genericErrors = ['Form validation failed', 'Validation failed', 'Invalid request data', 'Bad Request'];
+        if (genericErrors.includes(data.error)) {
+          return data.detail;
+        }
+      }
+      
       // Common error message fields
       const messageFields = ['message', 'error', 'detail', 'description'];
       
@@ -184,10 +193,29 @@ export class ApiErrorHandler {
    * Handle and report API errors
    */
   public static handleApiError(
-    error: AxiosError,
+    error: AxiosError | TApiError | Error,
     context: Record<string, any> = {}
   ): AppError {
-    const appError = this.handleAxiosError(error);
+    let appError: AppError;
+
+    // Handle TApiError (from axios client interceptor)
+    if (error instanceof TApiError) {
+      appError = this.handleTApiError(error);
+    } 
+    // Handle AxiosError
+    else if ('response' in error || 'request' in error) {
+      appError = this.handleAxiosError(error as AxiosError);
+    }
+    // Handle generic Error
+    else {
+      appError = new AppError(
+        error.message || ERROR_MESSAGES.SERVER_ERROR,
+        'UNKNOWN_ERROR',
+        500,
+        false,
+        { originalError: error }
+      );
+    }
     
     // Report to error handler
     errorHandler.handleError(
@@ -195,14 +223,9 @@ export class ApiErrorHandler {
       {
         ...context,
         apiError: true,
-        originalAxiosError: {
+        originalError: {
           message: error.message,
-          code: error.code,
-          config: {
-            url: error.config?.url,
-            method: error.config?.method,
-            headers: error.config?.headers,
-          },
+          name: error.name,
         },
       },
       this.getErrorSeverity(appError),
@@ -210,6 +233,87 @@ export class ApiErrorHandler {
     );
 
     return appError;
+  }
+
+  /**
+   * Handle TApiError (custom error from axios client)
+   */
+  private static handleTApiError(error: TApiError): AppError {
+    const status = error.status || 500;
+    const message = this.extractErrorMessage(error.data) || error.message;
+
+    switch (status) {
+      case 400:
+        return new ValidationError(
+          message || 'Invalid request data',
+          undefined,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      case 401:
+        return new AuthenticationError(
+          message || ERROR_MESSAGES.UNAUTHORIZED,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      case 403:
+        return new AuthorizationError(
+          message || ERROR_MESSAGES.FORBIDDEN,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      case 404:
+        return new NotFoundError(
+          message || ERROR_MESSAGES.NOT_FOUND,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      case 422:
+        return new ValidationError(
+          message || 'Validation failed',
+          undefined,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      case 500:
+        return new AppError(
+          message || ERROR_MESSAGES.SERVER_ERROR,
+          'INTERNAL_SERVER_ERROR',
+          500,
+          false,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+
+      default:
+        return new AppError(
+          message || `HTTP ${status} error`,
+          'HTTP_ERROR',
+          status,
+          true,
+          {
+            status,
+            responseData: error.data,
+          }
+        );
+    }
   }
 
   /**

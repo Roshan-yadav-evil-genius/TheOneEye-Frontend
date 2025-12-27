@@ -86,8 +86,12 @@ class AxiosApiClient {
         // Transform axios error to our custom TApiError
         if (error.response) {
           // Server responded with error status
+          // Extract error message from response data (check error, detail, or message fields)
+          const errorMessage = this.extractErrorMessage(error.response.data) || 
+            `HTTP ${error.response.status}: ${error.response.statusText}`;
+          
           const apiError = new TApiError(
-            error.response.data?.message || `HTTP ${error.response.status}: ${error.response.statusText}`,
+            errorMessage,
             error.response.status,
             error.response.data
           );
@@ -154,6 +158,35 @@ class AxiosApiClient {
   // Get the underlying axios instance for advanced usage
   getInstance(): AxiosInstance {
     return this.client;
+  }
+
+  /**
+   * Extract error message from response data
+   * Checks error, detail, and message fields (in that order)
+   * If error is generic, prefers detail field which usually has the actual error message
+   */
+  private extractErrorMessage(data: any): string | undefined {
+    if (!data || typeof data !== 'object') {
+      return undefined;
+    }
+
+    // If error is generic, prefer detail field
+    if (data.error && data.detail) {
+      const genericErrors = ['Form validation failed', 'Validation failed', 'Invalid request data', 'Bad Request'];
+      if (genericErrors.includes(data.error)) {
+        return data.detail;
+      }
+    }
+
+    // Check common error message fields
+    const messageFields = ['error', 'detail', 'message', 'description'];
+    for (const field of messageFields) {
+      if (data[field]) {
+        return String(data[field]);
+      }
+    }
+
+    return undefined;
   }
 }
 
