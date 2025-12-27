@@ -8,9 +8,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { nodeExecutionService } from '@/services/node-execution-service';
 import { TNodeExecuteResponse, TNodeFormData } from '@/types';
-import { uiHelpers } from '@/stores/ui';
 import { workflowApi } from '@/lib/api/services/workflow-api';
 import { useWorkflowCanvasStore } from '@/stores';
+import { errorNotificationService } from '@/lib/services/error-notification-service';
 
 export interface NodeExecutionOptions {
   nodeIdentifier: string;
@@ -52,6 +52,8 @@ export function useNodeExecution(options: NodeExecutionOptions) {
 
         if (isWorkflowMode && workflowContext) {
           // Workflow mode: use execute_and_save_node API (saves to DB)
+          // If FormValidationException is raised, it will be caught by BaseApiService
+          // and ErrorNotificationService will show toast automatically
           const response = await workflowApi.executeAndSaveNode(
             workflowContext.workflowId,
             workflowContext.nodeInstanceId,
@@ -72,15 +74,14 @@ export function useNodeExecution(options: NodeExecutionOptions) {
             form: response.form,
           };
 
-          // Handle form validation errors - show in form
+          // Handle form validation errors - set form state for inline errors
+          // Toast notification is already handled by ErrorNotificationService via BaseApiService
           if (!response.success && response.error_type === 'FormValidationError' && response.form) {
             setExecutionFormState(response.form);
           } else if (!response.success) {
-            // Show non-field errors in toast
-            uiHelpers.showError(
-              'Execution Failed',
-              response.error || response.message || 'An error occurred during execution'
-            );
+            // For backward compatibility: if error is still in response (not raised as exception)
+            // Show notification (though this shouldn't happen after full refactoring)
+            errorNotificationService.notifyNodeExecutionError(result);
             setExecutionFormState(null);
           } else {
             setExecutionFormState(null);
@@ -105,6 +106,7 @@ export function useNodeExecution(options: NodeExecutionOptions) {
           }
         } else {
           // Standalone mode: use regular execute API with session_id for stateful execution
+          // If FormValidationException is raised, it will be caught by BaseApiService
           result = await nodeExecutionService.executeStandaloneNode({
             nodeIdentifier,
             formData,
@@ -113,15 +115,15 @@ export function useNodeExecution(options: NodeExecutionOptions) {
             isWorkflowMode: false,
           });
 
-          // Handle errors for standalone mode too
+          // Handle errors for standalone mode
+          // Toast notification is already handled by ErrorNotificationService via BaseApiService
           if (!result.success) {
             if (result.error_type === 'FormValidationError' && result.form) {
+              // Set form state for inline errors
               setExecutionFormState(result.form);
             } else {
-              uiHelpers.showError(
-                'Execution Failed',
-                result.error || result.message || 'An error occurred during execution'
-              );
+              // For backward compatibility: if error is still in response
+              errorNotificationService.notifyNodeExecutionError(result);
               setExecutionFormState(null);
             }
           } else {
@@ -131,7 +133,20 @@ export function useNodeExecution(options: NodeExecutionOptions) {
 
         onOutputChange?.(result);
         return result;
-      } catch (error) {
+      } catch (error: any) {
+        // Error was caught by BaseApiService and ErrorNotificationService already showed toast
+        // But we need to extract form data if it's a FormValidationError to show inline errors
+        const responseData = error?.context?.responseData || error?.data;
+        if (responseData && (responseData.error_code === 'FormValidationError' || responseData.form)) {
+          // Extract form data from error response
+          const formData = responseData.form;
+          if (formData) {
+            setExecutionFormState(formData);
+          }
+        } else {
+          setExecutionFormState(null);
+        }
+
         console.error('Node execution failed:', error);
         const errorResult: TNodeExecuteResponse = {
           success: false,

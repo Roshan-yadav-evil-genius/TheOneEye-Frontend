@@ -47,6 +47,8 @@ export function useDynamicFieldOptions(
         });
 
         // Update the dependent field's options
+        // Errors are now raised as exceptions and handled by BaseApiService
+        // ErrorNotificationService will automatically show toast notifications
         setFormState((prev) => {
           if (!prev) return prev;
           return {
@@ -63,6 +65,8 @@ export function useDynamicFieldOptions(
           };
         });
       } catch (err) {
+        // Error is already handled by BaseApiService → ErrorNotificationService
+        // Just log for debugging
         console.error(`Failed to load options for ${dependentField}:`, err);
       } finally {
         setLoadingFields((prev) => {

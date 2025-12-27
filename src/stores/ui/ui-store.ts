@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { TUIStoreState, TBreadcrumb, TNotification } from '../types';
+import { toastService } from '@/lib/services/toast-service';
 
 interface UIActions {
   // Sidebar management
@@ -381,6 +382,12 @@ export const uiSelectors = {
 export const uiHelpers = {
   // TNotification helpers
   showSuccess: (title: string, message: string) => {
+    // Show toast notification for immediate feedback
+    toastService.success(title, {
+      description: message,
+    });
+    
+    // Also show persistent notification
     useUIStore.getState().addTNotification({
       type: 'success',
       title,
@@ -390,6 +397,12 @@ export const uiHelpers = {
   },
 
   showError: (title: string, message: string) => {
+    // Show toast notification for immediate feedback
+    toastService.error(title, {
+      description: message,
+    });
+    
+    // Also show persistent notification
     useUIStore.getState().addTNotification({
       type: 'error',
       title,
@@ -399,6 +412,12 @@ export const uiHelpers = {
   },
 
   showWarning: (title: string, message: string) => {
+    // Show toast notification for immediate feedback
+    toastService.warning(title, {
+      description: message,
+    });
+    
+    // Also show persistent notification
     useUIStore.getState().addTNotification({
       type: 'warning',
       title,
@@ -408,6 +427,12 @@ export const uiHelpers = {
   },
 
   showInfo: (title: string, message: string) => {
+    // Show toast notification for immediate feedback
+    toastService.info(title, {
+      description: message,
+    });
+    
+    // Also show persistent notification
     useUIStore.getState().addTNotification({
       type: 'info',
       title,

@@ -8,7 +8,6 @@
 import { nodeApi } from '@/lib/api/services/node-api';
 import { workflowApi } from '@/lib/api/services/workflow-api';
 import { TNodeExecuteResponse, TNodeExecuteRequest } from '@/types';
-import { uiHelpers } from '@/stores/ui';
 
 export interface NodeExecutionOptions {
   nodeIdentifier: string;
@@ -55,11 +54,17 @@ export class NodeExecutionService {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
+      // Error was caught by BaseApiService and ErrorNotificationService already showed toast
+      // Extract form data if it's a FormValidationError to return in response
+      const responseData = error?.context?.responseData || error?.data;
+      const formData = responseData?.form;
+      
       const errorResult: TNodeExecuteResponse = {
         success: false,
         error: error instanceof Error ? error.message : 'Execution failed',
-        error_type: 'ExecutionError',
+        error_type: responseData?.error_code === 'FormValidationError' ? 'FormValidationError' : 'ExecutionError',
+        form: formData,
       };
 
       if (options.onError) {
@@ -97,17 +102,8 @@ export class NodeExecutionService {
         form: response.form,
       };
 
-      // Handle form validation errors
-      if (!response.success && response.error_type === 'FormValidationError' && response.form) {
-        // Form validation errors are returned in the form field
-        // The caller should handle displaying these
-      } else if (!response.success) {
-        // Show non-field errors in toast
-        uiHelpers.showError(
-          'Execution Failed',
-          response.error || response.message || 'An error occurred during execution'
-        );
-      }
+      // Errors are now handled by BaseApiService → ErrorNotificationService automatically
+      // No need to manually show notifications here
 
       if (options.onSuccess) {
         options.onSuccess(result);

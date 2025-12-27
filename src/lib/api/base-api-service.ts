@@ -12,6 +12,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { axiosApiClient } from './axios-client';
 import { handleApiError } from '../error-handling/api-error-handler';
+import { errorNotificationService } from '../services/error-notification-service';
 
 /**
  * Base class for all API services.
@@ -70,7 +71,12 @@ export abstract class BaseApiService {
     try {
       return await requestFn();
     } catch (error) {
-      throw handleApiError(error as any);
+      const appError = handleApiError(error as any);
+      
+      // Show toast notification for all API errors
+      errorNotificationService.notifyApiError(appError);
+      
+      throw appError;
     }
   }
 
