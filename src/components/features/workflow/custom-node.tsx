@@ -37,8 +37,16 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
   // Get store method to update node execution data
   const updateNodeExecutionData = useWorkflowCanvasStore(state => state.updateNodeExecutionData);
   
-  // Subscribe to WebSocket-driven execution state - use selector to check specific node
+  // Subscribe to store to get latest node data (including form_values) - fixes stale prop issue
   const nodeInstanceId = workflowContext?.nodeInstanceId || id;
+  const latestNodeData = useWorkflowCanvasStore(state => 
+    state.nodes.find(n => n.id === nodeInstanceId)
+  );
+  
+  // Use latest node data from store if available, otherwise fall back to prop
+  const nodeData = latestNodeData || data;
+  
+  // Subscribe to WebSocket-driven execution state - use selector to check specific node
   const isWorkflowNodeExecuting = useWorkflowExecutionStore(
     state => nodeInstanceId in state.executingNodes
   );
@@ -50,19 +58,19 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
 
   // Convert BackendNodeType to TNodeMetadata for the execute dialog
   const nodeMetadata: TNodeMetadata = useMemo(() => ({
-    name: data.node_type?.name || 'Unknown',
-    identifier: data.node_type?.identifier || '',
-    type: data.node_type?.type || 'unknown',
-    label: data.node_type?.label,
-    description: data.node_type?.description,
-    has_form: data.node_type?.has_form ?? false,
-    category: data.node_type?.category,
-    icon: data.node_type?.icon,
-  }), [data.node_type]);
+    name: nodeData.node_type?.name || 'Unknown',
+    identifier: nodeData.node_type?.identifier || '',
+    type: nodeData.node_type?.type || 'unknown',
+    label: nodeData.node_type?.label,
+    description: nodeData.node_type?.description,
+    has_form: nodeData.node_type?.has_form ?? false,
+    category: nodeData.node_type?.category,
+    icon: nodeData.node_type?.icon,
+  }), [nodeData.node_type]);
 
   // Get port configurations with defaults
-  const inputPorts = data.node_type?.input_ports || [{ id: 'default', label: 'In' }];
-  const outputPorts = data.node_type?.output_ports || [{ id: 'default', label: 'Out' }];
+  const inputPorts = nodeData.node_type?.input_ports || [{ id: 'default', label: 'In' }];
+  const outputPorts = nodeData.node_type?.output_ports || [{ id: 'default', label: 'Out' }];
 
   // Event handlers
   const handleDelete = useCallback((e: React.MouseEvent) => {
@@ -90,12 +98,12 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
       // Generate session ID for stateful execution
       const sessionId = `${workflowContext.workflowId}_${workflowContext.nodeInstanceId}`;
       
-      // Execute node with saved form values
+      // Execute node with saved form values (use latest from store)
       const response = await workflowApi.executeAndSaveNode(
         workflowContext.workflowId,
         workflowContext.nodeInstanceId,
         {
-          form_values: data.form_values || {},
+          form_values: nodeData.form_values || {},
           input_data: inputData,
           session_id: sessionId,
         }
@@ -125,7 +133,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     } finally {
       setIsLocalNodeExecuting(false);
     }
-  }, [workflowContext, data.form_values, updateNodeExecutionData, isNodeExecuting]);
+  }, [workflowContext, nodeData.form_values, updateNodeExecutionData, isNodeExecuting]);
 
   const handlePause = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -201,9 +209,9 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
           ) : (
             <NodeLogo
               node={{
-                name: data.node_type?.name || 'Unknown',
-                type: data.node_type?.type || 'unknown',
-                icon: data.node_type?.icon,
+                name: nodeData.node_type?.name || 'Unknown',
+                type: nodeData.node_type?.type || 'unknown',
+                icon: nodeData.node_type?.icon,
               }}
               size="lg"
             />
@@ -214,7 +222,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
       {/* External Title */}
       <div className="mt-2 text-center max-w-40">
         <h3 className="font-semibold text-sm text-foreground leading-tight">
-          {data.node_type?.name || 'Unknown Node'}
+          {nodeData.node_type?.name || 'Unknown Node'}
         </h3>
       </div>
 
@@ -225,9 +233,9 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
         node={nodeMetadata}
         workflowContext={workflowContext ? {
           ...workflowContext,
-          savedFormValues: data.form_values,
-          savedInputData: data.input_data,
-          savedOutputData: data.output_data,
+          savedFormValues: nodeData.form_values,
+          savedInputData: nodeData.input_data,
+          savedOutputData: nodeData.output_data,
         } : undefined}
       />
     </div>

@@ -64,6 +64,18 @@ export function useFormState(
     formValuesRef.current = formValues;
   }, [formValues]);
 
+  // Track previous initialFormValues to detect actual changes (not just reference changes)
+  const prevInitialFormValuesRef = useRef<string>('');
+  useEffect(() => {
+    const currentKey = initialFormValues ? JSON.stringify(initialFormValues) : '';
+    if (currentKey !== prevInitialFormValuesRef.current && initialFormValues && Object.keys(initialFormValues).length > 0) {
+      prevInitialFormValuesRef.current = currentKey;
+      // Update form values when initialFormValues actually changes
+      const defaultValues = getDefaultValues();
+      setFormValues({ ...defaultValues, ...initialFormValues });
+    }
+  }, [initialFormValues, getDefaultValues]);
+
   // Update formState when execution returns validation errors
   useEffect(() => {
     if (executionFormState) {

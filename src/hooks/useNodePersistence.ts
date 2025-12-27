@@ -48,6 +48,12 @@ export function useNodePersistence(
   const updateNodeExecutionData = useWorkflowCanvasStore(
     (state) => state.updateNodeExecutionData
   );
+  
+  // Subscribe to store to get latest node data (for workflow mode)
+  const nodeInstanceId = workflowContext?.nodeInstanceId;
+  const latestNodeData = useWorkflowCanvasStore(state => 
+    nodeInstanceId ? state.nodes.find(n => n.id === nodeInstanceId) : null
+  );
 
   // Initialize state from workflow context or persisted store
   const [inputData, setInputData] = useState<Record<string, unknown>>(() => {
@@ -96,23 +102,32 @@ export function useNodePersistence(
     if (isOpen) {
       if (isWorkflowMode) {
         const ctx = workflowContextRef.current;
-        // In workflow mode: load from workflow context
+        // In workflow mode: load from store first (most up-to-date), then fall back to workflow context
         const connectedOutput = ctx?.getConnectedNodeOutput?.();
         if (connectedOutput && Object.keys(connectedOutput).length > 0) {
           setInputData(connectedOutput);
+        } else if (latestNodeData?.input_data) {
+          setInputData(latestNodeData.input_data as Record<string, unknown>);
         } else if (ctx?.savedInputData) {
           setInputData(ctx.savedInputData as Record<string, unknown>);
         }
 
-        if (ctx?.savedFormValues) {
+        // Prefer store data over workflowContext prop (store is always up-to-date)
+        const formValuesToUse = latestNodeData?.form_values || ctx?.savedFormValues;
+        if (formValuesToUse) {
           const formValues: Record<string, string> = {};
-          for (const [key, value] of Object.entries(ctx.savedFormValues)) {
+          for (const [key, value] of Object.entries(formValuesToUse)) {
             formValues[key] = String(value ?? '');
           }
           setFormValues(formValues);
         }
 
-        if (ctx?.savedOutputData && Object.keys(ctx.savedOutputData).length > 0) {
+        if (latestNodeData?.output_data && Object.keys(latestNodeData.output_data).length > 0) {
+          setOutputData({
+            success: true,
+            output: { data: latestNodeData.output_data },
+          });
+        } else if (ctx?.savedOutputData && Object.keys(ctx.savedOutputData).length > 0) {
           setOutputData({
             success: true,
             output: { data: ctx.savedOutputData },
@@ -129,10 +144,22 @@ export function useNodePersistence(
     isOpen,
     nodeIdentifier,
     isWorkflowMode,
+    latestNodeData,
     getInputData,
     getFormData,
     getOutputData,
   ]);
+
+  // Update form values when store data changes (for workflow mode)
+  useEffect(() => {
+    if (isWorkflowMode && isOpen && latestNodeData?.form_values) {
+      const formValues: Record<string, string> = {};
+      for (const [key, value] of Object.entries(latestNodeData.form_values)) {
+        formValues[key] = String(value ?? '');
+      }
+      setFormValues(formValues);
+    }
+  }, [latestNodeData?.form_values, isWorkflowMode, isOpen]);
 
   // Persist input data whenever it changes (only in standalone mode)
   const handleInputDataChange = useCallback(
