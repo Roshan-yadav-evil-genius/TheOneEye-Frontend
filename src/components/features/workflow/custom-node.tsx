@@ -231,12 +231,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         node={nodeMetadata}
-        workflowContext={workflowContext ? {
-          ...workflowContext,
-          savedFormValues: nodeData.form_values,
-          savedInputData: nodeData.input_data,
-          savedOutputData: nodeData.output_data,
-        } : undefined}
+        workflowContext={workflowContext}
       />
     </div>
   );

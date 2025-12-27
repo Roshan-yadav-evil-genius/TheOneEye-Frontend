@@ -13,9 +13,6 @@ import { TNodeExecuteResponse } from '@/types';
 export interface WorkflowPersistenceContext {
   workflowId: string;
   nodeInstanceId: string;
-  savedFormValues?: Record<string, unknown>;
-  savedInputData?: Record<string, unknown>;
-  savedOutputData?: Record<string, unknown>;
   getConnectedNodeOutput?: () => Record<string, unknown> | null;
 }
 
@@ -55,41 +52,10 @@ export function useNodePersistence(
     nodeInstanceId ? state.nodes.find(n => n.id === nodeInstanceId) : null
   );
 
-  // Initialize state from workflow context or persisted store
-  const [inputData, setInputData] = useState<Record<string, unknown>>(() => {
-    if (isWorkflowMode) {
-      // In workflow mode: prefer connected node's output, then saved input
-      const connectedOutput = workflowContext?.getConnectedNodeOutput?.();
-      if (connectedOutput && Object.keys(connectedOutput).length > 0) {
-        return connectedOutput;
-      }
-      return (workflowContext?.savedInputData as Record<string, unknown>) || {};
-    }
-    return getInputData(nodeIdentifier);
-  });
-
-  const [formValues, setFormValues] = useState<Record<string, string>>(() => {
-    if (isWorkflowMode && workflowContext?.savedFormValues) {
-      // Convert Record<string, unknown> to Record<string, string>
-      const formValues: Record<string, string> = {};
-      for (const [key, value] of Object.entries(workflowContext.savedFormValues)) {
-        formValues[key] = String(value ?? '');
-      }
-      return formValues;
-    }
-    return getFormData(nodeIdentifier);
-  });
-
-  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(() => {
-    if (isWorkflowMode && workflowContext?.savedOutputData && Object.keys(workflowContext.savedOutputData).length > 0) {
-      return {
-        success: true,
-        output: { data: workflowContext.savedOutputData },
-      };
-    }
-    // In standalone mode: load last output from store
-    return getOutputData(nodeIdentifier);
-  });
+  // Initialize state with empty defaults - data will be loaded from store when dialog opens
+  const [inputData, setInputData] = useState<Record<string, unknown>>({});
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [outputData, setOutputData] = useState<TNodeExecuteResponse | null>(null);
 
   // Load data when dialog opens or node changes
   // Use refs to avoid infinite loops from object dependencies
@@ -102,35 +68,28 @@ export function useNodePersistence(
     if (isOpen) {
       if (isWorkflowMode) {
         const ctx = workflowContextRef.current;
-        // In workflow mode: load from store first (most up-to-date), then fall back to workflow context
+        // In workflow mode: load from store (single source of truth)
         const connectedOutput = ctx?.getConnectedNodeOutput?.();
         if (connectedOutput && Object.keys(connectedOutput).length > 0) {
           setInputData(connectedOutput);
         } else if (latestNodeData?.input_data) {
           setInputData(latestNodeData.input_data as Record<string, unknown>);
-        } else if (ctx?.savedInputData) {
-          setInputData(ctx.savedInputData as Record<string, unknown>);
         }
 
-        // Prefer store data over workflowContext prop (store is always up-to-date)
-        const formValuesToUse = latestNodeData?.form_values || ctx?.savedFormValues;
-        if (formValuesToUse) {
+        // Load form values from store (always up-to-date)
+        if (latestNodeData?.form_values) {
           const formValues: Record<string, string> = {};
-          for (const [key, value] of Object.entries(formValuesToUse)) {
+          for (const [key, value] of Object.entries(latestNodeData.form_values)) {
             formValues[key] = String(value ?? '');
           }
           setFormValues(formValues);
         }
 
+        // Load output data from store
         if (latestNodeData?.output_data && Object.keys(latestNodeData.output_data).length > 0) {
           setOutputData({
             success: true,
             output: { data: latestNodeData.output_data },
-          });
-        } else if (ctx?.savedOutputData && Object.keys(ctx.savedOutputData).length > 0) {
-          setOutputData({
-            success: true,
-            output: { data: ctx.savedOutputData },
           });
         }
       } else {
@@ -149,17 +108,6 @@ export function useNodePersistence(
     getFormData,
     getOutputData,
   ]);
-
-  // Update form values when store data changes (for workflow mode)
-  useEffect(() => {
-    if (isWorkflowMode && isOpen && latestNodeData?.form_values) {
-      const formValues: Record<string, string> = {};
-      for (const [key, value] of Object.entries(latestNodeData.form_values)) {
-        formValues[key] = String(value ?? '');
-      }
-      setFormValues(formValues);
-    }
-  }, [latestNodeData?.form_values, isWorkflowMode, isOpen]);
 
   // Persist input data whenever it changes (only in standalone mode)
   const handleInputDataChange = useCallback(

@@ -26,9 +26,6 @@ import { useNodeExecution } from "@/hooks/useNodeExecution";
 export interface WorkflowExecuteContext {
   workflowId: string;
   nodeInstanceId: string;
-  savedFormValues?: Record<string, unknown>;
-  savedInputData?: Record<string, unknown>;
-  savedOutputData?: Record<string, unknown>;
   getConnectedNodeOutput?: () => Record<string, unknown> | null;
 }
 
@@ -53,9 +50,6 @@ export function NodeExecuteDialog({
     ? {
         workflowId: workflowContext.workflowId,
         nodeInstanceId: workflowContext.nodeInstanceId,
-        savedFormValues: workflowContext.savedFormValues,
-        savedInputData: workflowContext.savedInputData,
-        savedOutputData: workflowContext.savedOutputData,
         getConnectedNodeOutput: workflowContext.getConnectedNodeOutput,
       }
     : undefined;
