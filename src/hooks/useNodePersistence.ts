@@ -41,16 +41,16 @@ export function useNodePersistence(
     setOutputData: persistOutputData,
   } = useNodeTestDataStore();
 
-  // Get store method to update node execution data (for workflow mode)
-  const updateNodeExecutionData = useWorkflowCanvasStore(
-    (state) => state.updateNodeExecutionData
-  );
-  
   // Subscribe to store to get latest node data (for workflow mode)
   const nodeInstanceId = workflowContext?.nodeInstanceId;
   const latestNodeData = useWorkflowCanvasStore(state => 
     nodeInstanceId ? state.nodes.find(n => n.id === nodeInstanceId) : null
   );
+
+  // Subscribe to all nodes to detect when connected node output changes
+  // This ensures the effect re-runs when any node's output_data updates,
+  // allowing getConnectedNodeOutput() to read the latest data from the store
+  const allNodes = useWorkflowCanvasStore(state => state.nodes);
 
   // Initialize state with empty defaults - data will be loaded from store when dialog opens
   const [inputData, setInputData] = useState<Record<string, unknown>>({});
@@ -69,6 +69,7 @@ export function useNodePersistence(
       if (isWorkflowMode) {
         const ctx = workflowContextRef.current;
         // In workflow mode: load from store (single source of truth)
+        // Call getConnectedNodeOutput reactively - it reads latest data from store each time
         const connectedOutput = ctx?.getConnectedNodeOutput?.();
         if (connectedOutput && Object.keys(connectedOutput).length > 0) {
           setInputData(connectedOutput);
@@ -104,6 +105,7 @@ export function useNodePersistence(
     nodeIdentifier,
     isWorkflowMode,
     latestNodeData,
+    allNodes, // Add this to detect when any node's output_data changes
     getInputData,
     getFormData,
     getOutputData,

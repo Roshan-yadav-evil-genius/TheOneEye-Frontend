@@ -184,23 +184,30 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
   }, [edges, highlightEdge]);
 
   // Helper function to get connected node's output data
+  // IMPORTANT: Read directly from store to get latest data, not from ReactFlow state
+  // ReactFlow state may lag behind store updates
   const getConnectedNodeOutput = useCallback((nodeId: string): Record<string, unknown> | null => {
+    // Get latest data directly from store
+    const storeState = useWorkflowCanvasStore.getState();
+    const storeNodes = storeState.nodes;
+    const storeConnections = storeState.connections;
+    
     // Find incoming edge to this node
-    const incomingEdge = edges.find(edge => edge.target === nodeId);
+    const incomingEdge = storeConnections.find(conn => conn.target === nodeId);
     if (!incomingEdge) return null;
     
-    // Find the source node
-    const sourceNode = nodes.find(n => n.id === incomingEdge.source);
+    // Find the source node from store
+    const sourceNode = storeNodes.find(n => n.id === incomingEdge.source);
     if (!sourceNode) return null;
     
     // Get the source node's output_data
-    const outputData = sourceNode.data?.output_data as Record<string, unknown> | null;
+    const outputData = sourceNode.output_data as Record<string, unknown> | null;
     if (!outputData) return null;
     
     // IMPORTANT: Only apply routing check if source is ACTUALLY a conditional node
     // The if_condition data is passed through all downstream nodes, so we must check
     // the source node's type, not just if the data contains if_condition
-    const isConditionalNode = sourceNode.data?.node_type?.identifier === 'if-condition';
+    const isConditionalNode = sourceNode.node_type?.identifier === 'if-condition';
     
     if (isConditionalNode) {
       const ifCondition = outputData?.if_condition as { route?: string } | undefined;
@@ -214,7 +221,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     }
     
     return outputData;
-  }, [edges, nodes]);
+  }, []); // No dependencies - reads directly from store each time
 
   // Update node selection and add delete callback, workflow context, and execution state
   const updatedNodes = useMemo(() => {
