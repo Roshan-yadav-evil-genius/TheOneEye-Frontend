@@ -11,6 +11,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { label: 'About', link: '/about', icon: BookOpen },
   // { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
   // { label: 'Products', link: '#', icon: Package },
   // { label: 'Pricing', link: '#', icon: DollarSign },
