@@ -5,18 +5,14 @@ import { MobileMenuToggle, MobileMenuOverlay, MobileMenu } from './MobileMenu';
 import { useMobileMenu } from '@/hooks/useMobileMenu';
 
 // Main NavBar Component
-interface NavBarProps {
-  onBookDemo?: () => void;
-}
-
-const NavBar = ({ onBookDemo }: NavBarProps) => {
+const NavBar = () => {
   const { isOpen, toggleMenu, closeMenu } = useMobileMenu();
 
   return (
     <>
-      <header className='fixed right-0 left-0 top-0 p-4 bg-slate-100 dark:bg-slate-900 backdrop-blur-lg z-50 rounded border-2 flex items-center justify-between'>
+      <header className='fixed right-0 left-0 top-0 p-4 z-50 flex items-center justify-between' style={{ backgroundColor: '#1A1D2B', borderBottom: '1px solid #2A2E3B' }}>
         <Logo />
-        <DesktopNav onBookDemo={onBookDemo} />
+        <DesktopNav />
         {/* <MobileMenuToggle isOpen={isOpen} onToggle={toggleMenu} /> */}
       </header>
 

@@ -19,11 +19,7 @@ const navItems: NavItem[] = [
   // { label: 'Resources', link: '#', icon: BookOpen }
 ];
 
-interface DesktopNavProps {
-  onBookDemo?: () => void;
-}
-
-export const DesktopNav = ({ onBookDemo }: DesktopNavProps) => {
+export const DesktopNav = () => {
   const pathname = usePathname();
   const router = useRouter();
   return (
@@ -48,16 +44,11 @@ export const DesktopNav = ({ onBookDemo }: DesktopNavProps) => {
             </Link>
           );
         })}
-        {onBookDemo && (
-          <Button 
-            className='bg-primary text-primary-foreground hover:bg-primary/90' 
-            onClick={onBookDemo}
-          >
-            Apply for Systems Audit
-          </Button>
-        )}
-        <Button className='bg-slate-700 text-slate-50 hover:bg-slate-600' onClick={() => router.push('/dashboard')}>
-          Login
+        <Button 
+          className='bg-transparent border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded' 
+          onClick={() => router.push('/dashboard')}
+        >
+          My Account
         </Button>
       </div>
     </nav>

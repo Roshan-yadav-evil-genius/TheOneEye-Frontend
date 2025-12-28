@@ -1339,7 +1339,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col gap-10">
-      <NavBar onBookDemo={handleOpenModal} />
+      <NavBar />
       <main>
         <HeroSection onBookDemo={handleOpenModal} />
         <LightSocialProof />
