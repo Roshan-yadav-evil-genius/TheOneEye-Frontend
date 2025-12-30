@@ -11,40 +11,6 @@ interface HeroProps {
   onBookDemo: () => void;
 }
 
-const StickyCTA: React.FC<HeroProps> = ({ onBookDemo }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsVisible(scrollY > 300);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  if (!isVisible) return null;
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 border-t border-slate-700 shadow-lg backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center justify-between">
-          <div className="hidden md:block">
-            <p className="text-sm text-slate-300">Ready to eliminate manual work?</p>
-          </div>
-          <button
-            onClick={onBookDemo}
-            className="w-full md:w-auto inline-block px-6 py-2 text-sm font-semibold text-primary-foreground bg-primary rounded-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all duration-300"
-          >
-            Book a Systems Audit
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
   return (
     <section className="relative py-24 md:py-32 lg:py-40 overflow-hidden">
@@ -1365,7 +1331,6 @@ export default function Home() {
         <Cta onBookDemo={handleOpenModal} />
       </main>
       <Footer />
-      <StickyCTA onBookDemo={handleOpenModal} />
       <DemoModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </main>
   );

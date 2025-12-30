@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
 
 export default function AboutPage() {
   return (
-    <main className="flex flex-col gap-10 min-h-screen bg-slate-950">
+    <main className="flex flex-col min-h-screen bg-slate-950">
       <NavBar />
       <main>
         <About />
