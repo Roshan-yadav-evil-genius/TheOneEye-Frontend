@@ -146,13 +146,18 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         />
       </div>
 
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 text-base font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
-      >
-        {isSubmitting ? 'Sending...' : 'Send'}
-      </Button>
+      <div className="space-y-3">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 text-base font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
+        >
+          {isSubmitting ? 'Sending...' : 'Send Message'}
+        </Button>
+        <p className="text-center text-slate-400 text-sm">
+          We reply within <strong className="text-primary">24 hours</strong>
+        </p>
+      </div>
     </form>
   );
 };

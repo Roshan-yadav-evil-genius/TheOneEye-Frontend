@@ -50,7 +50,12 @@ export const ContactInfo: React.FC = () => {
           </div>
           <div>
             <h3 className="text-base font-semibold text-slate-50">Email Us</h3>
-            <p className="text-slate-300 text-sm">{contactInfo.email.primary}</p>
+            <a 
+              href={`mailto:${contactInfo.email.primary}`}
+              className="text-primary hover:text-primary/80 transition-colors text-sm"
+            >
+              {contactInfo.email.primary}
+            </a>
           </div>
         </div>
 

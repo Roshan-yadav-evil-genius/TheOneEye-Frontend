@@ -1338,7 +1338,7 @@ export default function Home() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <main className="flex flex-col gap-10">
+    <main className="flex flex-col">
       <NavBar />
       <main>
         <HeroSection onBookDemo={handleOpenModal} />
