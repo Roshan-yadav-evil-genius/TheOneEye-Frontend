@@ -1,8 +1,10 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import NavBar from "@/components/global/NavBar";
 import About from "@/components/sections/About";
+import DemoModal from '@/components/common/DemoModal';
+import ScrollFadeInSection from '@/components/common/ScrollFadeInSection';
 
 const Footer: React.FC = () => {
   return (
@@ -52,14 +54,41 @@ const Footer: React.FC = () => {
   );
 };
 
+const BookAuditSection: React.FC<{ onBookDemo: () => void }> = ({ onBookDemo }) => {
+  return (
+    <section className="py-16 bg-slate-900/30">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <ScrollFadeInSection>
+          <button
+            onClick={onBookDemo}
+            className="inline-block px-8 py-4 text-lg font-semibold text-slate-50 bg-slate-800/50 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            Book a Systems Audit
+          </button>
+          <p className="mt-3 text-sm text-slate-400">
+            Takes 2 minutes. No commitment.
+          </p>
+        </ScrollFadeInSection>
+      </div>
+    </section>
+  );
+};
+
 export default function AboutPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
   return (
     <main className="flex flex-col min-h-screen bg-slate-950">
       <NavBar />
-      <main>
+      <main className="flex-1">
         <About />
+        <BookAuditSection onBookDemo={handleOpenModal} />
       </main>
       <Footer />
+      <DemoModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </main>
   );
 }

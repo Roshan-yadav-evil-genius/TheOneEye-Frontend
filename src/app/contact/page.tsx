@@ -56,7 +56,7 @@ export default function ContactPage() {
   return (
     <main className="flex flex-col min-h-screen bg-slate-950">
       <NavBar />
-      <main>
+      <main className="flex-1">
         <Contact />
       </main>
       <Footer />

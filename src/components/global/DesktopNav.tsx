@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Package, DollarSign, Users, BookOpen, LayoutDashboard, Mail } from 'lucide-react';
+import { Package, DollarSign, Users, BookOpen, LayoutDashboard, Mail, Home } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { label: 'Home', link: '/', icon: Home },
   { label: 'About', link: '/about', icon: BookOpen },
   { label: 'Contact', link: '/contact', icon: Mail },
   // { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
@@ -25,7 +26,7 @@ export const DesktopNav = () => {
   const router = useRouter();
   return (
     <nav className=''>
-      <div className='flex gap-4 items-center'>
+      <div className='flex gap-10 items-center'>
         {navItems.map(item => {
           const isActive = pathname === item.link || 
             (item.link !== '/' && pathname.startsWith(item.link));
@@ -34,7 +35,7 @@ export const DesktopNav = () => {
             <Link 
               key={item.label} 
               href={item.link} 
-              className={`flex items-center gap-1 transition-colors ${
+              className={`flex items-center gap-1 transition-colors text-lg ${
                 isActive 
                   ? 'text-primary font-medium' 
                   : 'hover:text-primary hover:font-bold'

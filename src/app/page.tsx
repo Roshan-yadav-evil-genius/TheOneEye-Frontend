@@ -1304,9 +1304,9 @@ export default function Home() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <main className="flex flex-col">
+    <main className="flex flex-col min-h-screen">
       <NavBar />
-      <main>
+      <main className="flex-1">
         <HeroSection onBookDemo={handleOpenModal} />
         <LightSocialProof />
         <QuickLinks />

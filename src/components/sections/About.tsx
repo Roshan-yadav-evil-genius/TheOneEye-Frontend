@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Image from 'next/image';
 import ScrollFadeInSection from '@/components/common/ScrollFadeInSection';
 import { CheckIcon } from 'lucide-react';
 
@@ -13,12 +14,15 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="py-20 md:py-28 bg-slate-900/50">
+    <section id="about" className="mt-10 md:py-28 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <ScrollFadeInSection>
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">About TheOneEye</h2>
+              <div className="flex flex-col items-start gap-4 mb-10">
+                <Image src="/logo.png" width={100} height={100} alt="TheOneEye" className="object-contain" />
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-50">About TheOneEye</h2>
+              </div>
               <p className="text-slate-300 text-lg leading-relaxed">
                 At <strong>TheOneEye</strong>, we are <strong>consultants, not vendors</strong>. We don't sell automation tools—we build <strong>industrial-grade automation systems</strong> that eliminate the human bottleneck in your operations.
               </p>
