@@ -209,6 +209,7 @@ export function NodeExecuteDialog({
                     disabled={isExecuting || isSaving}
                     className="w-20 h-8 text-xs"
                     placeholder="30"
+                    tabIndex={-1}
                   />
                 </div>
                 {/* Execute button */}
