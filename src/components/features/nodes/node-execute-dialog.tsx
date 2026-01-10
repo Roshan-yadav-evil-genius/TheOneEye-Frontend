@@ -14,6 +14,7 @@ import { NodeFormEditor } from "./node-form-editor";
 import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { RotateCcw, Play, Loader2 } from "lucide-react";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
@@ -89,6 +90,9 @@ export function NodeExecuteDialog({
   const [activeInputTab, setActiveInputTab] = useState<"schema" | "json">("schema");
   const [activeOutputTab, setActiveOutputTab] = useState<"schema" | "json">("schema");
 
+  // Timeout state (in seconds, default 30 seconds)
+  const [timeout, setTimeout] = useState<number>(30);
+
   // Clear execution form state when dialog closes
   useEffect(() => {
     if (!isOpen) {
@@ -138,8 +142,8 @@ export function NodeExecuteDialog({
 
   // Wrapper to call execute with current form values (for header button)
   const handleExecuteClick = useCallback(() => {
-    execute(persistedFormValues, inputData);
-  }, [execute, persistedFormValues, inputData]);
+    execute(persistedFormValues, inputData, timeout);
+  }, [execute, persistedFormValues, inputData, timeout]);
 
   const getTypeBadgeColor = (type: string) => {
     const styles = getBadgeStyles(type);
@@ -185,6 +189,28 @@ export function NodeExecuteDialog({
               </div>
               {/* Header action buttons */}
               <div className="flex items-center gap-3 mr-2">
+                {/* Timeout input */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="timeout-input" className="text-xs text-muted-foreground whitespace-nowrap">
+                    Timeout (s):
+                  </label>
+                  <Input
+                    id="timeout-input"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={timeout}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10);
+                      if (!isNaN(value) && value >= 1) {
+                        setTimeout(value);
+                      }
+                    }}
+                    disabled={isExecuting || isSaving}
+                    className="w-20 h-8 text-xs"
+                    placeholder="30"
+                  />
+                </div>
                 {/* Execute button */}
                 <Button
                   size="sm"
@@ -273,7 +299,7 @@ export function NodeExecuteDialog({
                 <div className="flex-1 overflow-hidden">
                   <NodeFormEditor
                     node={node}
-                    onExecute={(formData) => execute(formData, inputData)}
+                    onExecute={(formData) => execute(formData, inputData, timeout)}
                     isExecuting={isExecuting}
                     initialFormValues={persistedFormValues}
                     onFormValuesChange={setPersistedFormValues}

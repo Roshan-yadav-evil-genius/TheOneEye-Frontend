@@ -42,7 +42,8 @@ export function useNodeExecution(options: NodeExecutionOptions) {
   const execute = useCallback(
     async (
       formData: Record<string, string>,
-      inputData: Record<string, unknown>
+      inputData: Record<string, unknown>,
+      timeout?: number
     ): Promise<TNodeExecuteResponse> => {
       setIsExecuting(true);
       onOutputChange?.(null);
@@ -61,7 +62,8 @@ export function useNodeExecution(options: NodeExecutionOptions) {
               form_values: formData,
               input_data: inputData,
               session_id: sessionId,
-            }
+            },
+            timeout
           );
 
           // Convert workflow response to standard format
@@ -113,6 +115,7 @@ export function useNodeExecution(options: NodeExecutionOptions) {
             inputData,
             sessionId,
             isWorkflowMode: false,
+            timeout,
           });
 
           // Handle errors for standalone mode

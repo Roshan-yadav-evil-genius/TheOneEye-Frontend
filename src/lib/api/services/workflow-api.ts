@@ -164,7 +164,8 @@ class WorkflowApiService extends BaseApiService {
       form_values: Record<string, unknown>;
       input_data: Record<string, unknown>;
       session_id?: string;
-    }
+    },
+    timeout?: number
   ): Promise<WorkflowNodeExecuteResponse> {
     return this.post<WorkflowNodeExecuteResponse>(
       `/workflow/${workflowId}/execute_and_save_node/`,
@@ -173,7 +174,9 @@ class WorkflowApiService extends BaseApiService {
         form_values: data.form_values,
         input_data: data.input_data,
         session_id: data.session_id,
-      }
+        timeout: timeout, // Timeout in seconds for backend
+      },
+      timeout ? { timeout: timeout * 1000 } : undefined // Convert seconds to ms for axios
     );
   }
 }

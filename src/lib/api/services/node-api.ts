@@ -39,9 +39,18 @@ class NodeApiService extends BaseApiService {
 
   async executeNode(
     identifier: string, 
-    data: TNodeExecuteRequest
+    data: TNodeExecuteRequest,
+    timeout?: number
   ): Promise<TNodeExecuteResponse> {
-    return this.post<TNodeExecuteResponse>(`/nodes/${identifier}/execute/`, data);
+    const requestData = {
+      ...data,
+      timeout: timeout, // Timeout in seconds for backend
+    };
+    return this.post<TNodeExecuteResponse>(
+      `/nodes/${identifier}/execute/`,
+      requestData,
+      timeout ? { timeout: timeout * 1000 } : undefined // Convert seconds to ms for axios
+    );
   }
 
   async getNodeFieldOptions(

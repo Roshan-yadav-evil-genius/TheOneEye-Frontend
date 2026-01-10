@@ -19,6 +19,7 @@ export interface NodeExecutionOptions {
     workflowId: string;
     nodeInstanceId: string;
   };
+  timeout?: number;
   onSuccess?: (response: TNodeExecuteResponse) => void;
   onError?: (error: Error) => void;
 }
@@ -29,6 +30,7 @@ export interface WorkflowExecutionOptions {
   formData: Record<string, string>;
   inputData: Record<string, unknown>;
   sessionId: string;
+  timeout?: number;
   onSuccess?: (response: TNodeExecuteResponse) => void;
   onError?: (error: Error) => void;
 }
@@ -38,7 +40,7 @@ export class NodeExecutionService {
    * Execute a node in standalone mode
    */
   async executeStandaloneNode(options: NodeExecutionOptions): Promise<TNodeExecuteResponse> {
-    const { nodeIdentifier, formData, inputData, sessionId } = options;
+    const { nodeIdentifier, formData, inputData, sessionId, timeout } = options;
 
     const request: TNodeExecuteRequest = {
       input_data: inputData,
@@ -47,7 +49,7 @@ export class NodeExecutionService {
     };
 
     try {
-      const result = await nodeApi.executeNode(nodeIdentifier, request);
+      const result = await nodeApi.executeNode(nodeIdentifier, request, timeout);
       
       if (options.onSuccess) {
         options.onSuccess(result);
@@ -79,7 +81,7 @@ export class NodeExecutionService {
    * Execute a node in workflow mode
    */
   async executeWorkflowNode(options: WorkflowExecutionOptions): Promise<TNodeExecuteResponse> {
-    const { workflowId, nodeInstanceId, formData, inputData, sessionId } = options;
+    const { workflowId, nodeInstanceId, formData, inputData, sessionId, timeout } = options;
 
     try {
       const response = await workflowApi.executeAndSaveNode(
@@ -89,7 +91,8 @@ export class NodeExecutionService {
           form_values: formData,
           input_data: inputData,
           session_id: sessionId,
-        }
+        },
+        timeout
       );
 
       // Convert workflow response to standard format
