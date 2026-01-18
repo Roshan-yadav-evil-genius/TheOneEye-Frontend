@@ -83,6 +83,7 @@ const defaultColumnConfigs: ColumnConfig[] = [
   { id: "name", label: "Name", visible: true },
   { id: "status", label: "Status", visible: true },
   { id: "category", label: "Category", visible: true },
+  { id: "workflowType", label: "Type", visible: true },
   { id: "lastRun", label: "Last Run", visible: true },
   { id: "nextRun", label: "Next Run", visible: true },
   { id: "runsCount", label: "Runs Count", visible: true },
@@ -308,10 +309,18 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
           defaultRowsPerPage: state.defaultRowsPerPage,
           maxRowsPerPage: state.maxRowsPerPage,
         }),
-        version: 1,
+        version: 2,
         migrate: (persistedState: unknown, version: number) => {
-          // Handle future migrations here
-          return persistedState;
+          const state = persistedState as WorkflowTableStoreState;
+          if (version < 2) {
+            // Add workflowType column if missing
+            const hasWorkflowType = state.tableState.columns.some(c => c.id === 'workflowType');
+            if (!hasWorkflowType) {
+              const categoryIndex = state.tableState.columns.findIndex(c => c.id === 'category');
+              state.tableState.columns.splice(categoryIndex + 1, 0, { id: 'workflowType', label: 'Type', visible: true });
+            }
+          }
+          return state;
         },
       }
     ),

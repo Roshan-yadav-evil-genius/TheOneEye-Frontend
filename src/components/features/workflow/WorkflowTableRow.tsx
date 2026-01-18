@@ -12,12 +12,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   IconDots,
   IconPlayerPlay,
   IconPlayerStop,
   IconEdit,
   IconSettings,
   IconTrash,
+  IconInfoCircle,
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
 import { formatRelativeDate } from "@/lib/dates";
@@ -86,11 +92,18 @@ export function WorkflowTableRow({
       </TableCell>
       {columns.find(col => col.id === "name")?.visible && (
         <TableCell>
-          <div>
-            <div className="font-medium">{workflow.name}</div>
-            <div className="text-sm text-muted-foreground">
-              {workflow.description}
-            </div>
+          <div className="flex items-center gap-2">
+            {workflow.description && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconInfoCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  {workflow.description}
+                </TooltipContent>
+              </Tooltip>
+            )}
+            <span className="font-medium">{workflow.name}</span>
           </div>
         </TableCell>
       )}

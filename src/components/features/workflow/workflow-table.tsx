@@ -91,6 +91,7 @@ export function WorkflowTable({
               {columns.find(col => col.id === "name")?.visible && <TableHead>Name</TableHead>}
               {columns.find(col => col.id === "status")?.visible && <TableHead>Status</TableHead>}
               {columns.find(col => col.id === "category")?.visible && <TableHead>Category</TableHead>}
+              {columns.find(col => col.id === "workflowType")?.visible && <TableHead>Type</TableHead>}
               {columns.find(col => col.id === "lastRun")?.visible && <TableHead>Last Run</TableHead>}
               {columns.find(col => col.id === "nextRun")?.visible && <TableHead>Next Run</TableHead>}
               {columns.find(col => col.id === "runsCount")?.visible && <TableHead>Runs Count</TableHead>}
