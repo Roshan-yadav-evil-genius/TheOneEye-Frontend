@@ -49,17 +49,20 @@ function mergeWithCachedChoices(
     ...newSchema,
     fields: newSchema.fields.map(field => {
       const newChoices = field.widget._choices || field.widget.choices || [];
+      // FIX: Check for ACTUAL choices (not just placeholder)
+      const nonEmptyNewChoices = newChoices.filter(([val]: [string, string]) => val !== '');
       
-      // If backend returned choices, use them (fresh data)
-      if (newChoices.length > 0) return field;
+      // If backend returned actual choices, use them (fresh data)
+      if (nonEmptyNewChoices.length > 0) return field;
       
-      // Backend returned empty - check if we can use cache
+      // Backend returned only placeholder or empty - check if we can use cache
       const cachedField = cachedSchema.fields.find(f => f.name === field.name);
       const cachedChoices = cachedField?.widget._choices || cachedField?.widget.choices || [];
+      const nonEmptyCachedChoices = cachedChoices.filter(([val]: [string, string]) => val !== '');
       
-      // Only use cache if parent dependencies haven't changed
+      // Only use cache if parent dependencies haven't changed AND cache has actual choices
       if (
-        cachedChoices.length > 0 && 
+        nonEmptyCachedChoices.length > 0 && 
         canUseCachedChoices(field.name, newSchema.dependencies_graph, cachedValues, newValues)
       ) {
         return {
@@ -153,6 +156,7 @@ export function useFormLoader(nodeIdentifier: string, hasForm: boolean): UseForm
           fieldValues,
           cachedValues
         );
+        
         setFormState(merged);
         return merged;
       }

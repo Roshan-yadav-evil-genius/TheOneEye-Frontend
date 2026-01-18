@@ -92,34 +92,68 @@ export function NodeFormEditor({
       if (!formState?.dependencies_graph) return;
 
       // Use initialFormValues if provided, otherwise use current formValues (which may have auto-selected values)
-      const valuesToLoad = (initialFormValues && Object.keys(initialFormValues).length > 0)
+      const allValues = (initialFormValues && Object.keys(initialFormValues).length > 0)
         ? initialFormValues
         : formValuesRef.current;
 
-      // Check if there are any values that might need dependent loaders
-      if (Object.keys(valuesToLoad).length === 0) return;
+      // Categorize fields for cascading loads
+      const dependentFields = new Set(Object.keys(formState.dependencies_graph));
+      const parentFields = new Set(
+        Object.values(formState.dependencies_graph).flat()
+      );
+      
+      // Fields that have persisted values and are parents (need to trigger child loaders)
+      const parentsWithValues = [...parentFields].filter(
+        field => allValues[field] && allValues[field] !== ''
+      );
 
-      // Check if any of these values are for fields that have dependents
-      const hasParentWithValue = Object.keys(valuesToLoad).some(fieldName => {
-        const value = valuesToLoad[fieldName];
-        // Check if field has dependents (is listed as a dependency for another field) and has a non-empty value
-        return value && value !== '' && 
-          Object.values(formState.dependencies_graph).some(deps => deps.includes(fieldName));
-      });
-
-      if (!hasParentWithValue) return;
+      if (parentsWithValues.length === 0) return;
 
       initialLoadDoneRef.current = true;
 
-      // Trigger loaders for dependent fields
+      // TWO-CALL APPROACH for cascading dependencies:
+      // Call 1: Send only ROOT parents (non-dependent) to load INTERMEDIATE choices
+      // Call 2: Send all parents to load LEAF choices
+      
+      // Root parents = parent fields that are NOT dependents themselves
+      const rootParentValues = Object.fromEntries(
+        Object.entries(allValues).filter(([key]) => 
+          parentFields.has(key) && !dependentFields.has(key) && allValues[key] && allValues[key] !== ''
+        )
+      );
+      
+      // All parent values (for second call)
+      const allParentValues = Object.fromEntries(
+        Object.entries(allValues).filter(([key]) => 
+          parentFields.has(key) && allValues[key] && allValues[key] !== ''
+        )
+      );
+
       try {
-        const updatedForm = await updateForm(
-          valuesToLoad,
-          formState,
-          {} // empty cached values since this is initial load
+        let latestForm = formState;
+        
+        // CALL 1: Load intermediate choices (e.g., spreadsheet choices from google_account)
+        if (Object.keys(rootParentValues).length > 0) {
+          const intermediateForm = await updateForm(rootParentValues, latestForm, {});
+          if (intermediateForm) {
+            latestForm = intermediateForm;
+            setLocalFormState(intermediateForm);
+          }
+        }
+
+        // CALL 2: Load leaf choices (e.g., sheet choices from google_account + spreadsheet)
+        // Only if there are intermediate parent values (fields that are both dependent and parent)
+        const intermediateParentValues = Object.fromEntries(
+          Object.entries(allValues).filter(([key]) => 
+            parentFields.has(key) && dependentFields.has(key) && allValues[key] && allValues[key] !== ''
+          )
         );
-        if (updatedForm) {
-          setLocalFormState(updatedForm);
+        
+        if (Object.keys(intermediateParentValues).length > 0) {
+          const leafForm = await updateForm(allParentValues, latestForm, rootParentValues);
+          if (leafForm) {
+            setLocalFormState(leafForm);
+          }
         }
       } catch (err) {
         console.error('[NodeFormEditor] Failed to load dependent field options:', err);
@@ -164,7 +198,11 @@ export function NodeFormEditor({
           const cachedValues = { ...formValuesRef.current };
           
           // Get current form values including the new value
+          // FIX: Delete dependent field values so their loaders run (like lab/app)
           const currentFormValues = { ...formValuesRef.current, [fieldName]: value };
+          for (const dep of allDependents) {
+            delete currentFormValues[dep];
+          }
           
           // Update form with current values to trigger loaders for dependent fields
           // Pass cached schema and values for smart choice preservation
