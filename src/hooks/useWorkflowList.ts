@@ -135,6 +135,26 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     uiHelpers.openCreateWorkflowModal();
   };
 
+  const handleDuplicate = async (id: string) => {
+    const workflow = workflows.find(w => w.id === id);
+    
+    try {
+      await workflowApi.duplicateWorkflow(id);
+      uiHelpers.showSuccess(
+        "Workflow Duplicated",
+        `Workflow "${workflow?.name}" has been duplicated successfully.`
+      );
+      // Refresh workflow list to show the new copy
+      await loadWorkflows();
+    } catch (error) {
+      console.error("Failed to duplicate workflow:", error);
+      uiHelpers.showError(
+        "Duplication Failed",
+        "Failed to duplicate workflow. Please try again."
+      );
+    }
+  };
+
   return {
     // State
     modals,
@@ -150,6 +170,7 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     handleStop,
     handleEditInfo,
     handleEditWorkflow,
+    handleDuplicate,
     handleDelete,
     handleConfirmDelete,
     handleCancelDelete,

@@ -154,6 +154,14 @@ class WorkflowApiService extends BaseApiService {
     return this.post<{ status: string; message: string }>(`/workflow/${workflowId}/deactivate/`);
   }
 
+  /**
+   * Duplicate a workflow with all its nodes and connections.
+   * Creates a new workflow with "(Copy)" appended to the name.
+   */
+  async duplicateWorkflow(workflowId: string): Promise<BackendWorkflow> {
+    return this.post<BackendWorkflow>(`/workflow/${workflowId}/duplicate/`);
+  }
+
   async getWorkflowTaskStatus(workflowId: string): Promise<{ task_id: string; status: string }> {
     return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/task_status/`);
   }
@@ -208,6 +216,7 @@ export const {
   createWorkflow,
   updateWorkflow,
   deleteWorkflow,
+  duplicateWorkflow,
   getWorkflowCanvasData,
   addNodeToWorkflow,
   updateNodePosition,
