@@ -148,22 +148,18 @@ class ErrorNotificationService {
     
     if (formData?.fields) {
       formData.fields.forEach(field => {
-        // Check for errors array (standard format)
-        if (field.errors && Array.isArray(field.errors) && field.errors.length > 0) {
-          field.errors.forEach(err => {
+        // Check for field_level_errors array (new format)
+        if (field.field_level_errors && Array.isArray(field.field_level_errors) && field.field_level_errors.length > 0) {
+          field.field_level_errors.forEach(err => {
             fieldErrors.push(`${field.label || field.name}: ${err}`);
           });
-        }
-        // Check for single error property (if backend returns it)
-        else if ((field as any).error && typeof (field as any).error === 'string') {
-          fieldErrors.push(`${field.label || field.name}: ${(field as any).error}`);
         }
       });
     }
     
-    // Also check for non-field errors
-    if (formData?.non_field_errors && Array.isArray(formData.non_field_errors) && formData.non_field_errors.length > 0) {
-      fieldErrors.push(...formData.non_field_errors);
+    // Also check for form-level errors
+    if (formData?.form_level_errors && Array.isArray(formData.form_level_errors) && formData.form_level_errors.length > 0) {
+      fieldErrors.push(...formData.form_level_errors);
     }
 
     // Build error message

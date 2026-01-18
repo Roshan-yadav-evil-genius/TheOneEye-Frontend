@@ -41,30 +41,45 @@ export interface TNodeCount {
 }
 
 /**
- * Node form field from FormSerializer
- * Matches the output structure from core/Node/Core/Form/Core/FormSerializer.py
+ * Widget information for a form field
+ * Contains rendering hints and choices for select fields
+ */
+export interface TWidgetInfo {
+  input_type: string | null;
+  attrs?: Record<string, unknown>;
+  choices?: Array<[string, string]>;  // [value, label] tuples
+  _choices?: Array<[string, string]>; // Runtime choices (after loader)
+  is_required?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Node form field from Form Schema Builder
+ * Matches the output structure from core/Node/Core/Form/Core/SchemaBuilder.py
  */
 export interface TNodeFormField {
-  tag: "input" | "select" | "textarea";
   name: string;
   label: string;
-  type?: string;
-  value?: unknown;
-  options?: Array<{ value: string; text: string; selected?: boolean }>;
-  required?: boolean;
-  placeholder?: string;
-  disabled?: boolean;
-  errors?: string[];
-  json_mode?: boolean; // Indicates JSON editor mode from backend (for textarea fields)
+  help_text: string | null;
+  disabled: boolean;
+  initial: unknown;
+  value: unknown;
+  dependencies: string[];  // List of parent field names this field depends on
+  dependency_status: Record<string, boolean>;  // Status of each dependency
+  ready: boolean;  // Whether all dependencies are satisfied
+  widget: TWidgetInfo;
+  field_level_errors: string[];  // Validation errors for this field
 }
 
 /**
  * Form data structure with fields and dependencies
  */
 export interface TNodeFormData {
+  form_name: string;
   fields: TNodeFormField[];
-  dependencies?: Record<string, string[]>;
-  non_field_errors?: string[];
+  field_order: string[];
+  dependencies_graph: Record<string, string[]>;  // child -> [parents] mapping
+  form_level_errors: string[];  // Non-field validation errors
 }
 
 /**
@@ -92,6 +107,13 @@ export interface TFieldOptionsRequest {
 export interface TFieldOptionsResponse {
   field: string;
   options: Array<{ value: string; text: string }>;
+}
+
+/**
+ * Form update request
+ */
+export interface TFormUpdateRequest {
+  field_values: Record<string, unknown>;
 }
 
 /**

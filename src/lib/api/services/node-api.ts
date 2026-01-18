@@ -10,6 +10,7 @@ import {
   TNodeExecuteResponse,
   TNodeResetSessionRequest,
   TNodeResetSessionResponse,
+  TFormUpdateRequest,
 } from '@/types';
 
 /**
@@ -35,6 +36,14 @@ class NodeApiService extends BaseApiService {
 
   async getNodeForm(identifier: string): Promise<TNodeForm> {
     return this.get<TNodeForm>(`/nodes/${identifier}/form/`);
+  }
+
+  async updateNodeForm(
+    identifier: string,
+    fieldValues: Record<string, unknown> = {}
+  ): Promise<TNodeForm> {
+    const data: TFormUpdateRequest = { field_values: fieldValues };
+    return this.post<TNodeForm>(`/nodes/${identifier}/form/update/`, data);
   }
 
   async executeNode(
@@ -85,6 +94,7 @@ export const {
   getNodesCount,
   getNodeDetail,
   getNodeForm,
+  updateNodeForm,
   executeNode,
   getNodeFieldOptions,
   refreshNodeCache,

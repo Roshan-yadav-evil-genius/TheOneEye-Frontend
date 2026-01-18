@@ -21,6 +21,14 @@ export interface UseFormStateResult {
 }
 
 /**
+ * Get choices from a field's widget
+ * Handles both _choices (runtime) and choices (static)
+ */
+function getFieldChoices(field: { widget?: { _choices?: Array<[string, string]>; choices?: Array<[string, string]> } }): Array<[string, string]> {
+  return field.widget?._choices || field.widget?.choices || [];
+}
+
+/**
  * Hook for managing form values and validation state
  */
 export function useFormState(
@@ -35,15 +43,23 @@ export function useFormState(
 
     const defaultValues: Record<string, string> = {};
     formState.fields.forEach((field) => {
-      if (field.value !== undefined && field.value !== null) {
+      // Use the field's value if available
+      if (field.value !== undefined && field.value !== null && field.value !== '') {
         defaultValues[field.name] = String(field.value);
-      } else if (field.options?.find((o) => o.selected)) {
-        const selected = field.options.find((o) => o.selected);
-        if (selected) {
-          defaultValues[field.name] = selected.value;
-        }
       } else {
-        defaultValues[field.name] = '';
+        // Check for choices - if there's only one non-empty choice, it might be auto-selected
+        const choices = getFieldChoices(field);
+        const nonEmptyChoices = choices.filter(([value]) => value !== '');
+        
+        if (nonEmptyChoices.length === 1) {
+          // Auto-select single choice
+          defaultValues[field.name] = nonEmptyChoices[0][0];
+        } else if (field.initial !== undefined && field.initial !== null) {
+          // Use initial value
+          defaultValues[field.name] = String(field.initial);
+        } else {
+          defaultValues[field.name] = '';
+        }
       }
     });
 
@@ -118,4 +134,3 @@ export function useFormState(
     formValuesRef,
   };
 }
-
