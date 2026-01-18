@@ -23,37 +23,65 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
   const [workflowToEdit, setWorkflowToEdit] = useState<TWorkflow | null>(null);
 
   const handleRun = async (id: string) => {
+    const workflow = workflows.find(w => w.id === id);
+    
     try {
-      await workflowApi.startWorkflowExecution(id);
-      uiHelpers.showSuccess(
-        "Workflow Started",
-        "Workflow execution has been started successfully."
-      );
+      if (workflow?.workflow_type === 'api') {
+        // API workflow: just activate (no Celery task)
+        await workflowApi.activateWorkflow(id);
+        uiHelpers.showSuccess(
+          "Workflow Activated",
+          "API workflow is now accepting requests via /execute/ endpoint."
+        );
+      } else {
+        // Production workflow: start Celery task
+        await workflowApi.startWorkflowExecution(id);
+        uiHelpers.showSuccess(
+          "Workflow Started",
+          "Workflow execution has been started successfully."
+        );
+      }
       // Refresh workflow list to show updated status
       await loadWorkflows();
     } catch (error) {
       console.error("Failed to start workflow:", error);
       uiHelpers.showError(
-        "Execution Failed",
-        "Failed to start workflow execution. Please try again."
+        workflow?.workflow_type === 'api' ? "Activation Failed" : "Execution Failed",
+        workflow?.workflow_type === 'api' 
+          ? "Failed to activate API workflow. Please try again."
+          : "Failed to start workflow execution. Please try again."
       );
     }
   };
 
   const handleStop = async (id: string) => {
+    const workflow = workflows.find(w => w.id === id);
+    
     try {
-      await workflowApi.stopWorkflowExecution(id);
-      uiHelpers.showSuccess(
-        "Workflow Stopped",
-        "Workflow execution has been stopped successfully."
-      );
+      if (workflow?.workflow_type === 'api') {
+        // API workflow: just deactivate (no Celery task to revoke)
+        await workflowApi.deactivateWorkflow(id);
+        uiHelpers.showSuccess(
+          "Workflow Deactivated",
+          "API workflow is no longer accepting requests."
+        );
+      } else {
+        // Production workflow: stop Celery task
+        await workflowApi.stopWorkflowExecution(id);
+        uiHelpers.showSuccess(
+          "Workflow Stopped",
+          "Workflow execution has been stopped successfully."
+        );
+      }
       // Refresh workflow list to show updated status
       await loadWorkflows();
     } catch (error) {
       console.error("Failed to stop workflow:", error);
       uiHelpers.showError(
-        "Stop Failed",
-        "Failed to stop workflow execution. Please try again."
+        workflow?.workflow_type === 'api' ? "Deactivation Failed" : "Stop Failed",
+        workflow?.workflow_type === 'api'
+          ? "Failed to deactivate API workflow. Please try again."
+          : "Failed to stop workflow execution. Please try again."
       );
     }
   };

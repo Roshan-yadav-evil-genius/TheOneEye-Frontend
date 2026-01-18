@@ -136,6 +136,24 @@ class WorkflowApiService extends BaseApiService {
     return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/stop_execution/`);
   }
 
+  /**
+   * Activate an API workflow (mark as ready to receive requests).
+   * This does NOT start a Celery task - it only sets status='active'.
+   * Use this for API workflows only.
+   */
+  async activateWorkflow(workflowId: string): Promise<{ status: string; message: string }> {
+    return this.post<{ status: string; message: string }>(`/workflow/${workflowId}/activate/`);
+  }
+
+  /**
+   * Deactivate an API workflow (stop accepting requests).
+   * This does NOT revoke a Celery task - it only sets status='inactive'.
+   * Use this for API workflows only.
+   */
+  async deactivateWorkflow(workflowId: string): Promise<{ status: string; message: string }> {
+    return this.post<{ status: string; message: string }>(`/workflow/${workflowId}/deactivate/`);
+  }
+
   async getWorkflowTaskStatus(workflowId: string): Promise<{ task_id: string; status: string }> {
     return this.get<{ task_id: string; status: string }>(`/workflow/${workflowId}/task_status/`);
   }
@@ -200,6 +218,8 @@ export const {
   getTaskStatus,
   startWorkflowExecution,
   stopWorkflowExecution,
+  activateWorkflow,
+  deactivateWorkflow,
   getWorkflowTaskStatus,
   getNodeInputData,
   getNodeOutputData,

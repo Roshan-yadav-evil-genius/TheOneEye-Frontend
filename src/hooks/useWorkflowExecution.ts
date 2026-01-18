@@ -90,18 +90,27 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       return;
     }
 
+    const workflowType = canvasStoreRef.current.workflow?.workflow_type;
+
     try {
-      // Connect WebSocket via singleton manager
-      workflowWsManager.connect(workflowId);
-      
-      const response = await workflowApi.startWorkflowExecution(workflowId);
-      setTaskId(response.task_id);
-      setTaskStatus(response.status);
-      setIsRunning(true);
-      startPolling();
-      
+      if (workflowType === 'api') {
+        // API workflow: just activate (no WebSocket, no Celery task)
+        await workflowApi.activateWorkflow(workflowId);
+        setIsRunning(true);  // This disables editing in canvas
+      } else {
+        // Production workflow: start Celery task + WebSocket for live updates
+        workflowWsManager.connect(workflowId);
+        
+        const response = await workflowApi.startWorkflowExecution(workflowId);
+        setTaskId(response.task_id);
+        setTaskStatus(response.status);
+        setIsRunning(true);
+        startPolling();
+      }
     } catch {
-      workflowWsManager.disconnect();
+      if (workflowType !== 'api') {
+        workflowWsManager.disconnect();
+      }
     }
   };
 
@@ -110,18 +119,27 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       return;
     }
 
+    const workflowType = canvasStoreRef.current.workflow?.workflow_type;
+
     try {
-      await workflowApi.stopWorkflowExecution(workflowId);
-      setTaskId(null);
-      setTaskStatus(null);
-      setIsRunning(false);
-      stopPolling();
-      
-      // Clear executing nodes from store to remove spinners
-      executionStoreRef.current.setExecutingNodes({});
-      executionStoreRef.current.setStatus('idle');
-      
-      workflowWsManager.disconnect();
+      if (workflowType === 'api') {
+        // API workflow: just deactivate (no Celery task to revoke)
+        await workflowApi.deactivateWorkflow(workflowId);
+        setIsRunning(false);  // This re-enables editing in canvas
+      } else {
+        // Production workflow: stop Celery task + disconnect WebSocket
+        await workflowApi.stopWorkflowExecution(workflowId);
+        setTaskId(null);
+        setTaskStatus(null);
+        setIsRunning(false);
+        stopPolling();
+        
+        // Clear executing nodes from store to remove spinners
+        executionStoreRef.current.setExecutingNodes({});
+        executionStoreRef.current.setStatus('idle');
+        
+        workflowWsManager.disconnect();
+      }
     } catch {
       // Error handling
     }
@@ -252,11 +270,23 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       if (!workflowId) return;
       
       try {
-        // Fetch workflow to get task_id
+        // Fetch workflow to get task_id and workflow_type
         const workflows = await workflowApi.getWorkflows();
         const workflow = workflows.find(w => w.id === workflowId);
         
-        if (workflow?.task_id) {
+        if (!workflow) return;
+        
+        // Handle API workflows: check if active
+        if (workflow.workflow_type === 'api') {
+          if (workflow.status === 'active') {
+            setIsRunning(true);
+            // No WebSocket or polling needed for API workflows
+          }
+          return;
+        }
+        
+        // Handle Production workflows: check Celery task status
+        if (workflow.task_id) {
           setTaskId(workflow.task_id);
           // Check current status
           const statusResponse = await workflowApi.getWorkflowTaskStatus(workflowId);
