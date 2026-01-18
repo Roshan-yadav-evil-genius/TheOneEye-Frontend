@@ -21,6 +21,8 @@ import {
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
 import { formatRelativeDate } from "@/lib/dates";
+import { WorkflowTypeBadge } from "@/components/ui/workflow-type-badge";
+import { WorkflowType } from "@/types/common/constants";
 
 interface WorkflowTableRowProps {
   workflow: TWorkflow;
@@ -98,6 +100,23 @@ export function WorkflowTableRow({
       {columns.find(col => col.id === "category")?.visible && (
         <TableCell>
           <Badge variant="secondary">{workflow.category || "Uncategorized"}</Badge>
+        </TableCell>
+      )}
+      {columns.find(col => col.id === "workflowType")?.visible && (
+        <TableCell>
+          {workflow.workflow_type ? (
+            <WorkflowTypeBadge 
+              workflowType={workflow.workflow_type} 
+              size="sm" 
+              showTooltip={false}
+            />
+          ) : (
+            <WorkflowTypeBadge 
+              workflowType={WorkflowType.PRODUCTION} 
+              size="sm" 
+              showTooltip={false}
+            />
+          )}
         </TableCell>
       )}
       {columns.find(col => col.id === "lastRun")?.visible && (

@@ -14,6 +14,7 @@ import { useWorkflowState } from "@/hooks/useWorkflowState";
 import { useWorkflowDragDrop } from "@/hooks/useWorkflowDragDrop";
 import { nodeTypes } from "./nodeTypes";
 import DragOverlay from "./DragOverlay";
+import { useWorkflowCanvasStore } from "@/stores/workflow/workflow-canvas-store";
 
 interface WorkflowCanvasProps {
   workflowId: string;
@@ -44,6 +45,10 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     error,
   } = useWorkflowState({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning });
 
+  // Get workflow type from canvas store for node compatibility
+  const workflow = useWorkflowCanvasStore((state) => state.workflow);
+  const workflowType = workflow?.workflow_type;
+
   const {
     reactFlowWrapper,
     reactFlowInstance,
@@ -51,7 +56,7 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     onDragOver,
     onDragLeave,
     onDrop,
-  } = useWorkflowDragDrop({ addNodeFromDrag, setIsDragOver });
+  } = useWorkflowDragDrop({ addNodeFromDrag, setIsDragOver, workflowType });
 
   // Show loading state
   if (isLoading) {

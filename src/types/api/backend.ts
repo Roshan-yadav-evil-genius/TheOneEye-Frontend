@@ -19,6 +19,7 @@ export interface BackendNodeType {
   icon?: string;  // Auto-discovered icon path (e.g., "Store/icon.png")
   input_ports?: NodePort[];
   output_ports?: NodePort[];
+  supported_workflow_types?: string[];  // List of workflow types this node supports
 }
 
 export interface TFormConfiguration {
@@ -36,6 +37,7 @@ export interface BackendWorkflowCanvasResponse {
     name: string;
     description: string;
     status: string;
+    workflow_type?: string;  // Workflow execution mode ('production' | 'api')
     runs_count: number;
     last_run?: string | null;
   };

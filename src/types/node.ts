@@ -17,6 +17,7 @@ export interface TNodeMetadata {
   file_path?: string;
   category?: string;
   icon?: string;  // Auto-discovered icon path (e.g., "Store/icon.png")
+  supported_workflow_types?: string[];  // List of workflow types this node supports
 }
 
 /**

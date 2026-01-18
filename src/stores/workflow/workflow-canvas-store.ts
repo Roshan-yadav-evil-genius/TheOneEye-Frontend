@@ -9,6 +9,7 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { BackendWorkflowNode } from '@/types/api/backend';
 import { TWorkflowConnection } from '@/types/common/entities';
+import { WorkflowType } from '@/types/common/constants';
 import {
   TWorkflowNodeCreateRequest,
   TWorkflowConnectionCreateRequest
@@ -27,6 +28,7 @@ interface WorkflowCanvasState {
     name: string;
     description: string;
     status: string;
+    workflow_type?: WorkflowType;
     runs_count: number;
     last_run?: string | null;
   } | null;
@@ -130,7 +132,10 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
                 target: edge.target_node,
                 sourceHandle: edge.source_handle || 'default',
               }));
-              state.workflow = canvasData.workflow;
+              state.workflow = {
+                ...canvasData.workflow,
+                workflow_type: canvasData.workflow.workflow_type as WorkflowType | undefined,
+              };
               state.isLoading = false;
               state.error = null;
             });

@@ -23,6 +23,8 @@ import {
   IconMapOff
 } from "@tabler/icons-react";
 import { formatRelativeDate } from "@/lib/dates";
+import { WorkflowTypeBadge } from "@/components/ui/workflow-type-badge";
+import { WorkflowType } from "@/types/common/constants";
 
 interface WorkflowStatsHeaderProps {
   isRunning: boolean;
@@ -39,6 +41,7 @@ interface WorkflowStatsHeaderProps {
     runs_count: number;
     last_run?: string | null;
     status: string;
+    workflow_type?: WorkflowType;
   } | null;
 }
 
@@ -138,6 +141,15 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
 
         {/* Status and Controls */}
         <div className="flex items-center gap-2">
+          {/* Workflow Type Badge */}
+          {workflow?.workflow_type && (
+            <WorkflowTypeBadge 
+              workflowType={workflow.workflow_type} 
+              size="sm"
+              showTooltip={true}
+            />
+          )}
+
           {/* Status Badge */}
           <div className="flex items-center gap-1">
             {getStatusBadge()}

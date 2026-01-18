@@ -25,6 +25,7 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
+        workflow_type: formData.workflow_type,
         nodes: [],
         connections: [],
         status: 'inactive' as const,

@@ -6,10 +6,12 @@ import { DraggableNodeItem } from './draggable-node-item';
 import { countNodesInFolder } from '@/hooks/useNodeTree';
 import { IconChevronRight, IconFolder, IconFolderOpen } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { WorkflowType } from '@/types/common/constants';
 
 interface NodeCategoryTreeProps {
   nodeTree: TNodeTree;
   searchTerm?: string;
+  workflowType?: WorkflowType;
 }
 
 interface CategoryItemProps {
@@ -17,6 +19,7 @@ interface CategoryItemProps {
   folder: TNodeFolder;
   level?: number;
   defaultExpanded?: boolean;
+  workflowType?: WorkflowType;
 }
 
 /**
@@ -35,7 +38,7 @@ function getCategoryIcon(name: string, isOpen: boolean): React.ReactNode {
 /**
  * A single expandable category item with its nodes and subfolders
  */
-function CategoryItem({ name, folder, level = 0, defaultExpanded = false }: CategoryItemProps) {
+function CategoryItem({ name, folder, level = 0, defaultExpanded = false, workflowType }: CategoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const nodeCount = countNodesInFolder(folder);
   
@@ -87,7 +90,11 @@ function CategoryItem({ name, folder, level = 0, defaultExpanded = false }: Cate
               style={{ paddingLeft: `${(level + 1) * 12 + 16}px` }}
             >
               {folder.nodes.map((node) => (
-                <DraggableNodeItem key={node.identifier} node={node} />
+                <DraggableNodeItem 
+                  key={node.identifier} 
+                  node={node} 
+                  workflowType={workflowType}
+                />
               ))}
             </div>
           )}
@@ -100,6 +107,7 @@ function CategoryItem({ name, folder, level = 0, defaultExpanded = false }: Cate
               folder={subFolder}
               level={level + 1}
               defaultExpanded={defaultExpanded}
+              workflowType={workflowType}
             />
           ))}
         </div>
@@ -111,7 +119,7 @@ function CategoryItem({ name, folder, level = 0, defaultExpanded = false }: Cate
 /**
  * Main component that renders the entire node category tree
  */
-export function NodeCategoryTree({ nodeTree, searchTerm }: NodeCategoryTreeProps) {
+export function NodeCategoryTree({ nodeTree, searchTerm, workflowType }: NodeCategoryTreeProps) {
   const categories = Object.entries(nodeTree);
   
   if (categories.length === 0) {
@@ -136,6 +144,7 @@ export function NodeCategoryTree({ nodeTree, searchTerm }: NodeCategoryTreeProps
           name={categoryName}
           folder={folder}
           defaultExpanded={shouldExpandByDefault}
+          workflowType={workflowType}
         />
       ))}
     </div>

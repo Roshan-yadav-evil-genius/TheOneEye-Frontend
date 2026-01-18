@@ -32,6 +32,7 @@ export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflo
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
+        workflow_type: formData.workflow_type,
         updatedAt: new Date(),
       };
 
@@ -77,6 +78,7 @@ export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflo
             name: workflow.name,
             description: workflow.description,
             category: workflow.category || "",
+            workflow_type: workflow.workflow_type,
           }}
           onSubmit={handleSubmit}
           submitButtonText="Update Workflow"

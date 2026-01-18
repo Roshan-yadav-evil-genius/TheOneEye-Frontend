@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -12,6 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { WorkflowType, WORKFLOW_TYPE_LABELS, WORKFLOW_TYPE_DESCRIPTIONS } from "@/types/common/constants";
+import { IconRefresh, IconApi } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
 export const WORKFLOW_CATEGORIES = [
   "Marketing",
@@ -32,6 +36,7 @@ export interface WorkflowFormData {
   name: string;
   description: string;
   category: string;
+  workflow_type: WorkflowType;
 }
 
 export interface WorkflowFormProps {
@@ -59,23 +64,26 @@ export function WorkflowForm({
       name: initialData.name || "",
       description: initialData.description || "",
       category: initialData.category || "",
+      workflow_type: initialData.workflow_type || WorkflowType.PRODUCTION,
     },
     mode: "onChange",
   });
 
   const categoryValue = watch("category");
+  const workflowTypeValue = watch("workflow_type");
 
   // Update form when initialData changes
   useEffect(() => {
     // Only reset if initialData has actual values to avoid infinite loops
-    if (initialData.name || initialData.description || initialData.category) {
+    if (initialData.name || initialData.description || initialData.category || initialData.workflow_type) {
       reset({
         name: initialData.name || "",
         description: initialData.description || "",
         category: initialData.category || "",
+        workflow_type: initialData.workflow_type || WorkflowType.PRODUCTION,
       });
     }
-  }, [initialData.name, initialData.description, initialData.category, reset]);
+  }, [initialData.name, initialData.description, initialData.category, initialData.workflow_type, reset]);
 
   const onFormSubmit = async (data: WorkflowFormData) => {
     try {
@@ -104,6 +112,63 @@ export function WorkflowForm({
         />
         {errors.name && (
           <p className="text-sm text-red-500">{errors.name.message}</p>
+        )}
+      </div>
+
+      {/* Workflow Type Selector */}
+      <div className="space-y-3">
+        <Label>Workflow Type *</Label>
+        <input
+          type="hidden"
+          {...register("workflow_type", { required: "Workflow type is required" })}
+        />
+        <RadioGroup
+          value={workflowTypeValue}
+          onValueChange={(value) => setValue("workflow_type", value as WorkflowType)}
+          className="grid grid-cols-1 gap-3"
+          disabled={isSubmitting}
+        >
+          {Object.values(WorkflowType).map((type) => (
+            <div key={type} className="relative">
+              <RadioGroupItem
+                value={type}
+                id={`workflow-type-${type}`}
+                className="peer sr-only"
+              />
+              <Label
+                htmlFor={`workflow-type-${type}`}
+                className={cn(
+                  "flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
+                  "hover:bg-muted/50",
+                  "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5",
+                  "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+                  workflowTypeValue === type ? "border-primary bg-primary/5" : "border-border"
+                )}
+              >
+                <div className={cn(
+                  "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
+                  type === WorkflowType.PRODUCTION 
+                    ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                    : "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                )}>
+                  {type === WorkflowType.PRODUCTION ? (
+                    <IconRefresh size={20} />
+                  ) : (
+                    <IconApi size={20} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">{WORKFLOW_TYPE_LABELS[type]}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {WORKFLOW_TYPE_DESCRIPTIONS[type]}
+                  </div>
+                </div>
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+        {errors.workflow_type && (
+          <p className="text-sm text-red-500">{errors.workflow_type.message}</p>
         )}
       </div>
 

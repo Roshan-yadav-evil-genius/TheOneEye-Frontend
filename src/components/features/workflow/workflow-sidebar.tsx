@@ -7,6 +7,8 @@ import { NodeCategoryTree } from "./node-category-tree";
 import { DraggableNodeItem } from "./draggable-node-item";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores";
+import { useWorkflowCanvasStore } from "@/stores/workflow/workflow-canvas-store";
+import { WorkflowType } from "@/types/common/constants";
 
 interface WorkflowSidebarProps {
   searchTerm: string;
@@ -33,6 +35,10 @@ export function WorkflowSidebar({
   const setNodesViewMode = useUIStore((state) => state.setNodesViewMode);
   const [showFilters, setShowFilters] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('');
+  
+  // Get workflow type from canvas store
+  const workflow = useWorkflowCanvasStore((state) => state.workflow);
+  const workflowType = workflow?.workflow_type;
   
   const { nodeTree, flatNodes, categories, isLoading, error, refresh } = useNodeTree({ 
     searchTerm, 
@@ -166,7 +172,11 @@ export function WorkflowSidebar({
             </button>
           </div>
         ) : nodesViewMode === 'tree' ? (
-          <NodeCategoryTree nodeTree={nodeTree} searchTerm={searchTerm} />
+          <NodeCategoryTree 
+            nodeTree={nodeTree} 
+            searchTerm={searchTerm} 
+            workflowType={workflowType}
+          />
         ) : (
           /* Flat List View */
           <div className="space-y-2">
@@ -179,7 +189,11 @@ export function WorkflowSidebar({
               </div>
             ) : (
               flatNodes.map((node) => (
-                <DraggableNodeItem key={node.identifier} node={node} />
+                <DraggableNodeItem 
+                  key={node.identifier} 
+                  node={node} 
+                  workflowType={workflowType}
+                />
               ))
             )}
           </div>

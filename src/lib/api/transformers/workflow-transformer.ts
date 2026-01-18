@@ -5,6 +5,7 @@
  * Handles all workflow-related data transformations.
  */
 import { TWorkflow } from '@/types';
+import { WorkflowType } from '@/types/common/constants';
 import { BaseTransformer } from './base-transformer';
 
 /**
@@ -15,6 +16,7 @@ export interface BackendWorkflow {
   name: string;
   description: string;
   category: string;
+  workflow_type?: string;  // 'production' | 'api'
   status: string;
   last_run?: string;
   next_run?: string;
@@ -37,6 +39,7 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       name: backend.name,
       description: backend.description,
       category: backend.category,
+      workflow_type: backend.workflow_type as WorkflowType | undefined,
       nodes: [],
       connections: [],
       status: backend.status as 'active' | 'inactive' | 'error',
@@ -56,6 +59,7 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       name: frontend.name,
       description: frontend.description,
       category: frontend.category,
+      workflow_type: frontend.workflow_type,
       status: frontend.status,
       runs_count: frontend.runsCount,
       tags: frontend.tags,

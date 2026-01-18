@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { WORKFLOW_STATUS } from '@/constants';
+import { WorkflowType } from '@/types/common/constants';
 
 // Workflow creation/update validation schema
 export const workflowSchema = z.object({
@@ -12,6 +13,12 @@ export const workflowSchema = z.object({
     .string()
     .max(500, 'Description must be no more than 500 characters')
     .optional(),
+  workflow_type: z
+    .enum(Object.values(WorkflowType) as [string, ...string[]], {
+      errorMap: () => ({ message: 'Please select a valid workflow type' }),
+    })
+    .optional()
+    .default(WorkflowType.PRODUCTION),
   status: z
     .enum(Object.values(WORKFLOW_STATUS) as [string, ...string[]], {
       errorMap: () => ({ message: 'Please select a valid workflow status' }),

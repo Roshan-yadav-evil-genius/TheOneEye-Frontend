@@ -1,4 +1,5 @@
 import { BackendNodeType } from "../api";
+import { WorkflowType } from "./constants";
 
 // Core entity types
 export type TNode = BackendNodeType;
@@ -28,6 +29,7 @@ export interface TWorkflow {
   name: string;
   description: string;
   category?: string;
+  workflow_type?: WorkflowType;  // ✅ Match backend - workflow execution mode
   nodes: TWorkflowNode[]; // Changed from TNode[] to TWorkflowNode[]
   connections: TWorkflowConnection[];
   status: 'active' | 'inactive' | 'error';
