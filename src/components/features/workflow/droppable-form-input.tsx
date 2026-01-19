@@ -352,7 +352,8 @@ export function DroppableFormInput({
             baseInputClasses,
             "py-2 resize-y min-h-[80px]",
             isOverInput && "border-pink-400 bg-pink-900/10",
-            className
+            className,
+            (error || jsonError) && "border-red-500 focus:border-red-500"
           )}
         />
       ) : (
@@ -366,7 +367,8 @@ export function DroppableFormInput({
             baseInputClasses,
             "h-10",
             isOverInput && "border-pink-400 bg-pink-900/10",
-            className
+            className,
+            (error || jsonError) && "border-red-500 focus:border-red-500"
           )}
         />
       )}

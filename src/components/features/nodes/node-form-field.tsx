@@ -200,7 +200,7 @@ export function NodeFormField({
         {required && <span className="text-red-400 ml-1">*</span>}
       </Label>
       <DroppableFormInput
-        type={field.widget?.input_type || "text"}
+        type="text"
         id={`form-field-${field.name}`}
         value={value}
         onChange={onChange}
