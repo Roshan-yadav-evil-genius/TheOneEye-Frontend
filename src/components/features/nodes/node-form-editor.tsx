@@ -59,10 +59,29 @@ export function NodeFormEditor({
     }
   }, [loadedFormState]);
 
-  // Update formState when execution returns validation errors
+  // Update formState when execution returns validation errors or clears them on success
   useEffect(() => {
     if (executionFormState) {
+      // Execution returned validation errors - show them
       setLocalFormState(executionFormState);
+    } else {
+      // Execution succeeded or cleared - remove any previous errors from form state
+      setLocalFormState(prev => {
+        if (!prev) return prev;
+        // Only update if there are actually errors to clear
+        const hasErrors = prev.fields.some(f => f.field_level_errors?.length > 0) || 
+                          (prev.form_level_errors?.length > 0);
+        if (!hasErrors) return prev;
+        
+        return {
+          ...prev,
+          fields: prev.fields.map(field => ({
+            ...field,
+            field_level_errors: []
+          })),
+          form_level_errors: []
+        };
+      });
     }
   }, [executionFormState]);
 
