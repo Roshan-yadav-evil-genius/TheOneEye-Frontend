@@ -62,8 +62,25 @@ export function NodeFormEditor({
   // Update formState when execution returns validation errors or clears them on success
   useEffect(() => {
     if (executionFormState) {
-      // Execution returned validation errors - show them
-      setLocalFormState(executionFormState);
+      // Execution returned validation errors - merge errors into existing state, preserve choices
+      setLocalFormState(prev => {
+        if (!prev) return executionFormState;
+        
+        return {
+          ...prev,
+          form_level_errors: executionFormState.form_level_errors || [],
+          fields: prev.fields.map(existingField => {
+            const errorField = executionFormState.fields?.find(f => f.name === existingField.name);
+            return {
+              ...existingField,
+              // Update errors from response
+              field_level_errors: errorField?.field_level_errors || [],
+              // Update value if backend rendered it (e.g., Jinja templates)
+              value: errorField?.value !== undefined ? errorField.value : existingField.value,
+            };
+          }),
+        };
+      });
     } else {
       // Execution succeeded or cleared - remove any previous errors from form state
       setLocalFormState(prev => {
