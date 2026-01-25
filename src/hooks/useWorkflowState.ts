@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
-import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange } from "reactflow";
+import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange, EdgeChange } from "reactflow";
 import { useWorkflowCanvasStore, useWorkflowSelectionStore } from "@/stores";
 import { TWorkflowNodeCreateRequest } from "@/types";
 
@@ -30,6 +30,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     updateNodePosition,
     removeNode,
     addConnection,
+    removeConnection,
     setDragOver,
     highlightEdge,
   } = useWorkflowCanvasStore();
@@ -83,6 +84,19 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     // Apply changes to local state first
     onNodesChange(changes);
   }, [onNodesChange]);
+
+  // Custom handler for edge changes that persists deletions to backend
+  const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
+    // Filter for removals and persist to backend
+    changes.forEach(change => {
+      if (change.type === 'remove') {
+        removeConnection(change.id);
+      }
+    });
+    
+    // Apply all changes to ReactFlow state
+    onEdgesChange(changes);
+  }, [removeConnection, onEdgesChange]);
 
   // Handle node drag stop to save position
   const handleNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
@@ -246,7 +260,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     isDragOver,
     setIsDragOver: setDragOver,
     onNodesChange: handleNodesChange,
-    onEdgesChange,
+    onEdgesChange: handleEdgesChange,
     onConnect,
     onNodeDragStop: handleNodeDragStop,
     addNodeFromDrag,
