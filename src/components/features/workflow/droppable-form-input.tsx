@@ -5,7 +5,8 @@ import { useDroppable, useDndMonitor } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
 import { convertPathToExpression } from './expression-utils';
 import Editor, { OnMount } from "@monaco-editor/react";
-import type { editor } from 'monaco-editor';
+import type { editor } from "monaco-editor";
+import { setupJinjaJson, langId, themeName } from "@/lib/monaco/jinja-json";
 
 interface DroppableFormInputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'textarea';
@@ -44,25 +45,9 @@ export function DroppableFormInput({
     }
   });
 
-  // Check if the drag is exactly over the input field
   const [isOverInput, setIsOverInput] = useState(false);
-  const [jsonError, setJsonError] = useState<string | null>(null);
   const [editorHeight, setEditorHeight] = useState<number>(rows * 20 + 40);
   const [isResizing, setIsResizing] = useState(false);
-
-  // Validate JSON when in JSON mode
-  useEffect(() => {
-    if (jsonMode && value) {
-      try {
-        JSON.parse(value);
-        setJsonError(null);
-      } catch (e) {
-        setJsonError('Invalid JSON syntax');
-      }
-    } else {
-      setJsonError(null);
-    }
-  }, [value, jsonMode]);
 
   // Update editor height when rows prop changes
   useEffect(() => {
@@ -72,7 +57,7 @@ export function DroppableFormInput({
     }
   }, [rows, jsonMode, type]);
 
-  // Setup Monaco autocomplete for JSON and variables
+  // Setup Monaco autocomplete for jinja-json (workflow variables + JSON keywords)
   useEffect(() => {
     if (!jsonMode || !editorRef.current) return;
 
@@ -80,12 +65,10 @@ export function DroppableFormInput({
     const model = editor.getModel();
     if (!model) return;
 
-    // Get monaco instance from window (set in onMount)
-    const monaco = (window as any).monaco;
+    const monaco = (window as Window & { monaco?: typeof import("monaco-editor") }).monaco;
     if (!monaco) return;
 
-    // Register completion item provider
-    const disposable = monaco.languages.registerCompletionItemProvider('json', {
+    const disposable = monaco.languages.registerCompletionItemProvider(langId, {
       provideCompletionItems: (model: editor.ITextModel, position: editor.Position) => {
         const word = model.getWordUntilPosition(position);
         const range = {
@@ -240,14 +223,15 @@ export function DroppableFormInput({
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
-    // Store monaco instance globally for autocomplete provider
-    (window as any).monaco = monaco;
+    (window as Window & { monaco?: typeof import("monaco-editor") }).monaco = monaco;
+    if (jsonMode) {
+      setupJinjaJson(monaco);
+    }
   };
 
-  // Helper function to get error styling
   const getErrorStyling = (baseClasses: string) => {
-    if (error || jsonError) {
-      return baseClasses.replace('border-input', 'border-red-500').replace('focus:border-primary/50', 'focus:border-red-500');
+    if (error) {
+      return baseClasses.replace("border-input", "border-red-500").replace("focus:border-primary/50", "focus:border-red-500");
     }
     return baseClasses;
   };
@@ -270,22 +254,22 @@ export function DroppableFormInput({
         )}
         style={{ minHeight: `${rows * 20 + 40}px` }}
       >
-        <div 
+        <div
           ref={resizeRef}
           className={cn(
             "border rounded-lg overflow-hidden relative",
-            error || jsonError ? "border-red-500" : "border-input",
+            error ? "border-red-500" : "border-input",
             isOverInput && "border-pink-400 bg-pink-900/10"
           )}
           style={{ height: `${editorHeight}px` }}
         >
           <Editor
             height={`${editorHeight}px`}
-            language="json"
+            language={langId}
             value={value}
             onChange={handleEditorChange}
             onMount={handleEditorDidMount}
-            theme="vs-dark"
+            theme={themeName}
             options={{
               readOnly: false,
               lineNumbers: 'on',
@@ -325,8 +309,8 @@ export function DroppableFormInput({
           </div>
         )}
         
-        {(error || jsonError) && (
-          <p className="text-red-500 text-xs mt-1">{error || jsonError}</p>
+        {error && (
+          <p className="text-red-500 text-xs mt-1">{error}</p>
         )}
       </div>
     );
@@ -353,7 +337,7 @@ export function DroppableFormInput({
             "py-2 resize-y min-h-[80px]",
             isOverInput && "border-pink-400 bg-pink-900/10",
             className,
-            (error || jsonError) && "border-red-500 focus:border-red-500"
+            error && "border-red-500 focus:border-red-500"
           )}
         />
       ) : (
@@ -368,7 +352,7 @@ export function DroppableFormInput({
             "h-10",
             isOverInput && "border-pink-400 bg-pink-900/10",
             className,
-            (error || jsonError) && "border-red-500 focus:border-red-500"
+            error && "border-red-500 focus:border-red-500"
           )}
         />
       )}
