@@ -173,7 +173,7 @@ export function useNodeExecution(options: NodeExecutionOptions) {
     ]
   );
 
-  // Reset session - clears server-side state (keeps deterministic session_id)
+  // Reset session - clears server-side state and node output in store so reopen shows empty
   const reset = useCallback(async () => {
     if (isResettingRef.current) return;
     isResettingRef.current = true;
@@ -182,12 +182,16 @@ export function useNodeExecution(options: NodeExecutionOptions) {
       // Clear server-side session
       await nodeExecutionService.resetSession(nodeIdentifier, sessionId);
       onOutputChange?.(null);
+      // Clear node output_data in workflow store so reopening the form does not show old data
+      if (isWorkflowMode && workflowContext) {
+        updateNodeExecutionData(workflowContext.nodeInstanceId, { output_data: {} });
+      }
     } catch (error) {
       console.error('Failed to reset session:', error);
     } finally {
       isResettingRef.current = false;
     }
-  }, [nodeIdentifier, sessionId, onOutputChange]);
+  }, [nodeIdentifier, sessionId, isWorkflowMode, workflowContext, updateNodeExecutionData, onOutputChange]);
 
   // Save form values to DB (workflow mode only)
   const save = useCallback(

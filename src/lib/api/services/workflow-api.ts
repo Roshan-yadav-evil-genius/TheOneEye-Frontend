@@ -217,19 +217,22 @@ class WorkflowApiService extends BaseApiService {
     data: {
       form_values: Record<string, unknown>;
       input_data: Record<string, unknown>;
-      iteration_index: number;
+      iteration_index?: number;  // optional; backend derives next index from node.output_data.forEachNode.state
     },
     timeout?: number
   ): Promise<ExecuteForEachIterationResponse> {
+    const body: Record<string, unknown> = {
+      node_id: nodeId,
+      form_values: data.form_values,
+      input_data: data.input_data,
+      timeout: timeout,
+    };
+    if (data.iteration_index !== undefined) {
+      body.iteration_index = data.iteration_index;
+    }
     return this.post<ExecuteForEachIterationResponse>(
       `/workflow/${workflowId}/execute_for_each_iteration/`,
-      {
-        node_id: nodeId,
-        form_values: data.form_values,
-        input_data: data.input_data,
-        iteration_index: data.iteration_index,
-        timeout: timeout,
-      },
+      body,
       timeout ? { timeout: timeout * 1000 } : undefined
     );
   }

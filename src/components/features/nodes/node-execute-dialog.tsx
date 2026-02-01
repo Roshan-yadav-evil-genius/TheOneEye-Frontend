@@ -95,8 +95,7 @@ export function NodeExecuteDialog({
   // Timeout state (in seconds, default 30 seconds)
   const [timeout, setTimeout] = useState<number>(30);
 
-  // ForEach "iterate and stop": step index for next iteration
-  const [forEachStepIndex, setForEachStepIndex] = useState<number>(0);
+  // ForEach "iterate and stop": loading state only; backend derives next index from node.output_data
   const [isIterating, setIsIterating] = useState(false);
   const updateNodeExecutionData = useWorkflowCanvasStore((s) => s.updateNodeExecutionData);
 
@@ -152,7 +151,7 @@ export function NodeExecuteDialog({
     execute(persistedFormValues, inputData, timeout);
   }, [execute, persistedFormValues, inputData, timeout]);
 
-  // ForEach: run one iteration and stop
+  // ForEach: run one iteration and stop; backend derives next index from node.output_data.forEachNode.state
   const handleIterateAndStop = useCallback(async () => {
     if (!workflowContext) return;
     setIsIterating(true);
@@ -164,7 +163,6 @@ export function NodeExecuteDialog({
         {
           form_values: persistedFormValues as Record<string, unknown>,
           input_data: inputData,
-          iteration_index: forEachStepIndex,
         },
         timeout
       );
@@ -179,10 +177,6 @@ export function NodeExecuteDialog({
           success: true,
           output: { data: outputDataPayload },
         });
-        const nextIndex = (response.forEachNode as { state?: { index?: number }; index?: number } | undefined)?.state?.index
-          ?? (response.forEachNode as { index?: number } | undefined)?.index
-          ?? forEachStepIndex;
-        setForEachStepIndex(nextIndex + 1);
       } else if (!response.success) {
         setOutputData({
           success: false,
@@ -203,7 +197,6 @@ export function NodeExecuteDialog({
     workflowContext,
     persistedFormValues,
     inputData,
-    forEachStepIndex,
     timeout,
     setOutputData,
     updateNodeExecutionData,
@@ -294,7 +287,6 @@ export function NodeExecuteDialog({
                       <>
                         <StepForward className="w-4 h-4" />
                         <span>Iterate and stop</span>
-                        <span className="text-xs text-muted-foreground">({forEachStepIndex})</span>
                       </>
                     )}
                   </Button>
