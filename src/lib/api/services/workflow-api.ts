@@ -9,6 +9,7 @@ import {
   BackendWorkflowCanvasResponse,
   BackendWorkflowConnection,
   WorkflowNodeExecuteResponse,
+  ExecuteForEachIterationResponse,
 } from '@/types';
 import { BackendWorkflow } from '../transformers/workflow-transformer';
 
@@ -205,6 +206,33 @@ class WorkflowApiService extends BaseApiService {
       timeout ? { timeout: timeout * 1000 } : undefined // Convert seconds to ms for axios
     );
   }
+
+  /**
+   * Run one ForEach iteration (iterate and stop).
+   * Returns forEachNode state and iteration_output; backend persists to Node.output_data.
+   */
+  async executeForEachIteration(
+    workflowId: string,
+    nodeId: string,
+    data: {
+      form_values: Record<string, unknown>;
+      input_data: Record<string, unknown>;
+      iteration_index: number;
+    },
+    timeout?: number
+  ): Promise<ExecuteForEachIterationResponse> {
+    return this.post<ExecuteForEachIterationResponse>(
+      `/workflow/${workflowId}/execute_for_each_iteration/`,
+      {
+        node_id: nodeId,
+        form_values: data.form_values,
+        input_data: data.input_data,
+        iteration_index: data.iteration_index,
+        timeout: timeout,
+      },
+      timeout ? { timeout: timeout * 1000 } : undefined
+    );
+  }
 }
 
 // Export singleton instance
@@ -233,4 +261,5 @@ export const {
   getNodeInputData,
   getNodeOutputData,
   executeAndSaveNode,
+  executeForEachIteration,
 } = workflowApi;

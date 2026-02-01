@@ -72,6 +72,30 @@ export interface WorkflowNodeExecuteResponse {
   form?: TNodeFormData;
 }
 
+// ForEach block: input array, collected results, and current iteration state
+export interface ForEachNodeState {
+  input: unknown[];
+  results: unknown[];
+  state: { index: number; item: unknown };
+}
+
+// Legacy shape (index/current_item at top level) for backward compatibility
+export interface ForEachNodeStateLegacy {
+  input: unknown[];
+  index?: number;
+  current_item?: unknown;
+}
+
+// Response from execute_for_each_iteration endpoint
+export interface ExecuteForEachIterationResponse {
+  success: boolean;
+  node_id: string;
+  forEachNode?: ForEachNodeState;
+  iteration_output?: unknown[];
+  output?: { data?: Record<string, unknown> };
+  error?: string;
+}
+
 // Represents a Connection between nodes in a workflow
 export interface BackendWorkflowConnection {
   id: string;

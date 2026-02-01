@@ -15,13 +15,15 @@ import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RotateCcw, Play, Loader2 } from "lucide-react";
+import { RotateCcw, Play, Loader2, StepForward } from "lucide-react";
 import { getBadgeStyles } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useNodeSession } from "@/hooks/useNodeSession";
 import { useNodePersistence, WorkflowPersistenceContext } from "@/hooks/useNodePersistence";
 import { useNodeExecution } from "@/hooks/useNodeExecution";
+import { workflowApi } from "@/lib/api/services/workflow-api";
+import { useWorkflowCanvasStore } from "@/stores";
 
 // Workflow context for DB persistence
 export interface WorkflowExecuteContext {
@@ -93,6 +95,11 @@ export function NodeExecuteDialog({
   // Timeout state (in seconds, default 30 seconds)
   const [timeout, setTimeout] = useState<number>(30);
 
+  // ForEach "iterate and stop": step index for next iteration
+  const [forEachStepIndex, setForEachStepIndex] = useState<number>(0);
+  const [isIterating, setIsIterating] = useState(false);
+  const updateNodeExecutionData = useWorkflowCanvasStore((s) => s.updateNodeExecutionData);
+
   // Clear execution form state when dialog closes
   useEffect(() => {
     if (!isOpen) {
@@ -144,6 +151,63 @@ export function NodeExecuteDialog({
   const handleExecuteClick = useCallback(() => {
     execute(persistedFormValues, inputData, timeout);
   }, [execute, persistedFormValues, inputData, timeout]);
+
+  // ForEach: run one iteration and stop
+  const handleIterateAndStop = useCallback(async () => {
+    if (!workflowContext) return;
+    setIsIterating(true);
+    setOutputData(null);
+    try {
+      const response = await workflowApi.executeForEachIteration(
+        workflowContext.workflowId,
+        workflowContext.nodeInstanceId,
+        {
+          form_values: persistedFormValues as Record<string, unknown>,
+          input_data: inputData,
+          iteration_index: forEachStepIndex,
+        },
+        timeout
+      );
+      if (response.success && (response.forEachNode ?? response.output?.data)) {
+        const outputDataPayload = response.output?.data ?? (response.forEachNode
+          ? { ...inputData, forEachNode: { ...response.forEachNode, results: response.iteration_output ?? [] } }
+          : { ...inputData, forEachNode: { input: [], results: [], state: { index: 0, item: null } } });
+        updateNodeExecutionData(workflowContext.nodeInstanceId, {
+          output_data: outputDataPayload,
+        });
+        setOutputData({
+          success: true,
+          output: { data: outputDataPayload },
+        });
+        const nextIndex = (response.forEachNode as { state?: { index?: number }; index?: number } | undefined)?.state?.index
+          ?? (response.forEachNode as { index?: number } | undefined)?.index
+          ?? forEachStepIndex;
+        setForEachStepIndex(nextIndex + 1);
+      } else if (!response.success) {
+        setOutputData({
+          success: false,
+          error: response.error,
+          error_type: "ExecutionError",
+        });
+      }
+    } catch (err) {
+      setOutputData({
+        success: false,
+        error: err instanceof Error ? err.message : "Iteration failed",
+        error_type: "ExecutionError",
+      });
+    } finally {
+      setIsIterating(false);
+    }
+  }, [
+    workflowContext,
+    persistedFormValues,
+    inputData,
+    forEachStepIndex,
+    timeout,
+    setOutputData,
+    updateNodeExecutionData,
+  ]);
 
   const getTypeBadgeColor = (type: string) => {
     const styles = getBadgeStyles(type);
@@ -212,6 +276,29 @@ export function NodeExecuteDialog({
                     tabIndex={-1}
                   />
                 </div>
+                {/* Iterate and stop (ForEach only) */}
+                {node.identifier === "for-each" && workflowContext && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={handleIterateAndStop}
+                    disabled={isExecuting || isSaving || isIterating}
+                    className="flex items-center gap-2 px-4 py-2 font-medium"
+                  >
+                    {isIterating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Step...</span>
+                      </>
+                    ) : (
+                      <>
+                        <StepForward className="w-4 h-4" />
+                        <span>Iterate and stop</span>
+                        <span className="text-xs text-muted-foreground">({forEachStepIndex})</span>
+                      </>
+                    )}
+                  </Button>
+                )}
                 {/* Execute button */}
                 <Button
                   size="sm"
