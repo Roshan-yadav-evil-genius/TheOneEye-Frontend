@@ -221,6 +221,13 @@ export function DroppableFormInput({
     }
   };
 
+  const handleBeforeMount = useCallback(
+    (monaco: Parameters<OnMount>[1]) => {
+      if (jsonMode) setupJinjaJson(monaco);
+    },
+    [jsonMode]
+  );
+
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     (window as Window & { monaco?: typeof import("monaco-editor") }).monaco = monaco;
@@ -268,6 +275,7 @@ export function DroppableFormInput({
             language={langId}
             value={value}
             onChange={handleEditorChange}
+            beforeMount={handleBeforeMount}
             onMount={handleEditorDidMount}
             theme={themeName}
             options={{
