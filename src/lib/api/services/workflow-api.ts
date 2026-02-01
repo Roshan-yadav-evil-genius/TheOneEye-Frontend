@@ -211,6 +211,16 @@ class WorkflowApiService extends BaseApiService {
    * Run one ForEach iteration (iterate and stop).
    * Returns forEachNode state and iteration_output; backend persists to Node.output_data.
    */
+  /**
+   * Clear a node's output_data in the backend (e.g. on Reset so iterate-and-stop starts fresh).
+   */
+  async clearNodeOutput(workflowId: string, nodeId: string): Promise<{ success: boolean; error?: string }> {
+    return this.post<{ success: boolean; error?: string }>(
+      `/workflow/${workflowId}/clear_node_output/`,
+      { node_id: nodeId }
+    );
+  }
+
   async executeForEachIteration(
     workflowId: string,
     nodeId: string,

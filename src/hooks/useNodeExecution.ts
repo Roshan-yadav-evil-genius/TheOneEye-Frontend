@@ -173,25 +173,29 @@ export function useNodeExecution(options: NodeExecutionOptions) {
     ]
   );
 
-  // Reset session - clears server-side state and node output in store so reopen shows empty
+  // Reset - clears backend output_data and store so reopen shows empty (no session clear)
   const reset = useCallback(async () => {
     if (isResettingRef.current) return;
     isResettingRef.current = true;
 
     try {
-      // Clear server-side session
-      await nodeExecutionService.resetSession(nodeIdentifier, sessionId);
       onOutputChange?.(null);
-      // Clear node output_data in workflow store so reopening the form does not show old data
       if (isWorkflowMode && workflowContext) {
+        // Clear node output_data in backend (DB) so iterate-and-stop accumulation starts fresh
+        try {
+          await workflowApi.clearNodeOutput(workflowContext.workflowId, workflowContext.nodeInstanceId);
+        } catch (e) {
+          console.error('Failed to clear node output on backend:', e);
+        }
+        // Clear node output_data in workflow store so reopening the form does not show old data
         updateNodeExecutionData(workflowContext.nodeInstanceId, { output_data: {} });
       }
     } catch (error) {
-      console.error('Failed to reset session:', error);
+      console.error('Failed to reset:', error);
     } finally {
       isResettingRef.current = false;
     }
-  }, [nodeIdentifier, sessionId, isWorkflowMode, workflowContext, updateNodeExecutionData, onOutputChange]);
+  }, [isWorkflowMode, workflowContext, updateNodeExecutionData, onOutputChange]);
 
   // Save form values to DB (workflow mode only)
   const save = useCallback(
