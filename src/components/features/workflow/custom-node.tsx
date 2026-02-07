@@ -92,8 +92,13 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
     setIsLocalNodeExecuting(true);
     
     try {
-      // Get input data from connected nodes
-      const inputData = workflowContext.getConnectedNodeOutput?.() || {};
+      // Get merged input from all upstream nodes (same as backend merge)
+      let inputData: Record<string, unknown> = {};
+      try {
+        inputData = await workflowApi.getNodeInputData(workflowContext.workflowId, workflowContext.nodeInstanceId) ?? {};
+      } catch {
+        inputData = workflowContext.getConnectedNodeOutput?.() ?? {};
+      }
       
       // Generate session ID for stateful execution
       const sessionId = `${workflowContext.workflowId}_${workflowContext.nodeInstanceId}`;

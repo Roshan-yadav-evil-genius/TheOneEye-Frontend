@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNodeTestDataStore } from '@/stores/node-test-data-store';
 import { useWorkflowCanvasStore } from '@/stores';
+import { workflowApi } from '@/lib/api/services/workflow-api';
 import { TNodeExecuteResponse } from '@/types';
 
 export interface WorkflowPersistenceContext {
@@ -68,14 +69,26 @@ export function useNodePersistence(
     if (isOpen) {
       if (isWorkflowMode) {
         const ctx = workflowContextRef.current;
-        // In workflow mode: load from store (single source of truth)
-        // Call getConnectedNodeOutput reactively - it reads latest data from store each time
-        const connectedOutput = ctx?.getConnectedNodeOutput?.();
-        if (connectedOutput && Object.keys(connectedOutput).length > 0) {
-          setInputData(connectedOutput);
-        } else if (latestNodeData?.input_data) {
-          setInputData(latestNodeData.input_data as Record<string, unknown>);
-        }
+        // In workflow mode: load merged input from all upstream nodes via API (not single connection)
+        const loadMergedInput = async () => {
+          if (!ctx?.workflowId || !ctx?.nodeInstanceId) return;
+          try {
+            const merged = await workflowApi.getNodeInputData(ctx.workflowId, ctx.nodeInstanceId);
+            if (merged && Object.keys(merged).length > 0) {
+              setInputData(merged);
+            } else if (latestNodeData?.input_data) {
+              setInputData(latestNodeData.input_data as Record<string, unknown>);
+            }
+          } catch {
+            const connectedOutput = ctx?.getConnectedNodeOutput?.();
+            if (connectedOutput && Object.keys(connectedOutput).length > 0) {
+              setInputData(connectedOutput);
+            } else if (latestNodeData?.input_data) {
+              setInputData(latestNodeData.input_data as Record<string, unknown>);
+            }
+          }
+        };
+        void loadMergedInput();
 
         // Load form values from store (always up-to-date)
         if (latestNodeData?.form_values) {
@@ -105,7 +118,9 @@ export function useNodePersistence(
     nodeIdentifier,
     isWorkflowMode,
     latestNodeData,
-    allNodes, // Add this to detect when any node's output_data changes
+    allNodes,
+    workflowContext?.workflowId,
+    workflowContext?.nodeInstanceId,
     getInputData,
     getFormData,
     getOutputData,
