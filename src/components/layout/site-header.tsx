@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import Link from "next/link"
 import Image from "next/image"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 export function SiteHeader() {
   const breadcrumbs = useBreadcrumb()
@@ -45,10 +46,15 @@ export function SiteHeader() {
         </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Image src="/logo.png" width={40} height={12} alt="TheOneEye" />
-            <span className="text-sm font-semibold hidden sm:inline">TheOneEye</span>
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <Image src="/logo.png" width={40} height={12} alt="TheOneEye" />
+                <span className="text-sm font-semibold hidden sm:inline">Tattva</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>The core layer (fundamental principle) from which everything arises</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </header>
