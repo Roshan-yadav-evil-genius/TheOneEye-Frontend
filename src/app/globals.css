@@ -181,4 +181,30 @@
   .dark .sidebar-scrollbar::-webkit-scrollbar-thumb:active {
     background: hsl(var(--sidebar-primary));
   }
+
+  /* Animated yellow/gold gradient text (brand title) */
+  @keyframes brand-gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+
+  .brand-title-gradient {
+    background: linear-gradient(
+      90deg,
+      #fef08a,
+      #facc15,
+      #eab308,
+      #facc15,
+      #fef08a
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: brand-gradient-shift 3s linear infinite;
+  }
 }

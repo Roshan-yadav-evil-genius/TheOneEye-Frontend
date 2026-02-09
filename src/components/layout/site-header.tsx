@@ -50,7 +50,7 @@ export function SiteHeader() {
             <TooltipTrigger asChild>
               <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <Image src="/logo.png" width={40} height={12} alt="TheOneEye" />
-                <span className="text-sm font-semibold hidden sm:inline">Tattva</span>
+                <span className="brand-title-gradient text-lg font-semibold hidden sm:inline">Tattva</span>
               </Link>
             </TooltipTrigger>
             <TooltipContent>The core layer (fundamental principle) from which everything arises</TooltipContent>
