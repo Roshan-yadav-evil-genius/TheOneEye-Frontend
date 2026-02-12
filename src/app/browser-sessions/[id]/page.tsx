@@ -129,10 +129,10 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 						Back to Sessions
 					</Button>
 				</Link>
-				<Link href={`/browser-sessions/${sessionId}/domain-throttle`}>
+				<Link href={`/browser-sessions/${sessionId}/settings`}>
 					<Button variant="ghost" size="sm">
 						<IconClock className="mr-2 h-4 w-4" />
-						Domain throttle
+						Settings
 					</Button>
 				</Link>
 			</div>

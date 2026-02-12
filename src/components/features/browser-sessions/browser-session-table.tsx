@@ -132,10 +132,10 @@ export function BrowserSessionTable({
                         Launch Browser
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => router.push(`/browser-sessions/${session.id}/domain-throttle`)}
+                        onClick={() => router.push(`/browser-sessions/${session.id}/settings`)}
                       >
                         <IconClock className="mr-2 h-4 w-4" />
-                        Domain throttle
+                        Settings
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDelete(session)}
