@@ -143,28 +143,11 @@ export default function Page({ params }: DomainThrottlePageProps) {
     <DashboardLayout>
       <main className="p-4">
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <Link href="/browser-sessions">
-              <Button variant="outline" size="sm">
-                <IconArrowLeft className="mr-2 h-4 w-4" />
-                Back to Sessions
-              </Button>
-            </Link>
-            <Link href={`/browser-sessions/${sessionId}`}>
-              <Button variant="ghost" size="sm">
-                {sessionName || "Session"} (detail)
-              </Button>
-            </Link>
-          </div>
-
         <div>
           <h1 className="text-2xl font-bold">
             Domain throttle
-            {sessionName ? ` — ${sessionName}` : ""}
+            ({sessionName ? `${sessionName}` : ""})
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Minimum delay (seconds) between requests to each domain when using this browser session.
-          </p>
         </div>
 
         {error && (
