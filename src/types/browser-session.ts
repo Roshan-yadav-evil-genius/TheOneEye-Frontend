@@ -70,6 +70,7 @@ export interface TDomainThrottleRule {
   session: string;
   domain: string;
   delay_seconds: number;
+  enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -82,6 +83,7 @@ export interface TDomainThrottleRuleCreate {
 export interface TDomainThrottleRuleUpdate {
   domain?: string;
   delay_seconds?: number;
+  enabled?: boolean;
 }
 
 

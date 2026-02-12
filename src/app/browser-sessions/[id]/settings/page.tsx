@@ -74,7 +74,6 @@ export default function Page({ params }: SettingsPageProps) {
   const [formDelay, setFormDelay] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [blockingTypes, setBlockingTypes] = useState<string[]>([]);
-  const [blockingEnabled, setBlockingEnabled] = useState(false);
   const [deleteResourceBlockingOpen, setDeleteResourceBlockingOpen] = useState(false);
 
   const {
@@ -175,20 +174,13 @@ export default function Page({ params }: SettingsPageProps) {
     }
   };
 
-  const handleThrottleEnabledChange = async (checked: boolean) => {
-    if (!session) return;
+  const handleThrottleRuleEnabledChange = async (rule: TDomainThrottleRule, checked: boolean) => {
+    const id = rule?.id;
+    if (id == null || id === "") {
+      return;
+    }
     try {
-      await updateSession(sessionId, {
-        name: session.name,
-        description: session.description ?? "",
-        browser_type: session.browser_type,
-        playwright_config: session.playwright_config,
-        status: session.status,
-        domain_throttle_enabled: checked,
-        resource_blocking_enabled: session.resource_blocking_enabled,
-        blocked_resource_types: session.blocked_resource_types ?? [],
-      });
-      await loadSession();
+      await updateRule(sessionId, String(id), { enabled: checked });
     } catch {
       // Error handled by store
     }
@@ -214,7 +206,6 @@ export default function Page({ params }: SettingsPageProps) {
   };
 
   const handleResourceBlockingEditOpen = () => {
-    setBlockingEnabled(session?.resource_blocking_enabled ?? false);
     setBlockingTypes(session?.blocked_resource_types ?? []);
     setResourceBlockingOpen(true);
   };
@@ -229,7 +220,7 @@ export default function Page({ params }: SettingsPageProps) {
         playwright_config: session.playwright_config,
         status: session.status,
         domain_throttle_enabled: session.domain_throttle_enabled,
-        resource_blocking_enabled: blockingEnabled,
+        resource_blocking_enabled: false,
         blocked_resource_types: blockingTypes,
       });
       await loadSession();
@@ -334,8 +325,10 @@ export default function Page({ params }: SettingsPageProps) {
                           </TableCell>
                           <TableCell>
                             <Switch
-                              checked={session?.domain_throttle_enabled ?? true}
-                              onCheckedChange={handleThrottleEnabledChange}
+                              checked={row.rule.enabled ?? false}
+                              onCheckedChange={(checked) =>
+                                handleThrottleRuleEnabledChange(row.rule, checked)
+                              }
                             />
                           </TableCell>
                           <TableCell>
@@ -381,7 +374,7 @@ export default function Page({ params }: SettingsPageProps) {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={handleResourceBlockingEditOpen}>
+                              <Button variant="ghost" size="sm" onClick={handleResourceBlockingEditOpen}>
                               <IconEdit className="h-4 w-4" />
                             </Button>
                             <Button
@@ -516,14 +509,6 @@ export default function Page({ params }: SettingsPageProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="blocking-enabled"
-                checked={blockingEnabled}
-                onCheckedChange={setBlockingEnabled}
-              />
-              <Label htmlFor="blocking-enabled">Enable resource blocking</Label>
-            </div>
             <div className="grid gap-2">
               <Label>Block these resource types</Label>
               <div className="grid grid-cols-2 gap-2">
