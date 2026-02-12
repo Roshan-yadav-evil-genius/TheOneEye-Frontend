@@ -45,6 +45,26 @@ export interface BrowserSessionFormProps {
   onCancel: () => void;
 }
 
+// Domain throttle rule (per session, per domain delay)
+export interface TDomainThrottleRule {
+  id: string;
+  session: string;
+  domain: string;
+  delay_seconds: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TDomainThrottleRuleCreate {
+  domain: string;
+  delay_seconds: number;
+}
+
+export interface TDomainThrottleRuleUpdate {
+  domain?: string;
+  delay_seconds?: number;
+}
+
 
 
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
+import { IconArrowLeft, IconLoader2, IconClock } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
@@ -121,12 +121,26 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 
 	// Success state - render the session detail
 	return (
-			<DashboardLayout>
-				<BrowserSessionDetail
-					session={session}
-					onSave={handleSave}
-				/>
-			</DashboardLayout>
+		<DashboardLayout>
+			<div className="flex items-center gap-2 px-4 py-2">
+				<Link href="/browser-sessions">
+					<Button variant="outline" size="sm">
+						<IconArrowLeft className="mr-2 h-4 w-4" />
+						Back to Sessions
+					</Button>
+				</Link>
+				<Link href={`/browser-sessions/${sessionId}/domain-throttle`}>
+					<Button variant="ghost" size="sm">
+						<IconClock className="mr-2 h-4 w-4" />
+						Domain throttle
+					</Button>
+				</Link>
+			</div>
+			<BrowserSessionDetail
+				session={session}
+				onSave={handleSave}
+			/>
+		</DashboardLayout>
 	);
 }
 
