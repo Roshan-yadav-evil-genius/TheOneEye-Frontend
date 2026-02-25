@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { apiConfig } from '@/lib/config/app-config';
 
 type WebSocketStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -29,15 +30,8 @@ export function useVideoWebSocket(): UseVideoWebSocketReturn {
   const reconnectDelay = 3000; // 3 seconds
 
   const getWebSocketUrl = (): string => {
-    // Get base URL from environment or default
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
-    
-    // Convert HTTP URL to WebSocket URL
-    // Remove /api suffix if present, and convert http:// to ws:// or https:// to wss://
-    let wsUrl = apiUrl.replace(/\/api$/, ''); // Remove /api suffix
-    wsUrl = wsUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
-    
-    // Append the WebSocket endpoint with trailing slash (as shown in Postman)
+    const origin = apiConfig.apiBaseOrigin;
+    const wsUrl = origin.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
     let finalUrl = `${wsUrl}/ws/video/`;
     
     // Add authentication token as query parameter if available

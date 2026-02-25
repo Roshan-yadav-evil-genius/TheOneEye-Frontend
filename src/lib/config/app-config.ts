@@ -5,11 +5,15 @@
  * Single source of truth for all configuration values.
  */
 
+const apiBaseURL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
+
 /**
  * API Configuration
  */
 export const apiConfig = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api',
+  baseURL: apiBaseURL,
+  /** Base origin (no /api) for WebSocket and static URLs (e.g. node-icons) */
+  apiBaseOrigin: apiBaseURL.replace(/\/api\/?$/, ''),
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
   retryDelay: 1000, // 1 second

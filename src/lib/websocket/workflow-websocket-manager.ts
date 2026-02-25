@@ -9,6 +9,8 @@
  * - workflowWsManager.off(event, callback)
  */
 
+import { apiConfig } from '@/lib/config/app-config';
+
 // Event types
 export type WebSocketEvent = 
   | 'connected'
@@ -353,9 +355,8 @@ class WorkflowWebSocketManager {
    * Internal: Get WebSocket URL
    */
   private getWebSocketUrl(workflowId: string): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7878/api';
-    let wsUrl = apiUrl.replace(/\/api$/, '');
-    wsUrl = wsUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+    const origin = apiConfig.apiBaseOrigin;
+    const wsUrl = origin.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
     return `${wsUrl}/ws/workflow/${workflowId}/`;
   }
 }

@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { IconCube } from "@tabler/icons-react";
 import { getNodeColors } from "@/constants/node-styles";
 import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
+import { apiConfig } from "@/lib/config/app-config";
 
-// Backend URL for node icons (dedicated endpoint, not Django static)
-const BACKEND_STATIC_URL = "http://127.0.0.1:7878/node-icons";
+const NODE_ICONS_BASE = `${apiConfig.apiBaseOrigin}/node-icons`;
 
 interface NodeLogoProps {
   node: {
@@ -35,7 +35,7 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
     <div className={`${container} flex items-center justify-center ${className}`}>
       {hasValidIcon ? (
         <img
-          src={`${BACKEND_STATIC_URL}/${node.icon}`}
+          src={`${NODE_ICONS_BASE}/${node.icon}`}
           alt={node.name || "Node icon"}
           width={dimensions}
           height={dimensions}

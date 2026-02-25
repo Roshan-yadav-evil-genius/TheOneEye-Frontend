@@ -1,3 +1,5 @@
+import { apiConfig } from '@/lib/config/app-config';
+
 // Application Constants
 export const APP_CONFIG = {
   name: 'TheOneEye',
@@ -7,12 +9,12 @@ export const APP_CONFIG = {
   supportEmail: 'support@theoneeye.com',
 } as const;
 
-// API Configuration
+// API Configuration (baseUrl from app-config single source of truth)
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-  timeout: 30000,
-  retryAttempts: 3,
-  retryDelay: 1000,
+  baseUrl: apiConfig.baseURL,
+  timeout: apiConfig.timeout,
+  retryAttempts: apiConfig.retryAttempts,
+  retryDelay: apiConfig.retryDelay,
 } as const;
 
 // Route Paths
