@@ -2,6 +2,7 @@ import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
 import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange, EdgeChange } from "reactflow";
 import { useWorkflowCanvasStore, useWorkflowSelectionStore } from "@/stores";
+import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { TWorkflowNodeCreateRequest } from "@/types";
 
 interface WorkflowStateProps {
@@ -224,7 +225,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     const isConditionalNode = sourceNode.node_type?.identifier === 'if-condition';
     
     if (isConditionalNode) {
-      const ifCondition = outputData?.if_condition as { route?: string } | undefined;
+      const ifCondition = getIfConditionFromOutput(outputData);
       if (ifCondition?.route) {
         const edgeSourceHandle = incomingEdge.sourceHandle || 'default';
         // Only return data if this edge comes from the active route

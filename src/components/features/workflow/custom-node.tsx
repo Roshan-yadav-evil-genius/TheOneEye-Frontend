@@ -9,6 +9,7 @@ import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode, TNodeMetadata } from "@/types";
 import { IconGripVertical, IconLoader2 } from "@tabler/icons-react";
 import { workflowApi } from "@/lib/api/services/workflow-api";
+import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { useWorkflowCanvasStore } from "@/stores";
 import { useWorkflowExecutionStore } from "@/stores/workflow/workflow-execution-store";
 
@@ -130,7 +131,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
         });
         
         // Highlight outgoing edges to show data flow
-        const ifCondition = outputData?.if_condition as { route?: string } | undefined;
+        const ifCondition = getIfConditionFromOutput(outputData);
         workflowContext.highlightNodeOutputEdges?.(ifCondition?.route);
       }
     } catch (error) {
