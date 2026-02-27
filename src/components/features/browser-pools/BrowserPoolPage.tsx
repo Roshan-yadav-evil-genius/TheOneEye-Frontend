@@ -48,14 +48,17 @@ export function BrowserPoolPage({ pools, isLoading }: BrowserPoolPageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-muted-foreground">Loading pools...</p>
-      </div>
+      <main className="p-4">
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground">Loading pools...</p>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <main className="p-4">
+      <div className="space-y-6">
       {pools.length > 0 ? (
         <BrowserPoolTable
           pools={pools}
@@ -99,5 +102,6 @@ export function BrowserPoolPage({ pools, isLoading }: BrowserPoolPageProps) {
         isDeleting={isDeleting}
       />
     </div>
+    </main>
   );
 }
