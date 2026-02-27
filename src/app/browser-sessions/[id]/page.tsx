@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { IconArrowLeft, IconLoader2, IconClock } from "@tabler/icons-react";
+import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
@@ -127,12 +127,6 @@ export default function Page({ params }: BrowserSessionDetailPageProps) {
 					<Button variant="outline" size="sm">
 						<IconArrowLeft className="mr-2 h-4 w-4" />
 						Back to Sessions
-					</Button>
-				</Link>
-				<Link href={`/browser-sessions/${sessionId}/settings`}>
-					<Button variant="ghost" size="sm">
-						<IconClock className="mr-2 h-4 w-4" />
-						Settings
 					</Button>
 				</Link>
 			</div>

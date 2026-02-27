@@ -6,5 +6,5 @@ interface DomainThrottlePageProps {
 
 export default async function Page({ params }: DomainThrottlePageProps) {
   const { id } = await params;
-  redirect(`/browser-sessions/${id}/settings`);
+  redirect(`/browser-pools`);
 }

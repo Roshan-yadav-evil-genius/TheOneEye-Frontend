@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { TBrowserPool } from "@/types/browser-pool";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IconDots, IconEdit, IconTrash, IconPlus } from "@tabler/icons-react";
+import { IconDots, IconEdit, IconTrash, IconPlus, IconSettings } from "@tabler/icons-react";
 
 interface BrowserPoolTableProps {
   pools: TBrowserPool[];
@@ -67,6 +68,12 @@ export function BrowserPoolTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/browser-pools/${pool.id}/settings`}>
+                          <IconSettings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(pool)}>
                         <IconEdit className="mr-2 h-4 w-4" />
                         Edit

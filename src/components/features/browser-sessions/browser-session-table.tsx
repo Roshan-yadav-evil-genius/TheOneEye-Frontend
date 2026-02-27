@@ -24,7 +24,6 @@ import {
   IconEye,
   IconPlus,
   IconPlayerPlay,
-  IconClock
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
@@ -130,12 +129,6 @@ export function BrowserSessionTable({
                       <DropdownMenuItem onClick={() => router.push(`/browser-sessions/${session.id}`)}>
                         <IconPlayerPlay className="mr-2 h-4 w-4" />
                         Launch Browser
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/browser-sessions/${session.id}/settings`)}
-                      >
-                        <IconClock className="mr-2 h-4 w-4" />
-                        Settings
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDelete(session)}
