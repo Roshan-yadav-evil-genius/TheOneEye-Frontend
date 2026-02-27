@@ -10,6 +10,7 @@ import {
   IconListDetails,
   IconKey,
   IconComponents,
+  IconStack2,
 } from '@tabler/icons-react';
 
 export interface NavItem {
@@ -49,6 +50,11 @@ export const mainNavItems: NavItem[] = [
     title: 'Sessions',
     url: '/browser-sessions',
     icon: IconBrowser,
+  },
+  {
+    title: 'Browser Pool',
+    url: '/browser-pools',
+    icon: IconStack2,
   },
   {
     title: 'Auth',

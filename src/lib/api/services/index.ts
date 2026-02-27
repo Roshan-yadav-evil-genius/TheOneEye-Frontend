@@ -4,6 +4,7 @@ export * from './auth-api';
 export * from './node-api';
 export * from './demo-api';
 export * from './google-oauth-api';
+export * from './browser-pool-api';
 
 // Import service instances for convenience
 import { workflowApi } from './workflow-api';

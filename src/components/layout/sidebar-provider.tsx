@@ -23,6 +23,7 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
                          pathname.startsWith('/workflow') || 
                          pathname.startsWith('/nodes') ||
                          pathname.startsWith('/browser-sessions') ||
+                         pathname.startsWith('/browser-pools') ||
                          pathname.startsWith('/auth')
 
   if (!isDashboardPage) {

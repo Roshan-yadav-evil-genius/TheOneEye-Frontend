@@ -36,6 +36,7 @@ export { useFormStore } from './form-store';
 export { useWorkflowLayoutStore, useWorkflowLayout } from './workflow-layout-store';
 export { useWorkflowTableStore, useWorkflowTable } from './workflow-table-store';
 export { useBrowserSessionStore } from './browser-session-store';
+export { useBrowserPoolStore } from './browser-pool-store';
 export { useDomainThrottleStore } from './domain-throttle-store';
 export { useGoogleOAuthStore } from './google-oauth-store';
 
