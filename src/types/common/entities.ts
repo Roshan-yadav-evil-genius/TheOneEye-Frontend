@@ -11,6 +11,10 @@ export interface TUser {
   avatar?: string;
   role?: string;
   permissions?: string[];
+  /** Backend-aligned fields from /auth/me/ and login */
+  username?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 // WorkflowNode - Instance of a node in a specific workflow

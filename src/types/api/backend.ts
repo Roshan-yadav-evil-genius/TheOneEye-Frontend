@@ -120,3 +120,12 @@ export interface BackendAuthResponse {
   token: string;
   refresh_token?: string;
 }
+
+/** Response from GET /auth/me/ - matches Django UserSerializer fields */
+export interface BackendMeUser {
+  id: number | string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}

@@ -24,7 +24,8 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
                          pathname.startsWith('/nodes') ||
                          pathname.startsWith('/browser-sessions') ||
                          pathname.startsWith('/browser-pools') ||
-                         pathname.startsWith('/auth')
+                         pathname.startsWith('/auth') ||
+                         pathname.startsWith('/account')
 
   if (!isDashboardPage) {
     // For non-dashboard pages, just render children without sidebar

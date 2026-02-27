@@ -1,5 +1,5 @@
 import { BaseApiService } from '../base-api-service';
-import { TUser, BackendUser } from '@/types';
+import { TUser, BackendUser, BackendMeUser } from '@/types';
 import { getAuthToken } from '@/lib/auth/token-manager';
 
 /**
@@ -15,14 +15,17 @@ class AuthApiService extends BaseApiService {
     }
 
     try {
-      const response = await this.get<BackendUser>('/auth/me/');
+      const response = await this.get<BackendMeUser>('/auth/me/');
+      const first = response.first_name ?? '';
+      const last = response.last_name ?? '';
+      const name = `${first} ${last}`.trim() || response.username;
       return {
-        id: response.id,
-        name: response.name,
+        id: String(response.id),
+        name,
         email: response.email,
-        avatar: response.avatar,
-        role: response.role,
-        permissions: response.permissions,
+        username: response.username,
+        first_name: response.first_name,
+        last_name: response.last_name,
       };
     } catch (error) {
       // Return null on error instead of throwing
