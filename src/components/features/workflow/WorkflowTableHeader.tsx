@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,9 +18,11 @@ import {
   IconColumns,
   IconSearch,
   IconFilter,
+  IconFilterOff,
   IconPlus,
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
+import { WorkflowType, WORKFLOW_TYPE_LABELS } from "@/types/common/constants";
 
 interface WorkflowTableHeaderProps {
   workflows: TWorkflow[];
@@ -27,11 +30,17 @@ interface WorkflowTableHeaderProps {
   searchTerm: string;
   statusFilter: string;
   categoryFilter: string;
+  tagFilter: string;
+  workflowTypeFilter: string;
   categories: string[];
+  tags: string[];
   columns: Array<{ id: string; label: string; visible: boolean }>;
   onSearchChange: (value: string) => void;
   onStatusFilterChange: (value: string) => void;
   onCategoryFilterChange: (value: string) => void;
+  onTagFilterChange: (value: string) => void;
+  onWorkflowTypeFilterChange: (value: string) => void;
+  onClearFilters?: () => void;
   onToggleColumnVisibility: (columnId: string) => void;
   onCreate?: () => void;
 }
@@ -42,11 +51,17 @@ export function WorkflowTableHeader({
   searchTerm,
   statusFilter,
   categoryFilter,
+  tagFilter,
+  workflowTypeFilter,
   categories,
+  tags,
   columns,
   onSearchChange,
   onStatusFilterChange,
   onCategoryFilterChange,
+  onTagFilterChange,
+  onWorkflowTypeFilterChange,
+  onClearFilters,
   onToggleColumnVisibility,
   onCreate,
 }: WorkflowTableHeaderProps) {
@@ -119,7 +134,47 @@ export function WorkflowTableHeader({
                   </Select>
                 </div>
               )}
+
+              <div>
+                <label className="text-sm font-medium mb-1 block">Tag</label>
+                <Select value={tagFilter} onValueChange={onTagFilterChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {tags.map(tag => (
+                      <SelectItem key={tag} value={tag}>
+                        {tag}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-1 block">Type</label>
+                <Select value={workflowTypeFilter} onValueChange={onWorkflowTypeFilterChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value={WorkflowType.PRODUCTION}>{WORKFLOW_TYPE_LABELS[WorkflowType.PRODUCTION]}</SelectItem>
+                    <SelectItem value={WorkflowType.API}>{WORKFLOW_TYPE_LABELS[WorkflowType.API]}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            {onClearFilters && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onClearFilters} className="cursor-pointer">
+                  <IconFilterOff className="mr-2 h-4 w-4" />
+                  Clear all filters
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 

@@ -23,6 +23,8 @@ interface WorkflowTableState {
   searchTerm: string;
   statusFilter: string;
   categoryFilter: string;
+  tagFilter: string;
+  workflowTypeFilter: string;
   
   // Column configuration
   columns: ColumnConfig[];
@@ -61,6 +63,8 @@ interface WorkflowTableStoreActions {
   setSearchTerm: (searchTerm: string) => void;
   setStatusFilter: (statusFilter: string) => void;
   setCategoryFilter: (categoryFilter: string) => void;
+  setTagFilter: (tagFilter: string) => void;
+  setWorkflowTypeFilter: (workflowTypeFilter: string) => void;
   clearFilters: () => void;
   
   // Column management
@@ -84,6 +88,7 @@ const defaultColumnConfigs: ColumnConfig[] = [
   { id: "status", label: "Status", visible: true },
   { id: "category", label: "Category", visible: true },
   { id: "workflowType", label: "Type", visible: true },
+  { id: "tags", label: "Tags", visible: true },
   { id: "lastRun", label: "Last Run", visible: true },
   { id: "nextRun", label: "Next Run", visible: true },
   { id: "runsCount", label: "Runs Count", visible: true },
@@ -96,6 +101,8 @@ const defaultTableState: WorkflowTableState = {
   searchTerm: "",
   statusFilter: "all",
   categoryFilter: "all",
+  tagFilter: "all",
+  workflowTypeFilter: "all",
   columns: defaultColumnConfigs,
   sortBy: "name",
   sortOrder: "asc",
@@ -218,11 +225,29 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
           });
         },
 
+        setTagFilter: (tagFilter: string) => {
+          set((state) => {
+            state.tableState.tagFilter = tagFilter;
+            state.tableState.currentPage = 1;
+            state.tableState.selectedRows = [];
+          });
+        },
+
+        setWorkflowTypeFilter: (workflowTypeFilter: string) => {
+          set((state) => {
+            state.tableState.workflowTypeFilter = workflowTypeFilter;
+            state.tableState.currentPage = 1;
+            state.tableState.selectedRows = [];
+          });
+        },
+
         clearFilters: () => {
           set((state) => {
             state.tableState.searchTerm = "";
             state.tableState.statusFilter = "all";
             state.tableState.categoryFilter = "all";
+            state.tableState.tagFilter = "all";
+            state.tableState.workflowTypeFilter = "all";
             state.tableState.currentPage = 1;
             state.tableState.selectedRows = [];
           });
@@ -309,16 +334,19 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
           defaultRowsPerPage: state.defaultRowsPerPage,
           maxRowsPerPage: state.maxRowsPerPage,
         }),
-        version: 2,
+        version: 3,
         migrate: (persistedState: unknown, version: number) => {
           const state = persistedState as WorkflowTableStoreState;
           if (version < 2) {
-            // Add workflowType column if missing
             const hasWorkflowType = state.tableState.columns.some(c => c.id === 'workflowType');
             if (!hasWorkflowType) {
               const categoryIndex = state.tableState.columns.findIndex(c => c.id === 'category');
               state.tableState.columns.splice(categoryIndex + 1, 0, { id: 'workflowType', label: 'Type', visible: true });
             }
+          }
+          if (version < 3) {
+            if (state.tableState.tagFilter === undefined) state.tableState.tagFilter = "all";
+            if (state.tableState.workflowTypeFilter === undefined) state.tableState.workflowTypeFilter = "all";
           }
           return state;
         },
@@ -345,6 +373,8 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     setSearchTerm,
     setStatusFilter,
     setCategoryFilter,
+    setTagFilter,
+    setWorkflowTypeFilter,
     clearFilters,
     setColumnVisibility,
     toggleColumnVisibility,
@@ -359,6 +389,12 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     new Set(workflows.map(w => w.category).filter((category): category is string => Boolean(category)))
   );
 
+  // Get unique tags from workflows (sorted for stable order)
+  const tags = React.useMemo(
+    () => Array.from(new Set(workflows.flatMap(w => w.tags || []))).sort(),
+    [workflows]
+  );
+
   // Filter workflows based on search and filters
   const filteredWorkflows = React.useMemo(() => {
     return workflows.filter(workflow => {
@@ -371,10 +407,13 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
       
       const matchesStatus = tableState.statusFilter === "all" || workflow.status === tableState.statusFilter;
       const matchesCategory = tableState.categoryFilter === "all" || workflow.category === tableState.categoryFilter;
+      const matchesTag = tableState.tagFilter === "all" || (workflow.tags != null && workflow.tags.includes(tableState.tagFilter));
+      const workflowType = workflow.workflow_type ?? "production";
+      const matchesWorkflowType = tableState.workflowTypeFilter === "all" || workflowType === tableState.workflowTypeFilter;
       
-      return matchesSearch && matchesStatus && matchesCategory;
+      return matchesSearch && matchesStatus && matchesCategory && matchesTag && matchesWorkflowType;
     });
-  }, [workflows, tableState.searchTerm, tableState.statusFilter, tableState.categoryFilter]);
+  }, [workflows, tableState.searchTerm, tableState.statusFilter, tableState.categoryFilter, tableState.tagFilter, tableState.workflowTypeFilter]);
 
   // Sort filtered workflows
   const sortedWorkflows = React.useMemo(() => {
@@ -461,8 +500,11 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     searchTerm: tableState.searchTerm,
     statusFilter: tableState.statusFilter,
     categoryFilter: tableState.categoryFilter,
+    tagFilter: tableState.tagFilter,
+    workflowTypeFilter: tableState.workflowTypeFilter,
     columns: tableState.columns,
     categories,
+    tags,
     filteredWorkflows,
     currentWorkflows,
     totalPages,
@@ -475,6 +517,8 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     setSearchTerm,
     setStatusFilter,
     setCategoryFilter,
+    setTagFilter,
+    setWorkflowTypeFilter,
     clearFilters,
     handleSelectAll,
     handleSelectRow,

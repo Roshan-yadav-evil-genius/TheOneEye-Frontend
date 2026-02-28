@@ -135,6 +135,21 @@ export function WorkflowTableRow({
           )}
         </TableCell>
       )}
+      {columns.find(col => col.id === "tags")?.visible && (
+        <TableCell>
+          <div className="flex flex-wrap gap-1">
+            {(workflow.tags ?? []).length > 0 ? (
+              (workflow.tags ?? []).map((tag, idx) => (
+                <Badge key={`${tag}-${idx}`} variant="secondary" className="text-xs font-normal">
+                  {tag}
+                </Badge>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">—</span>
+            )}
+          </div>
+        </TableCell>
+      )}
       {columns.find(col => col.id === "lastRun")?.visible && (
         <TableCell className="text-sm text-muted-foreground">
           {formatRelativeDate(workflow.lastRun)}

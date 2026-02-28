@@ -17,7 +17,9 @@ interface CreateWorkflowDialogProps {
 }
 
 export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialogProps) {
-  const { createWorkflow } = useWorkflowListStore();
+  const { createWorkflow, workflows } = useWorkflowListStore();
+
+  const tagSuggestions = [...new Set(workflows.flatMap((w) => w.tags || []))];
 
   const handleSubmit = async (formData: WorkflowFormData) => {
     try {
@@ -30,7 +32,7 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         connections: [],
         status: 'inactive' as const,
         runsCount: 0,
-        tags: [],
+        tags: formData.tags ?? [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: "current-user", // TODO: Get from auth context
@@ -70,6 +72,8 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         </DialogHeader>
         
         <WorkflowForm
+          initialData={{ tags: [] }}
+          tagSuggestions={tagSuggestions}
           onSubmit={handleSubmit}
           submitButtonText="Create Workflow"
           onCancel={handleClose}

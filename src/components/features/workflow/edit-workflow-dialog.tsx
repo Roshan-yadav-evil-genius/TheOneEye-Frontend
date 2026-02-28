@@ -19,7 +19,9 @@ interface EditWorkflowDialogProps {
 }
 
 export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflowDialogProps) {
-  const { updateWorkflow } = useWorkflowListStore();
+  const { updateWorkflow, workflows } = useWorkflowListStore();
+
+  const tagSuggestions = [...new Set(workflows.flatMap((w) => w.tags || []))];
 
   const handleSubmit = async (formData: WorkflowFormData) => {
     if (!workflow) {
@@ -33,6 +35,7 @@ export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflo
         description: formData.description.trim(),
         category: formData.category,
         workflow_type: formData.workflow_type,
+        tags: formData.tags ?? [],
         updatedAt: new Date(),
       };
 
@@ -79,7 +82,9 @@ export function EditWorkflowDialog({ open, onOpenChange, workflow }: EditWorkflo
             description: workflow.description,
             category: workflow.category || "",
             workflow_type: workflow.workflow_type,
+            tags: workflow.tags ?? [],
           }}
+          tagSuggestions={tagSuggestions}
           onSubmit={handleSubmit}
           submitButtonText="Update Workflow"
           onCancel={handleClose}

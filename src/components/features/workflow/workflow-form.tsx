@@ -16,6 +16,7 @@ import {
 import { WorkflowType, WORKFLOW_TYPE_LABELS, WORKFLOW_TYPE_DESCRIPTIONS } from "@/types/common/constants";
 import { IconRefresh, IconApi } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import { TagsInput } from "@/components/features/nodes/tags-input";
 
 export const WORKFLOW_CATEGORIES = [
   "Marketing",
@@ -37,10 +38,12 @@ export interface WorkflowFormData {
   description: string;
   category: string;
   workflow_type: WorkflowType;
+  tags: string[];
 }
 
 export interface WorkflowFormProps {
   initialData?: Partial<WorkflowFormData>;
+  tagSuggestions?: string[];
   onSubmit: (data: WorkflowFormData) => Promise<void>;
   submitButtonText: string;
   onCancel: () => void;
@@ -48,6 +51,7 @@ export interface WorkflowFormProps {
 
 export function WorkflowForm({
   initialData = {},
+  tagSuggestions,
   onSubmit,
   submitButtonText,
   onCancel,
@@ -65,25 +69,28 @@ export function WorkflowForm({
       description: initialData.description || "",
       category: initialData.category || "",
       workflow_type: initialData.workflow_type || WorkflowType.PRODUCTION,
+      tags: initialData.tags ?? [],
     },
     mode: "onChange",
   });
 
   const categoryValue = watch("category");
   const workflowTypeValue = watch("workflow_type");
+  const tagsValue = watch("tags");
 
   // Update form when initialData changes
   useEffect(() => {
     // Only reset if initialData has actual values to avoid infinite loops
-    if (initialData.name || initialData.description || initialData.category || initialData.workflow_type) {
+    if (initialData.name || initialData.description || initialData.category || initialData.workflow_type || (initialData.tags && initialData.tags.length > 0)) {
       reset({
         name: initialData.name || "",
         description: initialData.description || "",
         category: initialData.category || "",
         workflow_type: initialData.workflow_type || WorkflowType.PRODUCTION,
+        tags: initialData.tags ?? [],
       });
     }
-  }, [initialData.name, initialData.description, initialData.category, initialData.workflow_type, reset]);
+  }, [initialData.name, initialData.description, initialData.category, initialData.workflow_type, initialData.tags, reset]);
 
   const onFormSubmit = async (data: WorkflowFormData) => {
     try {
@@ -219,6 +226,17 @@ export function WorkflowForm({
         {errors.category && (
           <p className="text-sm text-red-500">{errors.category.message}</p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <TagsInput
+          tags={tagsValue}
+          onTagsChange={(tags) => setValue("tags", tags)}
+          label="Tags"
+          placeholder="Type to search or add a tag"
+          suggestions={tagSuggestions}
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="flex justify-end space-x-2 pt-4">
