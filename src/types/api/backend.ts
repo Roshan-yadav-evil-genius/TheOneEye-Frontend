@@ -40,6 +40,7 @@ export interface BackendWorkflowCanvasResponse {
     workflow_type?: string;  // Workflow execution mode ('production' | 'api')
     runs_count: number;
     last_run?: string | null;
+    runtime_state?: Record<string, string>;
   };
 }
 

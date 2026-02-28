@@ -27,6 +27,7 @@ export interface BackendWorkflow {
   created_by: string;
   task_id?: string;
   env?: Record<string, string>;
+  runtime_state?: Record<string, string>;
 }
 
 /**
@@ -53,6 +54,7 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       createdBy: backend.created_by,
       taskId: backend.task_id,
       env: backend.env ?? {},
+      runtime_state: backend.runtime_state ?? {},
     };
   }
 
@@ -68,6 +70,7 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       created_by: frontend.createdBy,
     };
     if (frontend.env !== undefined) out.env = frontend.env;
+    if (frontend.runtime_state !== undefined) out.runtime_state = frontend.runtime_state;
     return out;
   }
 }

@@ -35,6 +35,7 @@ export default function WorkflowEnvPage({ params }: EnvPageProps) {
   const [rows, setRows] = useState<EnvRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingRuntime, setIsDeletingRuntime] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadWorkflow = useCallback(async () => {
@@ -103,6 +104,26 @@ export default function WorkflowEnvPage({ params }: EnvPageProps) {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteRuntimeKey = async (key: string) => {
+    if (!workflow) return;
+    const current = workflow.runtime_state ?? {};
+    const updated = { ...current };
+    delete updated[key];
+    try {
+      setIsDeletingRuntime(true);
+      await workflowApi.updateWorkflow(workflow.id, { ...workflow, runtime_state: updated });
+      uiHelpers.showSuccess("Deleted", "Runtime variable removed.");
+      setWorkflow((w) => (w ? { ...w, runtime_state: updated } : null));
+    } catch (err) {
+      uiHelpers.showError(
+        "Delete failed",
+        err instanceof Error ? err.message : "Failed to delete runtime variable"
+      );
+    } finally {
+      setIsDeletingRuntime(false);
     }
   };
 
@@ -226,6 +247,54 @@ export default function WorkflowEnvPage({ params }: EnvPageProps) {
                         size="icon"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         onClick={() => removeRow(index)}
+                      >
+                        <IconTrash className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <h2 className="text-xl font-semibold mt-10 mb-2">Runtime variables</h2>
+        <p className="text-muted-foreground mb-4">
+          Set/delete from Jinja with <code className="rounded bg-muted px-1">set_runtime</code> /{" "}
+          <code className="rounded bg-muted px-1">delete_runtime</code>, or delete here. Updated after each run.
+        </p>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Key</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead className="w-12">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Object.entries(workflow?.runtime_state ?? {}).length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    No runtime variables. Set from Jinja (e.g. <code>{"{{ '' | set_runtime('key', 'value') }}"}</code>) and run a node.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                Object.entries(workflow?.runtime_state ?? {}).map(([key, value]) => (
+                  <TableRow key={key}>
+                    <TableCell className="font-mono">{key}</TableCell>
+                    <TableCell className="font-mono">
+                      {typeof value === "string" ? value : JSON.stringify(value)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">Runtime</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDeleteRuntimeKey(key)}
+                        disabled={isDeletingRuntime}
                       >
                         <IconTrash className="h-4 w-4" />
                       </Button>
