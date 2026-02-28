@@ -45,6 +45,7 @@ export interface TWorkflow {
   created_at: string;  // ✅ Match backend
   updated_at: string;  // ✅ Match backend
   task_id?: string;  // ✅ Match backend
+  env?: Record<string, string>;  // Workflow-level variables for Jinja (workflowenv.<key>)
 }
 
 export interface TWorkflowConnection {

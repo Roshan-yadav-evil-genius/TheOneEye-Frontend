@@ -95,6 +95,10 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     router.push(`/workflow/${id}`);
   };
 
+  const handleEnvVariables = (id: string) => {
+    router.push(`/workflow/${id}/env`);
+  };
+
   const handleDelete = (id: string) => {
     const workflow = workflows.find(w => w.id === id);
     if (workflow) {
@@ -170,6 +174,7 @@ export const useWorkflowList = ({ workflows }: UseWorkflowListProps) => {
     handleStop,
     handleEditInfo,
     handleEditWorkflow,
+    handleEnvVariables,
     handleDuplicate,
     handleDelete,
     handleConfirmDelete,

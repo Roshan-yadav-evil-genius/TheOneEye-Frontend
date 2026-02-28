@@ -26,6 +26,7 @@ export interface BackendWorkflow {
   updated_at: string;
   created_by: string;
   task_id?: string;
+  env?: Record<string, string>;
 }
 
 /**
@@ -51,11 +52,12 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       updatedAt: backend.updated_at,
       createdBy: backend.created_by,
       taskId: backend.task_id,
+      env: backend.env ?? {},
     };
   }
 
   toBackend(frontend: Partial<TWorkflow>): Partial<BackendWorkflow> {
-    return {
+    const out: Partial<BackendWorkflow> = {
       name: frontend.name,
       description: frontend.description,
       category: frontend.category,
@@ -65,6 +67,8 @@ class WorkflowTransformer extends BaseTransformer<BackendWorkflow, TWorkflow> {
       tags: frontend.tags,
       created_by: frontend.createdBy,
     };
+    if (frontend.env !== undefined) out.env = frontend.env;
+    return out;
   }
 }
 

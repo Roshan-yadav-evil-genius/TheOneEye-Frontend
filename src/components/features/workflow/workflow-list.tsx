@@ -28,6 +28,7 @@ export function WorkflowList({
     handleStop,
     handleEditInfo,
     handleEditWorkflow,
+    handleEnvVariables,
     handleDuplicate,
     handleDelete,
     handleConfirmDelete,
@@ -45,6 +46,7 @@ export function WorkflowList({
           onStop={handleStop}
           onEditInfo={handleEditInfo}
           onEditWorkflow={handleEditWorkflow}
+          onEnvVariables={handleEnvVariables}
           onDuplicate={handleDuplicate}
           onDelete={handleDelete}
           onCreate={handleCreate}

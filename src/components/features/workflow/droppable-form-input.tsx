@@ -19,6 +19,7 @@ interface DroppableFormInputProps {
   error?: string;
   jsonMode?: boolean; // Enable JSON editor mode
   availableVariables?: string[]; // For autocomplete suggestions
+  workflowEnvKeys?: string[]; // Keys from workflow env for workflowenv.<key> autocomplete
 }
 
 export function DroppableFormInput({ 
@@ -32,6 +33,7 @@ export function DroppableFormInput({
   error,
   jsonMode = false,
   availableVariables = [],
+  workflowEnvKeys = [],
 }: DroppableFormInputProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
@@ -91,6 +93,18 @@ export function DroppableFormInput({
           });
         });
 
+        // Add workflowenv.<key> suggestions for workflow-level variables
+        workflowEnvKeys.forEach((key) => {
+          const label = `workflowenv.${key}`;
+          suggestions.push({
+            label,
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: `{{ ${label} }}`,
+            range,
+            detail: 'Workflow env variable',
+          });
+        });
+
         // Add common JSON keywords
         const jsonKeywords = [
           { label: 'true', kind: monaco.languages.CompletionItemKind.Keyword },
@@ -114,7 +128,7 @@ export function DroppableFormInput({
     return () => {
       disposable.dispose();
     };
-  }, [jsonMode, availableVariables]);
+  }, [jsonMode, availableVariables, workflowEnvKeys]);
 
   // Handle resize functionality for Monaco Editor
   const handleResizeStart = useCallback((e: React.MouseEvent) => {

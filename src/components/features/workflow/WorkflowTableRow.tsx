@@ -25,6 +25,7 @@ import {
   IconTrash,
   IconInfoCircle,
   IconCopy,
+  IconVariable,
 } from "@tabler/icons-react";
 import { TWorkflow } from "@/types";
 import { formatRelativeDate } from "@/lib/dates";
@@ -40,6 +41,7 @@ interface WorkflowTableRowProps {
   onStop?: (id: string) => void;
   onEditInfo?: (workflow: TWorkflow) => void;
   onEditWorkflow?: (id: string) => void;
+  onEnvVariables?: (id: string) => void;
   onDuplicate?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -53,6 +55,7 @@ export function WorkflowTableRow({
   onStop,
   onEditInfo,
   onEditWorkflow,
+  onEnvVariables,
   onDuplicate,
   onDelete,
 }: WorkflowTableRowProps) {
@@ -192,6 +195,10 @@ export function WorkflowTableRow({
             <DropdownMenuItem onClick={() => onEditWorkflow?.(workflow.id)}>
               <IconEdit className="mr-2 h-4 w-4" />
               Edit Workflow
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEnvVariables?.(workflow.id)}>
+              <IconVariable className="mr-2 h-4 w-4" />
+              Env variables
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onDuplicate?.(workflow.id)}>
               <IconCopy className="mr-2 h-4 w-4" />
