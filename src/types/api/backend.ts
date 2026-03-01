@@ -59,6 +59,22 @@ export interface BackendWorkflowNode {
 
 import { TNodeFormData } from '../node';
 
+// Response from POST /workflow/{id}/execute/ (API workflow execute endpoint).
+// When the last node is HTTP Response node, the view returns only that node's body and status;
+// otherwise the response is this envelope with HTTP 200 or 400.
+export interface WorkflowExecuteResponse {
+  success: boolean;
+  workflow_id: string;
+  output?: unknown;
+  error?: string;
+  execution_time_ms: number;
+  /** Present when the last node is HTTP Response node; then the view returns body + status instead of this envelope */
+  http_response?: {
+    status: number;
+    body?: unknown;
+  };
+}
+
 // Response from execute_and_save_node endpoint
 export interface WorkflowNodeExecuteResponse {
   success: boolean;
