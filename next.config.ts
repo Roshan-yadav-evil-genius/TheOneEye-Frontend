@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
         port: '7878',
         pathname: '/media/**',
       },
+      {
+        protocol: 'http',
+        hostname: '4.188.82.36',
+        port: '7878',
+        pathname: '/media/**',
+      },
     ],
   },
   // Allow cross-origin requests from localhost during development
