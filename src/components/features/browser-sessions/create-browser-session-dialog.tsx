@@ -28,7 +28,6 @@ export function CreateBrowserSessionDialog({ open, onOpenChange }: CreateBrowser
         browser_type: formData.browser_type,
         playwright_config: formData.playwright_config,
         status: 'inactive' as const,
-        created_by: "current-user", // TODO: Get from auth context
       };
 
       await createSession(sessionData);

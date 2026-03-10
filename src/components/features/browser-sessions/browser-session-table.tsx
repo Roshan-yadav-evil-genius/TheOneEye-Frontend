@@ -106,7 +106,7 @@ export function BrowserSessionTable({
                 </TableCell>
                 <TableCell>{getBrowserTypeBadge(session.browser_type)}</TableCell>
                 <TableCell>{getStatusBadge(session.status)}</TableCell>
-                <TableCell>{session.created_by || "Unknown"}</TableCell>
+                <TableCell>{session.created_by_username ?? session.created_by ?? "Unknown"}</TableCell>
                 <TableCell>
                   {new Date(session.created_at).toLocaleDateString()}
                 </TableCell>

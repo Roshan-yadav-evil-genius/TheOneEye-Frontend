@@ -68,7 +68,7 @@ export const workflowFilterSchema = z.object({
   status: z.string().optional(),
   search: z.string().optional(),
   isActive: z.boolean().optional(),
-  createdBy: z.string().optional(),
+  createdBy: z.number().optional(),
   dateRange: z.object({
     start: z.date().optional(),
     end: z.date().optional(),

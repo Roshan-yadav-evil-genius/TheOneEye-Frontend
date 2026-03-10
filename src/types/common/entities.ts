@@ -41,7 +41,8 @@ export interface TWorkflow {
   next_run?: string;  // ✅ Match backend
   runs_count: number;  // ✅ Match backend
   tags: string[];
-  created_by?: string;  // ✅ Match backend
+  createdBy?: number | null;  // User id (FK)
+  createdByUsername?: string | null;  // For display
   created_at: string;  // ✅ Match backend
   updated_at: string;  // ✅ Match backend
   task_id?: string;  // ✅ Match backend

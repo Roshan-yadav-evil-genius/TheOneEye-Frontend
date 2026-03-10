@@ -35,7 +35,6 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         tags: formData.tags ?? [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        createdBy: "current-user", // TODO: Get from auth context
       };
 
       await createWorkflow(workflowData);

@@ -50,7 +50,7 @@ export interface TimestampedEntity {
  * Common entity with user tracking
  */
 export interface UserTrackedEntity extends TimestampedEntity {
-  created_by: string;
+  created_by: number | null;
   updated_by?: string;
 }
 

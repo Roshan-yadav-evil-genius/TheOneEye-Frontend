@@ -76,23 +76,23 @@ export function AuthMiddleware({ children }: AuthMiddlewareProps) {
     hasCheckedAuth.current = false;
   }, [pathname]);
 
-  // Show loading spinner while checking authentication
+  // Check if current route is public (needed before loading check so form stays mounted on login/signup)
+  const isPublicRoute = PUBLIC_ROUTES.some(route =>
+    pathname === route || pathname.startsWith(route + '/')
+  );
+
+  // If it's a public route, always show content (so login/signup forms stay mounted and keep their state on submit/error)
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
+
+  // Show loading spinner only when checking auth on protected routes (not on login/signup)
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
       </div>
     );
-  }
-
-  // Check if current route is public
-  const isPublicRoute = PUBLIC_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  );
-
-  // If it's a public route, always show content
-  if (isPublicRoute) {
-    return <>{children}</>;
   }
 
   // If not authenticated and not a public route, don't render content

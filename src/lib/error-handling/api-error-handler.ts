@@ -184,6 +184,19 @@ export class ApiErrorHandler {
         const errors = Object.values(data.validation_errors).flat();
         return errors.join(', ');
       }
+
+      // Django REST Framework serializer.errors: { "field_name": ["error1", "error2"], ... }
+      const drfErrors: string[] = [];
+      for (const key of Object.keys(data)) {
+        const val = data[key];
+        if (Array.isArray(val) && val.length > 0) {
+          const msgs = val.map((v: unknown) => (typeof v === 'string' ? v : (v as { message?: string })?.message ?? String(v))).filter(Boolean);
+          if (msgs.length) drfErrors.push(`${key}: ${msgs.join(', ')}`);
+        }
+      }
+      if (drfErrors.length > 0) {
+        return drfErrors.join('; ');
+      }
     }
 
     return undefined;

@@ -5,7 +5,8 @@ export interface TBrowserSession {
   browser_type: 'chromium' | 'firefox' | 'webkit';
   playwright_config: Record<string, any>;
   status: 'active' | 'inactive' | 'error';
-  created_by: string | null;
+  created_by: number | null;
+  created_by_username?: string | null;
   created_at: Date;
   updated_at: Date;
   domain_throttle_enabled?: boolean;
@@ -19,7 +20,6 @@ export interface TBrowserSessionCreate {
   browser_type: 'chromium' | 'firefox' | 'webkit';
   playwright_config: Record<string, any>;
   status: 'active' | 'inactive' | 'error';
-  created_by: string | null;
 }
 
 export interface TBrowserSessionUpdate {
