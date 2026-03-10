@@ -18,6 +18,7 @@ const PUBLIC_ROUTES = [
   '/contact',
   '/pricing',
   '/features',
+  '/auth/google/callback',
 ];
 
 export function AuthMiddleware({ children }: AuthMiddlewareProps) {
