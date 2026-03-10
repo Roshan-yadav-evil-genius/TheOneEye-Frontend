@@ -22,3 +22,6 @@ export * from './node';
 
 // Google OAuth Types
 export * from './google-oauth';
+
+// API Keys Types
+export * from './api-keys';

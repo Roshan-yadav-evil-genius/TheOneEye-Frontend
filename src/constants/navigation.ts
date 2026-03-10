@@ -9,6 +9,7 @@ import {
   IconDashboard,
   IconListDetails,
   IconKey,
+  IconKeyOff,
   IconComponents,
   IconStack2,
 } from '@tabler/icons-react';
@@ -60,6 +61,11 @@ export const mainNavItems: NavItem[] = [
     title: 'Auth',
     url: '/auth',
     icon: IconKey,
+  },
+  {
+    title: 'API Keys',
+    url: '/api-keys',
+    icon: IconKeyOff,
   },
 ];
 

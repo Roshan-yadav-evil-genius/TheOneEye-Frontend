@@ -25,6 +25,7 @@ export function SidebarProviderWrapper({ children }: SidebarProviderWrapperProps
                          pathname.startsWith('/browser-sessions') ||
                          pathname.startsWith('/browser-pools') ||
                          pathname.startsWith('/auth') ||
+                         pathname.startsWith('/api-keys') ||
                          pathname.startsWith('/account')
 
   if (!isDashboardPage) {
