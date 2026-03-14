@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } f
 import { TApiError } from '@/types';
 import { logger } from '@/lib/logging';
 import { getAuthToken, getRefreshToken, updateAuthToken, clearAuthData } from '@/lib/auth/token-manager';
+import { buildLoginUrlWithRedirect } from '@/lib/auth/redirect-after-login';
 import { apiConfig } from '@/lib/config';
 
 // Axios-based API client with better error handling and interceptors
@@ -69,10 +70,11 @@ class AxiosApiClient {
               return this.client(originalRequest);
             }
           } catch (refreshError) {
-            // Refresh failed, clear auth data and redirect to login
+            // Refresh failed, clear auth data and redirect to login with return URL
             clearAuthData();
             if (typeof window !== 'undefined') {
-              window.location.href = '/login';
+              const returnTo = window.location.pathname + window.location.search;
+              window.location.href = buildLoginUrlWithRedirect(returnTo);
             }
           }
         }

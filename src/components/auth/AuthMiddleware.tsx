@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores';
+import { buildLoginUrlWithRedirect } from '@/lib/auth/redirect-after-login';
 
 interface AuthMiddlewareProps {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export function AuthMiddleware({ children }: AuthMiddlewareProps) {
   const { isAuthenticated, isLoading, getCurrentUser } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
@@ -57,11 +59,13 @@ export function AuthMiddleware({ children }: AuthMiddlewareProps) {
           // If so, redirect to login
           const currentState = useAuthStore.getState();
           if (!currentState.isAuthenticated) {
-            router.push('/login');
+            const returnTo = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+            router.push(buildLoginUrlWithRedirect(returnTo));
           }
         } catch (error) {
-          // If getting user fails, redirect to login
-          router.push('/login');
+          // If getting user fails, redirect to login with return URL
+          const returnTo = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+          router.push(buildLoginUrlWithRedirect(returnTo));
         }
       } else {
         hasCheckedAuth.current = true;
@@ -69,7 +73,7 @@ export function AuthMiddleware({ children }: AuthMiddlewareProps) {
     };
 
     checkAuth();
-  }, [pathname, router, getCurrentUser, isAuthenticated, isLoading]);
+  }, [pathname, searchParams, router, getCurrentUser, isAuthenticated, isLoading]);
 
   // Reset the check flag when pathname changes
   useEffect(() => {

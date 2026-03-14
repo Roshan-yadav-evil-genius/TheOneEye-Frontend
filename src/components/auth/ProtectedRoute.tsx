@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores';
+import { buildLoginUrlWithRedirect } from '@/lib/auth/redirect-after-login';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,16 +12,19 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, getCurrentUser } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
       getCurrentUser().then(() => {
-        if (!isAuthenticated) {
-          router.push('/login');
+        if (!useAuthStore.getState().isAuthenticated) {
+          const returnTo = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+          router.push(buildLoginUrlWithRedirect(returnTo));
         }
       });
     }
-  }, [isAuthenticated, isLoading, getCurrentUser, router]);
+  }, [isAuthenticated, isLoading, getCurrentUser, router, pathname, searchParams]);
 
   if (isLoading) {
     return (

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/stores"
 import { toast } from "sonner"
+import { getSafeRedirectTarget } from "@/lib/auth/redirect-after-login"
 
 export function LoginForm({
   className,
@@ -28,6 +29,7 @@ export function LoginForm({
   
   const { login, error, clearError } = useAuthStore()
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -42,7 +44,8 @@ export function LoginForm({
     try {
       await login(formData.username, formData.password)
       toast.success("Login successful!")
-      router.push("/dashboard")
+      const redirectTo = getSafeRedirectTarget(searchParams.get("redirect"))
+      router.push(redirectTo ?? "/dashboard")
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed. Please check your credentials.")
     } finally {
