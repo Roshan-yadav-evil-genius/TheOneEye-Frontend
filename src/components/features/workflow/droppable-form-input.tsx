@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { convertPathToExpression } from './expression-utils';
 import Editor, { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
-import { setupJinjaJson, registerCompletionProvider, langId, themeName } from "@/lib/monaco/jinja-json";
+import { setupJinjaJson, registerCompletionProvider, langId, langIdJinjaText, themeName } from "@/lib/monaco/jinja-json";
 
 interface DroppableFormInputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'textarea';
@@ -55,13 +55,13 @@ export function DroppableFormInput({
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeRef = useRef(onChange);
 
-  // Update editor height when rows prop changes
+  // Update editor height when rows prop changes (all textarea fields use Monaco)
   useEffect(() => {
-    if (jsonMode && type === 'textarea') {
+    if (type === 'textarea') {
       const newHeight = rows * 20 + 40;
       setEditorHeight(newHeight);
     }
-  }, [rows, jsonMode, type]);
+  }, [rows, type]);
 
   // Setup Monaco autocomplete for jinja-json (workflow variables + JSON keywords)
   useEffect(() => {
@@ -184,10 +184,11 @@ export function DroppableFormInput({
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  // Sync from prop when value changes externally (e.g. execution result, persisted form)
+  // Sync from prop when value changes externally (only when code editor is used to avoid update depth)
   useEffect(() => {
+    if (type !== 'textarea') return;
     setLocalValue(value);
-  }, [value]);
+  }, [value, type]);
 
   // Clear debounce timer on unmount
   useEffect(() => {
@@ -223,7 +224,7 @@ export function DroppableFormInput({
           // Convert the field path to expression syntax
           const expression = convertPathToExpression(dragData.path);
           
-          if (jsonMode && editorRef.current) {
+          if (isTextarea && editorRef.current) {
             // Insert into Monaco editor
             const editor = editorRef.current;
             const selection = editor.getSelection();
@@ -278,18 +279,20 @@ export function DroppableFormInput({
     }, 280);
   };
 
+  const isTextarea = type === "textarea";
+
   const handleBeforeMount = useCallback(
     (monaco: Parameters<OnMount>[1]) => {
-      if (jsonMode) setupJinjaJson(monaco);
+      if (isTextarea) setupJinjaJson(monaco);
     },
-    [jsonMode]
+    [isTextarea]
   );
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     (window as Window & { monaco?: typeof import("monaco-editor") }).monaco = monaco;
-    if (jsonMode) {
-      completionDisposableRef.current = registerCompletionProvider(monaco);
+    if (isTextarea) {
+      completionDisposableRef.current = registerCompletionProvider(monaco, jsonMode ? langId : langIdJinjaText);
     }
   };
 
@@ -304,10 +307,8 @@ export function DroppableFormInput({
     "w-full bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
   );
 
-  const isTextarea = type === 'textarea';
-
-  // Use Monaco Editor for JSON mode textarea fields
-  if (jsonMode && isTextarea) {
+  // Use Monaco Editor for all textarea fields (jinja-json or jinja-text by jsonMode)
+  if (isTextarea) {
     return (
       <div
         ref={setNodeRef}
@@ -329,7 +330,7 @@ export function DroppableFormInput({
         >
           <Editor
             height={`${editorHeight}px`}
-            language={langId}
+            language={jsonMode ? langId : langIdJinjaText}
             value={localValue}
             onChange={handleEditorChange}
             beforeMount={handleBeforeMount}
@@ -381,7 +382,7 @@ export function DroppableFormInput({
     );
   }
 
-  // Regular input/textarea for non-JSON mode
+  // Regular input for non-textarea fields (textarea uses Monaco above)
   return (
     <div
       ref={setNodeRef}
@@ -390,37 +391,20 @@ export function DroppableFormInput({
         isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
       )}
     >
-      {isTextarea ? (
-        <textarea
-          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-          value={value}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          rows={rows}
-          className={cn(
-            baseInputClasses,
-            "py-2 resize-y min-h-[80px]",
-            isOverInput && "border-pink-400 bg-pink-900/10",
-            className,
-            error && "border-red-500 focus:border-red-500"
-          )}
-        />
-      ) : (
-        <input
-          ref={inputRef as React.RefObject<HTMLInputElement>}
-          type={type}
-          value={value}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          className={cn(
-            baseInputClasses,
-            "h-10",
-            isOverInput && "border-pink-400 bg-pink-900/10",
-            className,
-            error && "border-red-500 focus:border-red-500"
-          )}
-        />
-      )}
+      <input
+        ref={inputRef as React.RefObject<HTMLInputElement>}
+        type={type}
+        value={value}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+        className={cn(
+          baseInputClasses,
+          "h-10",
+          isOverInput && "border-pink-400 bg-pink-900/10",
+          className,
+          error && "border-red-500 focus:border-red-500"
+        )}
+      />
       
       {isOverInput && (
         <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none">

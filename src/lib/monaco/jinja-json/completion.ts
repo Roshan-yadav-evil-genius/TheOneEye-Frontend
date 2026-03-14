@@ -2,8 +2,9 @@ import { type Monaco } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { langId } from "./language";
 
-export const registerCompletionProvider = (monaco: Monaco) => {
-  return monaco.languages.registerCompletionItemProvider(langId, {
+export const registerCompletionProvider = (monaco: Monaco, languageId?: string) => {
+  const lang = languageId ?? langId;
+  return monaco.languages.registerCompletionItemProvider(lang, {
     provideCompletionItems: (
       model: editor.ITextModel,
       position: editor.Position

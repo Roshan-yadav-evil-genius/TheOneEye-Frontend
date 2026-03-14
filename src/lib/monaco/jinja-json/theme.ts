@@ -23,6 +23,7 @@ export const defineTheme = (monaco: Monaco) => {
       { token: "number", foreground: "B5CEA8" },
       { token: "delimiter", foreground: "D4D4D4" },
       { token: "identifier", foreground: "DCDCAA" },
+      { token: "text", foreground: "D4D4D4" },
     ],
     colors: {
       "editor.background": "#1e1e1e",
