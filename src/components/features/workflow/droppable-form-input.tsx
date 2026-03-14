@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { convertPathToExpression } from './expression-utils';
 import Editor, { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
-import { setupJinjaJson, langId, themeName } from "@/lib/monaco/jinja-json";
+import { setupJinjaJson, registerCompletionProvider, langId, themeName } from "@/lib/monaco/jinja-json";
 
 interface DroppableFormInputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'textarea';
@@ -38,6 +38,7 @@ export function DroppableFormInput({
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
+  const completionDisposableRef = useRef<{ dispose: () => void } | null>(null);
   
   const { setNodeRef } = useDroppable({
     id: id || 'droppable-form-input',
@@ -50,6 +51,9 @@ export function DroppableFormInput({
   const [isOverInput, setIsOverInput] = useState(false);
   const [editorHeight, setEditorHeight] = useState<number>(rows * 20 + 40);
   const [isResizing, setIsResizing] = useState(false);
+  const [localValue, setLocalValue] = useState(value);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onChangeRef = useRef(onChange);
 
   // Update editor height when rows prop changes
   useEffect(() => {
@@ -167,6 +171,34 @@ export function DroppableFormInput({
     };
   }, [isResizing, rows]);
 
+  // Dispose Jinja completion provider on unmount (avoids duplicate suggestions on reopen)
+  useEffect(() => {
+    return () => {
+      completionDisposableRef.current?.dispose();
+      completionDisposableRef.current = null;
+    };
+  }, []);
+
+  // Keep latest onChange for debounced callback
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  // Sync from prop when value changes externally (e.g. execution result, persisted form)
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  // Clear debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+    };
+  }, []);
+
   // Monitor drag events to handle drops
   useDndMonitor({
     onDragStart: () => {
@@ -202,6 +234,13 @@ export function DroppableFormInput({
               };
               editor.executeEdits('drop-variable', [op]);
               editor.focus();
+              const newValue = editor.getModel()?.getValue() ?? '';
+              setLocalValue(newValue);
+              if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = null;
+              }
+              onChangeRef.current(newValue);
             }
           } else {
             // Insert into regular input/textarea
@@ -229,10 +268,14 @@ export function DroppableFormInput({
     onChange(e.target.value);
   };
 
-  const handleEditorChange = (value: string | undefined) => {
-    if (value !== undefined) {
-      onChange(value);
-    }
+  const handleEditorChange = (newValue: string | undefined) => {
+    if (newValue === undefined) return;
+    setLocalValue(newValue);
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      onChangeRef.current(newValue);
+      debounceTimerRef.current = null;
+    }, 280);
   };
 
   const handleBeforeMount = useCallback(
@@ -246,7 +289,7 @@ export function DroppableFormInput({
     editorRef.current = editor;
     (window as Window & { monaco?: typeof import("monaco-editor") }).monaco = monaco;
     if (jsonMode) {
-      setupJinjaJson(monaco);
+      completionDisposableRef.current = registerCompletionProvider(monaco);
     }
   };
 
@@ -287,7 +330,7 @@ export function DroppableFormInput({
           <Editor
             height={`${editorHeight}px`}
             language={langId}
-            value={value}
+            value={localValue}
             onChange={handleEditorChange}
             beforeMount={handleBeforeMount}
             onMount={handleEditorDidMount}
