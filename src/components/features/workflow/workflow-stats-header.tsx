@@ -38,6 +38,7 @@ interface WorkflowStatsHeaderProps {
   onMinimapToggle: () => void;
   workflowId?: string;
   workflow?: {
+    name?: string;
     runs_count: number;
     last_run?: string | null;
     status: string;
@@ -127,6 +128,12 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
               className="mx-2 data-[orientation=vertical]:h-4"
             />
           </div>
+
+          {workflow?.name && (
+            <span className="text-sm font-semibold text-foreground truncate max-w-[200px]" title={workflow.name}>
+              {workflow.name}
+            </span>
+          )}
 
           <div className="flex items-center gap-4">
             {/* Total Runs */}
