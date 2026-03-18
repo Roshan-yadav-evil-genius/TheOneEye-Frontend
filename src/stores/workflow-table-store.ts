@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { TWorkflow } from '@/types';
+import { compareWorkflowsTableOrder } from '@/lib/utils/workflow-table-sort';
 
 // Column configuration interface
 interface ColumnConfig {
@@ -28,10 +29,6 @@ interface WorkflowTableState {
   
   // Column configuration
   columns: ColumnConfig[];
-  
-  // Sorting state
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
 }
 
 // Store state
@@ -72,10 +69,6 @@ interface WorkflowTableStoreActions {
   toggleColumnVisibility: (columnId: string) => void;
   resetColumns: () => void;
   
-  // Sorting
-  setSorting: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
-  toggleSort: (columnId: string) => void;
-  
   // Utility
   resetTable: () => void;
   setDefaults: (defaults: Partial<Pick<WorkflowTableStoreState, 'defaultRowsPerPage' | 'maxRowsPerPage'>>) => void;
@@ -104,8 +97,6 @@ const defaultTableState: WorkflowTableState = {
   tagFilter: "all",
   workflowTypeFilter: "all",
   columns: defaultColumnConfigs,
-  sortBy: "name",
-  sortOrder: "asc",
 };
 
 const initialState: WorkflowTableStoreState = {
@@ -278,32 +269,6 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
           });
         },
 
-        // Sorting
-        setSorting: (sortBy: string, sortOrder: 'asc' | 'desc') => {
-          set((state) => {
-            state.tableState.sortBy = sortBy;
-            state.tableState.sortOrder = sortOrder;
-            state.tableState.currentPage = 1; // Reset to first page
-            state.tableState.selectedRows = []; // Clear selection
-          });
-        },
-
-        toggleSort: (columnId: string) => {
-          set((state) => {
-            const { sortBy, sortOrder } = state.tableState;
-            if (sortBy === columnId) {
-              // Toggle order for same column
-              state.tableState.sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-            } else {
-              // New column, default to ascending
-              state.tableState.sortBy = columnId;
-              state.tableState.sortOrder = 'asc';
-            }
-            state.tableState.currentPage = 1; // Reset to first page
-            state.tableState.selectedRows = []; // Clear selection
-          });
-        },
-
         // Utility
         resetTable: () => {
           set((state) => {
@@ -334,9 +299,11 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
           defaultRowsPerPage: state.defaultRowsPerPage,
           maxRowsPerPage: state.maxRowsPerPage,
         }),
-        version: 3,
+        version: 4,
         migrate: (persistedState: unknown, version: number) => {
-          const state = persistedState as WorkflowTableStoreState;
+          const state = persistedState as WorkflowTableStoreState & {
+            tableState?: { sortBy?: string; sortOrder?: string };
+          };
           if (version < 2) {
             const hasWorkflowType = state.tableState.columns.some(c => c.id === 'workflowType');
             if (!hasWorkflowType) {
@@ -348,7 +315,11 @@ export const useWorkflowTableStore = create<WorkflowTableStore>()(
             if (state.tableState.tagFilter === undefined) state.tableState.tagFilter = "all";
             if (state.tableState.workflowTypeFilter === undefined) state.tableState.workflowTypeFilter = "all";
           }
-          return state;
+          if (version < 4) {
+            delete (state.tableState as { sortBy?: string }).sortBy;
+            delete (state.tableState as { sortOrder?: string }).sortOrder;
+          }
+          return state as WorkflowTableStoreState;
         },
       }
     ),
@@ -379,8 +350,6 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     setColumnVisibility,
     toggleColumnVisibility,
     resetColumns,
-    setSorting,
-    toggleSort,
     resetTable,
   } = useWorkflowTableStore();
 
@@ -415,48 +384,9 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     });
   }, [workflows, tableState.searchTerm, tableState.statusFilter, tableState.categoryFilter, tableState.tagFilter, tableState.workflowTypeFilter]);
 
-  // Sort filtered workflows
   const sortedWorkflows = React.useMemo(() => {
-    return [...filteredWorkflows].sort((a, b) => {
-      const { sortBy, sortOrder } = tableState;
-      let aValue: any;
-      let bValue: any;
-
-      switch (sortBy) {
-        case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
-          break;
-        case 'status':
-          aValue = a.status.toLowerCase();
-          bValue = b.status.toLowerCase();
-          break;
-        case 'category':
-          aValue = (a.category || '').toLowerCase();
-          bValue = (b.category || '').toLowerCase();
-          break;
-        case 'lastRun':
-          aValue = a.last_run ? new Date(a.last_run) : new Date(0);
-          bValue = b.last_run ? new Date(b.last_run) : new Date(0);
-          break;
-        case 'nextRun':
-          aValue = a.next_run ? new Date(a.next_run) : new Date(0);
-          bValue = b.next_run ? new Date(b.next_run) : new Date(0);
-          break;
-        case 'runsCount':
-          aValue = a.runs_count || 0;
-          bValue = b.runs_count || 0;
-          break;
-        default:
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
-      }
-
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [filteredWorkflows, tableState.sortBy, tableState.sortOrder]);
+    return [...filteredWorkflows].sort(compareWorkflowsTableOrder);
+  }, [filteredWorkflows]);
 
   // Calculate pagination
   const totalPages = Math.ceil(sortedWorkflows.length / tableState.rowsPerPage);
@@ -510,8 +440,6 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     totalPages,
     isAllSelected,
     isIndeterminate,
-    sortBy: tableState.sortBy,
-    sortOrder: tableState.sortOrder,
     
     // Actions
     setSearchTerm,
@@ -526,8 +454,6 @@ export const useWorkflowTable = (workflows: TWorkflow[]) => {
     handleRowsPerPageChange,
     toggleColumnVisibility,
     resetColumns,
-    setSorting,
-    toggleSort,
     resetTable,
   };
 };
