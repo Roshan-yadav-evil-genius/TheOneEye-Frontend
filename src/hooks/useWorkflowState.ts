@@ -16,6 +16,11 @@ interface WorkflowStateProps {
   isRunning: boolean;
 }
 
+const EDGE_COLORS = {
+  default: "var(--primary)",
+  success: "var(--success)",
+};
+
 export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning }: WorkflowStateProps) => {
   // Get workflow canvas store state and actions
   const {
@@ -69,7 +74,7 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         type: lineType,
         animated: isRunning,
         style: { 
-          stroke: highlightColor || '#3b82f6', 
+          stroke: highlightColor || EDGE_COLORS.default,
           strokeWidth: isHighlighted ? 3 : 2,
         },
       };
@@ -189,11 +194,11 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
       // If route is specified (conditional node), only highlight matching handle
       if (route) {
         if (edge.sourceHandle === route) {
-          highlightEdge(edge.id, '#22c55e', 1000); // Green for 2 seconds
+          highlightEdge(edge.id, EDGE_COLORS.success, 1000);
         }
       } else {
         // Regular node: highlight all outgoing edges
-        highlightEdge(edge.id, '#22c55e', 1000); // Green for 2 seconds
+        highlightEdge(edge.id, EDGE_COLORS.success, 1000);
       }
     }
   }, [edges, highlightEdge]);

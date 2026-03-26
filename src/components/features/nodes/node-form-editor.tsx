@@ -274,8 +274,8 @@ export function NodeFormEditor({
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <IconLoader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-400">Loading form...</p>
+          <IconLoader2 className="mx-auto mb-2 h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Loading form...</p>
         </div>
       </div>
     );
@@ -285,7 +285,7 @@ export function NodeFormEditor({
   if (formError) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-center text-gray-400">
+        <div className="text-center text-muted-foreground">
           <p className="text-sm">{formError}</p>
         </div>
       </div>
@@ -296,7 +296,7 @@ export function NodeFormEditor({
   if (!formState || !formState.fields) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-center text-gray-400">
+        <div className="text-center text-muted-foreground">
           <p className="text-sm">No form available for this node</p>
         </div>
       </div>
@@ -309,9 +309,9 @@ export function NodeFormEditor({
       <div className="flex-1 overflow-y-auto p-4 space-y-4 sidebar-scrollbar">
         {/* Form-level errors */}
         {formState.form_level_errors && formState.form_level_errors.length > 0 && (
-          <div className="bg-red-900/20 border border-red-500/30 rounded-md p-3">
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3">
             {formState.form_level_errors.map((error, index) => (
-              <p key={index} className="text-red-400 text-sm">
+              <p key={index} className="text-sm text-destructive">
                 {error}
               </p>
             ))}
@@ -332,7 +332,7 @@ export function NodeFormEditor({
 
       {/* Bottom Button Section - conditionally render Save or Execute */}
       {(showExecuteButton || onSave) && (
-        <div className="border-t border-gray-700 p-4 flex-shrink-0">
+        <div className="shrink-0 border-t border-border p-4">
           {onSave ? (
             <Button
               onClick={onSave}

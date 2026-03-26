@@ -20,36 +20,36 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
           <div className="inline-block px-6 py-3 mb-6 bg-gradient-to-r from-primary via-primary/90 to-primary border-2 border-primary shadow-lg shadow-primary/50 rounded-full backdrop-blur-sm">
             <p className="text-xs font-bold text-slate-50 tracking-widest uppercase">Managed Automation for Scalable Businesses</p>
           </div>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-50 tracking-tighter">
+          <h1 className="text-4xl font-extrabold tracking-tighter text-foreground md:text-6xl lg:text-7xl">
             <span className="block">Stop Managing Tasks.</span>
             <span className="block text-primary">Let Systems Run Your Business.</span>
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed">
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
             We design, run, and maintain automations so founders never touch tools, workflows, or fixes.
           </p>
-          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-400">
+          <p className="mx-auto mt-3 max-w-2xl text-base text-muted-foreground">
             If something breaks, we fix it before you even notice — you never touch tools or workflows.
           </p>
           <div className="mt-10 max-w-4xl mx-auto">
-            <div className="relative bg-slate-900/80 border-2 border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+            <div className="relative rounded-xl border-2 border-border/70 bg-card/80 p-6 backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 rounded-xl"></div>
               <div className="relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-4 text-center">
                     <div className="text-2xl font-bold text-primary mb-1">20+ hrs</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Reclaimed Weekly</div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Reclaimed Weekly</div>
                   </div>
-                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-4 text-center">
                     <div className="text-2xl font-bold text-primary mb-1">10M+</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Events/Month</div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Events/Month</div>
                   </div>
-                  <div className="text-center p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-4 text-center">
                     <div className="text-2xl font-bold text-primary mb-1">99.9%</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Uptime</div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Uptime</div>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-700/50">
-                  <div className="flex items-center justify-center space-x-3 text-xs text-slate-400">
+                <div className="mt-4 border-t border-border/70 pt-4">
+                  <div className="flex items-center justify-center space-x-3 text-xs text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
                       <span>Runs Without You</span>
@@ -77,7 +77,7 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
               Book a Systems Audit
             </button>
             <div className="flex flex-col items-center gap-1">
-              <p className="text-sm text-slate-400">No commitment. No credit card.</p>
+              <p className="text-sm text-muted-foreground">No commitment. No credit card.</p>
               <p className="text-xs font-semibold text-primary">Only 2 spots remaining for January Founding Partners.</p>
             </div>
           </div>
@@ -89,14 +89,14 @@ const HeroSection: React.FC<HeroProps> = ({ onBookDemo }) => {
 
 const LightSocialProof: React.FC = () => {
   return (
-    <div className="text-center py-8 border-y border-slate-700/50 bg-slate-900/30">
-      <p className="text-base text-slate-300 font-medium mb-2">
+    <div className="border-y border-border/70 bg-muted/20 py-8 text-center">
+      <p className="mb-2 text-base font-medium text-foreground">
         Founder-built systems running in production • No templates • No outsourcing
       </p>
-      <p className="text-sm text-slate-400 mb-3">
+      <p className="mb-3 text-sm text-muted-foreground">
         Processing 10M+ events/month • AI/ML models deployed across workflows • 99.9% uptime
       </p>
-      <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500">
+      <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
         <span>Node-based execution platform</span>
         <span>•</span>
         <span>API, browser, AI/ML, data processing</span>

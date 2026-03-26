@@ -314,7 +314,7 @@ export function DroppableFormInput({
         ref={setNodeRef}
         className={cn(
           "relative w-full",
-          isOverInput && "ring-2 ring-pink-500 ring-opacity-50",
+          isOverInput && "ring-2 ring-primary/40",
           className
         )}
         style={{ minHeight: `${rows * 20 + 40}px` }}
@@ -323,8 +323,8 @@ export function DroppableFormInput({
           ref={resizeRef}
           className={cn(
             "border rounded-lg overflow-hidden relative",
-            error ? "border-red-500" : "border-input",
-            isOverInput && "border-pink-400 bg-pink-900/10"
+            error ? "border-destructive" : "border-input",
+            isOverInput && "border-primary/60 bg-primary/10"
           )}
           style={{ height: `${editorHeight}px` }}
         >
@@ -370,13 +370,13 @@ export function DroppableFormInput({
         </div>
         
         {isOverInput && (
-          <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none z-10">
-            <span className="text-pink-400 text-sm font-medium">Drop field here</span>
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
+            <span className="text-sm font-medium text-primary">Drop field here</span>
           </div>
         )}
         
         {error && (
-          <p className="text-red-500 text-xs mt-1">{error}</p>
+          <p className="mt-1 text-xs text-destructive">{error}</p>
         )}
       </div>
     );
@@ -388,7 +388,7 @@ export function DroppableFormInput({
       ref={setNodeRef}
       className={cn(
         "relative w-full",
-        isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
+        isOverInput && "ring-2 ring-primary/40"
       )}
     >
       <input
@@ -400,20 +400,20 @@ export function DroppableFormInput({
         className={cn(
           baseInputClasses,
           "h-10",
-          isOverInput && "border-pink-400 bg-pink-900/10",
+          isOverInput && "border-primary/60 bg-primary/10",
           className,
-          error && "border-red-500 focus:border-red-500"
+          error && "border-destructive focus:border-destructive"
         )}
       />
       
       {isOverInput && (
-        <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none">
-          <span className="text-pink-400 text-sm font-medium">Drop field here</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
+          <span className="text-sm font-medium text-primary">Drop field here</span>
         </div>
       )}
       
       {error && (
-        <p className="text-red-500 text-xs mt-1">{error}</p>
+        <p className="mt-1 text-xs text-destructive">{error}</p>
       )}
     </div>
   );

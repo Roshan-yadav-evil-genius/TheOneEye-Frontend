@@ -55,7 +55,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
   // Combined execution state: either local (single node test) or workflow (WebSocket-driven)
   const isNodeExecuting = isLocalNodeExecuting || isWorkflowNodeExecuting;
   
-  const colorClass = getNodeColor(data.node_type?.type || '');
+  const colorClass = getNodeColor(data.node_type?.type || "", data.node_type?.identifier || "");
 
   // Convert BackendNodeType to TNodeMetadata for the execute dialog
   const nodeMetadata: TNodeMetadata = useMemo(() => ({

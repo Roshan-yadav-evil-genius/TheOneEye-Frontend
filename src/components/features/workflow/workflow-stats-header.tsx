@@ -59,8 +59,8 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
     if (isRunning) {
       return (
         <>
-          <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
-          <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
+          <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-success"></div>
+          <Badge variant="outline" className="border-success/40 bg-success/15 px-2 py-0.5 text-xs text-success">
             Running
           </Badge>
         </>
@@ -70,8 +70,8 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
     if (!workflow) {
       return (
         <>
-          <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
-          <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
+          <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground"></div>
+          <Badge variant="outline" className="border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
             Stopped
           </Badge>
         </>
@@ -82,8 +82,8 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
     if (status === 'active') {
       return (
         <>
-          <div className="h-1.5 w-1.5 bg-green-500 rounded-full"></div>
-          <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-0.5">
+          <div className="h-1.5 w-1.5 rounded-full bg-success"></div>
+          <Badge variant="outline" className="border-success/40 bg-success/15 px-2 py-0.5 text-xs text-success">
             Active
           </Badge>
         </>
@@ -92,8 +92,8 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
     if (status === 'error') {
       return (
         <>
-          <div className="h-1.5 w-1.5 bg-red-500 rounded-full"></div>
-          <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 text-xs px-2 py-0.5">
+          <div className="h-1.5 w-1.5 rounded-full bg-destructive"></div>
+          <Badge variant="outline" className="border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
             Error
           </Badge>
         </>
@@ -101,8 +101,8 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
     }
     return (
       <>
-        <div className="h-1.5 w-1.5 bg-gray-400 rounded-full"></div>
-        <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 text-xs px-2 py-0.5">
+        <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground"></div>
+        <Badge variant="outline" className="border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
           Inactive
         </Badge>
       </>
@@ -181,7 +181,7 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
               >
                 {lineTypeOptions.find(option => option.value === lineType)?.icon && 
                   React.createElement(lineTypeOptions.find(option => option.value === lineType)!.icon, {
-                    className: "h-3.5 w-3.5 text-blue-500 hover:text-blue-600"
+                    className: "h-3.5 w-3.5 text-primary hover:text-primary/80"
                   })
                 }
               </Button>
@@ -217,9 +217,9 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
             title={showMinimap ? "Hide minimap" : "Show minimap"}
           >
             {showMinimap ? (
-              <IconMap className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
+              <IconMap className="h-3.5 w-3.5 text-success hover:text-success/80" />
             ) : (
-              <IconMapOff className="h-3.5 w-3.5 text-gray-500 hover:text-gray-600" />
+              <IconMapOff className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
             )}
           </Button>
 
@@ -233,9 +233,9 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
               title={isRunning ? "Stop" : "Run"}
             >
               {isRunning ? (
-                <IconSquare className="h-3.5 w-3.5 text-red-500 hover:text-red-600" />
+                <IconSquare className="h-3.5 w-3.5 text-destructive hover:text-destructive/80" />
               ) : (
-                <IconPlayerPlay className="h-3.5 w-3.5 text-green-500 hover:text-green-600" />
+                <IconPlayerPlay className="h-3.5 w-3.5 text-success hover:text-success/80" />
               )}
             </Button>
           </div>

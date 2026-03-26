@@ -203,7 +203,7 @@ export function NodeExecuteDialog({
   ]);
 
   const getTypeBadgeColor = (type: string) => {
-    const styles = getBadgeStyles(type);
+    const styles = getBadgeStyles(type, node.identifier);
     return `${styles.bg} ${styles.text}`;
   };
 
@@ -335,10 +335,10 @@ export function NodeExecuteDialog({
               className="flex-1 overflow-hidden"
             >
               {/* INPUT Panel */}
-              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-blue-500/30 bg-background transition-all duration-200">
+              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-node-blocking/40 bg-background transition-all duration-200">
                 <JsonViewer
                   title="INPUT"
-                  statusColor="bg-blue-500"
+                  statusColor="bg-node-blocking"
                   jsonData={inputData}
                   activeTab={activeInputTab}
                   onTabChange={setActiveInputTab}
@@ -349,10 +349,10 @@ export function NodeExecuteDialog({
               </div>
 
               {/* FORM Panel */}
-              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-pink-500/30 bg-background transition-all duration-200">
+              <div className="h-full flex flex-col overflow-hidden border-r border-border/50 border-l-2 border-l-node-producer/40 bg-background transition-all duration-200">
                 <div className="flex items-center justify-between gap-2 px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-pink-500 rounded-full shadow-[0_0_8px_rgba(236,72,153,0.6)] animate-pulse"></div>
+                    <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-node-producer"></div>
                     <h3 className="text-foreground font-medium text-sm tracking-wide">
                       {isWorkflowMode && workflowContext 
                         ? `Form(${workflowContext.nodeInstanceId})` 
@@ -394,14 +394,14 @@ export function NodeExecuteDialog({
               {/* OUTPUT Panel */}
               <div className={`h-full flex flex-col overflow-hidden border-l-2 ${
                 outputData?.success 
-                  ? "border-l-green-500/30" 
+                  ? "border-l-success/40" 
                   : outputData?.error 
-                  ? "border-l-red-500/30" 
-                  : "border-l-yellow-500/30"
+                  ? "border-l-destructive/40" 
+                  : "border-l-primary/40"
               } bg-background transition-all duration-200`}>
                 <JsonViewer
                   title="OUTPUT"
-                  statusColor={outputData?.success ? "bg-green-500" : outputData?.error ? "bg-red-500" : "bg-yellow-500"}
+                  statusColor={outputData?.success ? "bg-success" : outputData?.error ? "bg-destructive" : "bg-primary"}
                   jsonData={getOutputDisplayData()}
                   activeTab={activeOutputTab}
                   onTabChange={setActiveOutputTab}
@@ -417,7 +417,7 @@ export function NodeExecuteDialog({
       {/* DragOverlay outside Dialog - not affected by dialog's CSS transforms */}
       <DragOverlay dropAnimation={null} style={{ width: 'auto', height: 'auto' }}>
         {activeDragKey ? (
-          <div className="inline-flex px-3 py-1.5 rounded text-sm font-mono bg-blue-600 text-white border border-blue-400 shadow-xl cursor-grabbing whitespace-nowrap w-auto">
+          <div className="inline-flex w-auto cursor-grabbing whitespace-nowrap rounded border border-primary/60 bg-primary px-3 py-1.5 font-mono text-sm text-primary-foreground shadow-xl">
             {activeDragKey}
           </div>
         ) : null}

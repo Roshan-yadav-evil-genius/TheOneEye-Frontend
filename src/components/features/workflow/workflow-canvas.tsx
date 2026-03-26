@@ -16,6 +16,15 @@ import { nodeTypes } from "./nodeTypes";
 import DragOverlay from "./DragOverlay";
 import { useWorkflowCanvasStore } from "@/stores/workflow/workflow-canvas-store";
 
+const FLOW_COLORS = {
+  connection: "var(--primary)",
+  running: "var(--success)",
+  trigger: "var(--node-blocking)",
+  action: "var(--node-non-blocking)",
+  logic: "var(--node-producer)",
+  fallback: "var(--muted-foreground)",
+};
+
 interface WorkflowCanvasProps {
   workflowId: string;
   selectedNodes: string[];
@@ -105,13 +114,13 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
 
       {/* Execution mode indicator */}
       {isRunning && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-green-500/90 backdrop-blur-sm border border-green-600 rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+        <div className="absolute top-4 left-1/2 z-10 flex -translate-x-1/2 transform items-center gap-2 rounded-lg border border-success/50 bg-success/20 px-4 py-2 shadow-lg backdrop-blur-sm">
           <div className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-success"></span>
           </div>
-          <span className="text-sm font-medium text-white">Workflow Running</span>
-          <span className="text-xs text-green-100">Editing disabled</span>
+          <span className="text-sm font-medium text-foreground">Workflow Running</span>
+          <span className="text-xs text-muted-foreground">Editing disabled</span>
         </div>
       )}
 
@@ -129,14 +138,17 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
         nodeTypes={nodeTypes}
         fitView
         className="bg-background"
-        connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
+        connectionLineStyle={{ stroke: FLOW_COLORS.connection, strokeWidth: 2 }}
         connectionLineType={lineType === 'straight' ? ConnectionLineType.Straight : 
                            lineType === 'step' ? ConnectionLineType.Step :
                            lineType === 'smoothstep' ? ConnectionLineType.SmoothStep :
                            ConnectionLineType.Bezier}
         defaultEdgeOptions={{
           animated: isRunning,
-          style: { stroke: isRunning ? '#10b981' : '#3b82f6', strokeWidth: 2 },
+          style: {
+            stroke: isRunning ? FLOW_COLORS.running : FLOW_COLORS.connection,
+            strokeWidth: 2,
+          },
           type: lineType,
         }}
         nodesDraggable={!isRunning}
@@ -149,10 +161,10 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
           <MiniMap 
             nodeColor={(node) => {
               switch (node.data?.backendWorkflowNode?.node_type?.type) {
-                case "trigger": return "#3b82f6";
-                case "action": return "#10b981";
-                case "logic": return "#8b5cf6";
-                default: return "#6b7280";
+                case "trigger": return FLOW_COLORS.trigger;
+                case "action": return FLOW_COLORS.action;
+                case "logic": return FLOW_COLORS.logic;
+                default: return FLOW_COLORS.fallback;
               }
             }}
             nodeStrokeWidth={3}

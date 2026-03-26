@@ -115,7 +115,7 @@ export function TemplateInputField({
 
         {/* Error Section */}
         {!validation.isValid && validation.error && (
-          <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded">
+          <div className="rounded bg-destructive/10 p-2 text-sm text-destructive">
             {validation.error}
           </div>
         )}
@@ -126,7 +126,7 @@ export function TemplateInputField({
           ref={setNodeRef}
           className={cn(
             "relative w-full",
-            isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
+            isOverInput && "ring-2 ring-primary/40"
           )}
         >
           <Textarea
@@ -141,24 +141,24 @@ export function TemplateInputField({
               "font-mono text-sm leading-relaxed",
               "border border-input focus:border-primary/50",
               "placeholder:text-muted-foreground/60",
-              error && "border-red-500 focus:border-red-500",
-              isOverInput && "ring-2 ring-pink-500 ring-opacity-50"
+              error && "border-destructive focus:border-destructive",
+              isOverInput && "ring-2 ring-primary/40"
             )}
           />
           {error && (
-            <p className="text-sm text-red-500 mt-1">{error}</p>
+            <p className="mt-1 text-sm text-destructive">{error}</p>
           )}
           
           {isOverInput && (
-            <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none">
-              <span className="text-pink-400 text-sm font-medium">Drop field here</span>
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
+              <span className="text-sm font-medium text-primary">Drop field here</span>
             </div>
           )}
         </div>
       </div>
       
       {error && (
-        <p className="text-sm text-red-500">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       )}
     </div>
   );

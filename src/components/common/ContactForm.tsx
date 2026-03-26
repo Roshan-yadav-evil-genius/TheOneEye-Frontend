@@ -65,7 +65,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-slate-50">Name</Label>
+          <Label htmlFor="name" className="text-foreground">Name</Label>
           <Input
             id="name"
             name="name"
@@ -73,39 +73,39 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             required
             value={formData.name}
             onChange={handleInputChange}
-            className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
+            className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
             placeholder="Name"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company" className="text-slate-50">Company</Label>
+          <Label htmlFor="company" className="text-foreground">Company</Label>
           <Input
             id="company"
             name="company"
             type="text"
             value={formData.company}
             onChange={handleInputChange}
-            className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
+            className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
             placeholder="Company"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-slate-50">Phone</Label>
+          <Label htmlFor="phone" className="text-foreground">Phone</Label>
           <Input
             id="phone"
             name="phone"
             type="tel"
             value={formData.phone}
             onChange={handleInputChange}
-            className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
+            className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
             placeholder="Phone"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-slate-50">Email</Label>
+          <Label htmlFor="email" className="text-foreground">Email</Label>
           <Input
             id="email"
             name="email"
@@ -113,14 +113,14 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             required
             value={formData.email}
             onChange={handleInputChange}
-            className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
+            className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
             placeholder="Email"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="subject" className="text-slate-50">Subject</Label>
+        <Label htmlFor="subject" className="text-foreground">Subject</Label>
         <Input
           id="subject"
           name="subject"
@@ -128,20 +128,20 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           required
           value={formData.subject}
           onChange={handleInputChange}
-          className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20"
+          className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
           placeholder="Subject"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="message" className="text-slate-50">Message</Label>
+        <Label htmlFor="message" className="text-foreground">Message</Label>
         <Textarea
           id="message"
           name="message"
           required
           value={formData.message}
           onChange={handleInputChange}
-          className="bg-slate-700/50 border-slate-600 text-slate-50 placeholder:text-slate-400 focus:border-primary focus:ring-primary/20 min-h-[100px] resize-y"
+          className="min-h-[100px] resize-y border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
           placeholder="Message"
         />
       </div>
@@ -150,11 +150,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 text-base font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
+          className="w-full bg-primary px-6 py-2 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-300 hover:bg-primary/90 hover:shadow-primary/40 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
         >
           {isSubmitting ? 'Sending...' : 'Send Message'}
         </Button>
-        <p className="text-center text-slate-400 text-sm">
+        <p className="text-center text-sm text-muted-foreground">
           We reply within <strong className="text-primary">24 hours</strong>
         </p>
       </div>

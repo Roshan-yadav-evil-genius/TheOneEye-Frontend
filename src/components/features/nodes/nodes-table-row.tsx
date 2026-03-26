@@ -30,8 +30,8 @@ export function NodesTableRow({
   onViewForm,
   onExecute,
 }: NodesTableRowProps) {
-  const getTypeBadge = (type: string) => {
-    const styles = getBadgeStyles(type);
+  const getTypeBadge = (type: string, identifier: string) => {
+    const styles = getBadgeStyles(type, identifier);
     return <Badge className={`${styles.bg} ${styles.text} border`}>{type}</Badge>;
   };
 
@@ -83,7 +83,7 @@ export function NodesTableRow({
       )}
       {columns.find(col => col.id === "type")?.visible && (
         <TableCell>
-          {getTypeBadge(node.type)}
+          {getTypeBadge(node.type, node.identifier)}
         </TableCell>
       )}
       {columns.find(col => col.id === "category")?.visible && (

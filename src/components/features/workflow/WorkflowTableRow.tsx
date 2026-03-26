@@ -62,23 +62,23 @@ export function WorkflowTableRow({
   const getStatusBadge = (status: "active" | "inactive" | "error") => {
     if (status === "active") {
       return (
-        <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
-          <div className="w-2 h-2 bg-green-500 rounded-full mr-1" />
+        <Badge variant="default" className="border-success/40 bg-success/15 text-success">
+          <div className="mr-1 h-2 w-2 rounded-full bg-success" />
           Active
         </Badge>
       );
     }
     if (status === "error") {
       return (
-        <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
-          <div className="w-2 h-2 bg-red-500 rounded-full mr-1" />
+        <Badge variant="destructive" className="border-destructive/40 bg-destructive/10 text-destructive">
+          <div className="mr-1 h-2 w-2 rounded-full bg-destructive" />
           Error
         </Badge>
       );
     }
     return (
-      <Badge variant="outline" className="text-gray-600 border-gray-300 dark:text-gray-400 dark:border-gray-600">
-        <div className="w-2 h-2 bg-gray-400 rounded-full mr-1" />
+      <Badge variant="outline" className="border-border text-muted-foreground">
+        <div className="mr-1 h-2 w-2 rounded-full bg-muted-foreground" />
         Inactive
       </Badge>
     );

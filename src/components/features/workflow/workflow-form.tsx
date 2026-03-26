@@ -114,11 +114,11 @@ export function WorkflowForm({
               message: "Name must be at least 3 characters"
             }
           })}
-          className={errors.name ? "border-red-500" : ""}
+          className={errors.name ? "border-destructive" : ""}
           disabled={isSubmitting}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-sm text-destructive">{errors.name.message}</p>
         )}
       </div>
 
@@ -155,8 +155,8 @@ export function WorkflowForm({
                 <div className={cn(
                   "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
                   type === WorkflowType.PRODUCTION 
-                    ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                    : "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                    ? "bg-chart-1/20 text-chart-1"
+                    : "bg-chart-3/20 text-chart-3"
                 )}>
                   {type === WorkflowType.PRODUCTION ? (
                     <IconRefresh size={20} />
@@ -175,7 +175,7 @@ export function WorkflowForm({
           ))}
         </RadioGroup>
         {errors.workflow_type && (
-          <p className="text-sm text-red-500">{errors.workflow_type.message}</p>
+          <p className="text-sm text-destructive">{errors.workflow_type.message}</p>
         )}
       </div>
 
@@ -191,12 +191,12 @@ export function WorkflowForm({
               message: "Description must be at least 10 characters"
             }
           })}
-          className={errors.description ? "border-red-500" : ""}
+          className={errors.description ? "border-destructive" : ""}
           rows={3}
           disabled={isSubmitting}
         />
         {errors.description && (
-          <p className="text-sm text-red-500">{errors.description.message}</p>
+          <p className="text-sm text-destructive">{errors.description.message}</p>
         )}
       </div>
 
@@ -212,7 +212,7 @@ export function WorkflowForm({
           onValueChange={(value) => setValue("category", value)}
           disabled={isSubmitting}
         >
-          <SelectTrigger className={`w-full ${errors.category ? "border-red-500" : ""}`}>
+          <SelectTrigger className={`w-full ${errors.category ? "border-destructive" : ""}`}>
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
@@ -224,7 +224,7 @@ export function WorkflowForm({
           </SelectContent>
         </Select>
         {errors.category && (
-          <p className="text-sm text-red-500">{errors.category.message}</p>
+          <p className="text-sm text-destructive">{errors.category.message}</p>
         )}
       </div>
 
@@ -244,14 +244,14 @@ export function WorkflowForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? "Processing..." : submitButtonText}
         </button>

@@ -45,7 +45,7 @@ export function DraggableNodeItem({ node, workflowType, className }: DraggableNo
   };
 
   const displayName = node.label || node.name;
-  const badgeStyle = getBadgeStyles(node.type);
+  const badgeStyle = getBadgeStyles(node.type, node.identifier);
 
   const nodeContent = (
     <div
@@ -97,7 +97,7 @@ export function DraggableNodeItem({ node, workflowType, className }: DraggableNo
           {/* Type Badge */}
           <span
             className={cn(
-              'inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border flex-shrink-0',
+              'inline-flex items-center px-2 py-0.5 rounded-md text-[10px] leading-none font-semibold border flex-shrink-0',
               badgeStyle.bg,
               badgeStyle.text,
               !isCompatible && 'opacity-60'

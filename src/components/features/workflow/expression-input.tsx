@@ -156,8 +156,8 @@ export function ExpressionInput({
   const baseInputClasses = cn(
     "w-full bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60",
     "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
-    error && "border-red-500 focus:border-red-500",
-    isOverInput && "border-pink-400 bg-pink-900/10"
+    error && "border-destructive focus:border-destructive",
+    isOverInput && "border-primary/60 bg-primary/10"
   );
 
   return (
@@ -224,14 +224,14 @@ export function ExpressionInput({
       
       {/* Drop overlay */}
       {isOverInput && (
-        <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-400 rounded flex items-center justify-center pointer-events-none z-10">
-          <span className="text-pink-400 text-sm font-medium">Drop field here</span>
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
+          <span className="text-sm font-medium text-primary">Drop field here</span>
         </div>
       )}
       
       {/* Error message */}
       {error && (
-        <p className="text-red-500 text-xs mt-1">{error}</p>
+        <p className="mt-1 text-xs text-destructive">{error}</p>
       )}
     </div>
   );

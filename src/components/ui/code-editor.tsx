@@ -71,7 +71,7 @@ export function CodeEditor({
 
       {/* Error message */}
       {error && (
-        <div className="px-3 py-2 bg-red-900/30 border-t border-red-500/30 text-red-400 text-xs flex-shrink-0">
+        <div className="shrink-0 border-t border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}

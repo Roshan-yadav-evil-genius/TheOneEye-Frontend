@@ -85,9 +85,9 @@ export function NodeFormField({
 
     return (
       <div className="space-y-2">
-        <Label htmlFor={field.name} className="text-sm font-medium text-gray-300">
+        <Label htmlFor={field.name} className="text-sm font-medium text-foreground">
           {field.label}
-          {required && <span className="text-red-400 ml-1">*</span>}
+          {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
         <Select
           value={value || "__clear__"}
@@ -97,18 +97,18 @@ export function NodeFormField({
           <SelectTrigger
             id={field.name}
             className={cn(
-              "w-full bg-gray-800 border-gray-600 text-gray-200",
-              hasError && "border-red-500",
+              "w-full border-input bg-background text-foreground",
+              hasError && "border-destructive",
               isLoading && "opacity-50"
             )}
           >
             <SelectValue placeholder={placeholderText} />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-600">
+          <SelectContent className="border-border bg-popover">
             {/* Clear/placeholder option */}
             <SelectItem
               value="__clear__"
-              className="text-gray-400 focus:bg-gray-700"
+              className="text-muted-foreground focus:bg-accent"
             >
               {placeholderText}
             </SelectItem>
@@ -117,23 +117,23 @@ export function NodeFormField({
               <SelectItem
                 key={optValue}
                 value={optValue}
-                className="text-gray-200 focus:bg-gray-700"
+                className="text-foreground focus:bg-accent"
               >
                 {optLabel}
               </SelectItem>
             ))}
             {nonEmptyChoices.length === 0 && (
-              <div className="px-2 py-1.5 text-sm text-gray-400">
+              <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 {isLoading ? "Loading options..." : "No options available"}
               </div>
             )}
           </SelectContent>
         </Select>
         {field.help_text && (
-          <p className="text-gray-400 text-xs">{field.help_text}</p>
+          <p className="text-xs text-muted-foreground">{field.help_text}</p>
         )}
         {errorMessage && (
-          <p className="text-red-400 text-xs">{errorMessage}</p>
+          <p className="text-xs text-destructive">{errorMessage}</p>
         )}
       </div>
     );
@@ -148,17 +148,17 @@ export function NodeFormField({
           checked={value === "true" || value === "on"}
           onCheckedChange={(checked) => onChange(checked ? "true" : "false")}
           disabled={field.disabled}
-          className={cn(hasError && "border-red-500")}
+          className={cn(hasError && "border-destructive")}
         />
         <Label
           htmlFor={field.name}
-          className="text-sm font-medium text-gray-300 cursor-pointer"
+          className="cursor-pointer text-sm font-medium text-foreground"
         >
           {field.label}
-          {required && <span className="text-red-400 ml-1">*</span>}
+          {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
         {errorMessage && (
-          <p className="text-red-400 text-xs ml-2">{errorMessage}</p>
+          <p className="ml-2 text-xs text-destructive">{errorMessage}</p>
         )}
       </div>
     );
@@ -170,9 +170,9 @@ export function NodeFormField({
     
     return (
       <div className="space-y-2">
-        <Label htmlFor={field.name} className="text-sm font-medium text-gray-300">
+        <Label htmlFor={field.name} className="text-sm font-medium text-foreground">
           {field.label}
-          {required && <span className="text-red-400 ml-1">*</span>}
+          {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
         <DroppableFormInput
           type="textarea"
@@ -182,11 +182,11 @@ export function NodeFormField({
           placeholder={`Enter ${field.label}`}
           rows={rows}
           error={errorMessage}
-          className="bg-gray-800 border-gray-600 text-gray-200"
+          className="border-input bg-background text-foreground"
           jsonMode={isJsonMode(field)}
         />
         {field.help_text && (
-          <p className="text-gray-400 text-xs">{field.help_text}</p>
+          <p className="text-xs text-muted-foreground">{field.help_text}</p>
         )}
       </div>
     );
@@ -195,9 +195,9 @@ export function NodeFormField({
   // Render text input field - supports drag-drop
   return (
     <div className="space-y-2">
-      <Label htmlFor={field.name} className="text-sm font-medium text-gray-300">
+      <Label htmlFor={field.name} className="text-sm font-medium text-foreground">
         {field.label}
-        {required && <span className="text-red-400 ml-1">*</span>}
+        {required && <span className="ml-1 text-destructive">*</span>}
       </Label>
       <DroppableFormInput
         type="text"
@@ -206,10 +206,10 @@ export function NodeFormField({
         onChange={onChange}
         placeholder={`Enter ${field.label}`}
         error={errorMessage}
-        className="bg-gray-800 border-gray-600 text-gray-200"
+        className="border-input bg-background text-foreground"
       />
       {field.help_text && (
-        <p className="text-gray-400 text-xs">{field.help_text}</p>
+        <p className="text-xs text-muted-foreground">{field.help_text}</p>
       )}
     </div>
   );

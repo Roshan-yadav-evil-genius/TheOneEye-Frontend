@@ -15,6 +15,8 @@ interface UseWorkflowExecutionProps {
   workflowId?: string;
 }
 
+const EXECUTION_EDGE_SUCCESS_COLOR = "var(--success)";
+
 export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) => {
   // Workflow execution state
   const [isRunning, setIsRunning] = useState(false);
@@ -207,7 +209,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
         if (data.route && edge.sourceHandle !== data.route) {
           return;
         }
-        highlightEdge(edge.id, '#22c55e', 1500);
+        highlightEdge(edge.id, EXECUTION_EDGE_SUCCESS_COLOR, 1500);
       });
     };
     

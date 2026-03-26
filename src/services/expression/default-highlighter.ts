@@ -10,7 +10,7 @@ import React from 'react';
 
 export class DefaultExpressionHighlighter implements ExpressionHighlighter {
   private readonly style: HighlightStyle = {
-    className: 'bg-green-500/20 text-green-300 px-1 py-0.5 rounded font-mono',
+    className: 'rounded bg-primary/15 px-1 py-0.5 font-mono text-primary',
   };
 
   renderWithHighlights(text: string, expressions: ExpressionMatch[]): React.ReactNode {

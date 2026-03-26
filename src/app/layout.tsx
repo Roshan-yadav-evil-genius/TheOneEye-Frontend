@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import {DM_Sans} from "next/font/google"
+import { DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { SidebarProviderWrapper } from "@/components/layout/sidebar-provider";
 import { AlertProvider } from "@/contexts/alert-context";
@@ -45,11 +45,14 @@ export const metadata: Metadata = {
     maximumScale: 1,
   },
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: "(prefers-color-scheme: light)", color: "oklch(1 0 0)" },
+    { media: "(prefers-color-scheme: dark)", color: "oklch(0.145 0 0)" },
   ],
 };
-const font = DM_Sans({subsets:['latin']});
+const font = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
 
 export default function RootLayout({
   children,
@@ -60,7 +63,7 @@ export default function RootLayout({
     <>
       <html lang="en" suppressHydrationWarning>
         <head />
-        <body className={font.className}>
+        <body className={`${font.className} ${font.variable}`}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

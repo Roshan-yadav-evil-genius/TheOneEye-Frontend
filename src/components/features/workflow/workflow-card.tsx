@@ -41,11 +41,11 @@ export function WorkflowCard({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "border-success/40 bg-success/15 text-success"
       case "inactive":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+        return "border-border bg-muted text-muted-foreground"
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+        return "border-border bg-muted text-muted-foreground"
     }
   }
 

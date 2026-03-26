@@ -10,7 +10,7 @@ const NavBar = () => {
 
   return (
     <>
-      <header className='fixed right-0 left-0 top-0 p-4 z-50 flex items-center justify-between' style={{ backgroundColor: '#1A1D2B', borderBottom: '1px solid #2A2E3B' }}>
+      <header className="fixed right-0 left-0 top-0 z-50 flex items-center justify-between border-b border-border bg-background p-4">
         <Logo />
         <DesktopNav />
         {/* <MobileMenuToggle isOpen={isOpen} onToggle={toggleMenu} /> */}

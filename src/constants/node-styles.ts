@@ -7,43 +7,52 @@ export type NodeType = 'BlockingNode' | 'NonBlockingNode' | 'ProducerNode';
 
 // Node colors for canvas borders/backgrounds
 export const nodeColors = {
-  BlockingNode: "border-blue-400 bg-blue-50 dark:bg-blue-950/20",
-  NonBlockingNode: "border-green-400 bg-green-50 dark:bg-green-950/20",
-  ProducerNode: "border-pink-400 bg-pink-50 dark:bg-pink-950/20",
-  default: "border-gray-400 bg-gray-50 dark:bg-gray-950/20",
+  BlockingNode: "border-node-blocking bg-node-blocking/20",
+  NonBlockingNode: "border-node-non-blocking bg-node-non-blocking/20",
+  ProducerNode: "border-node-producer bg-node-producer/20",
+  default: "border-muted-foreground/50 bg-muted/40",
 } as const;
 
 // Icon colors for node logos/icons
 export const iconColors = {
-  BlockingNode: "text-blue-600 dark:text-blue-400",
-  NonBlockingNode: "text-green-600 dark:text-green-400",
-  ProducerNode: "text-pink-600 dark:text-pink-400",
-  default: "text-gray-600 dark:text-gray-400",
+  BlockingNode: "text-node-blocking",
+  NonBlockingNode: "text-node-non-blocking",
+  ProducerNode: "text-node-producer",
+  default: "text-muted-foreground",
 } as const;
 
 // Badge styles for tables/lists (includes background and text colors with border)
 export const badgeStyles = {
-  BlockingNode: { bg: "bg-blue-500/20 border-blue-500/50", text: "text-blue-400" },
-  NonBlockingNode: { bg: "bg-green-500/20 border-green-500/50", text: "text-green-400" },
-  ProducerNode: { bg: "bg-pink-500/20 border-pink-500/50", text: "text-pink-400" },
-  default: { bg: "bg-zinc-600/30 border-zinc-500/50", text: "text-zinc-400" },
+  BlockingNode: { bg: "bg-node-blocking/30 border-node-blocking/90", text: "text-node-blocking" },
+  NonBlockingNode: { bg: "bg-node-non-blocking/30 border-node-non-blocking/90", text: "text-node-non-blocking" },
+  ProducerNode: { bg: "bg-node-producer/30 border-node-producer/90", text: "text-node-producer" },
+  default: { bg: "bg-muted/60 border-muted-foreground/40", text: "text-muted-foreground" },
 } as const;
 
 // Badge colors for UI badge components (simpler format)
 export const badgeColors = {
-  BlockingNode: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  NonBlockingNode: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  ProducerNode: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
-  default: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+  BlockingNode: "bg-node-blocking/30 text-node-blocking border border-node-blocking/90",
+  NonBlockingNode: "bg-node-non-blocking/30 text-node-non-blocking border border-node-non-blocking/90",
+  ProducerNode: "bg-node-producer/30 text-node-producer border border-node-producer/90",
+  default: "bg-muted/60 text-muted-foreground border border-muted-foreground/40",
 } as const;
 
 type NodeColorKey = keyof typeof nodeColors;
 type BadgeStyleKey = keyof typeof badgeStyles;
 
+function isConditionNode(type: string, identifier?: string): boolean {
+  const normalizedIdentifier = (identifier || "").toLowerCase();
+  const normalizedType = (type || "").toLowerCase();
+  return normalizedIdentifier.includes("condition") || normalizedType.includes("condition");
+}
+
 /**
  * Get node canvas colors (border and background) for a given node type
  */
-export function getNodeColor(type: string): string {
+export function getNodeColor(type: string, identifier?: string): string {
+  if (isConditionNode(type, identifier)) {
+    return "border-node-condition bg-node-condition/20";
+  }
   const key = type as NodeColorKey;
   return nodeColors[key] || nodeColors.default;
 }
@@ -51,7 +60,10 @@ export function getNodeColor(type: string): string {
 /**
  * Get icon color for a given node type
  */
-export function getIconColor(type: string): string {
+export function getIconColor(type: string, identifier?: string): string {
+  if (isConditionNode(type, identifier)) {
+    return "text-node-condition";
+  }
   const key = type as NodeColorKey;
   return iconColors[key] || iconColors.default;
 }
@@ -60,7 +72,13 @@ export function getIconColor(type: string): string {
  * Get badge styles (bg and text classes) for a given node type
  * Used in tables, lists, and drag items
  */
-export function getBadgeStyles(type: string): { bg: string; text: string } {
+export function getBadgeStyles(type: string, identifier?: string): { bg: string; text: string } {
+  if (isConditionNode(type, identifier)) {
+    return {
+      bg: "bg-node-condition/30 border-node-condition/90",
+      text: "text-node-condition",
+    };
+  }
   const key = type as BadgeStyleKey;
   return badgeStyles[key] || badgeStyles.default;
 }
@@ -68,7 +86,10 @@ export function getBadgeStyles(type: string): { bg: string; text: string } {
 /**
  * Get badge color class for UI badge components
  */
-export function getBadgeColor(type: string): string {
+export function getBadgeColor(type: string, identifier?: string): string {
+  if (isConditionNode(type, identifier)) {
+    return "bg-node-condition/30 text-node-condition border border-node-condition/90";
+  }
   const key = type as NodeColorKey;
   return badgeColors[key] || badgeColors.default;
 }
