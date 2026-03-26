@@ -28,9 +28,18 @@ interface CustomNodeProps {
   onDelete?: (nodeId: string) => void;
   workflowContext?: WorkflowNodeContext;
   isExecuting?: boolean;
+  isBlinking?: boolean;
 }
 
-export function CustomNode({ id, data, selected, onDelete, workflowContext, isExecuting = false }: CustomNodeProps) {
+export function CustomNode({
+  id,
+  data,
+  selected,
+  onDelete,
+  workflowContext,
+  isExecuting = false,
+  isBlinking = false,
+}: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLocalNodeExecuting, setIsLocalNodeExecuting] = useState(false);
@@ -152,7 +161,7 @@ export function CustomNode({ id, data, selected, onDelete, workflowContext, isEx
       <div 
         className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
           selected ? "ring-2 ring-primary ring-offset-2" : ""
-        } ${colorClass}`}
+        } ${isBlinking ? "workflow-node-blink" : ""} ${colorClass}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

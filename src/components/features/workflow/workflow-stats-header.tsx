@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,8 @@ interface WorkflowStatsHeaderProps {
     status: string;
     workflow_type?: WorkflowType;
   } | null;
+  onLocateNodeById: (nodeId: string) => void;
+  locateStatus?: "idle" | "found" | "not_found";
 }
 
 const lineTypeOptions = [
@@ -53,7 +56,35 @@ const lineTypeOptions = [
   { value: 'smooth', label: 'Smooth', icon: IconCircle, description: 'Curved lines' },
 ];
 
-export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarCollapsed, onToggleSidebar, lineType, onLineTypeChange, showMinimap, onMinimapToggle, workflow }: WorkflowStatsHeaderProps) {
+export function WorkflowStatsHeader({
+  isRunning,
+  onStart,
+  onStop,
+  isSidebarCollapsed,
+  onToggleSidebar,
+  lineType,
+  onLineTypeChange,
+  showMinimap,
+  onMinimapToggle,
+  workflow,
+  onLocateNodeById,
+  locateStatus = "idle",
+}: WorkflowStatsHeaderProps) {
+  const [nodeIdQuery, setNodeIdQuery] = React.useState("");
+
+  const handleLocateNode = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    const nodeId = nodeIdQuery.trim();
+    if (!nodeId) {
+      return;
+    }
+
+    onLocateNodeById(nodeId);
+  };
+
   // Get status badge based on workflow status
   const getStatusBadge = () => {
     if (isRunning) {
@@ -129,11 +160,22 @@ export function WorkflowStatsHeader({ isRunning, onStart, onStop, isSidebarColla
             />
           </div>
 
-          {workflow?.name && (
-            <span className="text-sm font-semibold text-foreground truncate max-w-[200px]" title={workflow.name}>
-              {workflow.name}
-            </span>
-          )}
+          <div className="flex items-center gap-2 min-w-[280px]">
+            <Input
+              value={nodeIdQuery}
+              onChange={(event) => setNodeIdQuery(event.target.value)}
+              onKeyDown={handleLocateNode}
+              placeholder="Find node by ID and press Enter"
+              className="h-8 text-xs"
+              aria-label="Node ID search"
+            />
+            {locateStatus === "not_found" && (
+              <span className="text-xs text-destructive whitespace-nowrap">Node not found</span>
+            )}
+            {locateStatus === "found" && (
+              <span className="text-xs text-success whitespace-nowrap">Node located</span>
+            )}
+          </div>
 
           <div className="flex items-center gap-4">
             {/* Total Runs */}

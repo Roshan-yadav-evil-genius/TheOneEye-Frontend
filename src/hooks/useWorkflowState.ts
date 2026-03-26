@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
 import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange, EdgeChange } from "reactflow";
-import { useWorkflowCanvasStore, useWorkflowSelectionStore } from "@/stores";
+import { useWorkflowCanvasStore } from "@/stores";
 import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { TWorkflowNodeCreateRequest } from "@/types";
 
@@ -14,6 +14,7 @@ interface WorkflowStateProps {
     nodeGroup: string;
   };
   isRunning: boolean;
+  blinkingNodeId?: string | null;
 }
 
 const EDGE_COLORS = {
@@ -21,7 +22,15 @@ const EDGE_COLORS = {
   success: "var(--success)",
 };
 
-export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning }: WorkflowStateProps) => {
+export const useWorkflowState = ({
+  workflowId,
+  lineType,
+  selectedNodes,
+  searchTerm,
+  filters,
+  isRunning,
+  blinkingNodeId = null,
+}: WorkflowStateProps) => {
   // Get workflow canvas store state and actions
   const {
     nodes: workflowNodes,
@@ -40,12 +49,6 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
     setDragOver,
     highlightEdge,
   } = useWorkflowCanvasStore();
-
-  // Get selection store actions (now separate from canvas store)
-  const {
-    selectNode,
-    clearSelection,
-  } = useWorkflowSelectionStore();
 
   // Convert workflow nodes to ReactFlow format
   const reactFlowNodes = useMemo(() => {
@@ -255,9 +258,10 @@ export const useWorkflowState = ({ workflowId, lineType, selectedNodes, searchTe
         getConnectedNodeOutput: getConnectedNodeOutput,
         highlightNodeOutputEdges: highlightNodeOutputEdges,
         isExecuting: isRunning,
+        isBlinking: node.id === blinkingNodeId,
       },
     }));
-  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isRunning]);
+  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isRunning, blinkingNodeId]);
 
   return {
     nodes: updatedNodes,

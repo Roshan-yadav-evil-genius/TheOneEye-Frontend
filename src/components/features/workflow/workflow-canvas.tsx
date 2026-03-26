@@ -35,9 +35,25 @@ interface WorkflowCanvasProps {
   lineType: string;
   showMinimap: boolean;
   isRunning: boolean;
+  locateRequest?: { nodeId: string; requestId: number } | null;
+  onLocateResult?: (status: "found" | "not_found") => void;
 }
 
-export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters, lineType, showMinimap, isRunning }: WorkflowCanvasProps) {
+export function WorkflowCanvas({
+  workflowId,
+  selectedNodes,
+  searchTerm,
+  filters,
+  lineType,
+  showMinimap,
+  isRunning,
+  locateRequest,
+  onLocateResult,
+}: WorkflowCanvasProps) {
+  const [blinkingNodeId, setBlinkingNodeId] = React.useState<string | null>(null);
+  const clearBlinkTimeoutRef = React.useRef<number | null>(null);
+  const lastProcessedLocateRequestIdRef = React.useRef<number | null>(null);
+
   const {
     nodes,
     edges,
@@ -48,11 +64,18 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     onConnect,
     onNodeDragStop,
     addNodeFromDrag,
-    removeNode,
     isLoading,
     isSaving,
     error,
-  } = useWorkflowState({ workflowId, lineType, selectedNodes, searchTerm, filters, isRunning });
+  } = useWorkflowState({
+    workflowId,
+    lineType,
+    selectedNodes,
+    searchTerm,
+    filters,
+    isRunning,
+    blinkingNodeId,
+  });
 
   // Get workflow type from canvas store for node compatibility
   const workflow = useWorkflowCanvasStore((state) => state.workflow);
@@ -66,6 +89,49 @@ export function WorkflowCanvas({ workflowId, selectedNodes, searchTerm, filters,
     onDragLeave,
     onDrop,
   } = useWorkflowDragDrop({ addNodeFromDrag, setIsDragOver, workflowType });
+
+  React.useEffect(() => {
+    return () => {
+      if (clearBlinkTimeoutRef.current !== null) {
+        window.clearTimeout(clearBlinkTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!locateRequest || !reactFlowInstance) {
+      return;
+    }
+    if (lastProcessedLocateRequestIdRef.current === locateRequest.requestId) {
+      return;
+    }
+    lastProcessedLocateRequestIdRef.current = locateRequest.requestId;
+
+    const nodeId = locateRequest.nodeId.trim();
+    if (!nodeId) {
+      onLocateResult?.("not_found");
+      return;
+    }
+
+    const targetNode = nodes.find((node) => node.id === nodeId);
+    if (!targetNode) {
+      onLocateResult?.("not_found");
+      return;
+    }
+
+    const nodeCenterX = targetNode.position.x + 64;
+    const nodeCenterY = targetNode.position.y + 48;
+    reactFlowInstance.setCenter(nodeCenterX, nodeCenterY, { zoom: 1.2, duration: 350 });
+    setBlinkingNodeId(targetNode.id);
+    onLocateResult?.("found");
+
+    if (clearBlinkTimeoutRef.current !== null) {
+      window.clearTimeout(clearBlinkTimeoutRef.current);
+    }
+    clearBlinkTimeoutRef.current = window.setTimeout(() => {
+      setBlinkingNodeId(null);
+    }, 1000);
+  }, [locateRequest, nodes, onLocateResult, reactFlowInstance, workflowId]);
 
   // Show loading state
   if (isLoading) {

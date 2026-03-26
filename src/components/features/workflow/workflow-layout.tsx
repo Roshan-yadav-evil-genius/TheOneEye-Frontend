@@ -13,6 +13,13 @@ interface WorkflowLayoutProps {
   workflowId?: string;
 }
 
+type LocateStatus = "idle" | "found" | "not_found";
+
+interface LocateRequest {
+  nodeId: string;
+  requestId: number;
+}
+
 const MIN_SIDEBAR_WIDTH = 320;
 const MAX_SIDEBAR_WIDTH = 600;
 
@@ -46,6 +53,9 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   const [isResizing, setIsResizing] = useState(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
+  const locateRequestIdRef = useRef(0);
+  const [locateRequest, setLocateRequest] = useState<LocateRequest | null>(null);
+  const [locateStatus, setLocateStatus] = useState<LocateStatus>("idle");
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -84,6 +94,15 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
       };
     }
   }, [isResizing, handleResizeMove, handleResizeEnd]);
+
+  const handleLocateNodeById = useCallback((nodeId: string) => {
+    locateRequestIdRef.current += 1;
+    setLocateStatus("idle");
+    setLocateRequest({
+      nodeId,
+      requestId: locateRequestIdRef.current,
+    });
+  }, []);
 
   return (
     <div className="flex h-[calc(100vh-var(--header-height))] bg-background">
@@ -134,6 +153,8 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onMinimapToggle={handleMinimapToggle}
             workflowId={workflowId}
             workflow={workflow}
+            onLocateNodeById={handleLocateNodeById}
+            locateStatus={locateStatus}
           />
         </div>
 
@@ -148,6 +169,8 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
               lineType={lineType}
               showMinimap={showMinimap}
               isRunning={isRunning}
+              locateRequest={locateRequest}
+              onLocateResult={setLocateStatus}
             />
           )}
         </div>

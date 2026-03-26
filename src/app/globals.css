@@ -235,4 +235,20 @@
     -webkit-text-fill-color: transparent;
     animation: brand-gradient-shift 3s linear infinite;
   }
+
+  @keyframes workflow-node-blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .workflow-node-blink {
+    animation: workflow-node-blink 1s ease-in-out;
+  }
 }
