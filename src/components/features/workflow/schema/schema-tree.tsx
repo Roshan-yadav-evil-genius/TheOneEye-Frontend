@@ -1,25 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useDndMonitor } from '@dnd-kit/core';
-import { SchemaField as SchemaFieldType, SchemaTreeProps } from './types';
-import { SchemaField } from './schema-field';
-import { parseJsonToSchema, getTotalItems } from './utils';
+import React, { useState } from "react";
+import { SchemaField as SchemaFieldType, SchemaTreeProps } from "./types";
+import { SchemaField } from "./schema-field";
+import { parseJsonToSchema, getTotalItems } from "./utils";
 
-/**
- * Schema tree component that renders a hierarchical view of JSON data
- * Supports optional drag-and-drop functionality via enableDrag prop
- */
-export function SchemaTree({ jsonData, title, wordWrap = false, enableDrag = false }: SchemaTreeProps) {
-  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['[0]', '[1]']));
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Monitor drag events to disable scroll during drag (only when drag is enabled)
-  useDndMonitor({
-    onDragStart: () => enableDrag && setIsDragging(true),
-    onDragEnd: () => enableDrag && setIsDragging(false),
-    onDragCancel: () => enableDrag && setIsDragging(false),
-  });
+export function SchemaTree({ jsonData, title, wordWrap = false }: SchemaTreeProps) {
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(["[0]", "[1]"]));
 
   const toggleExpanded = (path: string) => {
     const newExpanded = new Set(expandedPaths);
@@ -44,7 +31,6 @@ export function SchemaTree({ jsonData, title, wordWrap = false, enableDrag = fal
             isExpanded={isExpanded}
             onToggle={() => toggleExpanded(field.path)}
             wordWrap={wordWrap}
-            enableDrag={enableDrag}
           />
           {hasChildren && isExpanded && (
             <div className="mt-1">
@@ -56,16 +42,11 @@ export function SchemaTree({ jsonData, title, wordWrap = false, enableDrag = fal
     });
   };
 
-  const schemaFields = parseJsonToSchema(jsonData, title, '');
+  const schemaFields = parseJsonToSchema(jsonData, title, "");
   const totalItems = getTotalItems(schemaFields);
 
-  // Apply overflow:hidden during drag to prevent scrolling issues
-  const containerClassName = enableDrag && isDragging 
-    ? 'h-full p-4 sidebar-scrollbar overflow-hidden'
-    : 'h-full p-4 sidebar-scrollbar overflow-auto';
-
   return (
-    <div className={containerClassName}>
+    <div className="h-full p-4 sidebar-scrollbar overflow-auto">
       <div className="mb-3 text-gray-400 text-sm">
         {totalItems} items
       </div>
@@ -79,6 +60,3 @@ export function SchemaTree({ jsonData, title, wordWrap = false, enableDrag = fal
     </div>
   );
 }
-
-
-

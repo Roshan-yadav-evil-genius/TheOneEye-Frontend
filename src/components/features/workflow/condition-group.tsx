@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
-import { DroppableInput } from "./droppable-input";
+import { Input } from "@/components/ui/input";
 import { OperatorBar } from "./operator-bar";
 
 interface Condition {
@@ -112,11 +112,12 @@ export function ConditionGroupComponent({
               <button className="bg-gray-700 text-gray-300 px-2 py-1 text-xs rounded">
                 fx
               </button>
-              <DroppableInput
+              <Input
                 value={conditionWithOp.condition.field}
-                onChange={(value) => updateCondition(conditionWithOp.condition.id, "field", value)}
+                onChange={(e) => updateCondition(conditionWithOp.condition.id, "field", e.target.value)}
                 placeholder="Field expression"
                 id={`condition-field-${conditionWithOp.condition.id}`}
+                className="w-full bg-gray-800 border-pink-500 text-white placeholder-gray-400"
               />
               <Select value={conditionWithOp.condition.operator} onValueChange={(value) => updateCondition(conditionWithOp.condition.id, "operator", value)}>
                 <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
@@ -129,12 +130,12 @@ export function ConditionGroupComponent({
                   <SelectItem value="contains">contains</SelectItem>
                 </SelectContent>
               </Select>
-              <DroppableInput
+              <Input
                 value={conditionWithOp.condition.value}
-                onChange={(value) => updateCondition(conditionWithOp.condition.id, "value", value)}
+                onChange={(e) => updateCondition(conditionWithOp.condition.id, "value", e.target.value)}
                 placeholder="Value"
                 id={`condition-value-${conditionWithOp.condition.id}`}
-                className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                className="w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400"
               />
               <button
                 onClick={() => removeCondition(conditionWithOp.condition.id)}

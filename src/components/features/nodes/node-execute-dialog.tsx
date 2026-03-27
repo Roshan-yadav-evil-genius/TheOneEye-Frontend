@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { DndContext, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +10,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { ResizablePanels } from "@/components/ui/resizable-panel";
 import { JsonViewer } from "@/components/features/workflow/json-viewer";
 import { NodeFormEditor } from "./node-form-editor";
-import { TNodeMetadata, TNodeExecuteResponse } from "@/types";
+import { TNodeMetadata } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -105,20 +104,6 @@ export function NodeExecuteDialog({
       setExecutionFormState(null);
     }
   }, [isOpen, setExecutionFormState]);
-
-  // Drag state for overlay
-  const [activeDragKey, setActiveDragKey] = useState<string | null>(null);
-
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-    if (active.data.current?.type === 'field') {
-      setActiveDragKey(active.data.current.key);
-    }
-  }, []);
-
-  const handleDragEnd = useCallback(() => {
-    setActiveDragKey(null);
-  }, []);
 
   // Helper to extract output data for display
   const getOutputDisplayData = useCallback((): Record<string, unknown> | unknown[] | string | null => {
@@ -221,12 +206,7 @@ export function NodeExecuteDialog({
   };
 
   return (
-    <DndContext
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      collisionDetection={pointerWithin}
-    >
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="!max-w-[95vw] h-[90vh] bg-background border-border !p-0 shadow-2xl">
           <VisuallyHidden>
             <DialogTitle>Execute Node: {node.name}</DialogTitle>
@@ -342,7 +322,6 @@ export function NodeExecuteDialog({
                   jsonData={inputData}
                   activeTab={activeInputTab}
                   onTabChange={setActiveInputTab}
-                  enableDragDrop={true}
                   editable={true}
                   onJsonChange={setInputData}
                 />
@@ -405,7 +384,6 @@ export function NodeExecuteDialog({
                   jsonData={getOutputDisplayData()}
                   activeTab={activeOutputTab}
                   onTabChange={setActiveOutputTab}
-                  enableDragDrop={false}
                   isLoading={isExecuting}
                 />
               </div>
@@ -413,16 +391,6 @@ export function NodeExecuteDialog({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* DragOverlay outside Dialog - not affected by dialog's CSS transforms */}
-      <DragOverlay dropAnimation={null} style={{ width: 'auto', height: 'auto' }}>
-        {activeDragKey ? (
-          <div className="inline-flex w-auto cursor-grabbing whitespace-nowrap rounded border border-primary/60 bg-primary px-3 py-1.5 font-mono text-sm text-primary-foreground shadow-xl">
-            {activeDragKey}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
   );
 }
 

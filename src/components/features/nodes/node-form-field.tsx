@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DroppableFormInput } from "@/components/features/workflow/droppable-form-input";
+import { FormValueInput } from "@/components/features/workflow/form-value-input";
 import { cn } from "@/lib/utils";
 import { TNodeFormField } from "@/types";
 
@@ -174,7 +174,7 @@ export function NodeFormField({
           {field.label}
           {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
-        <DroppableFormInput
+        <FormValueInput
           type="textarea"
           id={`form-field-${field.name}`}
           value={value}
@@ -199,7 +199,7 @@ export function NodeFormField({
         {field.label}
         {required && <span className="ml-1 text-destructive">*</span>}
       </Label>
-      <DroppableFormInput
+      <FormValueInput
         type="text"
         id={`form-field-${field.name}`}
         value={value}

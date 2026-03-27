@@ -23,7 +23,6 @@ export interface SchemaFieldProps {
   isExpanded: boolean;
   onToggle: () => void;
   wordWrap?: boolean;
-  enableDrag?: boolean;
 }
 
 /**
@@ -33,7 +32,6 @@ export interface SchemaTreeProps {
   jsonData: unknown;
   title: string;
   wordWrap?: boolean;
-  enableDrag?: boolean;
 }
 
 

@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { useDroppable, useDndMonitor } from '@dnd-kit/core';
-import { cn } from '@/lib/utils';
-import { convertPathToExpression } from './expression-utils';
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import Editor, { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { setupJinjaJson, registerCompletionProvider, langId, langIdJinjaText, themeName } from "@/lib/monaco/jinja-json";
 
-interface DroppableFormInputProps {
-  type?: 'text' | 'email' | 'password' | 'number' | 'textarea';
+export interface FormValueInputProps {
+  type?: "text" | "email" | "password" | "number" | "textarea";
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -17,15 +15,15 @@ interface DroppableFormInputProps {
   id?: string;
   rows?: number;
   error?: string;
-  jsonMode?: boolean; // Enable JSON editor mode
-  availableVariables?: string[]; // For autocomplete suggestions
-  workflowEnvKeys?: string[]; // Keys from workflow env for workflowenv.<key> autocomplete
+  jsonMode?: boolean;
+  availableVariables?: string[];
+  workflowEnvKeys?: string[];
 }
 
-export function DroppableFormInput({ 
-  type = 'text',
-  value, 
-  onChange, 
+export function FormValueInput({
+  type = "text",
+  value,
+  onChange,
   placeholder,
   className,
   id,
@@ -34,36 +32,25 @@ export function DroppableFormInput({
   jsonMode = false,
   availableVariables = [],
   workflowEnvKeys = [],
-}: DroppableFormInputProps) {
+}: FormValueInputProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
   const completionDisposableRef = useRef<{ dispose: () => void } | null>(null);
-  
-  const { setNodeRef } = useDroppable({
-    id: id || 'droppable-form-input',
-    data: {
-      type: 'form-field',
-      accepts: ['field']
-    }
-  });
 
-  const [isOverInput, setIsOverInput] = useState(false);
   const [editorHeight, setEditorHeight] = useState<number>(rows * 20 + 40);
   const [isResizing, setIsResizing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeRef = useRef(onChange);
 
-  // Update editor height when rows prop changes (all textarea fields use Monaco)
   useEffect(() => {
-    if (type === 'textarea') {
+    if (type === "textarea") {
       const newHeight = rows * 20 + 40;
       setEditorHeight(newHeight);
     }
   }, [rows, type]);
 
-  // Setup Monaco autocomplete for jinja-json (workflow variables + JSON keywords)
   useEffect(() => {
     if (!jsonMode || !editorRef.current) return;
 
@@ -86,18 +73,16 @@ export function DroppableFormInput({
 
         const suggestions: monaco.languages.CompletionItem[] = [];
 
-        // Add variable suggestions
         availableVariables.forEach((variable) => {
           suggestions.push({
             label: variable,
             kind: monaco.languages.CompletionItemKind.Variable,
             insertText: variable,
             range,
-            detail: 'Workflow variable',
+            detail: "Workflow variable",
           });
         });
 
-        // Add workflowenv.<key> suggestions for workflow-level variables
         workflowEnvKeys.forEach((key) => {
           const label = `workflowenv.${key}`;
           suggestions.push({
@@ -105,15 +90,14 @@ export function DroppableFormInput({
             kind: monaco.languages.CompletionItemKind.Variable,
             insertText: `{{ ${label} }}`,
             range,
-            detail: 'Workflow env variable',
+            detail: "Workflow env variable",
           });
         });
 
-        // Add common JSON keywords
         const jsonKeywords = [
-          { label: 'true', kind: monaco.languages.CompletionItemKind.Keyword },
-          { label: 'false', kind: monaco.languages.CompletionItemKind.Keyword },
-          { label: 'null', kind: monaco.languages.CompletionItemKind.Keyword },
+          { label: "true", kind: monaco.languages.CompletionItemKind.Keyword },
+          { label: "false", kind: monaco.languages.CompletionItemKind.Keyword },
+          { label: "null", kind: monaco.languages.CompletionItemKind.Keyword },
         ];
 
         jsonKeywords.forEach(({ label, kind }) => {
@@ -134,7 +118,6 @@ export function DroppableFormInput({
     };
   }, [jsonMode, availableVariables, workflowEnvKeys]);
 
-  // Handle resize functionality for Monaco Editor
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -146,7 +129,7 @@ export function DroppableFormInput({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (resizeRef.current) {
-        const container = resizeRef.current.closest('.relative');
+        const container = resizeRef.current.closest(".relative");
         if (container) {
           const rect = container.getBoundingClientRect();
           const newHeight = e.clientY - rect.top;
@@ -162,16 +145,15 @@ export function DroppableFormInput({
       setIsResizing(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing, rows]);
 
-  // Dispose Jinja completion provider on unmount (avoids duplicate suggestions on reopen)
   useEffect(() => {
     return () => {
       completionDisposableRef.current?.dispose();
@@ -179,18 +161,15 @@ export function DroppableFormInput({
     };
   }, []);
 
-  // Keep latest onChange for debounced callback
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  // Sync from prop when value changes externally (only when code editor is used to avoid update depth)
   useEffect(() => {
-    if (type !== 'textarea') return;
+    if (type !== "textarea") return;
     setLocalValue(value);
   }, [value, type]);
 
-  // Clear debounce timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -199,71 +178,6 @@ export function DroppableFormInput({
       }
     };
   }, []);
-
-  // Monitor drag events to handle drops
-  useDndMonitor({
-    onDragStart: () => {
-      setIsOverInput(false);
-    },
-    onDragOver: (event) => {
-      const { over } = event;
-      if (over && over.id === (id || 'droppable-form-input')) {
-        setIsOverInput(true);
-      } else {
-        setIsOverInput(false);
-      }
-    },
-    onDragEnd: (event) => {
-      const { active, over } = event;
-      setIsOverInput(false);
-      
-      if (over && over.id === (id || 'droppable-form-input')) {
-        const dragData = active.data.current;
-        
-        if (dragData && dragData.type === 'field') {
-          // Convert the field path to expression syntax
-          const expression = convertPathToExpression(dragData.path);
-          
-          if (isTextarea && editorRef.current) {
-            // Insert into Monaco editor
-            const editor = editorRef.current;
-            const selection = editor.getSelection();
-            if (selection) {
-              const op = {
-                range: selection,
-                text: expression,
-              };
-              editor.executeEdits('drop-variable', [op]);
-              editor.focus();
-              const newValue = editor.getModel()?.getValue() ?? '';
-              setLocalValue(newValue);
-              if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-                debounceTimerRef.current = null;
-              }
-              onChangeRef.current(newValue);
-            }
-          } else {
-            // Insert into regular input/textarea
-            const input = inputRef.current;
-            if (input) {
-              const start = input.selectionStart || 0;
-              const end = input.selectionEnd || 0;
-              const newValue = value.slice(0, start) + expression + value.slice(end);
-              onChange(newValue);
-              
-              // Set cursor position after the inserted expression
-              setTimeout(() => {
-                const newCursorPos = start + expression.length;
-                input.setSelectionRange(newCursorPos, newCursorPos);
-                input.focus();
-              }, 0);
-            }
-          }
-        }
-      }
-    }
-  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange(e.target.value);
@@ -298,7 +212,9 @@ export function DroppableFormInput({
 
   const getErrorStyling = (baseClasses: string) => {
     if (error) {
-      return baseClasses.replace("border-input", "border-red-500").replace("focus:border-primary/50", "focus:border-red-500");
+      return baseClasses
+        .replace("border-input", "border-red-500")
+        .replace("focus:border-primary/50", "focus:border-red-500");
     }
     return baseClasses;
   };
@@ -307,24 +223,14 @@ export function DroppableFormInput({
     "w-full bg-background border border-input rounded-lg px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
   );
 
-  // Use Monaco Editor for all textarea fields (jinja-json or jinja-text by jsonMode)
   if (isTextarea) {
     return (
-      <div
-        ref={setNodeRef}
-        className={cn(
-          "relative w-full",
-          isOverInput && "ring-2 ring-primary/40",
-          className
-        )}
-        style={{ minHeight: `${rows * 20 + 40}px` }}
-      >
+      <div className={cn("relative w-full", className)} style={{ minHeight: `${rows * 20 + 40}px` }}>
         <div
           ref={resizeRef}
           className={cn(
             "border rounded-lg overflow-hidden relative",
-            error ? "border-destructive" : "border-input",
-            isOverInput && "border-primary/60 bg-primary/10"
+            error ? "border-destructive" : "border-input"
           )}
           style={{ height: `${editorHeight}px` }}
         >
@@ -338,7 +244,7 @@ export function DroppableFormInput({
             theme={themeName}
             options={{
               readOnly: false,
-              lineNumbers: 'on',
+              lineNumbers: "on",
               minimap: { enabled: false },
               automaticLayout: true,
               scrollBeyondLastLine: false,
@@ -346,7 +252,7 @@ export function DroppableFormInput({
               fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
               lineHeight: 20,
               padding: { top: 10, bottom: 10 },
-              wordWrap: 'on',
+              wordWrap: "on",
               formatOnPaste: true,
               formatOnType: true,
               suggestOnTriggerCharacters: true,
@@ -355,7 +261,6 @@ export function DroppableFormInput({
               insertSpaces: true,
             }}
           />
-          {/* Resize handle */}
           <div
             onMouseDown={handleResizeStart}
             className={cn(
@@ -368,30 +273,16 @@ export function DroppableFormInput({
             <div className="w-12 h-0.5 bg-border group-hover:bg-primary/50 rounded transition-colors" />
           </div>
         </div>
-        
-        {isOverInput && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
-            <span className="text-sm font-medium text-primary">Drop field here</span>
-          </div>
-        )}
-        
-        {error && (
-          <p className="mt-1 text-xs text-destructive">{error}</p>
-        )}
+
+        {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       </div>
     );
   }
 
-  // Regular input for non-textarea fields (textarea uses Monaco above)
   return (
-    <div
-      ref={setNodeRef}
-      className={cn(
-        "relative w-full",
-        isOverInput && "ring-2 ring-primary/40"
-      )}
-    >
+    <div className={cn("relative w-full", className)}>
       <input
+        id={id}
         ref={inputRef as React.RefObject<HTMLInputElement>}
         type={type}
         value={value}
@@ -400,21 +291,11 @@ export function DroppableFormInput({
         className={cn(
           baseInputClasses,
           "h-10",
-          isOverInput && "border-primary/60 bg-primary/10",
-          className,
           error && "border-destructive focus:border-destructive"
         )}
       />
-      
-      {isOverInput && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded border-2 border-dashed border-primary/50 bg-primary/10">
-          <span className="text-sm font-medium text-primary">Drop field here</span>
-        </div>
-      )}
-      
-      {error && (
-        <p className="mt-1 text-xs text-destructive">{error}</p>
-      )}
+
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
 }

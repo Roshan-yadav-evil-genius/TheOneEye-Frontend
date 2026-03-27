@@ -18,7 +18,6 @@ interface JsonViewerProps {
   onCopy?: () => void;
   onDownload?: () => void;
   onRefresh?: () => void;
-  enableDragDrop?: boolean;
   isLoading?: boolean;
   error?: Error | null;
   editable?: boolean;
@@ -33,7 +32,6 @@ export function JsonViewer({
   onTabChange,
   onCopy,
   onDownload,
-  enableDragDrop = true,
   isLoading = false,
   error = null,
   editable = false,
@@ -179,7 +177,6 @@ export function JsonViewer({
             jsonData={jsonData} 
             title={title} 
             wordWrap={wordWrap} 
-            enableDrag={enableDragDrop} 
           />
         </TabsContent>
       </Tabs>
