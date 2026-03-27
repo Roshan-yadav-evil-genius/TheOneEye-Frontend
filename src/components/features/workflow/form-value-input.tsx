@@ -3,18 +3,15 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Editor, { OnMount } from "@monaco-editor/react";
-import type { editor, languages } from "monaco-editor";
+import type { editor } from "monaco-editor";
 import {
   setupJinjaJson,
-  registerCompletionProvider,
   langId,
   langIdJinjaText,
   themeName,
+  getFormTemplateMonacoOptions,
 } from "@/lib/monaco/jinja-json";
-import {
-  provideDataExpressionCompletions,
-  shouldSuppressGenericJinjaCompletions,
-} from "@/lib/monaco/jinja-json/data-expression-completion";
+import { useMonacoFormValueCompletions } from "@/hooks/useMonacoFormValueCompletions";
 
 export interface FormValueInputProps {
   type?: "text" | "email" | "password" | "number" | "textarea";
@@ -49,8 +46,6 @@ export function FormValueInput({
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
-  const completionDisposableRef = useRef<{ dispose: () => void } | null>(null);
-  const dataCompletionDisposablesRef = useRef<{ dispose: () => void }[]>([]);
   const nodeInputDataRef = useRef(nodeInputData);
   nodeInputDataRef.current = nodeInputData;
 
@@ -68,110 +63,16 @@ export function FormValueInput({
     }
   }, [rows, type]);
 
-  useEffect(() => {
-    if (!jsonMode || !editorRef.current) return;
-
-    const editor = editorRef.current;
-    const model = editor.getModel();
-    if (!model) return;
-
-    const monaco = (window as Window & { monaco?: typeof import("monaco-editor") }).monaco;
-    if (!monaco) return;
-
-    const disposable = monaco.languages.registerCompletionItemProvider(langId, {
-      provideCompletionItems: (model: editor.ITextModel, position: editor.Position) => {
-        if (shouldSuppressGenericJinjaCompletions(model, position)) {
-          return { suggestions: [] };
-        }
-
-        const word = model.getWordUntilPosition(position);
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: word.startColumn,
-          endColumn: word.endColumn,
-        };
-
-        const suggestions: monaco.languages.CompletionItem[] = [];
-
-        availableVariables.forEach((variable) => {
-          suggestions.push({
-            label: variable,
-            kind: monaco.languages.CompletionItemKind.Variable,
-            insertText: variable,
-            range,
-            detail: "Workflow variable",
-          });
-        });
-
-        workflowEnvKeys.forEach((key) => {
-          const label = `workflowenv.${key}`;
-          suggestions.push({
-            label,
-            kind: monaco.languages.CompletionItemKind.Variable,
-            insertText: `{{ ${label} }}`,
-            range,
-            detail: "Workflow env variable",
-          });
-        });
-
-        const jsonKeywords = [
-          { label: "true", kind: monaco.languages.CompletionItemKind.Keyword },
-          { label: "false", kind: monaco.languages.CompletionItemKind.Keyword },
-          { label: "null", kind: monaco.languages.CompletionItemKind.Keyword },
-        ];
-
-        jsonKeywords.forEach(({ label, kind }) => {
-          suggestions.push({
-            label,
-            kind,
-            insertText: label,
-            range,
-          });
-        });
-
-        return { suggestions };
-      },
-    });
-
-    return () => {
-      disposable.dispose();
-    };
-  }, [jsonMode, availableVariables, workflowEnvKeys]);
-
-  useEffect(() => {
-    dataCompletionDisposablesRef.current.forEach((d) => d.dispose());
-    dataCompletionDisposablesRef.current = [];
-
-    if (type !== "textarea" || nodeInputData === undefined || !editorRef.current) {
-      return;
-    }
-
-    const monaco = (window as Window & { monaco?: typeof import("monaco-editor") }).monaco;
-    if (!monaco) return;
-
-    const runCompletion = (model: editor.ITextModel, position: editor.Position) => {
-      const data = nodeInputDataRef.current;
-      if (!data) return { suggestions: [] as languages.CompletionItem[] };
-      return provideDataExpressionCompletions(monaco, model, position, data) ?? {
-        suggestions: [] as languages.CompletionItem[],
-      };
-    };
-
-    const providerOpts = {
-      triggerCharacters: [".", "{", "|"],
-      provideCompletionItems: runCompletion,
-    };
-    const dJson = monaco.languages.registerCompletionItemProvider(langId, providerOpts);
-    const dJinja = monaco.languages.registerCompletionItemProvider(langIdJinjaText, providerOpts);
-    dataCompletionDisposablesRef.current = [dJson, dJinja];
-
-    return () => {
-      dJson.dispose();
-      dJinja.dispose();
-      dataCompletionDisposablesRef.current = [];
-    };
-  }, [type, nodeInputData !== undefined, editorMountEpoch]);
+  useMonacoFormValueCompletions({
+    enabled: type === "textarea",
+    editorRef,
+    editorMountEpoch,
+    jsonMode,
+    availableVariables,
+    workflowEnvKeys,
+    hasNodeInputData: nodeInputData !== undefined,
+    getNodeInputData: () => nodeInputDataRef.current,
+  });
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -208,15 +109,6 @@ export function FormValueInput({
       document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing, rows]);
-
-  useEffect(() => {
-    return () => {
-      completionDisposableRef.current?.dispose();
-      completionDisposableRef.current = null;
-      dataCompletionDisposablesRef.current.forEach((d) => d.dispose());
-      dataCompletionDisposablesRef.current = [];
-    };
-  }, []);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -263,7 +155,6 @@ export function FormValueInput({
     editorRef.current = editor;
     (window as Window & { monaco?: typeof import("monaco-editor") }).monaco = monaco;
     if (isTextarea) {
-      completionDisposableRef.current = registerCompletionProvider(monaco, jsonMode ? langId : langIdJinjaText);
       setEditorMountEpoch((n) => n + 1);
     }
   };
@@ -300,26 +191,7 @@ export function FormValueInput({
             beforeMount={handleBeforeMount}
             onMount={handleEditorDidMount}
             theme={themeName}
-            options={{
-              readOnly: false,
-              lineNumbers: "on",
-              minimap: { enabled: false },
-              automaticLayout: true,
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-              lineHeight: 20,
-              padding: { top: 10, bottom: 10 },
-              wordWrap: "on",
-              // Mixed JSON + Jinja: built-in JSON formatting breaks `{{ }}` and spaces inside blocks.
-              formatOnPaste: false,
-              formatOnType: false,
-              autoClosingOvertype: "never",
-              suggestOnTriggerCharacters: true,
-              quickSuggestions: true,
-              tabSize: 2,
-              insertSpaces: true,
-            }}
+            options={getFormTemplateMonacoOptions()}
           />
           <div
             onMouseDown={handleResizeStart}

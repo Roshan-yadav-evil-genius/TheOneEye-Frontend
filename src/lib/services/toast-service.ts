@@ -22,8 +22,18 @@ class ToastService {
     return toast.success(message, {
       description: options?.description,
       duration: options?.duration,
-      action: options?.action,
-      cancel: options?.cancel,
+      action: options?.action
+        ? {
+            label: options.action.label,
+            onClick: () => options.action?.onClick?.(),
+          }
+        : undefined,
+      cancel: options?.cancel
+        ? {
+            label: options.cancel.label,
+            onClick: () => options.cancel?.onClick?.(),
+          }
+        : undefined,
     });
   }
 
@@ -34,8 +44,18 @@ class ToastService {
     return toast.error(message, {
       description: options?.description,
       duration: options?.duration,
-      action: options?.action,
-      cancel: options?.cancel,
+      action: options?.action
+        ? {
+            label: options.action.label,
+            onClick: () => options.action?.onClick?.(),
+          }
+        : undefined,
+      cancel: options?.cancel
+        ? {
+            label: options.cancel.label,
+            onClick: () => options.cancel?.onClick?.(),
+          }
+        : undefined,
     });
   }
 
@@ -46,8 +66,18 @@ class ToastService {
     return toast.warning(message, {
       description: options?.description,
       duration: options?.duration,
-      action: options?.action,
-      cancel: options?.cancel,
+      action: options?.action
+        ? {
+            label: options.action.label,
+            onClick: () => options.action?.onClick?.(),
+          }
+        : undefined,
+      cancel: options?.cancel
+        ? {
+            label: options.cancel.label,
+            onClick: () => options.cancel?.onClick?.(),
+          }
+        : undefined,
     });
   }
 
@@ -58,8 +88,18 @@ class ToastService {
     return toast.info(message, {
       description: options?.description,
       duration: options?.duration,
-      action: options?.action,
-      cancel: options?.cancel,
+      action: options?.action
+        ? {
+            label: options.action.label,
+            onClick: () => options.action?.onClick?.(),
+          }
+        : undefined,
+      cancel: options?.cancel
+        ? {
+            label: options.cancel.label,
+            onClick: () => options.cancel?.onClick?.(),
+          }
+        : undefined,
     });
   }
 
@@ -83,7 +123,7 @@ class ToastService {
       success: string | ((data: T) => string);
       error: string | ((error: unknown) => string);
     }
-  ): Promise<T> {
+  ): ReturnType<typeof toast.promise<T>> {
     return toast.promise(promise, {
       loading: options.loading,
       success: options.success,

@@ -3,11 +3,11 @@
 import { useCallback } from "react";
 import FormBuilder from "../features/form-builder/FormBuilder";
 import { TWidgetConfig, TWidgetType } from "../features/form-builder/inputs";
-import { TFormConfiguration } from "@/types/api/backend";
+import { BackendFormConfiguration } from "@/types/api/backend";
 
 interface FormConfigurationEditorProps {
   value: Record<string, unknown>;
-  onChange: (value: TFormConfiguration) => void;
+  onChange: (value: BackendFormConfiguration) => void;
   disabled?: boolean;
   onValidationError?: (hasErrors: boolean, errorMessage?: string) => void;
 }
@@ -51,7 +51,7 @@ export function FormConfigurationEditor({ value, onChange, disabled, onValidatio
     onValidationError?.(false);
 
     // Convert widgets to form configuration format that matches backend expectations
-    const formConfig: TFormConfiguration = {
+    const formConfig: BackendFormConfiguration = {
       title: "Node Configuration Form",
       description: "Configure the settings for this node",
       elements: widgets.map(widget => ({

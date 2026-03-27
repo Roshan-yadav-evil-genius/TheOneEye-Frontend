@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { TTFormConfiguration, TTFormState } from './types';
+import { TFormConfiguration, TFormState } from './types';
 
 interface FormActions {
   // CRUD operations
@@ -431,11 +431,15 @@ export const useFormStore = create<FormStore>()(
           const errors: string[] = [];
           
           // Basic validation of test data against form elements
-          if (config.json && config.json.elements) {
-            for (const element of config.json.elements) {
-              if (element.isRequired && (!testData[element.name] || testData[element.name] === '')) {
-                errors.push(`Required field '${element.name}' is missing`);
-              }
+          const elements = Array.isArray(config.json?.elements)
+            ? (config.json.elements as Array<Record<string, unknown>>)
+            : [];
+          for (const element of elements) {
+            const name = typeof element.name === "string" ? element.name : "";
+            const isRequired = Boolean(element.isRequired);
+            if (!name) continue;
+            if (isRequired && (!testData[name] || testData[name] === "")) {
+              errors.push(`Required field '${name}' is missing`);
             }
           }
 

@@ -1,16 +1,16 @@
 /**
  * Default Expression Highlighter
- * 
+ *
  * Single Responsibility: Provides default highlighting for expressions.
  */
 
-import { ExpressionHighlighter, HighlightStyle } from './expression-highlighter';
-import { ExpressionMatch } from './expression-parser';
-import React from 'react';
+import { ExpressionHighlighter, HighlightStyle } from "./expression-highlighter";
+import { ExpressionMatch } from "./expression-parser";
+import React from "react";
 
 export class DefaultExpressionHighlighter implements ExpressionHighlighter {
   private readonly style: HighlightStyle = {
-    className: 'rounded bg-primary/15 px-1 py-0.5 font-mono text-primary',
+    className: "rounded bg-primary/15 px-1 py-0.5 font-mono text-primary",
   };
 
   renderWithHighlights(text: string, expressions: ExpressionMatch[]): React.ReactNode {
@@ -24,12 +24,10 @@ export class DefaultExpressionHighlighter implements ExpressionHighlighter {
     let lastIndex = 0;
 
     expressions.forEach((expr, idx) => {
-      // Add text before expression
       if (expr.start > lastIndex) {
         parts.push(<span key={`text-${idx}`}>{text.slice(lastIndex, expr.start)}</span>);
       }
 
-      // Add highlighted expression
       parts.push(
         <span key={`expr-${idx}`} className={this.style.className}>
           {expr.expression}
@@ -39,7 +37,6 @@ export class DefaultExpressionHighlighter implements ExpressionHighlighter {
       lastIndex = expr.end;
     });
 
-    // Add remaining text
     if (lastIndex < text.length) {
       parts.push(<span key="text-end">{text.slice(lastIndex)}</span>);
     }
@@ -52,6 +49,4 @@ export class DefaultExpressionHighlighter implements ExpressionHighlighter {
   }
 }
 
-// Export singleton instance
 export const defaultHighlighter = new DefaultExpressionHighlighter();
-

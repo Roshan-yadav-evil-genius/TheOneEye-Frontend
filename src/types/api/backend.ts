@@ -22,7 +22,7 @@ export interface BackendNodeType {
   supported_workflow_types?: string[];  // List of workflow types this node supports
 }
 
-export interface TFormConfiguration {
+export interface BackendFormConfiguration {
   title: string;
   description?: string;
   elements: Record<string, unknown>[];

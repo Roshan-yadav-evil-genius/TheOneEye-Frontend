@@ -3,7 +3,7 @@
  * using node INPUT JSON.
  */
 
-import type { editor } from "monaco-editor";
+import type { editor, IPosition, languages } from "monaco-editor";
 import type { Monaco } from "@monaco-editor/react";
 import { jinja2Parser } from "@/services/expression/jinja2-parser";
 
@@ -50,30 +50,8 @@ type ParseResult =
   | { kind: "keyword"; keywordText: string; replaceStartOffset: number; replaceEndOffset: number }
   | { kind: "keys"; segments: string[]; partial: string; replaceStartOffset: number; replaceEndOffset: number };
 
-/**
- * When true, hide generic Jinja snippets/filters so only INPUT key completions show for `data.*` paths.
- */
-export function shouldSuppressGenericJinjaCompletions(
-  model: editor.ITextModel,
-  position: editor.Position
-): boolean {
-  const offset = model.getOffsetAt(position);
-  const fullText = model.getValue();
-  const ctx = jinja2Parser.getDataPathExpressionStartAtPosition(fullText, offset);
-  if (!ctx) return false;
-
-  const raw = fullText.slice(ctx.innerStartOffset, offset);
-  const pathPart = raw.split("|")[0];
-  const leadMatch = pathPart.match(/^\s*/);
-  const lead = leadMatch ? leadMatch[0].length : 0;
-  const t = pathPart.slice(lead).trimEnd();
-
-  if (t.length === 0) return true;
-  if (t.length < 4 && "data".startsWith(t)) return true;
-  if (t === "data") return true;
-  if (t.startsWith("data.")) return true;
-  return false;
-}
+/** Re-export for callers that still import from this module. */
+export { shouldSuppressGenericJinjaCompletions } from "./data-path-context";
 
 function parseDataPathAfterInner(
   fullText: string,
@@ -170,9 +148,9 @@ function resolveObjectAtSegments(
 export function provideDataExpressionCompletions(
   monaco: Monaco,
   model: editor.ITextModel,
-  position: editor.Position,
+  position: IPosition,
   inputData: Record<string, unknown>
-): { suggestions: monaco.languages.CompletionItem[] } | undefined {
+): { suggestions: languages.CompletionItem[] } | undefined {
   const offset = model.getOffsetAt(position);
   const fullText = model.getValue();
   const ctx = jinja2Parser.getDataPathExpressionStartAtPosition(fullText, offset);
@@ -197,7 +175,7 @@ export function provideDataExpressionCompletions(
     range.endColumn = endPos.column;
   };
 
-  const suggestions: monaco.languages.CompletionItem[] = [];
+  const suggestions: languages.CompletionItem[] = [];
 
   if (parsed.kind === "keyword") {
     setRange(parsed.replaceStartOffset, parsed.replaceEndOffset);

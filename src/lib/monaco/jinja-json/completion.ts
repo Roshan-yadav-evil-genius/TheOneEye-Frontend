@@ -1,6 +1,6 @@
 import { type Monaco } from "@monaco-editor/react";
-import type { editor } from "monaco-editor";
-import { shouldSuppressGenericJinjaCompletions } from "./data-expression-completion";
+import type { editor, IPosition, languages } from "monaco-editor";
+import { shouldSuppressGenericJinjaCompletions } from "./data-path-context";
 import { langId } from "./language";
 
 export const registerCompletionProvider = (monaco: Monaco, languageId?: string) => {
@@ -8,7 +8,7 @@ export const registerCompletionProvider = (monaco: Monaco, languageId?: string) 
   return monaco.languages.registerCompletionItemProvider(lang, {
     provideCompletionItems: (
       model: editor.ITextModel,
-      position: editor.Position
+      position: IPosition
     ) => {
       if (shouldSuppressGenericJinjaCompletions(model, position)) {
         return { suggestions: [] };
@@ -22,7 +22,7 @@ export const registerCompletionProvider = (monaco: Monaco, languageId?: string) 
         endColumn: word.endColumn,
       };
 
-      const suggestions: monaco.languages.CompletionItem[] = [
+      const suggestions: languages.CompletionItem[] = [
         {
           label: "if",
           kind: monaco.languages.CompletionItemKind.Snippet,
