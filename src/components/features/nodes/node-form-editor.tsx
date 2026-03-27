@@ -23,6 +23,8 @@ interface NodeFormEditorProps {
   isSaving?: boolean;
   /** Form state from execution errors (with validation errors) */
   executionFormState?: TNodeFormData | null;
+  /** Node INPUT JSON for `data.*` template completions in the form */
+  inputData?: Record<string, unknown>;
 }
 
 export function NodeFormEditor({
@@ -35,6 +37,7 @@ export function NodeFormEditor({
   onSave,
   isSaving = false,
   executionFormState,
+  inputData,
 }: NodeFormEditorProps) {
   // Track which fields are currently loading
   const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
@@ -326,6 +329,7 @@ export function NodeFormEditor({
             value={formValues[field.name] || ""}
             onChange={(value) => handleFieldChange(field.name, value)}
             isLoading={loadingFields.has(field.name) || isUpdating}
+            inputData={inputData}
           />
         ))}
       </div>

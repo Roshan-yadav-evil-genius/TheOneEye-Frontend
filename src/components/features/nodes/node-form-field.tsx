@@ -18,6 +18,7 @@ interface NodeFormFieldProps {
   value: string;
   onChange: (value: string) => void;
   isLoading?: boolean;
+  inputData?: Record<string, unknown>;
 }
 
 /**
@@ -71,6 +72,7 @@ export function NodeFormField({
   value,
   onChange,
   isLoading = false,
+  inputData,
 }: NodeFormFieldProps) {
   const hasError = field.field_level_errors && field.field_level_errors.length > 0;
   const errorMessage = hasError ? field.field_level_errors[0] : undefined;
@@ -184,6 +186,7 @@ export function NodeFormField({
           error={errorMessage}
           className="border-input bg-background text-foreground"
           jsonMode={isJsonMode(field)}
+          nodeInputData={inputData}
         />
         {field.help_text && (
           <p className="text-xs text-muted-foreground">{field.help_text}</p>
@@ -207,6 +210,7 @@ export function NodeFormField({
         placeholder={`Enter ${field.label}`}
         error={errorMessage}
         className="border-input bg-background text-foreground"
+        nodeInputData={inputData}
       />
       {field.help_text && (
         <p className="text-xs text-muted-foreground">{field.help_text}</p>

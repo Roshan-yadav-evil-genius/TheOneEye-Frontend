@@ -58,7 +58,6 @@ export const registerLanguage = (monaco: Monaco) => {
     autoClosingPairs: [
       { open: "{", close: "}" },
       { open: "{%", close: "%}" },
-      { open: "{{", close: "}}" },
       { open: "(", close: ")" },
       { open: "[", close: "]" },
       { open: '"', close: '"' },

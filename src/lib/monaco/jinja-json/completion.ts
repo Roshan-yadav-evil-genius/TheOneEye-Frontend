@@ -1,5 +1,6 @@
 import { type Monaco } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
+import { shouldSuppressGenericJinjaCompletions } from "./data-expression-completion";
 import { langId } from "./language";
 
 export const registerCompletionProvider = (monaco: Monaco, languageId?: string) => {
@@ -9,6 +10,10 @@ export const registerCompletionProvider = (monaco: Monaco, languageId?: string) 
       model: editor.ITextModel,
       position: editor.Position
     ) => {
+      if (shouldSuppressGenericJinjaCompletions(model, position)) {
+        return { suggestions: [] };
+      }
+
       const word = model.getWordUntilPosition(position);
       const range = {
         startLineNumber: position.lineNumber,

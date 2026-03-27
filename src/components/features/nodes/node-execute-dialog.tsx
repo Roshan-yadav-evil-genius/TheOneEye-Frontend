@@ -366,6 +366,7 @@ export function NodeExecuteDialog({
                     onSave={isWorkflowMode ? () => handleSave(persistedFormValues) : undefined}
                     isSaving={isSaving}
                     executionFormState={executionFormState}
+                    inputData={inputData}
                   />
                 </div>
               </div>
