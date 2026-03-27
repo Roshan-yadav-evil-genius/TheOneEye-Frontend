@@ -44,7 +44,7 @@ class ErrorNotificationService {
    * @param context - Optional context about where the error occurred
    */
   notifyApiError(error: AppError | unknown, context?: string): void {
-    let title = 'API Error';
+    const title = 'API Error';
     let message = 'An error occurred while communicating with the server';
 
     if (error instanceof AppError) {
@@ -163,7 +163,7 @@ class ErrorNotificationService {
     }
 
     // Build error message
-    let title = 'Form Validation Error';
+    const title = 'Form Validation Error';
     let message = errorMessage || 'Please check the form for errors';
 
     if (fieldErrors.length > 0) {

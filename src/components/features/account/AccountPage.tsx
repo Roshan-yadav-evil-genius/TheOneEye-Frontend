@@ -29,7 +29,7 @@ function getDisplayName(user: TUser | null): string {
   const first = user.first_name ?? "";
   const last = user.last_name ?? "";
   const full = `${first} ${last}`.trim();
-  return full || user.name || user.username ?? "";
+  return full || user.name || user.username || "";
 }
 
 function getInitials(user: TUser | null): string {

@@ -50,7 +50,7 @@ export function useNodeSession(
 ) {
   const sessionId = useMemo(
     () => generateSessionId(nodeIdentifier, workflowContext),
-    [nodeIdentifier, workflowContext?.workflowId, workflowContext?.nodeInstanceId]
+    [nodeIdentifier, workflowContext]
   );
 
   return {

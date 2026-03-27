@@ -23,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Use store user data if available, fallback to default
   const userData = user && isAuthenticated ? {
-    name: `${user.first_name} ${user.last_name}`.trim() || user.username,
+    name: `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() || user.username || user.email,
     email: user.email,
     avatar: "" // No avatar image, will show initials fallback
   } : defaultUserInfo;

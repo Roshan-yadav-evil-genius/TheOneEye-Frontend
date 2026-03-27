@@ -21,7 +21,7 @@ export const paginationSchema = z.object({
  */
 export const searchSchema = z.object({
   query: z.string().min(1).max(100).optional(),
-  filters: z.record(z.any()).optional(),
+  filters: z.record(z.string(), z.any()).optional(),
 });
 
 /**

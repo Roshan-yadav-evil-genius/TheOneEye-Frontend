@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { NodeProps, NodeTypes } from "reactflow";
 import { CustomNode } from "./custom-node";
+import type { BackendWorkflowNode } from "@/types";
 
 // Wrapper component to pass delete callback, workflow context, and execution state to CustomNode
 interface CustomNodeData {
@@ -37,7 +38,7 @@ const CustomNodeWrapper = memo((props: NodeProps) => {
     <CustomNode 
       {...nodeProps} 
       id={id}
-      data={nodeData} 
+      data={nodeData as unknown as BackendWorkflowNode} 
       onDelete={onDeleteNode} 
       workflowContext={workflowContext}
       isExecuting={isExecuting}

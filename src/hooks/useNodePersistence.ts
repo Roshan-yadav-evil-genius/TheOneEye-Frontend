@@ -63,7 +63,7 @@ export function useNodePersistence(
   const workflowContextRef = useRef(workflowContext);
   useEffect(() => {
     workflowContextRef.current = workflowContext;
-  }, [workflowContext?.workflowId, workflowContext?.nodeInstanceId]);
+  }, [workflowContext]);
 
   useEffect(() => {
     if (isOpen) {

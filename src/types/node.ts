@@ -7,6 +7,7 @@
  * Node metadata returned from the API (flat list)
  */
 export interface TNodeMetadata {
+  [key: string]: unknown;
   name: string;
   identifier: string;
   type: string;

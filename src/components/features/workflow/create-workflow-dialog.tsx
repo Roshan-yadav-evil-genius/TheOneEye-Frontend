@@ -31,10 +31,10 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
         nodes: [],
         connections: [],
         status: 'inactive' as const,
-        runsCount: 0,
+        runs_count: 0,
         tags: formData.tags ?? [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       await createWorkflow(workflowData);

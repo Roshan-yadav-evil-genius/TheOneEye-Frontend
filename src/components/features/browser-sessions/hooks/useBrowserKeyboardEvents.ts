@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface UseBrowserKeyboardEventsProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -18,7 +18,7 @@ export function useBrowserKeyboardEvents({
   /**
    * Send keyboard event to backend via WebSocket.
    */
-  const sendKeyboardEvent = (type: string, event: KeyboardEvent) => {
+  const sendKeyboardEvent = useCallback((type: string, event: KeyboardEvent) => {
     if (!isStreaming) return;
 
     // Only send if canvas is focused
@@ -41,8 +41,8 @@ export function useBrowserKeyboardEvents({
       message.repeat = event.repeat || false;
     }
 
-    sendMessage(message);
-  };
+    sendMessage(message as { type: string; [key: string]: unknown });
+  }, [isStreaming, canvasRef, sendMessage]);
 
   // Setup keyboard event listeners
   useEffect(() => {

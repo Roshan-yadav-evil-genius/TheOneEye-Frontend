@@ -7,7 +7,7 @@ import Link from "next/link";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { WorkflowLayout } from "@/components/features/workflow/workflow-layout";
 import { workflowApi } from "@/lib/api/services/workflow-api";
-import { TWorkflow } from "@/types";
+import { type BackendWorkflow } from "@/lib/api/transformers/workflow-transformer";
 import { WorkflowsStoreInitializer } from "@/components/common/workflows-store-initializer";
 
 interface WorkflowDetailPageProps {
@@ -19,7 +19,7 @@ interface WorkflowDetailPageProps {
 export default function Page({ params }: WorkflowDetailPageProps) {
   const resolvedParams = React.use(params);
   const workflowId = resolvedParams.id;
-  const [workflow, setWorkflow] = useState<TWorkflow | null>(null);
+  const [workflow, setWorkflow] = useState<BackendWorkflow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

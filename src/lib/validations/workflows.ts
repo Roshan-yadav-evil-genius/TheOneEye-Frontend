@@ -15,24 +15,24 @@ export const workflowSchema = z.object({
     .optional(),
   workflow_type: z
     .enum(Object.values(WorkflowType) as [string, ...string[]], {
-      errorMap: () => ({ message: 'Please select a valid workflow type' }),
+      message: 'Please select a valid workflow type',
     })
     .optional()
     .default(WorkflowType.PRODUCTION),
   status: z
     .enum(Object.values(WORKFLOW_STATUS) as [string, ...string[]], {
-      errorMap: () => ({ message: 'Please select a valid workflow status' }),
+      message: 'Please select a valid workflow status',
     })
     .optional()
     .default(WORKFLOW_STATUS.DRAFT),
   isActive: z.boolean().optional().default(true),
-  triggerConfig: z.record(z.any()).optional(),
+  triggerConfig: z.record(z.string(), z.any()).optional(),
   steps: z
     .array(z.object({
       id: z.string(),
       type: z.string(),
       name: z.string(),
-      configuration: z.record(z.any()).optional(),
+      configuration: z.record(z.string(), z.any()).optional(),
       position: z.object({
         x: z.number(),
         y: z.number(),
@@ -49,13 +49,13 @@ export const workflowSchema = z.object({
       targetHandle: z.string().optional(),
     }))
     .optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 // Workflow execution schema
 export const workflowExecutionSchema = z.object({
   workflowId: z.string().uuid('Invalid workflow ID format'),
-  inputData: z.record(z.any()).optional(),
+  inputData: z.record(z.string(), z.any()).optional(),
   options: z.object({
     timeout: z.number().min(1000).max(300000).optional(), // 1 second to 5 minutes
     retryAttempts: z.number().min(0).max(5).optional(),

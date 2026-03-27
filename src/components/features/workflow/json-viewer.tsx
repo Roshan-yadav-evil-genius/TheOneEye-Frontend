@@ -53,7 +53,7 @@ export function JsonViewer({
       setEditableJsonText(newText);
       setJsonError(null);
     }
-  }, [jsonData, editable]);
+  }, [jsonData, editable, editableJsonText]);
 
   const handleEditableJsonChange = (value: string) => {
     setEditableJsonText(value);

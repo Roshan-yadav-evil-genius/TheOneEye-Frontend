@@ -10,7 +10,7 @@ export enum LogLevel {
   ERROR = 3,
 }
 
-interface LogEntry {
+export interface LogEntry {
   level: LogLevel;
   message: string;
   data?: unknown;

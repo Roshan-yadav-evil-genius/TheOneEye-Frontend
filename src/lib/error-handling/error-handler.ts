@@ -134,7 +134,7 @@ export class ErrorHandler {
     // Keep only last 100 error reports to prevent memory leaks
     if (this.errorReports.size > 100) {
       const firstKey = this.errorReports.keys().next().value;
-      this.errorReports.delete(firstKey);
+      if (firstKey) this.errorReports.delete(firstKey);
     }
   }
 

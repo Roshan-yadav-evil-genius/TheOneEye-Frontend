@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { workflowApi } from "@/lib/api/services/workflow-api";
 import { 
   workflowWsManager, 
@@ -44,7 +44,14 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
   }, []);
 
   // Polling functions
-  const startPolling = () => {
+  const stopPolling = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  }, []);
+
+  const startPolling = useCallback(() => {
     if (pollingIntervalRef.current) {
       clearInterval(pollingIntervalRef.current);
     }
@@ -77,14 +84,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
         // Don't break UI if polling fails
       }
     }, 2000);
-  };
-
-  const stopPolling = () => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-  };
+  }, [workflowId, taskId, stopPolling]);
 
   // Execution control functions
   const startExecution = async () => {
@@ -312,7 +312,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
     };
     
     fetchWorkflowState();
-  }, [workflowId]);
+  }, [workflowId, startPolling]);
 
   // Cleanup polling and WebSocket on unmount
   useEffect(() => {
@@ -320,7 +320,7 @@ export const useWorkflowExecution = ({ workflowId }: UseWorkflowExecutionProps) 
       stopPolling();
       workflowWsManager.disconnect();
     };
-  }, []);
+  }, [stopPolling]);
 
   return {
     // State

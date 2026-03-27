@@ -32,8 +32,11 @@ export interface TWorkflowCanvasData {
     name: string;
     description: string;
     status: string;
+    workflow_type?: string;
+    runs_count: number;
+    last_run?: string | null;
   };
 }
 
 // Workflow Node Creation Response
-export interface TWorkflowNodeCreateResponse extends BackendWorkflowNode {}
+export type TWorkflowNodeCreateResponse = BackendWorkflowNode;

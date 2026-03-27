@@ -9,7 +9,6 @@
 // ============================================================================
 export {
   useWorkflowListStore,
-  workflowListSelectors,
   useWorkflowCanvasStore,
   workflowCanvasSelectors,
   useWorkflowSelectionStore,

@@ -74,17 +74,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     ([, config]) => config.theme || config.color
   )
 
-  if (!colorConfig.length) {
-    return null
-  }
-
-  // Generate CSS custom properties safely using React refs
   const styleRef = React.useRef<HTMLStyleElement>(null)
-  
-  React.useEffect(() => {
-    if (!styleRef.current) return
-    
-    const styles = Object.entries(THEMES)
+  const styles = React.useMemo(() => {
+    return Object.entries(THEMES)
       .map(([theme, prefix]) => {
         const colorVars = colorConfig
           .map(([key, itemConfig]) => {
@@ -95,13 +87,21 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
           })
           .filter(Boolean)
           .join("\n")
-        
+
         return `${prefix} [data-chart="${id}"] {\n${colorVars}\n}`
       })
       .join("\n")
-    
-    styleRef.current.textContent = styles
   }, [id, colorConfig])
+  
+  React.useEffect(() => {
+    if (!colorConfig.length) return
+    if (!styleRef.current) return
+    styleRef.current.textContent = styles
+  }, [colorConfig.length, styles])
+
+  if (!colorConfig.length) {
+    return null
+  }
 
   return <style ref={styleRef} />
 }

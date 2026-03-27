@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import { Suspense } from "react";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -39,11 +40,12 @@ export const metadata: Metadata = {
     description: 'Fully managed Automation-as-a-Service that handles repetitive tasks, letting your team focus on growth.',
     creator: '@theoneeye',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "oklch(1 0 0)" },
     { media: "(prefers-color-scheme: dark)", color: "oklch(0.145 0 0)" },
@@ -71,17 +73,19 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AlertProvider>
-              <AuthMiddleware>
-                <SidebarProviderWrapper>
-                  {children}
-                  <Toaster 
-                    position="top-right"
-                    expand={true}
-                    richColors={true}
-                    closeButton={true}
-                  />
-                </SidebarProviderWrapper>
-              </AuthMiddleware>
+              <Suspense fallback={<SidebarProviderWrapper>{children}</SidebarProviderWrapper>}>
+                <AuthMiddleware>
+                  <SidebarProviderWrapper>
+                    {children}
+                    <Toaster 
+                      position="top-right"
+                      expand={true}
+                      richColors={true}
+                      closeButton={true}
+                    />
+                  </SidebarProviderWrapper>
+                </AuthMiddleware>
+              </Suspense>
             </AlertProvider>
           </ThemeProvider>
         </body>

@@ -58,7 +58,7 @@ export const formConfigurationSchema = z.object({
 // Form submission validation schema
 export const formSubmissionSchema = z.object({
   formId: z.string().uuid('Invalid form ID format'),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
   metadata: z.object({
     userAgent: z.string().optional(),
     ipAddress: z.string().optional(),
@@ -71,7 +71,7 @@ export const formSubmissionSchema = z.object({
 export const formResponseSchema = z.object({
   id: z.string().uuid(),
   formId: z.string().uuid(),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
   submittedAt: z.date(),
   submittedBy: z.string().optional(),
   status: z.enum(['pending', 'approved', 'rejected']).optional().default('pending'),

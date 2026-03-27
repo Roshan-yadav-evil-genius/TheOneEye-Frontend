@@ -53,14 +53,13 @@ export function NodeFolder({
   const paddingLeft = level * 16;
 
   return (
-    <Collapsible
-      open={isExpanded}
-      onOpenChange={setIsExpanded}
-      className={cn(
-        "rounded-lg border bg-card",
-        level > 0 && "border-l-2 border-l-primary/20"
-      )}
-    >
+    <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+      <div
+        className={cn(
+          "rounded-lg border bg-card",
+          level > 0 && "border-l-2 border-l-primary/20"
+        )}
+      >
       <CollapsibleTrigger
         className={cn(
           "flex w-full items-center justify-between p-3 hover:bg-muted/50 transition-colors",
@@ -135,6 +134,7 @@ export function NodeFolder({
           )}
         </div>
       </CollapsibleContent>
+      </div>
     </Collapsible>
   );
 }

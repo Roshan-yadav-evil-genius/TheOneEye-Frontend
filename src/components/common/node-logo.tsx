@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { IconCube } from "@tabler/icons-react";
 import { getNodeColors } from "@/constants/node-styles";
 import { getSizeConfig, type SizeVariant } from "@/lib/size-config";
@@ -34,7 +35,7 @@ export function NodeLogo({ node, size = "md", className = "" }: NodeLogoProps) {
   return (
     <div className={`${container} flex items-center justify-center ${className}`}>
       {hasValidIcon ? (
-        <img
+        <Image
           src={`${NODE_ICONS_BASE}/${node.icon}`}
           alt={node.name || "Node icon"}
           width={dimensions}

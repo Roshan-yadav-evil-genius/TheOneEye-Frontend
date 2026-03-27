@@ -227,6 +227,7 @@ export function useBrowserCanvas(): UseBrowserCanvasReturn {
       // Create image and draw to canvas
       const img = new Image();
       img.onload = () => {
+        if (!ctx) return;
         // Draw at actual viewport dimensions
         ctx.drawImage(img, 0, 0, width, height);
         URL.revokeObjectURL(imageUrl);

@@ -155,17 +155,17 @@ export function WorkflowTableRow({
       )}
       {columns.find(col => col.id === "lastRun")?.visible && (
         <TableCell className="text-sm text-muted-foreground">
-          {formatRelativeDate(workflow.lastRun)}
+          {formatRelativeDate(workflow.last_run)}
         </TableCell>
       )}
       {columns.find(col => col.id === "nextRun")?.visible && (
         <TableCell className="text-sm text-muted-foreground">
-          {workflow.nextRun || "Not scheduled"}
+          {workflow.next_run || "Not scheduled"}
         </TableCell>
       )}
       {columns.find(col => col.id === "runsCount")?.visible && (
         <TableCell className="text-sm">
-          {workflow.runsCount.toLocaleString()}
+          {workflow.runs_count.toLocaleString()}
         </TableCell>
       )}
       <TableCell>

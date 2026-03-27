@@ -19,11 +19,7 @@ import { ConnectGoogleDialog } from "./ConnectGoogleDialog";
 import { GoogleAccountCard } from "./GoogleAccountCard";
 import { useGoogleOAuthStore, uiHelpers } from "@/stores";
 
-interface AuthPageProps {
-  // Add props here when needed
-}
-
-export function AuthPage({}: AuthPageProps) {
+export function AuthPage() {
   const [isOAuth2DialogOpen, setIsOAuth2DialogOpen] = useState(false);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
 

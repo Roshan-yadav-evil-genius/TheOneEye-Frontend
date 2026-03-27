@@ -24,10 +24,10 @@ export const useUI = () => {
 
 export const useNotifications = () => {
   const notifications = useUIStore((state) => state.notifications);
-  const addNotification = useUIStore((state) => state.addNotification);
-  const removeNotification = useUIStore((state) => state.removeNotification);
-  const markNotificationAsRead = useUIStore((state) => state.markNotificationAsRead);
-  const clearNotifications = useUIStore((state) => state.clearNotifications);
+  const addNotification = useUIStore((state) => state.addTNotification);
+  const removeNotification = useUIStore((state) => state.removeTNotification);
+  const markNotificationAsRead = useUIStore((state) => state.markTNotificationAsRead);
+  const clearNotifications = useUIStore((state) => state.clearTNotifications);
   
   const unreadCount = useMemo(
     () => notifications.filter(n => !n.read).length,
@@ -86,7 +86,7 @@ export const useUser = () => {
   
   const login = useUserStore((state) => state.login);
   const logout = useUserStore((state) => state.logout);
-  const updateProfile = useUserStore((state) => state.updateProfile);
+  const updateProfile = useUserStore((state) => state.updateTUser);
   
   return {
     user,

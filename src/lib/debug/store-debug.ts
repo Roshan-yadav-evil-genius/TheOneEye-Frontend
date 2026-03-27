@@ -21,6 +21,9 @@ export const storeDebug = {
   // Get state differences
   getStateDiff: (prevState: unknown, nextState: unknown) => {
     const diff: Record<string, unknown> = {};
+    if (!isObjectRecord(prevState) || !isObjectRecord(nextState)) {
+      return diff;
+    }
     
     for (const key in nextState) {
       if (prevState[key] !== nextState[key]) {
@@ -61,8 +64,10 @@ export const storeDebug = {
   inspectStore: (storeName: string, store: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
       console.group(`🔍 ${storeName} Store Inspector`);
-      console.log('Current State:', store.getState());
-      console.log('Available Actions:', Object.keys(store.getState()).filter(key => typeof store.getState()[key] === 'function'));
+      const getState = store.getState as (() => Record<string, unknown>) | undefined;
+      const state = getState ? getState() : {};
+      console.log('Current State:', state);
+      console.log('Available Actions:', Object.keys(state).filter(key => typeof state[key] === 'function'));
       console.groupEnd();
     }
   }
@@ -90,11 +95,18 @@ export const debugMiddleware = (storeName: string) => <T>(config: (set: (...args
   // Add debugging methods to store
   if (process.env.NODE_ENV === 'development') {
     (store as Record<string, unknown>).__debug = {
-      inspect: () => storeDebug.inspectStore(storeName, store),
+      inspect: () => storeDebug.inspectStore(storeName, store as unknown as Record<string, unknown>),
       getState: () => get(),
-      reset: () => set(store.getInitialState?.() || {}),
+      reset: () => {
+        const storeWithInit = store as Record<string, unknown> & { getInitialState?: () => unknown };
+        set((storeWithInit.getInitialState?.() ?? {}) as object);
+      },
     };
   }
 
   return store;
 };
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}

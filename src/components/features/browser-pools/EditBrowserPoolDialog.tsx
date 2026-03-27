@@ -39,7 +39,7 @@ export function EditBrowserPoolDialog({ open, onOpenChange, pool }: EditBrowserP
 
   const initialData: Partial<BrowserPoolFormData> = pool
     ? { name: pool.name, description: pool.description ?? "", session_ids: pool.session_ids ?? [] }
-    : undefined;
+    : {};
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
