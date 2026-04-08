@@ -2,6 +2,7 @@ import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
 import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange, EdgeChange } from "reactflow";
 import { useWorkflowCanvasStore } from "@/stores";
+import { useWorkflowClipboardStore } from "@/stores/workflow/workflow-clipboard-store";
 import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { TWorkflowNodeCreateRequest } from "@/types";
 
@@ -20,6 +21,21 @@ const EDGE_COLORS = {
   default: "var(--primary)",
   success: "var(--success)",
 };
+
+/** Maps sidebar line type to custom edge component ids (see workflow-edge.tsx). */
+export function mapLineTypeToWorkflowEdgeType(lineType: string): string {
+  switch (lineType) {
+    case "straight":
+      return "workflowStraight";
+    case "step":
+      return "workflowStep";
+    case "smoothstep":
+      return "workflowSmoothStep";
+    case "smooth":
+    default:
+      return "workflowBezier";
+  }
+}
 
 export const useWorkflowState = ({
   workflowId,
@@ -72,7 +88,7 @@ export const useWorkflowState = ({
         source: connection.source,
         target: connection.target,
         sourceHandle: connection.sourceHandle || 'default',
-        type: lineType,
+        type: mapLineTypeToWorkflowEdgeType(lineType),
         animated: isRunning,
         style: { 
           stroke: highlightColor || EDGE_COLORS.default,
@@ -110,13 +126,26 @@ export const useWorkflowState = ({
     updateNodePosition(node.id, node.position);
   }, [updateNodePosition]);
 
-  // Sync ReactFlow state with workflow store
+  // Sync ReactFlow state with workflow store. Must preserve `selected` from RF local state —
+  // a full replace would clear clicks/marquee whenever reactFlowEdges changes (e.g. highlightedEdges).
   useEffect(() => {
-    setNodes(reactFlowNodes);
+    setNodes((current) => {
+      const selectedById = new Map(current.map((n) => [n.id, n.selected]));
+      return reactFlowNodes.map((rn) => ({
+        ...rn,
+        selected: selectedById.get(rn.id) ?? false,
+      }));
+    });
   }, [reactFlowNodes, setNodes]);
 
   useEffect(() => {
-    setEdges(reactFlowEdges);
+    setEdges((current) => {
+      const selectedById = new Map(current.map((e) => [e.id, e.selected]));
+      return reactFlowEdges.map((re) => ({
+        ...re,
+        selected: selectedById.get(re.id) ?? false,
+      }));
+    });
   }, [reactFlowEdges, setEdges]);
 
   // Load workflow data on mount
@@ -126,12 +155,27 @@ export const useWorkflowState = ({
     }
   }, [workflowId, loadWorkflowCanvas]);
 
+  // Drop selection ids that no longer exist (e.g. after delete or refresh)
+  useEffect(() => {
+    const validNodeIds = new Set(workflowNodes.map((n) => n.id));
+    const validEdgeIds = new Set(workflowConnections.map((c) => c.id));
+    const clip = useWorkflowClipboardStore.getState();
+    const nextNodes = clip.selectedNodeIds.filter((id) => validNodeIds.has(id));
+    const nextEdges = clip.selectedEdgeIds.filter((id) => validEdgeIds.has(id));
+    if (
+      nextNodes.length !== clip.selectedNodeIds.length ||
+      nextEdges.length !== clip.selectedEdgeIds.length
+    ) {
+      clip.setCanvasSelection(nextNodes, nextEdges);
+    }
+  }, [workflowNodes, workflowConnections]);
+
   // Update existing edges when lineType changes
   useEffect(() => {
     setEdges((currentEdges) =>
       currentEdges.map((edge) => ({
         ...edge,
-        type: lineType,
+        type: mapLineTypeToWorkflowEdgeType(lineType),
       }))
     );
   }, [lineType, setEdges]);
@@ -244,7 +288,20 @@ export const useWorkflowState = ({
     return outputData;
   }, []); // No dependencies - reads directly from store each time
 
-  // Update node selection and add delete callback, workflow context, and execution state
+  // Selection must stay on React Flow internal state only. Mirroring Zustand → `selected` here
+  // caused an infinite update loop during marquee selection (onSelectionChange ↔ props).
+
+  const applyCanvasSelection = useCallback(
+    (nodeIds: string[], edgeIds: string[]) => {
+      const nodeSet = new Set(nodeIds);
+      const edgeSet = new Set(edgeIds);
+      setNodes((nds) => nds.map((n) => ({ ...n, selected: nodeSet.has(n.id) })));
+      setEdges((eds) => eds.map((e) => ({ ...e, selected: edgeSet.has(e.id) })));
+    },
+    [setNodes, setEdges]
+  );
+
+  // Update node data and add delete callback, workflow context, and execution state
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
       ...node,
@@ -271,6 +328,7 @@ export const useWorkflowState = ({
     onConnect,
     onNodeDragStop: handleNodeDragStop,
     addNodeFromDrag,
+    applyCanvasSelection,
     removeNode,
     isLoading,
     isSaving,

@@ -52,7 +52,10 @@ interface WorkflowCanvasActions {
   refreshWorkflowCanvas: () => Promise<void>;
   
   // Node Operations
-  addNode: (nodeData: TWorkflowNodeCreateRequest) => Promise<BackendWorkflowNode | null>;
+  addNode: (
+    nodeData: TWorkflowNodeCreateRequest,
+    options?: { silent?: boolean }
+  ) => Promise<BackendWorkflowNode | null>;
   updateNodePosition: (nodeId: string, position: { x: number; y: number }) => Promise<void>;
   updateNodeFormValues: (nodeId: string, formValues: Record<string, unknown>) => Promise<void>;
   updateNodeExecutionData: (nodeId: string, data: { 
@@ -63,7 +66,10 @@ interface WorkflowCanvasActions {
   removeNode: (nodeId: string) => Promise<void>;
   
   // Connection Operations
-  addConnection: (connectionData: TWorkflowConnectionCreateRequest) => Promise<TWorkflowConnection | null>;
+  addConnection: (
+    connectionData: TWorkflowConnectionCreateRequest,
+    options?: { silent?: boolean }
+  ) => Promise<TWorkflowConnection | null>;
   removeConnection: (connectionId: string) => Promise<void>;
   
   // UI State Management
@@ -172,12 +178,14 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         },
 
         // Node Operations
-        addNode: async (nodeData: TWorkflowNodeCreateRequest) => {
+        addNode: async (nodeData: TWorkflowNodeCreateRequest, options?: { silent?: boolean }) => {
           const { workflowId } = get();
           if (!workflowId) {
             toastService.error('No workflow selected');
             return null;
           }
+
+          const silent = options?.silent === true;
 
           set((state) => {
             state.isSaving = true;
@@ -195,9 +203,11 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = null;
             });
 
-            toastService.success('Node added successfully!', {
-              description: `"${response.node_type?.name || 'Node'}" has been added to the workflow.`,
-            });
+            if (!silent) {
+              toastService.success('Node added successfully!', {
+                description: `"${response.node_type?.name || 'Node'}" has been added to the workflow.`,
+              });
+            }
 
             return newNode;
           } catch (error) {
@@ -333,12 +343,17 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
         },
 
         // Connection Operations
-        addConnection: async (connectionData: TWorkflowConnectionCreateRequest) => {
+        addConnection: async (
+          connectionData: TWorkflowConnectionCreateRequest,
+          options?: { silent?: boolean }
+        ) => {
           const { workflowId } = get();
           if (!workflowId) {
             toastService.error('No workflow selected');
             return null;
           }
+
+          const silent = options?.silent === true;
 
           set((state) => {
             state.isSaving = true;
@@ -354,7 +369,9 @@ export const useWorkflowCanvasStore = create<WorkflowCanvasStore>()(
               state.error = null;
             });
 
-            toastService.success('Connection added successfully!');
+            if (!silent) {
+              toastService.success('Connection added successfully!');
+            }
             return newConnection;
           } catch (error) {
             const errorMessage = error instanceof Error 

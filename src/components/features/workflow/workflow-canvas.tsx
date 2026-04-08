@@ -1,20 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import ReactFlow, {
   Controls,
   Background,
   BackgroundVariant,
   MiniMap,
   ConnectionLineType,
+  type OnSelectionChangeFunc,
 } from "reactflow";
+import { SelectionMode } from "@reactflow/core";
 import "reactflow/dist/style.css";
 
-import { useWorkflowState } from "@/hooks/useWorkflowState";
+import { useWorkflowState, mapLineTypeToWorkflowEdgeType } from "@/hooks/useWorkflowState";
 import { useWorkflowDragDrop } from "@/hooks/useWorkflowDragDrop";
 import { nodeTypes } from "./nodeTypes";
+import { workflowEdgeTypes } from "./workflow-edge";
 import DragOverlay from "./DragOverlay";
 import { useWorkflowCanvasStore } from "@/stores/workflow/workflow-canvas-store";
+import { useWorkflowClipboardStore } from "@/stores/workflow/workflow-clipboard-store";
+import { toastService } from "@/lib/services/toast-service";
+
+function isEditableDocumentTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (target.isContentEditable) return true;
+  return Boolean(target.closest('[role="textbox"]'));
+}
 
 const FLOW_COLORS = {
   connection: "var(--primary)",
@@ -62,6 +75,7 @@ export function WorkflowCanvas({
     onConnect,
     onNodeDragStop,
     addNodeFromDrag,
+    applyCanvasSelection,
     isLoading,
     isSaving,
     error,
@@ -87,7 +101,78 @@ export function WorkflowCanvas({
     onDrop,
   } = useWorkflowDragDrop({ addNodeFromDrag, setIsDragOver, workflowType });
 
-  React.useEffect(() => {
+  useEffect(() => {
+    useWorkflowClipboardStore.getState().resetForWorkflowChange();
+  }, [workflowId]);
+
+  const onSelectionChange = useCallback<OnSelectionChangeFunc>(
+    ({ nodes: selectedFlowNodes, edges: selectedFlowEdges }) => {
+      if (isRunning) return;
+      useWorkflowClipboardStore.getState().setCanvasSelection(
+        selectedFlowNodes.map((n) => n.id),
+        selectedFlowEdges.map((e) => e.id)
+      );
+    },
+    [isRunning]
+  );
+
+  useEffect(() => {
+    if (isRunning || isLoading || error) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      if (isEditableDocumentTarget(event.target)) return;
+
+      const key = event.key.toLowerCase();
+      if (key === "c") {
+        event.preventDefault();
+        void (async () => {
+          const { selectedNodeIds, copySelection } = useWorkflowClipboardStore.getState();
+          if (selectedNodeIds.length === 0) {
+            toastService.info("Nothing selected", {
+              description: "Select one or more nodes to copy.",
+            });
+            return;
+          }
+          const ok = await copySelection();
+          const clip = useWorkflowClipboardStore.getState().clipboard;
+          if (ok && clip) {
+            toastService.success("Copied", {
+              description: `${clip.nodes.length} node(s), ${clip.edges.length} internal connection(s).`,
+            });
+          }
+        })();
+        return;
+      }
+
+      if (key === "v") {
+        event.preventDefault();
+        void (async () => {
+          const { pasteClipboard, setCanvasSelection } = useWorkflowClipboardStore.getState();
+          const { newNodeIds, newEdgeIds } = await pasteClipboard();
+          if (newNodeIds.length === 0) {
+            toastService.info("Nothing to paste", {
+              description: "Copy a selection first (Ctrl+C).",
+            });
+            return;
+          }
+          setCanvasSelection(newNodeIds, newEdgeIds);
+          // Defer until useWorkflowState has synced new nodes from the canvas store (avoids racing setNodes).
+          window.setTimeout(() => {
+            applyCanvasSelection(newNodeIds, newEdgeIds);
+          }, 0);
+          toastService.success("Pasted", {
+            description: `${newNodeIds.length} node(s)${newEdgeIds.length ? `, ${newEdgeIds.length} connection(s)` : ""}.`,
+          });
+        })();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isRunning, isLoading, error, applyCanvasSelection]);
+
+  useEffect(() => {
     return () => {
       if (clearBlinkTimeoutRef.current !== null) {
         window.clearTimeout(clearBlinkTimeoutRef.current);
@@ -95,7 +180,7 @@ export function WorkflowCanvas({
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!locateRequest || !reactFlowInstance) {
       return;
     }
@@ -198,7 +283,9 @@ export function WorkflowCanvas({
         onDrop={isRunning ? undefined : onDrop}
         onDragOver={isRunning ? undefined : onDragOver}
         onDragLeave={isRunning ? undefined : onDragLeave}
+        onSelectionChange={isRunning ? undefined : onSelectionChange}
         nodeTypes={nodeTypes}
+        edgeTypes={workflowEdgeTypes}
         fitView
         className="bg-background"
         connectionLineStyle={{ stroke: FLOW_COLORS.connection, strokeWidth: 2 }}
@@ -212,12 +299,17 @@ export function WorkflowCanvas({
             stroke: isRunning ? FLOW_COLORS.running : FLOW_COLORS.connection,
             strokeWidth: 2,
           },
-          type: lineType,
+          type: mapLineTypeToWorkflowEdgeType(lineType),
         }}
         nodesDraggable={!isRunning}
         nodesConnectable={!isRunning}
         elementsSelectable={!isRunning}
         deleteKeyCode={isRunning ? null : 'Delete'}
+        selectionOnDrag={!isRunning}
+        selectionMode={SelectionMode.Partial}
+        panOnDrag={isRunning ? true : [1, 2]}
+        selectNodesOnDrag={false}
+        elevateEdgesOnSelect
       >
         <Controls />
         {showMinimap && (

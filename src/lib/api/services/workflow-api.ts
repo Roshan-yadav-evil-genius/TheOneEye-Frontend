@@ -5,7 +5,7 @@ import {
   TWorkflowCanvasData,
   TWorkflowNodeCreateRequest,
   TWorkflowConnectionCreateRequest,
-  TWorkflowNodeCreateResponse,
+  BackendWorkflowNode,
   BackendWorkflowCanvasResponse,
   BackendWorkflowConnection,
   WorkflowNodeExecuteResponse,
@@ -72,15 +72,19 @@ class WorkflowApiService extends BaseApiService {
   async addNodeToWorkflow(
     workflowId: string, 
     nodeData: TWorkflowNodeCreateRequest
-  ): Promise<TWorkflowNodeCreateResponse> {
-    const response = await this.post<TWorkflowNodeCreateResponse>(`/workflow/${workflowId}/nodes/add/`, nodeData);
-    
-    return {
-      id: response.id,
-      position: response.position,
-      form_values: response.form_values,
-      node_type: response.node_type
+  ): Promise<BackendWorkflowNode> {
+    const body: Record<string, unknown> = {
+      nodeTemplate: nodeData.nodeTemplate,
+      position: nodeData.position,
+      form_values: nodeData.form_values ?? {},
     };
+    if (nodeData.input_data !== undefined) body.input_data = nodeData.input_data;
+    if (nodeData.output_data !== undefined) body.output_data = nodeData.output_data;
+    if (nodeData.config !== undefined) body.config = nodeData.config;
+
+    // Return full canvas node payload so pasted nodes keep input_data / output_data from the API.
+    const response = await this.post<BackendWorkflowNode>(`/workflow/${workflowId}/nodes/add/`, body);
+    return response;
   }
 
   async updateNodePosition(

@@ -17,6 +17,10 @@ export interface TWorkflowNodeCreateRequest {
     y: number;
   };
   form_values?: Record<string, unknown>;
+  /** Optional; used when duplicating nodes (canvas paste). */
+  input_data?: Record<string, unknown>;
+  output_data?: Record<string, unknown>;
+  config?: Record<string, unknown>;
 }
 
 export interface TWorkflowConnectionCreateRequest {

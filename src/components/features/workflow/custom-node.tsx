@@ -160,7 +160,9 @@ export function CustomNode({
       {/* Node Container */}
       <div 
         className={`relative w-32 h-24 rounded-lg border-2 bg-card shadow-sm transition-all duration-200 ${
-          selected ? "ring-2 ring-primary ring-offset-2" : ""
+          selected
+            ? "ring-2 ring-primary ring-offset-2 ring-offset-background border-primary"
+            : ""
         } ${isBlinking ? "workflow-node-blink" : ""} ${colorClass}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
