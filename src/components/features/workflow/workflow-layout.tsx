@@ -25,7 +25,6 @@ const MAX_SIDEBAR_WIDTH = 600;
 
 export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
   const {
-    selectedNodes,
     searchTerm,
     filters,
     isSidebarCollapsed,
@@ -33,7 +32,6 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
     showMinimap,
     setSearchTerm,
     setFilters,
-    handleNodeSelect,
     handleLineTypeChange,
     handleMinimapToggle,
     handleToggleSidebar,
@@ -117,8 +115,6 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
             onSearchChange={setSearchTerm}
             filters={filters}
             onFiltersChange={setFilters}
-            selectedNodes={selectedNodes}
-            onNodeSelect={handleNodeSelect}
             isExecuting={isRunning}
           />
           
@@ -163,7 +159,6 @@ export function WorkflowLayout({ workflowId }: WorkflowLayoutProps = {}) {
           {workflowId && (
             <WorkflowCanvas
               workflowId={workflowId}
-              selectedNodes={selectedNodes}
               searchTerm={searchTerm}
               filters={filters}
               lineType={lineType}

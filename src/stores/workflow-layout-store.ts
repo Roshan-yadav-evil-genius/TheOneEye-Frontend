@@ -15,9 +15,6 @@ interface WorkflowLayoutState {
     nodeGroup: string;
   };
   
-  // Node selection
-  selectedNodes: string[];
-  
   // Canvas viewport (for future persistence)
   viewport: {
     x: number;
@@ -58,13 +55,6 @@ interface WorkflowLayoutStoreActions {
   setFilters: (workflowId: string, filters: Partial<WorkflowLayoutState['filters']>) => void;
   clearFilters: (workflowId: string) => void;
   
-  // Node selection
-  setSelectedNodes: (workflowId: string, nodeIds: string[]) => void;
-  addSelectedNode: (workflowId: string, nodeId: string) => void;
-  removeSelectedNode: (workflowId: string, nodeId: string) => void;
-  toggleNodeSelection: (workflowId: string, nodeId: string) => void;
-  clearSelection: (workflowId: string) => void;
-  
   // Viewport management (for future use)
   setViewport: (workflowId: string, viewport: WorkflowLayoutState['viewport']) => void;
   resetViewport: (workflowId: string) => void;
@@ -85,7 +75,6 @@ const defaultLayoutState: WorkflowLayoutState = {
   filters: {
     nodeGroup: 'all',
   },
-  selectedNodes: [],
   viewport: null,
 };
 
@@ -207,62 +196,6 @@ export const useWorkflowLayoutStore = create<WorkflowLayoutStore>()(
           });
         },
 
-        // Node selection
-        setSelectedNodes: (workflowId: string, nodeIds: string[]) => {
-          set((state) => {
-            if (!state.layouts[workflowId]) {
-              state.layouts[workflowId] = { ...defaultLayoutState };
-            }
-            state.layouts[workflowId].selectedNodes = nodeIds;
-          });
-        },
-
-        addSelectedNode: (workflowId: string, nodeId: string) => {
-          set((state) => {
-            if (!state.layouts[workflowId]) {
-              state.layouts[workflowId] = { ...defaultLayoutState };
-            }
-            if (!state.layouts[workflowId].selectedNodes.includes(nodeId)) {
-              state.layouts[workflowId].selectedNodes.push(nodeId);
-            }
-          });
-        },
-
-        removeSelectedNode: (workflowId: string, nodeId: string) => {
-          set((state) => {
-            if (!state.layouts[workflowId]) {
-              state.layouts[workflowId] = { ...defaultLayoutState };
-            }
-            state.layouts[workflowId].selectedNodes = state.layouts[workflowId].selectedNodes.filter(
-              id => id !== nodeId
-            );
-          });
-        },
-
-        toggleNodeSelection: (workflowId: string, nodeId: string) => {
-          set((state) => {
-            if (!state.layouts[workflowId]) {
-              state.layouts[workflowId] = { ...defaultLayoutState };
-            }
-            const selectedNodes = state.layouts[workflowId].selectedNodes;
-            const index = selectedNodes.indexOf(nodeId);
-            if (index > -1) {
-              selectedNodes.splice(index, 1);
-            } else {
-              selectedNodes.push(nodeId);
-            }
-          });
-        },
-
-        clearSelection: (workflowId: string) => {
-          set((state) => {
-            if (!state.layouts[workflowId]) {
-              state.layouts[workflowId] = { ...defaultLayoutState };
-            }
-            state.layouts[workflowId].selectedNodes = [];
-          });
-        },
-
         // Viewport management
         setViewport: (workflowId: string, viewport: WorkflowLayoutState['viewport']) => {
           set((state) => {
@@ -344,11 +277,6 @@ export const useWorkflowLayout = (workflowId?: string) => {
     setSearchTerm,
     setFilters,
     clearFilters,
-    setSelectedNodes,
-    addSelectedNode,
-    removeSelectedNode,
-    toggleNodeSelection,
-    clearSelection,
     setViewport,
     resetViewport,
   } = useWorkflowLayoutStore();
@@ -369,7 +297,6 @@ export const useWorkflowLayout = (workflowId?: string) => {
     showMinimap: layout.showMinimap,
     searchTerm: layout.searchTerm,
     filters: layout.filters,
-    selectedNodes: layout.selectedNodes,
     viewport: layout.viewport,
 
     // Actions
@@ -381,11 +308,6 @@ export const useWorkflowLayout = (workflowId?: string) => {
     setSearchTerm: (searchTerm: string) => workflowId && setSearchTerm(workflowId, searchTerm),
     setFilters: (filters: Partial<WorkflowLayoutState['filters']>) => workflowId && setFilters(workflowId, filters),
     clearFilters: () => workflowId && clearFilters(workflowId),
-    setSelectedNodes: (nodeIds: string[]) => workflowId && setSelectedNodes(workflowId, nodeIds),
-    addSelectedNode: (nodeId: string) => workflowId && addSelectedNode(workflowId, nodeId),
-    removeSelectedNode: (nodeId: string) => workflowId && removeSelectedNode(workflowId, nodeId),
-    toggleNodeSelection: (nodeId: string) => workflowId && toggleNodeSelection(workflowId, nodeId),
-    clearSelection: () => workflowId && clearSelection(workflowId),
     setViewport: (viewport: WorkflowLayoutState['viewport']) => workflowId && setViewport(workflowId, viewport),
     resetViewport: () => workflowId && resetViewport(workflowId),
   };

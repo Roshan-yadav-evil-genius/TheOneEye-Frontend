@@ -17,8 +17,6 @@ interface WorkflowSidebarProps {
     nodeGroup: string;
   };
   onFiltersChange: (filters: { nodeGroup: string }) => void;
-  selectedNodes: string[];
-  onNodeSelect: (nodeId: string) => void;
   isExecuting?: boolean;
 }
 
@@ -27,8 +25,6 @@ export function WorkflowSidebar({
   onSearchChange,
   filters,
   onFiltersChange,
-  selectedNodes,
-  onNodeSelect,
   isExecuting = false,
 }: WorkflowSidebarProps) {
   const nodesViewMode = useUIStore((state) => state.nodesViewMode);

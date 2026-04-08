@@ -27,7 +27,6 @@ const FLOW_COLORS = {
 
 interface WorkflowCanvasProps {
   workflowId: string;
-  selectedNodes: string[];
   searchTerm: string;
   filters: {
     nodeGroup: string;
@@ -41,7 +40,6 @@ interface WorkflowCanvasProps {
 
 export function WorkflowCanvas({
   workflowId,
-  selectedNodes,
   searchTerm,
   filters,
   lineType,
@@ -70,7 +68,6 @@ export function WorkflowCanvas({
   } = useWorkflowState({
     workflowId,
     lineType,
-    selectedNodes,
     searchTerm,
     filters,
     isRunning,

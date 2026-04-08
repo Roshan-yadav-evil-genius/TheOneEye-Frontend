@@ -7,10 +7,6 @@ interface UseWorkflowLayoutProps {
 export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) => {
   const storeHook = useWorkflowLayoutStore(workflowId);
 
-  const handleNodeSelect = (nodeId: string) => {
-    storeHook.toggleNodeSelection(nodeId);
-  };
-
   const handleLineTypeChange = (type: string) => {
     storeHook.setLineType(type);
   };
@@ -25,7 +21,6 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
 
   return {
     // State
-    selectedNodes: storeHook.selectedNodes,
     searchTerm: storeHook.searchTerm,
     filters: storeHook.filters,
     isSidebarCollapsed: storeHook.isSidebarCollapsed,
@@ -35,7 +30,6 @@ export const useWorkflowLayout = ({ workflowId }: UseWorkflowLayoutProps = {}) =
     // Actions
     setSearchTerm: storeHook.setSearchTerm,
     setFilters: storeHook.setFilters,
-    handleNodeSelect,
     handleLineTypeChange,
     handleMinimapToggle,
     handleToggleSidebar,

@@ -8,7 +8,6 @@ import { TWorkflowNodeCreateRequest } from "@/types";
 interface WorkflowStateProps {
   workflowId: string;
   lineType: string;
-  selectedNodes: string[];
   searchTerm: string;
   filters: {
     nodeGroup: string;
@@ -25,7 +24,6 @@ const EDGE_COLORS = {
 export const useWorkflowState = ({
   workflowId,
   lineType,
-  selectedNodes,
   searchTerm,
   filters,
   isRunning,
@@ -250,7 +248,6 @@ export const useWorkflowState = ({
   const updatedNodes = useMemo(() => {
     return nodes.map(node => ({
       ...node,
-      selected: selectedNodes.includes(node.id),
       data: {
         ...node.data,
         onDeleteNode: removeNode,
@@ -261,7 +258,7 @@ export const useWorkflowState = ({
         isBlinking: node.id === blinkingNodeId,
       },
     }));
-  }, [nodes, selectedNodes, removeNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isRunning, blinkingNodeId]);
+  }, [nodes, removeNode, workflowId, getConnectedNodeOutput, highlightNodeOutputEdges, isRunning, blinkingNodeId]);
 
   return {
     nodes: updatedNodes,
