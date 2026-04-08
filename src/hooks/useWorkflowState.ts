@@ -2,7 +2,8 @@ import { useCallback, useMemo, useEffect } from "react";
 import React from "react";
 import { Node, Edge, Connection, useNodesState, useEdgesState, NodeChange, EdgeChange } from "reactflow";
 import { useWorkflowCanvasStore } from "@/stores";
-import { useWorkflowClipboardStore } from "@/stores/workflow/workflow-clipboard-store";
+import { useApplyProgrammaticReactFlowSelection } from "@/hooks/workflow/useApplyProgrammaticReactFlowSelection";
+import { usePruneClipboardSelectionWhenGraphChanges } from "@/hooks/workflow/usePruneClipboardSelectionWhenGraphChanges";
 import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { TWorkflowNodeCreateRequest } from "@/types";
 
@@ -101,6 +102,9 @@ export const useWorkflowState = ({
   const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(reactFlowEdges);
 
+  const applyCanvasSelection = useApplyProgrammaticReactFlowSelection(setNodes, setEdges);
+  usePruneClipboardSelectionWhenGraphChanges(workflowNodes, workflowConnections);
+
   // Custom handler for node changes: persist removals (Delete / multi-select delete), then apply to RF state
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -173,21 +177,6 @@ export const useWorkflowState = ({
       loadWorkflowCanvas(workflowId);
     }
   }, [workflowId, loadWorkflowCanvas]);
-
-  // Drop selection ids that no longer exist (e.g. after delete or refresh)
-  useEffect(() => {
-    const validNodeIds = new Set(workflowNodes.map((n) => n.id));
-    const validEdgeIds = new Set(workflowConnections.map((c) => c.id));
-    const clip = useWorkflowClipboardStore.getState();
-    const nextNodes = clip.selectedNodeIds.filter((id) => validNodeIds.has(id));
-    const nextEdges = clip.selectedEdgeIds.filter((id) => validEdgeIds.has(id));
-    if (
-      nextNodes.length !== clip.selectedNodeIds.length ||
-      nextEdges.length !== clip.selectedEdgeIds.length
-    ) {
-      clip.setCanvasSelection(nextNodes, nextEdges);
-    }
-  }, [workflowNodes, workflowConnections]);
 
   // Update existing edges when lineType changes
   useEffect(() => {
@@ -309,16 +298,7 @@ export const useWorkflowState = ({
 
   // Selection must stay on React Flow internal state only. Mirroring Zustand → `selected` here
   // caused an infinite update loop during marquee selection (onSelectionChange ↔ props).
-
-  const applyCanvasSelection = useCallback(
-    (nodeIds: string[], edgeIds: string[]) => {
-      const nodeSet = new Set(nodeIds);
-      const edgeSet = new Set(edgeIds);
-      setNodes((nds) => nds.map((n) => ({ ...n, selected: nodeSet.has(n.id) })));
-      setEdges((eds) => eds.map((e) => ({ ...e, selected: edgeSet.has(e.id) })));
-    },
-    [setNodes, setEdges]
-  );
+  // Programmatic selection: useApplyProgrammaticReactFlowSelection → applyCanvasSelection.
 
   // Update node data and add delete callback, workflow context, and execution state
   const updatedNodes = useMemo(() => {
