@@ -101,11 +101,18 @@ export const useWorkflowState = ({
   const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(reactFlowEdges);
 
-  // Custom handler for node changes that also saves position to backend
-  const handleNodesChange = useCallback((changes: NodeChange[]) => {
-    // Apply changes to local state first
-    onNodesChange(changes);
-  }, [onNodesChange]);
+  // Custom handler for node changes: persist removals (Delete / multi-select delete), then apply to RF state
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      changes.forEach((change) => {
+        if (change.type === 'remove') {
+          void removeNode(change.id);
+        }
+      });
+      onNodesChange(changes);
+    },
+    [onNodesChange, removeNode]
+  );
 
   // Custom handler for edge changes that persists deletions to backend
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
@@ -124,6 +131,19 @@ export const useWorkflowState = ({
   const handleNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
     updateNodePosition(node.id, node.position);
   }, [updateNodePosition]);
+
+  // Persist all nodes after a multi-select drag (single-node drags use handleNodeDragStop only).
+  const handleSelectionDragStop = useCallback(
+    (_event: React.MouseEvent, draggedNodes: Node[]) => {
+      if (isRunning || draggedNodes.length < 2) {
+        return;
+      }
+      void Promise.all(
+        draggedNodes.map((n) => updateNodePosition(n.id, n.position))
+      );
+    },
+    [isRunning, updateNodePosition]
+  );
 
   // Sync ReactFlow state with workflow store. Must preserve `selected` from RF local state —
   // a full replace would clear clicks/marquee whenever reactFlowEdges changes (e.g. highlightedEdges).
@@ -326,6 +346,7 @@ export const useWorkflowState = ({
     onEdgesChange: handleEdgesChange,
     onConnect,
     onNodeDragStop: handleNodeDragStop,
+    onSelectionDragStop: handleSelectionDragStop,
     addNodeFromDrag,
     applyCanvasSelection,
     removeNode,

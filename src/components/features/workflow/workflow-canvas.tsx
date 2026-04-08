@@ -11,6 +11,7 @@ import ReactFlow, {
 } from "reactflow";
 import { SelectionMode } from "@reactflow/core";
 import "reactflow/dist/style.css";
+import "./workflow-canvas.css";
 
 import { useWorkflowState, mapLineTypeToWorkflowEdgeType } from "@/hooks/useWorkflowState";
 import { useWorkflowDragDrop } from "@/hooks/useWorkflowDragDrop";
@@ -74,6 +75,7 @@ export function WorkflowCanvas({
     onEdgesChange,
     onConnect,
     onNodeDragStop,
+    onSelectionDragStop,
     addNodeFromDrag,
     applyCanvasSelection,
     isLoading,
@@ -251,7 +253,7 @@ export function WorkflowCanvas({
   }
 
   return (
-    <div className="h-full w-full relative" ref={reactFlowWrapper}>
+    <div className="workflow-canvas h-full w-full relative" ref={reactFlowWrapper}>
       {/* Saving indicator */}
       {isSaving && (
         <div className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-sm border rounded-lg px-3 py-2 flex items-center gap-2">
@@ -279,6 +281,7 @@ export function WorkflowCanvas({
         onEdgesChange={isRunning ? undefined : onEdgesChange}
         onConnect={isRunning ? undefined : onConnect}
         onNodeDragStop={isRunning ? undefined : onNodeDragStop}
+        onSelectionDragStop={isRunning ? undefined : onSelectionDragStop}
         onInit={setReactFlowInstance}
         onDrop={isRunning ? undefined : onDrop}
         onDragOver={isRunning ? undefined : onDragOver}

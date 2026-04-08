@@ -1,0 +1,7 @@
+/* Multi-select group frame: keep hit area for group drag; hide the blue box after selection.
+   Marquee while dragging uses .react-flow__selection — unchanged. */
+.workflow-canvas .react-flow__nodesselection-rect {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none;
+}
