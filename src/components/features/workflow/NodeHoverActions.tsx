@@ -24,12 +24,21 @@ export function NodeHoverActions({
   isExecuting = false,
   isPolling = false
 }: NodeHoverActionsProps) {
+  const stopDragAndPan = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background border border-border rounded-md shadow-lg p-1">
+    <div
+      className="nodrag nopan absolute -top-8 left-1/2 flex -translate-x-1/2 transform gap-1 rounded-md border border-border bg-background p-1 shadow-lg"
+      onMouseDown={stopDragAndPan}
+      onPointerDown={stopDragAndPan}
+      onTouchStart={stopDragAndPan}
+    >
       <Button
         size="sm"
         variant="ghost"
-        className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/20"
+        className="nodrag h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/20"
         onClick={onEdit}
       >
         <IconEdit className="h-3 w-3" />
@@ -37,12 +46,12 @@ export function NodeHoverActions({
       <Button
         size="sm"
         variant="ghost"
-        className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/20"
+        className="nodrag h-6 w-6 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/20"
         onClick={isPolling ? onPause : onPlay}
         disabled={isExecuting && !isPolling}
       >
         {isExecuting && !isPolling ? (
-          <div className="h-3 w-3 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+          <div className="nodrag h-3 w-3 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
         ) : isPolling ? (
           <IconPlayerPause className="h-3 w-3" />
         ) : (
@@ -52,7 +61,7 @@ export function NodeHoverActions({
       <Button
         size="sm"
         variant="ghost"
-        className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20"
+        className="nodrag h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20"
         onClick={onDelete}
       >
         <IconTrash className="h-3 w-3" />

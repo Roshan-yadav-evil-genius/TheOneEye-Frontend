@@ -310,6 +310,8 @@ export function WorkflowCanvas({
         panOnDrag={isRunning ? true : [1, 2]}
         selectNodesOnDrag={false}
         elevateEdgesOnSelect
+        nodeDragThreshold={6}
+        elevateNodesOnSelect={false}
       >
         <Controls />
         {showMinimap && (

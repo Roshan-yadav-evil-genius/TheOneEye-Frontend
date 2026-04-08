@@ -7,7 +7,7 @@ import { NodeHoverActions } from "./NodeHoverActions";
 import { getNodeColor } from "@/constants/node-styles";
 import { NodeLogo } from "@/components/common/node-logo";
 import { BackendWorkflowNode, TNodeMetadata } from "@/types";
-import { IconGripVertical, IconLoader2 } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 import { workflowApi } from "@/lib/api/services/workflow-api";
 import { getIfConditionFromOutput } from "@/lib/utils/workflow-output";
 import { useWorkflowCanvasStore } from "@/stores";
@@ -167,21 +167,13 @@ export function CustomNode({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Drag Handle */}
-        <div 
-          className="drag-handle absolute top-1 left-1 w-4 h-4 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-60 hover:opacity-100 transition-opacity z-10"
-          title="Drag to move node"
-        >
-          <IconGripVertical className="w-3 h-3 text-muted-foreground" />
-        </div>
-
         {/* Input Handles */}
         {inputPorts.map((port, idx) => (
           <Handle
             key={port.id}
             type="target"
             position={Position.Left}
-            className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+            className="nodrag !cursor-crosshair w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
             style={{ 
               left: -6,
               top: `${((idx + 1) / (inputPorts.length + 1)) * 100}%`
@@ -197,7 +189,7 @@ export function CustomNode({
             key={port.id}
             type="source"
             position={Position.Right}
-            className="w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
+            className="nodrag !cursor-crosshair w-3 h-3 bg-primary border-2 border-background hover:bg-primary/80 transition-colors"
             style={{ 
               right: -6,
               top: `${((idx + 1) / (outputPorts.length + 1)) * 100}%`

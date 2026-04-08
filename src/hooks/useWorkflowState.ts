@@ -72,7 +72,6 @@ export const useWorkflowState = ({
         type: 'custom',
         position: workflowNode.position,
         data: workflowNode,
-        dragHandle: '.drag-handle',
       };
     });
   }, [workflowNodes]);
